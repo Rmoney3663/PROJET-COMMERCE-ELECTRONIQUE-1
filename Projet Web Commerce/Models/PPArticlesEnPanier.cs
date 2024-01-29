@@ -1,0 +1,23 @@
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Projet_Web_Commerce.Models
+{
+    public class PPArticlesEnPanier
+    {
+        public int NoPanier { get; set; }
+        public int NoClient { get; set; }
+        public int NoVendeur { get; set; }
+        public int NoProduit { get; set; }
+        public DateTime DateCreation { get; set; }
+        public int NbItems { get; set; }
+        [ForeignKey("NoVendeur")]
+        [InverseProperty("PPArticlesEnPanier")]
+        public virtual PPVendeurs? PPVendeurs { get; set; }
+        [ForeignKey("NoClient")]
+        [InverseProperty("PPArticlesEnPanier")]
+        public virtual PPPanier? PPPAnier { get; set; }
+        [ForeignKey("NoProduit")]
+        [InverseProperty("PPArticlesEnPanier")]
+        public virtual PPProduits? PPProduits { get; set; }
+    }
+}
