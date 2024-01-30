@@ -17,4 +17,4 @@ namespace Projet_Web_Commerce.Models
         public virtual PPVendeurs? PPVendeurs { get; set; }
     }
 }
-}
+
