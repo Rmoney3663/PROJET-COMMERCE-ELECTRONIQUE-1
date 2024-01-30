@@ -5,7 +5,8 @@ namespace Projet_Web_Commerce.Models
     public class PPPoidsLivraisons
     {
         public int CodeLivraison { get; set; }
-        public decimal CodePoids { get; set; }
+        public int CodePoids { get; set; }
+        [Column(TypeName = "smallmoney")]
         public decimal Tarif { get; set; }
 
 

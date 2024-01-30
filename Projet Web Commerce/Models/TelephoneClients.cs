@@ -1,9 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Projet_Web_Commerce.Models
 {
     public class TelephoneClients
     {
+        [Key]
         public int NoClient { get; set; }
         public string Tel { get; set; }
         [ForeignKey("NoClient")]
