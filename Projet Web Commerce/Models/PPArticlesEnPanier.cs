@@ -15,7 +15,7 @@ namespace Projet_Web_Commerce.Models
         public virtual PPVendeurs? PPVendeurs { get; set; }
         [ForeignKey("NoClient")]
         [InverseProperty("PPArticlesEnPanier")]
-        public virtual PPPanier? PPPAnier { get; set; }
+        public virtual PPClients? PPClients { get; set; }
         [ForeignKey("NoProduit")]
         [InverseProperty("PPArticlesEnPanier")]
         public virtual PPProduits? PPProduits { get; set; }
