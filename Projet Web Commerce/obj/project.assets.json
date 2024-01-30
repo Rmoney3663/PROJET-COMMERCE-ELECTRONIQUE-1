@@ -7861,23 +7861,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\r.pruteanu\\.nuget\\packages\\": {},
+    "C:\\Users\\w.burgess\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\r.pruteanu\\PROJET-COMMERCE-ELECTRONIQUE-1\\Projet Web Commerce\\Projet Web Commerce.csproj",
+      "projectUniqueName": "C:\\Users\\w.burgess\\Documents\\GitHub\\PROJET-COMMERCE-LECTRONIQUE-1\\Projet Web Commerce\\Projet Web Commerce.csproj",
       "projectName": "Projet Web Commerce",
-      "projectPath": "C:\\Users\\r.pruteanu\\PROJET-COMMERCE-ELECTRONIQUE-1\\Projet Web Commerce\\Projet Web Commerce.csproj",
-      "packagesPath": "C:\\Users\\r.pruteanu\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\r.pruteanu\\PROJET-COMMERCE-ELECTRONIQUE-1\\Projet Web Commerce\\obj\\",
+      "projectPath": "C:\\Users\\w.burgess\\Documents\\GitHub\\PROJET-COMMERCE-LECTRONIQUE-1\\Projet Web Commerce\\Projet Web Commerce.csproj",
+      "packagesPath": "C:\\Users\\w.burgess\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\w.burgess\\Documents\\GitHub\\PROJET-COMMERCE-LECTRONIQUE-1\\Projet Web Commerce\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\r.pruteanu\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\w.burgess\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
