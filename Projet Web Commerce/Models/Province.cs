@@ -10,8 +10,8 @@ namespace Projet_Web_Commerce.Models
         public string Nom { get; set; }
 
         [InverseProperty("Province")]
-        public virtual ICollection<PPClientAdresse>? PPClientAdresse { get; set; }
+        public virtual ICollection<PPClients>? PPClients { get; set; }
         [InverseProperty("Province")]
-        public virtual ICollection<PPVendeurAdresse>? PPVendeurAdresse { get; set; }
+        public virtual ICollection<PPVendeurs>? PPVendeurs { get; set; }
     }
 }
