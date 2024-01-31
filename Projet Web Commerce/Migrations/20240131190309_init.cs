@@ -289,8 +289,7 @@ namespace Projet_Web_Commerce.Migrations
                 name: "PPClients",
                 columns: table => new
                 {
-                    NoClient = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    NoClient = table.Column<int>(type: "int", nullable: false),
                     DateCreation = table.Column<DateTime>(type: "datetime2", nullable: false),
                     DateMAJ = table.Column<DateTime>(type: "datetime2", nullable: false),
                     NbConnexions = table.Column<int>(type: "int", nullable: false),
@@ -328,8 +327,7 @@ namespace Projet_Web_Commerce.Migrations
                 name: "PPVendeurs",
                 columns: table => new
                 {
-                    NoVendeur = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    NoVendeur = table.Column<int>(type: "int", nullable: false),
                     NomAffaires = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PoidsMaxLivraison = table.Column<int>(type: "int", nullable: false),
                     LivraisonGratuite = table.Column<decimal>(type: "smallmoney", nullable: false),
