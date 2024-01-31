@@ -19,8 +19,6 @@ namespace Projet_Web_Commerce.Models
 
         [Column(TypeName = "decimal(4,2)")]
         public decimal Pourcentage { get; set; }
-        [Column(TypeName = "smallmoney")]
-        public decimal LivraisonGratuite { get; set; }
 
         public string Configuration { get; set; }
 
