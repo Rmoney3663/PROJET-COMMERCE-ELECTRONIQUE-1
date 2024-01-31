@@ -11,14 +11,11 @@
 using System;
 using System.Reflection;
 
+[assembly: Microsoft.AspNetCore.Identity.UI.UIFrameworkAttribute("Bootstrap5")]
 [assembly: System.Reflection.AssemblyCompanyAttribute("Projet Web Commerce")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-<<<<<<< HEAD
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d922c26c7c474051ae21d1c79c2b2402b0653c12")]
-=======
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+08cf15baf6eccc295afe8dc32d49ad2d910c0a57")]
->>>>>>> parent of 54c4b22 (inscription acheteur)
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1ca547ee20d7865c0d17b9fded287439df276bbd")]
 [assembly: System.Reflection.AssemblyProductAttribute("Projet Web Commerce")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Projet Web Commerce")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
