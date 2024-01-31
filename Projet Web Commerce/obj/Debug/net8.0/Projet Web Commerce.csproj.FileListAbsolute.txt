@@ -588,3 +588,6 @@ C:\Users\r.pruteanu\PROJET-COMMERCE-ELECTRONIQUE-1\Projet Web Commerce\obj\Debug
 C:\Users\r.pruteanu\PROJET-COMMERCE-ELECTRONIQUE-1\Projet Web Commerce\obj\Debug\net8.0\Projet Web Commerce.pdb
 C:\Users\r.pruteanu\PROJET-COMMERCE-ELECTRONIQUE-1\Projet Web Commerce\obj\Debug\net8.0\Projet Web Commerce.genruntimeconfig.cache
 C:\Users\r.pruteanu\PROJET-COMMERCE-ELECTRONIQUE-1\Projet Web Commerce\obj\Debug\net8.0\ref\Projet Web Commerce.dll
+C:\Users\r.pruteanu\PROJET-COMMERCE-ELECTRONIQUE-1\Projet Web Commerce\bin\Debug\net8.0\BouncyCastle.Cryptography.dll
+C:\Users\r.pruteanu\PROJET-COMMERCE-ELECTRONIQUE-1\Projet Web Commerce\bin\Debug\net8.0\MailKit.dll
+C:\Users\r.pruteanu\PROJET-COMMERCE-ELECTRONIQUE-1\Projet Web Commerce\bin\Debug\net8.0\MimeKit.dll
