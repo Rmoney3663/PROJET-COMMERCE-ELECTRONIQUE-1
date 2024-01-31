@@ -116,8 +116,19 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
             [Display(Name = "Prix pour livraison gratuite ($ CAD)")]
             public int SelectedNumberLivraison { get; set; }
 
-        }
+            [Required]
+            [Display(Name = "Client doit payer taxe ?")]
+            public bool Tax { get; set; }
 
+            [Required]
+            [Display(Name = "Sélectionner la province")]
+            public string SelectedProvince { get; set; }
+
+            [Required]
+            [Display(Name = "Nom d'affaires")]
+            public string NomAffaires { get; set; }
+
+        }
 
         public async Task OnGetAsync(string returnUrl = null)
         {
@@ -132,6 +143,8 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
             Input.SelectedNumberPoids = 1;
 
             Input.SelectedNumberLivraison = 0;
+            Input.Tax = true;
+            //Input.SelectedProvince= "QC";
         }
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
@@ -142,6 +155,10 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
             {
                 var SelectedNumberPoids = Input.SelectedNumberPoids;
                 var SelectedNumberLivraison = Input.SelectedNumberLivraison;
+                var email = Input.Email;
+                var password = Input.Password;
+                var date = DateTime.Now;
+                var taxe = Input.Tax;
                 var user = CreateUser();
 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
@@ -162,8 +179,8 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
 
 
                     PPVendeurs newRecord = new PPVendeurs()
-                    { IdUtilisateur = user.Id, NoVendeur = lowestNo, 
-                      PoidsMaxLivraison = SelectedNumberPoids, LivraisonGratuite = SelectedNumberLivraison };
+                    { IdUtilisateur = user.Id, NoVendeur = lowestNo, AdresseEmail = email, MotDePasse = password, Taxes = taxe, NomAffaires = Input.NomAffaires,
+                      DateCreation = date, PoidsMaxLivraison = SelectedNumberPoids, LivraisonGratuite = SelectedNumberLivraison };
 
                     context.PPVendeurs.Add(newRecord);
                     context.SaveChanges();
