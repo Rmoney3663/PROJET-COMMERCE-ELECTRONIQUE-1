@@ -8860,6 +8860,7 @@
   "packageFolders": {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     "C:\\Users\\r.pruteanu\\.nuget\\packages\\": {},
 =======
     "C:\\Users\\w.burgess\\.nuget\\packages\\": {},
@@ -8867,6 +8868,9 @@
 =======
     "C:\\Users\\m.nadeau\\.nuget\\packages\\": {},
 >>>>>>> parent of 54c4b22 (inscription acheteur)
+=======
+    "C:\\Users\\r.pruteanu\\.nuget\\packages\\": {},
+>>>>>>> 13976b34668443782dc5f975a7948e14955ac362
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
@@ -8874,11 +8878,15 @@
     "restore": {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 13976b34668443782dc5f975a7948e14955ac362
       "projectUniqueName": "C:\\Users\\r.pruteanu\\PROJET-COMMERCE-ELECTRONIQUE-1\\Projet Web Commerce\\Projet Web Commerce.csproj",
       "projectName": "Projet Web Commerce",
       "projectPath": "C:\\Users\\r.pruteanu\\PROJET-COMMERCE-ELECTRONIQUE-1\\Projet Web Commerce\\Projet Web Commerce.csproj",
       "packagesPath": "C:\\Users\\r.pruteanu\\.nuget\\packages\\",
       "outputPath": "C:\\Users\\r.pruteanu\\PROJET-COMMERCE-ELECTRONIQUE-1\\Projet Web Commerce\\obj\\",
+<<<<<<< HEAD
 =======
       "projectUniqueName": "C:\\Users\\w.burgess\\Documents\\GitHub\\PROJET-COMMERCE-LECTRONIQUE-1\\Projet Web Commerce\\Projet Web Commerce.csproj",
       "projectName": "Projet Web Commerce",
@@ -8893,11 +8901,14 @@
       "packagesPath": "C:\\Users\\m.nadeau\\.nuget\\packages\\",
       "outputPath": "C:\\Users\\m.nadeau\\OneDrive - Cegep Gerald-Godin\\anné3\\Session6\\ProjetIntegration\\PROJET-COMMERCE-ELECTRONIQUE-1\\Projet Web Commerce\\obj\\",
 >>>>>>> parent of 54c4b22 (inscription acheteur)
+=======
+>>>>>>> 13976b34668443782dc5f975a7948e14955ac362
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
         "C:\\Users\\r.pruteanu\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -8907,6 +8918,9 @@
 =======
         "C:\\Users\\m.nadeau\\AppData\\Roaming\\NuGet\\NuGet.Config",
 >>>>>>> parent of 54c4b22 (inscription acheteur)
+=======
+        "C:\\Users\\r.pruteanu\\AppData\\Roaming\\NuGet\\NuGet.Config",
+>>>>>>> 13976b34668443782dc5f975a7948e14955ac362
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],

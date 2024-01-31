@@ -2,6 +2,9 @@
   "version": 2,
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 13976b34668443782dc5f975a7948e14955ac362
   "dgSpecHash": "gRCLoy6Pej+VkDacuaBIqHe3e3M6huan5RVzS2W40OKTv0HFEgsQz8yxwz3LHVcUga1Not1EbCQfoycKv69RVQ==",
   "success": true,
   "projectFilePath": "C:\\Users\\r.pruteanu\\PROJET-COMMERCE-ELECTRONIQUE-1\\Projet Web Commerce\\Projet Web Commerce.csproj",
@@ -190,6 +193,7 @@
     "C:\\Users\\r.pruteanu\\.nuget\\packages\\system.threading.tasks.dataflow\\7.0.0\\system.threading.tasks.dataflow.7.0.0.nupkg.sha512",
     "C:\\Users\\r.pruteanu\\.nuget\\packages\\system.threading.tasks.extensions\\4.5.4\\system.threading.tasks.extensions.4.5.4.nupkg.sha512",
     "C:\\Users\\r.pruteanu\\.nuget\\packages\\system.windows.extensions\\7.0.0\\system.windows.extensions.7.0.0.nupkg.sha512"
+<<<<<<< HEAD
 =======
   "dgSpecHash": "6uQ9LBp1FIjkPpAwffg/iJgEYiRFaB93Ia8CzkL8ujG8l0k+JYuyvVwAo3Ecbdea21r+Ua59fuBepgIPBFcdHA==",
 =======
@@ -570,6 +574,8 @@
     "C:\\Users\\m.nadeau\\.nuget\\packages\\system.threading.tasks.extensions\\4.5.4\\system.threading.tasks.extensions.4.5.4.nupkg.sha512",
     "C:\\Users\\m.nadeau\\.nuget\\packages\\system.windows.extensions\\7.0.0\\system.windows.extensions.7.0.0.nupkg.sha512"
 >>>>>>> parent of 54c4b22 (inscription acheteur)
+=======
+>>>>>>> 13976b34668443782dc5f975a7948e14955ac362
   ],
   "logs": []
 }
