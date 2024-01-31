@@ -44,8 +44,7 @@ public class AuthDbContext : IdentityDbContext<Utilisateur>
     public  DbSet<PPVendeurs> PPVendeurs { get; set; }
 
     public  DbSet<PPVendeursClients> PPVendeursClients { get; set; }
-
-
+    public DbSet<PPGestionnaire> PPGestionnaire { get; set; }
     public  DbSet<Province> Province { get; set; }
 
     public  DbSet<TelephoneClients> TelephoneClients { get; set; }
@@ -163,7 +162,8 @@ public class AuthDbContext : IdentityDbContext<Utilisateur>
             .HasKey(e => new { e.CodeLivraison, e.CodePoids });
 
         builder.Entity<PPClients>().HasKey(x => new { x.NoClient });
-
         builder.Entity<PPVendeurs>().HasKey(x => new { x.NoVendeur });
+        builder.Entity<PPGestionnaire>().HasKey(x => new { x.NoGestionnaire });
+        builder.Entity<PPProduits>().HasKey(x => new { x.NoProduit });
     }
 }

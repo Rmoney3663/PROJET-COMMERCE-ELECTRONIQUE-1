@@ -140,7 +140,7 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
                 Input = new InputModel();
             }
 
-            Input.SelectedNumberPoids = 1;
+            Input.SelectedNumberPoids = 0;
 
             Input.SelectedNumberLivraison = 0;
             Input.Tax = true;
@@ -159,6 +159,7 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
                 var password = Input.Password;
                 var date = DateTime.Now;
                 var taxe = Input.Tax;
+                var province = Input.SelectedProvince;
                 var user = CreateUser();
 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
@@ -174,13 +175,42 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
 
                     var context = new AuthDbContext(optionsBuilder.Options);
 
-                    int lowestNo = context.PPVendeurs.Any() ? context.PPVendeurs.Min(v => v.NoVendeur) : 10;
-                    lowestNo = Math.Min(99, Math.Max(10, lowestNo));
+                    int lowestNo = 10;
 
+                    if (context.PPVendeurs.Any())
+                    {
+                        int minNo = 10;
+                        int maxNo = 99;
+
+                        for (int i = minNo; i <= maxNo; i++)
+                        {
+                            if (!context.PPVendeurs.Any(u => u.NoVendeur == i))
+                            {
+                                lowestNo = i;
+                                break;
+                            }
+                        }
+                    }
+
+                    var pourcentage = 0.00;
+                    if(taxe == true)
+                    {
+                        if(province == "QC")
+                        {
+                            pourcentage = 14.975;
+                        }
+                        else
+                        {
+                            pourcentage = 5.00;
+                        }
+
+                    }
 
                     PPVendeurs newRecord = new PPVendeurs()
-                    { IdUtilisateur = user.Id, NoVendeur = lowestNo, AdresseEmail = email, MotDePasse = password, Taxes = taxe, NomAffaires = Input.NomAffaires,
-                      DateCreation = date, PoidsMaxLivraison = SelectedNumberPoids, LivraisonGratuite = SelectedNumberLivraison, Statut = 0 };
+                    { 
+                      IdUtilisateur = user.Id, NoVendeur = lowestNo, AdresseEmail = email, MotDePasse = password, Taxes = taxe, NomAffaires = Input.NomAffaires, NoProvince = province,
+                      DateCreation = date, PoidsMaxLivraison = SelectedNumberPoids, LivraisonGratuite = SelectedNumberLivraison, Statut = 0, Pourcentage = (decimal?)pourcentage
+                    };
 
                     context.PPVendeurs.Add(newRecord);
                     context.SaveChanges();
@@ -196,8 +226,8 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
                         values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
                         protocol: Request.Scheme);
 
-                    await _emailSender.SendEmailAsync(Input.Email, "Confirmez votre courriel",
-                        $"Veuillez confirmer votre compte en <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>en cliquant ici</a>.");
+                    await Methodes.envoyerCourriel(Input.Email, "Confirmer votre adresse courriel",
+                        $"Veuillez confirmer votre compte en <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>cliquant ici</a>. Votre numéro de vendeur est {lowestNo}");
 
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {

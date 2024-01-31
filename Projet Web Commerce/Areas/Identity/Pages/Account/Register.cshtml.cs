@@ -6,8 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Net;
-using System.Net.Mail;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading;
@@ -19,8 +17,11 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Projet_Web_Commerce.Areas.Identity.Data;
+using Projet_Web_Commerce.Data;
+using Projet_Web_Commerce.Models;
 
 namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
 {
@@ -129,7 +130,37 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
 
                 if (result.Succeeded)
                 {
-                    _logger.LogInformation("L'utilisateur a créé un nouveau compte avec un mot de passe."); 
+                    await _userManager.AddToRoleAsync(user, "Client");
+
+                    var optionsBuilder = new DbContextOptionsBuilder<AuthDbContext>();
+                    optionsBuilder.UseSqlServer("Data Source=tcp:424sql.cgodin.qc.ca,5433;Initial Catalog=BDB68_424Q24;User ID=B68equipe424q24;Password=Password24;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True;Integrated Security=False");
+
+                    var context = new AuthDbContext(optionsBuilder.Options);
+
+                    int lowestNo = 10000;
+
+                    if (context.PPClients.Any())
+                    {
+                        int minNo = 10000;
+                        int maxNo = 99999;
+
+                        for (int i = minNo; i <= maxNo; i++)
+                        {
+                            if (!context.PPClients.Any(u => u.NoClient == i))
+                            {
+                                lowestNo = i;
+                                break;
+                            }
+                        }
+                    }
+                    
+                    PPClients newRecord = new PPClients()
+                    { IdUtilisateur = user.Id, NoClient = lowestNo, MotDePasse= Input.Password, DateCreation=DateTime.Now, Statut=0, AdresseEmail=Input.Email, NbConnexions=0 };
+
+                    context.PPClients.Add(newRecord);
+                    context.SaveChanges();
+
+                    _logger.LogInformation("User created a new account with password.");
 
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
@@ -140,8 +171,8 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
                         values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
                         protocol: Request.Scheme);
 
-                    await Methodes.envoyerCourriel(Input.Email, "Confirmer votre courriel",
-                        $"Veuillez confirmer votre compte en <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>cliquant ici</a>.");
+                    await Methodes.envoyerCourriel(Input.Email, "Confirmer votre courriel", 
+                        $"Veuillez confirmer votre compte en <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>cliquant ici</a>. Votre numéro de client est {lowestNo}");
 
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {

@@ -8,37 +8,26 @@ namespace Projet_Web_Commerce.Models
     {
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int NoVendeur { get; set; }
-
         public string? NomAffaires { get; set; }
-
         public int? PoidsMaxLivraison { get; set; }
         [Column(TypeName = "smallmoney")]
         public decimal? LivraisonGratuite { get; set; }
-
         public bool? Taxes { get; set; }
-
         [Column(TypeName = "decimal(4,2)")]
         public decimal? Pourcentage { get; set; }
-
         public string? Configuration { get; set; }
-
         public DateTime DateCreation { get; set; }
-
         public DateTime? DateMAJ { get; set; }
-
         public int? Statut { get; set; }
-
         public string AdresseEmail { get; set; }
         public string MotDePasse { get; set; }
         public string? Nom { get; set; }
         public string? Prenom { get; set; }
         public string? Rue { get; set; }
-
         public string? Ville { get; set; }
 
         [Column(TypeName = "char(2)")]
         public string? NoProvince { get; set; }
-
         public string? CodePostal { get; set; }
         public string? Pays { get; set; }
         public string IdUtilisateur { get; set; }

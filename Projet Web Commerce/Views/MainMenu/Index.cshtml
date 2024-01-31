@@ -1,11 +1,36 @@
-﻿@{
+﻿@using Microsoft.AspNetCore.Identity
+@using System.Security.Claims
+@inject SignInManager<Projet_Web_Commerce.Areas.Identity.Data.Utilisateur> SignInManager
+@inject UserManager<Projet_Web_Commerce.Areas.Identity.Data.Utilisateur> UserManager
 
+@{
+    var user = await UserManager.GetUserAsync(User);
+    var role = "help";
+    if (User.IsInRole("Gestionnaire"))
+    {
+        role = "Gestionnaire";
+    }
+    else if (User.IsInRole("Vendeur"))
+    {
+        role = "Vendeur";
+    }
+    else
+    {
+        role = "Client";
+    }
 }
 
 <div class="row">
     <div class="col-md-4">
         <section>
-            
+            @if (SignInManager.IsSignedIn(User))
+            {
+                <h1>Vous êtes connecté @role</h1>
+            }
+            else
+            {
+                <h1>Vous n'êtes pas connecté</h1>
+            }
         </section>
     </div>
 </div>
