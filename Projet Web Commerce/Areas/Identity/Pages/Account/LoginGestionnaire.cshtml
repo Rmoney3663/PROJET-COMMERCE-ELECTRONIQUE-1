@@ -1,8 +1,8 @@
 ﻿@page
-@model LoginModel
+@model LoginModelGestionnaire
 
 @{
-    ViewData["Title"] = "Connexion";
+    ViewData["Title"] = "Log in";
 }
 
 <h1>@ViewData["Title"]</h1>
@@ -10,7 +10,7 @@
     <div class="col-md-4">
         <section>
             <form id="account" method="post">
-                <h2>Client ou vendeur</h2>
+                <h2>Gestionnaire</h2>
                 <hr />
                 <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
                 <div class="form-floating mb-3">
@@ -48,8 +48,8 @@
     </div>
     <div class="col-md-6 col-md-offset-2">
         <section>
-            <h3>Êtes-vous gestionnaire?</h3>
-            <a asp-area="Identity" asp-page="/Account/LoginGestionnaire">Se connecter comme gestionnaire</a>
+            <h3>Êtes-vous un client ou un vendeur?</h3>
+            <a asp-area="Identity" asp-page="/Account/Login">Se connecter comme client ou vendeur</a>
         </section>
     </div>
 </div>
