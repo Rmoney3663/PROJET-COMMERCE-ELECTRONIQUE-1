@@ -332,6 +332,7 @@ namespace Projet_Web_Commerce.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     NomAffaires = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PoidsMaxLivraison = table.Column<int>(type: "int", nullable: false),
+                    LivraisonGratuite = table.Column<decimal>(type: "smallmoney", nullable: false),
                     Taxes = table.Column<bool>(type: "bit", nullable: false),
                     Pourcentage = table.Column<decimal>(type: "decimal(4,2)", nullable: false),
                     Configuration = table.Column<string>(type: "nvarchar(max)", nullable: false),
