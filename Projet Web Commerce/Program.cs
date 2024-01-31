@@ -69,6 +69,8 @@ using (var scope = app.Services.CreateScope())
         {
             UserName = emailToCheck,
             Email = emailToCheck,
+            EmailConfirmed = true,
+
         };
 
         var result = await userManager.CreateAsync(user, "Password1!");
