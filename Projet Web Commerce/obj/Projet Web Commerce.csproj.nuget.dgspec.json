@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\w.burgess\\Documents\\GitHub\\PROJET-COMMERCE-LECTRONIQUE-1\\Projet Web Commerce\\Projet Web Commerce.csproj": {}
+    "C:\\Users\\m.nadeau\\OneDrive - Cegep Gerald-Godin\\anné3\\Session6\\ProjetIntegration\\PROJET-COMMERCE-ELECTRONIQUE-1\\Projet Web Commerce\\Projet Web Commerce.csproj": {}
   },
   "projects": {
-    "C:\\Users\\w.burgess\\Documents\\GitHub\\PROJET-COMMERCE-LECTRONIQUE-1\\Projet Web Commerce\\Projet Web Commerce.csproj": {
+    "C:\\Users\\m.nadeau\\OneDrive - Cegep Gerald-Godin\\anné3\\Session6\\ProjetIntegration\\PROJET-COMMERCE-ELECTRONIQUE-1\\Projet Web Commerce\\Projet Web Commerce.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\w.burgess\\Documents\\GitHub\\PROJET-COMMERCE-LECTRONIQUE-1\\Projet Web Commerce\\Projet Web Commerce.csproj",
+        "projectUniqueName": "C:\\Users\\m.nadeau\\OneDrive - Cegep Gerald-Godin\\anné3\\Session6\\ProjetIntegration\\PROJET-COMMERCE-ELECTRONIQUE-1\\Projet Web Commerce\\Projet Web Commerce.csproj",
         "projectName": "Projet Web Commerce",
-        "projectPath": "C:\\Users\\w.burgess\\Documents\\GitHub\\PROJET-COMMERCE-LECTRONIQUE-1\\Projet Web Commerce\\Projet Web Commerce.csproj",
-        "packagesPath": "C:\\Users\\w.burgess\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\w.burgess\\Documents\\GitHub\\PROJET-COMMERCE-LECTRONIQUE-1\\Projet Web Commerce\\obj\\",
+        "projectPath": "C:\\Users\\m.nadeau\\OneDrive - Cegep Gerald-Godin\\anné3\\Session6\\ProjetIntegration\\PROJET-COMMERCE-ELECTRONIQUE-1\\Projet Web Commerce\\Projet Web Commerce.csproj",
+        "packagesPath": "C:\\Users\\m.nadeau\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\m.nadeau\\OneDrive - Cegep Gerald-Godin\\anné3\\Session6\\ProjetIntegration\\PROJET-COMMERCE-ELECTRONIQUE-1\\Projet Web Commerce\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\w.burgess\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\m.nadeau\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -44,13 +44,21 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "dependencies": {
+            "MailKit": {
+              "target": "Package",
+              "version": "[4.3.0, )"
+            },
+            "Microsoft.AspNetCore.Components.QuickGrid.EntityFrameworkAdapter": {
+              "target": "Package",
+              "version": "[8.0.1, )"
+            },
             "Microsoft.AspNetCore.Identity.EntityFrameworkCore": {
               "target": "Package",
               "version": "[8.0.1, )"
             },
             "Microsoft.AspNetCore.Identity.UI": {
               "target": "Package",
-              "version": "[6.0.23, )"
+              "version": "[8.0.1, )"
             },
             "Microsoft.EntityFrameworkCore": {
               "target": "Package",
@@ -70,9 +78,17 @@
               "target": "Package",
               "version": "[8.0.1, )"
             },
+            "Microsoft.VisualStudio.Web.CodeGeneration.Design": {
+              "target": "Package",
+              "version": "[8.0.0, )"
+            },
             "Microsoft.VisualStudio.Web.CodeGeneration.EntityFrameworkCore": {
               "target": "Package",
               "version": "[8.0.0, )"
+            },
+            "MimeKit": {
+              "target": "Package",
+              "version": "[4.3.0, )"
             }
           },
           "imports": [

@@ -1,18 +1,28 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Projet_Web_Commerce.Models
 {
     public class PPProduits
     {
+        [Key]
         public int NoProduit { get; set; }
         public int NoVendeur { get; set; }
         public int NoCategorie { get; set; }
         public DateTime DateCreation { get; set; }
         public DateTime DateMAJ { get; set; }
-        [InverseProperty("PPProduits")]
-        public virtual ICollection<PPProduitsInfo>? PPProduitsInfo { get; set; }
-        [InverseProperty("PPProduits")]
-        public virtual ICollection<PPProduitsVente>? PPProduitsVente { get; set; }
+        public string Nom { get; set; }
+        public string Description { get; set; }
+        public string Photo { get; set; }
+        [Column(TypeName = "smallmoney")]
+        public decimal PrixDemande { get; set; }
+        public bool Disponibilite { get; set; }
+        [Column(TypeName = "numeric(8,1)")]
+        public decimal Poids { get; set; }
+        public DateTime DateVente { get; set; }
+        [Column(TypeName = "smallmoney")]
+        public decimal PrixVente { get; set; }
+
         [InverseProperty("PPProduits")]
         public virtual ICollection<PPArticlesEnPanier>? PPArticlesEnPanier { get; set; }
         [InverseProperty("PPProduits")]
