@@ -12,7 +12,7 @@ using Projet_Web_Commerce.Data;
 namespace Projet_Web_Commerce.Migrations
 {
     [DbContext(typeof(AuthDbContext))]
-    [Migration("20240131190309_init")]
+    [Migration("20240131192314_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -292,16 +292,15 @@ namespace Projet_Web_Commerce.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CodePostal")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("DateCreation")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("DateDerniereConnexion")
+                    b.Property<DateTime?>("DateDerniereConnexion")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("DateMAJ")
+                    b.Property<DateTime?>("DateMAJ")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("IdUtilisateur")
@@ -312,34 +311,28 @@ namespace Projet_Web_Commerce.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("NbConnexions")
+                    b.Property<int?>("NbConnexions")
                         .HasColumnType("int");
 
                     b.Property<string>("NoProvince")
-                        .IsRequired()
                         .HasColumnType("char(2)");
 
                     b.Property<string>("Nom")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Pays")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Prenom")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Rue")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Statut")
+                    b.Property<int?>("Statut")
                         .HasColumnType("int");
 
                     b.Property<string>("Ville")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("NoClient");
@@ -639,24 +632,22 @@ namespace Projet_Web_Commerce.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CodePostal")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Configuration")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("DateCreation")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("DateMAJ")
+                    b.Property<DateTime?>("DateMAJ")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("IdUtilisateur")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<decimal>("LivraisonGratuite")
+                    b.Property<decimal?>("LivraisonGratuite")
                         .HasColumnType("smallmoney");
 
                     b.Property<string>("MotDePasse")
@@ -664,43 +655,38 @@ namespace Projet_Web_Commerce.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NoProvince")
-                        .IsRequired()
                         .HasColumnType("char(2)");
 
                     b.Property<string>("Nom")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NomAffaires")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Pays")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("PoidsMaxLivraison")
+                    b.Property<int?>("PoidsMaxLivraison")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("Pourcentage")
+                    b.Property<decimal?>("Pourcentage")
                         .HasColumnType("decimal(4,2)");
 
                     b.Property<string>("Prenom")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Rue")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Statut")
+                    b.Property<int?>("Statut")
                         .HasColumnType("int");
 
-                    b.Property<bool>("Taxes")
+                    b.Property<bool?>("Taxes")
                         .HasColumnType("bit");
 
                     b.Property<string>("Ville")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("NoVendeur");
@@ -861,8 +847,7 @@ namespace Projet_Web_Commerce.Migrations
                     b.HasOne("Projet_Web_Commerce.Models.Province", "Province")
                         .WithMany("PPClients")
                         .HasForeignKey("NoProvince")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Province");
 
@@ -964,8 +949,7 @@ namespace Projet_Web_Commerce.Migrations
                     b.HasOne("Projet_Web_Commerce.Models.Province", "Province")
                         .WithMany("PPVendeurs")
                         .HasForeignKey("NoProvince")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Province");
 

@@ -11,9 +11,21 @@
         .navbar-custom{
             background-color: rgb(124, 105, 146);
         }
+
+        .container-custom{
+            background-color: rgb(187, 221, 230);
+            width: 100%;
+            height: 100%;
+            min-width: 75%; 
+            max-width: 75%;
+            padding-right: var(--bs-gutter-x, 0.75rem);
+            padding-left: var(--bs-gutter-x, 0.75rem);
+            margin-right: auto;
+            margin-left: auto;
+        }
     </style>
 </head>
-<body>
+<body style="background-color: rgb(139, 184, 232)">
     <header>
         <nav class="navbar navbar-custom navbar-expand-sm navbar-toggleable-sm navbar-light bg-customMauve border-bottom box-shadow mb-3">
             <div class="container-fluid">
@@ -33,17 +45,15 @@
             </div>
         </nav>
     </header>
-    <div class="container">
+    <div class="container-custom H-100">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
-
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2024 - Projet_Web_Commerce - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
+    <footer class="container-custom H-100" style="background-color: rgb(139, 184, 232)">
+        &copy; 2024 - Projet_Web_Commerce - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
     </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
