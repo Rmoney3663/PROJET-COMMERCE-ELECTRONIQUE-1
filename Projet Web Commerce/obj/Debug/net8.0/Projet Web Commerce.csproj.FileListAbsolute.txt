@@ -294,6 +294,7 @@ C:\Users\J.PERRON\Documents\GitHub\PROJET-COMMERCE-LECTRONIQUE-1\Projet Web Comm
 C:\Users\J.PERRON\Documents\GitHub\PROJET-COMMERCE-LECTRONIQUE-1\Projet Web Commerce\obj\Debug\net8.0\Projet Web Commerce.genruntimeconfig.cache
 C:\Users\J.PERRON\Documents\GitHub\PROJET-COMMERCE-LECTRONIQUE-1\Projet Web Commerce\obj\Debug\net8.0\ref\Projet Web Commerce.dll
 <<<<<<< HEAD
+<<<<<<< HEAD
 C:\Users\r.pruteanu\PROJET-COMMERCE-ELECTRONIQUE-1\Projet Web Commerce\bin\Debug\net8.0\appsettings.Development.json
 C:\Users\r.pruteanu\PROJET-COMMERCE-ELECTRONIQUE-1\Projet Web Commerce\bin\Debug\net8.0\appsettings.json
 C:\Users\r.pruteanu\PROJET-COMMERCE-ELECTRONIQUE-1\Projet Web Commerce\bin\Debug\net8.0\Projet Web Commerce.staticwebassets.runtime.json
@@ -892,3 +893,5 @@ C:\Users\w.burgess\Documents\GitHub\PROJET-COMMERCE-LECTRONIQUE-1\Projet Web Com
 C:\Users\w.burgess\Documents\GitHub\PROJET-COMMERCE-LECTRONIQUE-1\Projet Web Commerce\obj\Debug\net8.0\Projet Web Commerce.genruntimeconfig.cache
 C:\Users\w.burgess\Documents\GitHub\PROJET-COMMERCE-LECTRONIQUE-1\Projet Web Commerce\obj\Debug\net8.0\ref\Projet Web Commerce.dll
 >>>>>>> Willi
+=======
+>>>>>>> parent of 54c4b22 (inscription acheteur)
