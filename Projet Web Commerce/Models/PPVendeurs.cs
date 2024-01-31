@@ -6,7 +6,7 @@ namespace Projet_Web_Commerce.Models
 {
     public class PPVendeurs
     {
-        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int NoVendeur { get; set; }
 
         public string NomAffaires { get; set; }

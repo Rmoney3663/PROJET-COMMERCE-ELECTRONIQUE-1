@@ -282,10 +282,7 @@ namespace Projet_Web_Commerce.Migrations
             modelBuilder.Entity("Projet_Web_Commerce.Models.PPClients", b =>
                 {
                     b.Property<int>("NoClient")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("NoClient"));
 
                     b.Property<string>("AdresseEmail")
                         .IsRequired()
@@ -632,10 +629,7 @@ namespace Projet_Web_Commerce.Migrations
             modelBuilder.Entity("Projet_Web_Commerce.Models.PPVendeurs", b =>
                 {
                     b.Property<int>("NoVendeur")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("NoVendeur"));
 
                     b.Property<string>("AdresseEmail")
                         .IsRequired()
