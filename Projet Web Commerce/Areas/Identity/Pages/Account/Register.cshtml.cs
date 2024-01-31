@@ -141,8 +141,8 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
 
                     if (context.PPClients.Any())
                     {
-                        int minNo = context.PPClients.Min(u => u.NoClient);
-                        int maxNo = context.PPClients.Max(u => u.NoClient);
+                        int minNo = 10000;
+                        int maxNo = 99999;
 
                         for (int i = minNo; i <= maxNo; i++)
                         {
@@ -171,7 +171,7 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
                         values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
                         protocol: Request.Scheme);
 
-                    await Methodes.envoyerCourriel(Input.Email, "Confirm your email", 
+                    await Methodes.envoyerCourriel(Input.Email, "Confirmer votre courriel", 
                         $"Veuillez confirmer votre compte en <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>cliquant ici</a>. Votre numéro de client est {lowestNo}");
 
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)

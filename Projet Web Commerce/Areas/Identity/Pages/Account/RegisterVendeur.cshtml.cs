@@ -174,8 +174,22 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
 
                     var context = new AuthDbContext(optionsBuilder.Options);
 
-                    int lowestNo = context.PPVendeurs.Any() ? context.PPVendeurs.Min(v => v.NoVendeur) : 10;
-                    lowestNo = Math.Min(99, Math.Max(10, lowestNo));
+                    int lowestNo = 10;
+
+                    if (context.PPVendeurs.Any())
+                    {
+                        int minNo = 10;
+                        int maxNo = 99;
+
+                        for (int i = minNo; i <= maxNo; i++)
+                        {
+                            if (!context.PPVendeurs.Any(u => u.NoVendeur == i))
+                            {
+                                lowestNo = i;
+                                break;
+                            }
+                        }
+                    }
 
 
                     PPVendeurs newRecord = new PPVendeurs()
@@ -196,8 +210,8 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
                         values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
                         protocol: Request.Scheme);
 
-                    await _emailSender.SendEmailAsync(Input.Email, "Confirmez votre courriel",
-                        $"Veuillez confirmer votre compte en <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>en cliquant ici</a>.");
+                    await Methodes.envoyerCourriel(Input.Email, "Confirmer votre adresse courriel",
+                        $"Veuillez confirmer votre compte en <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>cliquant ici</a>. Votre numéro de vendeur est {lowestNo}");
 
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {
