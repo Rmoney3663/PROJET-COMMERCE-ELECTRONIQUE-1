@@ -525,10 +525,7 @@ namespace Projet_Web_Commerce.Migrations
             modelBuilder.Entity("Projet_Web_Commerce.Models.PPProduits", b =>
                 {
                     b.Property<int>("NoProduit")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("NoProduit"));
 
                     b.Property<DateTime>("DateCreation")
                         .HasColumnType("datetime2");

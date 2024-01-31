@@ -5,7 +5,7 @@ namespace Projet_Web_Commerce.Models
 {
     public class PPProduits
     {
-        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int NoProduit { get; set; }
         public int NoVendeur { get; set; }
         public int NoCategorie { get; set; }
