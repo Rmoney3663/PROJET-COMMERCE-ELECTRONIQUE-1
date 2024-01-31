@@ -1,7 +1,7 @@
 ﻿@page
-@model RegisterModel
+@model RegisterModel3
 @{
-    ViewData["Title"] = "Inscription Acheteur";
+    ViewData["Title"] = "Inscription Gestionnaire";
 }
 
 <h1>@ViewData["Title"]</h1>
@@ -38,8 +38,6 @@
     <div class="col-md-6 col-md-offset-2">
         <section>
             <h3>Use another service to register.</h3>
-            <a asp-area="Identity" asp-page="/Account/RegisterVendeur">S'inscrire comme vendeur</a>
-            <a asp-area="Identity" asp-page="/Account/RegisterGestionnaire">S'inscrire comme gestionnaire</a>
             <hr />
             @{
                 if ((Model.ExternalLogins?.Count ?? 0) == 0)

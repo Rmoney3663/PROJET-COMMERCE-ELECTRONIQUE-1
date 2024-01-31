@@ -22,7 +22,7 @@ using Projet_Web_Commerce.Areas.Identity.Data;
 
 namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
 {
-    public class RegisterModel : PageModel
+    public class RegisterModel3 : PageModel
     {
         private readonly SignInManager<Utilisateur> _signInManager;
         private readonly UserManager<Utilisateur> _userManager;
@@ -31,7 +31,7 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
 
-        public RegisterModel(
+        public RegisterModel3(
             UserManager<Utilisateur> userManager,
             IUserStore<Utilisateur> userStore,
             SignInManager<Utilisateur> signInManager,
@@ -127,6 +127,7 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
 
                 if (result.Succeeded)
                 {
+                    await _userManager.AddToRoleAsync(user, "Acheteur");
                     await _userManager.AddToRoleAsync(user, "Acheteur");
 
                     _logger.LogInformation("User created a new account with password.");
