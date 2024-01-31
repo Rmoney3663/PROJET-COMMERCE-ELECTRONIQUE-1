@@ -40,8 +40,8 @@ using (var scope = app.Services.CreateScope())
     var rolemanagerIdentity = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
     //var rolemanagerCustom = scope.ServiceProvider.GetRequiredService<RoleManager<TypesUtilisateur>>();
 
-    var roles = new[] { "Gestionnaire", "Acheteur", "Vendeur" };
-    var types = new[] { "G", "A", "V" };
+    var roles = new[] { "Gestionnaire", "Client", "Vendeur" };
+    var types = new[] { "G", "C", "V" };
 
 
     for (var i = 0; i < roles.Length; i++)
