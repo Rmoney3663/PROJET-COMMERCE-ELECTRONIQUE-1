@@ -293,3 +293,6 @@ C:\Users\J.PERRON\Documents\GitHub\PROJET-COMMERCE-LECTRONIQUE-1\Projet Web Comm
 C:\Users\J.PERRON\Documents\GitHub\PROJET-COMMERCE-LECTRONIQUE-1\Projet Web Commerce\obj\Debug\net8.0\Projet Web Commerce.pdb
 C:\Users\J.PERRON\Documents\GitHub\PROJET-COMMERCE-LECTRONIQUE-1\Projet Web Commerce\obj\Debug\net8.0\Projet Web Commerce.genruntimeconfig.cache
 C:\Users\J.PERRON\Documents\GitHub\PROJET-COMMERCE-LECTRONIQUE-1\Projet Web Commerce\obj\Debug\net8.0\ref\Projet Web Commerce.dll
+C:\Users\J.PERRON\Documents\GitHub\PROJET-COMMERCE-LECTRONIQUE-1\Projet Web Commerce\bin\Debug\net8.0\BouncyCastle.Cryptography.dll
+C:\Users\J.PERRON\Documents\GitHub\PROJET-COMMERCE-LECTRONIQUE-1\Projet Web Commerce\bin\Debug\net8.0\MailKit.dll
+C:\Users\J.PERRON\Documents\GitHub\PROJET-COMMERCE-LECTRONIQUE-1\Projet Web Commerce\bin\Debug\net8.0\MimeKit.dll
