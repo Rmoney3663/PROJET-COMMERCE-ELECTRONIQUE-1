@@ -22,7 +22,7 @@ using Projet_Web_Commerce.Areas.Identity.Data;
 
 namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
 {
-    public class RegisterModel : PageModel
+    public class RegisterModel2 : PageModel
     {
         private readonly SignInManager<Utilisateur> _signInManager;
         private readonly UserManager<Utilisateur> _userManager;
@@ -31,7 +31,7 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
 
-        public RegisterModel(
+        public RegisterModel2(
             UserManager<Utilisateur> userManager,
             IUserStore<Utilisateur> userStore,
             SignInManager<Utilisateur> signInManager,
@@ -79,12 +79,6 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
             [EmailAddress]
             [Display(Name = "Email")]
             public string Email { get; set; }
-
-            [Required]
-            [EmailAddress]
-            [Display(Name = "Confirm Email")]
-            [Compare("Email", ErrorMessage = "The email and confirmation email do not match.")]
-            public string ConfirmEmail { get; set; }
 
             /// <summary>
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
