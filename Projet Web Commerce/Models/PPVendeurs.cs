@@ -12,6 +12,8 @@ namespace Projet_Web_Commerce.Models
         public string NomAffaires { get; set; }
 
         public int PoidsMaxLivraison { get; set; }
+        [Column(TypeName = "smallmoney")]
+        public decimal LivraisonGratuite { get; set; }
 
         public bool Taxes { get; set; }
 

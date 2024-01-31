@@ -659,6 +659,9 @@ namespace Projet_Web_Commerce.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<decimal>("LivraisonGratuite")
+                        .HasColumnType("smallmoney");
+
                     b.Property<string>("MotDePasse")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");

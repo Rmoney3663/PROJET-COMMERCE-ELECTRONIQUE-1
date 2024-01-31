@@ -12,7 +12,7 @@ using Projet_Web_Commerce.Data;
 namespace Projet_Web_Commerce.Migrations
 {
     [DbContext(typeof(AuthDbContext))]
-    [Migration("20240130165028_init")]
+    [Migration("20240131185136_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -661,6 +661,9 @@ namespace Projet_Web_Commerce.Migrations
                     b.Property<string>("IdUtilisateur")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<decimal>("LivraisonGratuite")
+                        .HasColumnType("smallmoney");
 
                     b.Property<string>("MotDePasse")
                         .IsRequired()
