@@ -137,8 +137,22 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
 
                     var context = new AuthDbContext(optionsBuilder.Options);
 
-                    int lowestNo = context.PPClients.Any() ? context.PPClients.Max(u => u.NoClient) + 1 : 10000;
+                    int lowestNo = 10000;
 
+                    if (context.PPClients.Any())
+                    {
+                        int minNo = context.PPClients.Min(u => u.NoClient);
+                        int maxNo = context.PPClients.Max(u => u.NoClient);
+
+                        for (int i = minNo; i <= maxNo; i++)
+                        {
+                            if (!context.PPClients.Any(u => u.NoClient == i))
+                            {
+                                lowestNo = i;
+                                break;
+                            }
+                        }
+                    }
                     
                     PPClients newRecord = new PPClients()
                     { IdUtilisateur = user.Id, NoClient = lowestNo, MotDePasse= Input.Password, DateCreation=DateTime.Now, Statut=0, AdresseEmail=Input.Email, NbConnexions=0 };
@@ -157,8 +171,8 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
                         values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
                         protocol: Request.Scheme);
 
-                    await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-                        $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                    await Methodes.envoyerCourriel(Input.Email, "Confirm your email", 
+                        $"Veuillez confirmer votre compte en <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>cliquant ici</a>. Votre numéro de client est {lowestNo}");
 
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {
