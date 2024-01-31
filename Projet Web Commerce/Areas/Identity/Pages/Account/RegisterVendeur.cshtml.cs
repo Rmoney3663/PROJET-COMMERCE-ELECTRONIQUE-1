@@ -140,7 +140,7 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
                 Input = new InputModel();
             }
 
-            Input.SelectedNumberPoids = 1;
+            Input.SelectedNumberPoids = 0;
 
             Input.SelectedNumberLivraison = 0;
             Input.Tax = true;
