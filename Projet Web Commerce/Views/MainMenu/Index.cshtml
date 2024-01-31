@@ -1,5 +1,6 @@
 ﻿@using Microsoft.AspNetCore.Identity
 @using System.Security.Claims
+@model List<Projet_Web_Commerce.Models.PPVendeurs>
 @inject SignInManager<Projet_Web_Commerce.Areas.Identity.Data.Utilisateur> SignInManager
 @inject UserManager<Projet_Web_Commerce.Areas.Identity.Data.Utilisateur> UserManager
 
@@ -21,11 +22,40 @@
 }
 
 <div class="row">
-    <div class="col-md-4">
+    <div class="col">
         <section>
             @if (SignInManager.IsSignedIn(User))
             {
                 <h1>Vous êtes connecté @role</h1>
+
+                if (role == "Gestionnaire")
+                {
+                    <h3>Liste des Vendeurs à confirmer</h3>
+                    <div class="container mt-4">
+                        @if (role == "Gestionnaire" && Model != null && Model.Any())
+                        {
+                            <div class="row">
+                                @foreach (var item in Model)
+                                {
+                                    <div class="col-md-6 mb-4">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h5 class="card-title">@Html.DisplayFor(modelItem => item.AdresseEmail)</h5>
+                                                <p class="card-text">No Vendeur: @Html.DisplayFor(modelItem => item.NoVendeur)</p>
+                                                <p class="card-text">Date de demande : @Html.DisplayFor(modelItem => item.DateCreation)</p>
+                                                <button class="btn btn-primary">Accepter</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <p>Aucun vendeur trouvé avec le statut 0.</p>
+                        }
+                    </div>
+                }
             }
             else
             {

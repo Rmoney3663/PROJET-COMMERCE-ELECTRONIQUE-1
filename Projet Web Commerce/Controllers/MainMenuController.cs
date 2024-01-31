@@ -1,14 +1,27 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Projet_Web_Commerce.Areas.Identity.Data;
+using Projet_Web_Commerce.Data;
 
 namespace Projet_Web_Commerce.Controllers
 {
     public class MainMenuController : Controller
     {
+
+        private readonly AuthDbContext _context;
+        private readonly Microsoft.AspNetCore.Identity.UserManager<Utilisateur> _userManager;
+
+        public MainMenuController(AuthDbContext context, Microsoft.AspNetCore.Identity.UserManager<Utilisateur> userManager)
+        {
+            _context = context;
+            _userManager = userManager;
+        }
         // GET: MainMenuController
         public ActionResult Index()
         {
-            return View();
+            var vendeursStatutZero = _context.PPVendeurs.Where(v => v.Statut == 0).ToList();
+            return View(vendeursStatutZero);
         }
 
         // GET: MainMenuController/Details/5
