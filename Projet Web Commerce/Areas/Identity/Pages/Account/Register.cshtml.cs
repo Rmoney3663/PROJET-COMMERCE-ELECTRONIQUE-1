@@ -17,8 +17,11 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Projet_Web_Commerce.Areas.Identity.Data;
+using Projet_Web_Commerce.Data;
+using Projet_Web_Commerce.Models;
 
 namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
 {
@@ -128,6 +131,20 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
                 if (result.Succeeded)
                 {
                     await _userManager.AddToRoleAsync(user, "Acheteur");
+
+                    var optionsBuilder = new DbContextOptionsBuilder<AuthDbContext>();
+                    optionsBuilder.UseSqlServer("Data Source=tcp:424sql.cgodin.qc.ca,5433;Initial Catalog=BDB68_424Q24;User ID=B68equipe424q24;Password=Password24;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True;Integrated Security=False");
+
+                    var context = new AuthDbContext(optionsBuilder.Options);
+
+                    int lowestNo = context.PPClients.Any() ? context.PPClients.Min(u => u.NoClient) : 10000;
+
+                    
+                    PPClients newRecord = new PPClients()
+                    { IdUtilisateur = user.Id, NoClient = lowestNo };
+
+                    context.PPClients.Add(newRecord);
+                    context.SaveChanges();
 
                     _logger.LogInformation("User created a new account with password.");
 
