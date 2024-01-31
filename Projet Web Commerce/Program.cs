@@ -1,7 +1,10 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Projet_Web_Commerce.Areas.Identity.Data;
 using Projet_Web_Commerce.Data;
+using Projet_Web_Commerce.Migrations;
+using Projet_Web_Commerce.Models;
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("AuthDbContextConnection") ?? throw new InvalidOperationException("Connection string 'AuthDbContextConnection' not found.");
 
@@ -37,6 +40,7 @@ app.MapRazorPages();
 
 using (var scope = app.Services.CreateScope())
 {
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<Utilisateur>>();
     var rolemanagerIdentity = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
     //var rolemanagerCustom = scope.ServiceProvider.GetRequiredService<RoleManager<TypesUtilisateur>>();
 
@@ -52,6 +56,43 @@ using (var scope = app.Services.CreateScope())
             await rolemanagerIdentity.CreateAsync(newRole);
         }
     }
+
+    // Specify the email you want to check
+    var emailToCheck = "william.anthony.burgess@gmail.com";
+
+    // Check if a user with the specified email already exists
+    var existingUser = await userManager.FindByEmailAsync(emailToCheck);
+    if (existingUser == null)
+    {
+        // Create a user
+        var user = new Utilisateur
+        {
+            UserName = emailToCheck,
+            Email = emailToCheck,
+        };
+
+        var result = await userManager.CreateAsync(user, "Password1!");
+
+
+        if (result.Succeeded)
+        {
+            await userManager.AddToRoleAsync(user, "Gestionnaire");
+
+            var optionsBuilder = new DbContextOptionsBuilder<AuthDbContext>();
+            optionsBuilder.UseSqlServer("Data Source=tcp:424sql.cgodin.qc.ca,5433;Initial Catalog=BDB68_424Q24;User ID=B68equipe424q24;Password=Password24;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True;Integrated Security=False");
+
+            var context = new AuthDbContext(optionsBuilder.Options);
+
+            PPGestionnaire newRecord = new PPGestionnaire()
+            { IdUtilisateur = user.Id, NoGestionnaire = 100, MotDePasse = "Password1!", DateCreation = DateTime.Now, AdresseEmail = "william.anthony.burgess@gmail.com",  };
+
+            context.PPGestionnaire.Add(newRecord);
+            context.SaveChanges();
+
+        }
+
+    }
 }
+
 
 app.Run();
