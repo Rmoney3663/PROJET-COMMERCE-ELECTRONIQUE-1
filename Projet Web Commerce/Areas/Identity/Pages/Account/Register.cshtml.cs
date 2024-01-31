@@ -80,12 +80,6 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
             [Display(Name = "Email")]
             public string Email { get; set; }
 
-            [Required]
-            [EmailAddress]
-            [Display(Name = "Confirm Email")]
-            [Compare("Email", ErrorMessage = "The email and confirmation email do not match.")]
-            public string ConfirmEmail { get; set; }
-
             /// <summary>
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
