@@ -11,29 +11,29 @@ namespace Projet_Web_Commerce.Models
 
         public DateTime DateCreation { get; set; }
 
-        public DateTime DateMAJ { get; set; }
+        public DateTime? DateMAJ { get; set; }
 
-        public int NbConnexions { get; set; }
+        public int? NbConnexions { get; set; }
 
-        public DateTime DateDerniereConnexion { get; set; }
+        public DateTime? DateDerniereConnexion { get; set; }
 
-        public int Statut { get; set; }
+        public int? Statut { get; set; }
 
         public string AdresseEmail { get; set; }
         public string MotDePasse { get; set; }
 
-        public string Nom { get; set; }
-        public string Prenom { get; set; }
+        public string? Nom { get; set; }
+        public string? Prenom { get; set; }
 
-        public string Rue { get; set; }
+        public string? Rue { get; set; }
 
-        public string Ville { get; set; }
+        public string? Ville { get; set; }
 
         [Column(TypeName = "char(2)")]
-        public string NoProvince { get; set; }
+        public string? NoProvince { get; set; }
 
-        public string CodePostal { get; set; }
-        public string Pays { get; set; }
+        public string? CodePostal { get; set; }
+        public string? Pays { get; set; }
 
         public string IdUtilisateur { get; set; }
         [InverseProperty("PPClients")]
