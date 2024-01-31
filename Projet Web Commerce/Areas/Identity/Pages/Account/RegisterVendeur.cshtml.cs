@@ -159,6 +159,7 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
                 var password = Input.Password;
                 var date = DateTime.Now;
                 var taxe = Input.Tax;
+                var province = Input.SelectedProvince;
                 var user = CreateUser();
 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
@@ -191,10 +192,25 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
                         }
                     }
 
+                    var pourcentage = 0.00;
+                    if(taxe == true)
+                    {
+                        if(province == "QC")
+                        {
+                            pourcentage = 14.975;
+                        }
+                        else
+                        {
+                            pourcentage = 5.00;
+                        }
+
+                    }
 
                     PPVendeurs newRecord = new PPVendeurs()
-                    { IdUtilisateur = user.Id, NoVendeur = lowestNo, AdresseEmail = email, MotDePasse = password, Taxes = taxe, NomAffaires = Input.NomAffaires,
-                      DateCreation = date, PoidsMaxLivraison = SelectedNumberPoids, LivraisonGratuite = SelectedNumberLivraison, Statut = 0 };
+                    { 
+                      IdUtilisateur = user.Id, NoVendeur = lowestNo, AdresseEmail = email, MotDePasse = password, Taxes = taxe, NomAffaires = Input.NomAffaires, NoProvince = province,
+                      DateCreation = date, PoidsMaxLivraison = SelectedNumberPoids, LivraisonGratuite = SelectedNumberLivraison, Statut = 0, Pourcentage = (decimal?)pourcentage
+                    };
 
                     context.PPVendeurs.Add(newRecord);
                     context.SaveChanges();
