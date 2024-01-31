@@ -141,7 +141,7 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
 
                     
                     PPClients newRecord = new PPClients()
-                    { IdUtilisateur = user.Id, NoClient = lowestNo };
+                    { IdUtilisateur = user.Id, NoClient = lowestNo, MotDePasse= Input.Password, DateCreation=DateTime.Now, Statut=0, AdresseEmail=Input.Email };
 
                     context.PPClients.Add(newRecord);
                     context.SaveChanges();
