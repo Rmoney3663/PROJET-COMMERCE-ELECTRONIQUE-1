@@ -130,7 +130,7 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
 
                 if (result.Succeeded)
                 {
-                    await _userManager.AddToRoleAsync(user, "Acheteur");
+                    await _userManager.AddToRoleAsync(user, "Client");
 
                     var optionsBuilder = new DbContextOptionsBuilder<AuthDbContext>();
                     optionsBuilder.UseSqlServer("Data Source=tcp:424sql.cgodin.qc.ca,5433;Initial Catalog=BDB68_424Q24;User ID=B68equipe424q24;Password=Password24;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True;Integrated Security=False");
