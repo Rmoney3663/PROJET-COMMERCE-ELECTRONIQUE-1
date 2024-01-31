@@ -12,7 +12,7 @@ using Projet_Web_Commerce.Data;
 namespace Projet_Web_Commerce.Migrations
 {
     [DbContext(typeof(AuthDbContext))]
-    [Migration("20240131192314_init")]
+    [Migration("20240131201506_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -664,7 +664,6 @@ namespace Projet_Web_Commerce.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Pays")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("PoidsMaxLivraison")
@@ -677,7 +676,6 @@ namespace Projet_Web_Commerce.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Rue")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("Statut")

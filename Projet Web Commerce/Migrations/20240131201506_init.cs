@@ -341,11 +341,11 @@ namespace Projet_Web_Commerce.Migrations
                     MotDePasse = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Nom = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Prenom = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Rue = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Rue = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Ville = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     NoProvince = table.Column<string>(type: "char(2)", nullable: true),
                     CodePostal = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Pays = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Pays = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IdUtilisateur = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
