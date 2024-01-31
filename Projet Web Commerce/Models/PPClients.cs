@@ -6,7 +6,7 @@ namespace Projet_Web_Commerce.Models
 {
     public class PPClients
     {
-        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int NoClient { get; set; }
 
         public DateTime DateCreation { get; set; }

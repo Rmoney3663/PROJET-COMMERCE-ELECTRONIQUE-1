@@ -12,7 +12,7 @@ using Projet_Web_Commerce.Data;
 namespace Projet_Web_Commerce.Migrations
 {
     [DbContext(typeof(AuthDbContext))]
-    [Migration("20240130165028_init")]
+    [Migration("20240131190309_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -285,10 +285,7 @@ namespace Projet_Web_Commerce.Migrations
             modelBuilder.Entity("Projet_Web_Commerce.Models.PPClients", b =>
                 {
                     b.Property<int>("NoClient")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("NoClient"));
 
                     b.Property<string>("AdresseEmail")
                         .IsRequired()
@@ -635,10 +632,7 @@ namespace Projet_Web_Commerce.Migrations
             modelBuilder.Entity("Projet_Web_Commerce.Models.PPVendeurs", b =>
                 {
                     b.Property<int>("NoVendeur")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("NoVendeur"));
 
                     b.Property<string>("AdresseEmail")
                         .IsRequired()
@@ -661,6 +655,9 @@ namespace Projet_Web_Commerce.Migrations
                     b.Property<string>("IdUtilisateur")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<decimal>("LivraisonGratuite")
+                        .HasColumnType("smallmoney");
 
                     b.Property<string>("MotDePasse")
                         .IsRequired()
