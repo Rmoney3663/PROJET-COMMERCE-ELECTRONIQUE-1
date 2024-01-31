@@ -89,6 +89,25 @@ using (var scope = app.Services.CreateScope())
             context.PPGestionnaire.Add(newRecord);
             context.SaveChanges();
 
+            List<Province> provinces = new List<Province>
+            {
+                new Province { ProvinceID = "AB", Nom = "Alberta" },
+                new Province { ProvinceID = "BC", Nom = "Colombie-Britannique" },
+                new Province { ProvinceID = "MB", Nom = "Manitoba" },
+                new Province { ProvinceID = "NB", Nom = "Nouveau-Brunswick" },
+                new Province { ProvinceID = "NL", Nom = "Terre-Neuve-et-Labrador" },
+                new Province { ProvinceID = "NS", Nom = "Nouvelle-Écosse" },
+                new Province { ProvinceID = "NT", Nom = "Territoires du Nord-Ouest" },
+                new Province { ProvinceID = "NU", Nom = "Nunavut" },
+                new Province { ProvinceID = "ON", Nom = "Ontario" },
+                new Province { ProvinceID = "PE", Nom = "Île-du-Prince-Édouard" },
+                new Province { ProvinceID = "QC", Nom = "Québec" },
+                new Province { ProvinceID = "SK", Nom = "Saskatchewan" },
+                new Province { ProvinceID = "YT", Nom = "Yukon" }
+            };
+
+            context.AddRange(provinces);
+            context.SaveChanges();
         }
 
     }

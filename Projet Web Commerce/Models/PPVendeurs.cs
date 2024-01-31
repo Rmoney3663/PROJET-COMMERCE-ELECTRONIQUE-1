@@ -27,7 +27,7 @@ namespace Projet_Web_Commerce.Models
         public string? Ville { get; set; }
 
         [Column(TypeName = "char(2)")]
-        public string? NoProvince { get; set; }
+        public string NoProvince { get; set; }
         public string? CodePostal { get; set; }
         public string? Pays { get; set; }
         public string IdUtilisateur { get; set; }
