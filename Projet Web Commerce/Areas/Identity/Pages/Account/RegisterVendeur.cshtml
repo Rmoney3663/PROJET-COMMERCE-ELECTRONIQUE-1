@@ -36,28 +36,20 @@
                 <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
                 <label asp-for="Input.ConfirmPassword">Confirmer mot de passe</label>
                 <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
-            </div>
+            </div>    
+
             <div class="form-floating mb-3">
-                <select asp-for="Input.SelectedNumberPoids" class="form-control" aria-required="true">
-                    @for (int i = 1; i <= 500; i++)
-                    {
-                        <option value="@i">@i Kg</option>
-                    }
-                </select>
+                <input asp-for="Input.SelectedNumberPoids" class="form-control" type="number" min="0" data-val="true" />
                 <label asp-for="Input.SelectedNumberPoids">Poids max pour livraison (Kg)</label>
                 <span asp-validation-for="Input.SelectedNumberPoids" class="text-danger"></span>
             </div>
 
             <div class="form-floating mb-3">
-                <select asp-for="Input.SelectedNumberLivraison" class="form-control" aria-required="true">
-                    @for (int i = 0; i <= 500; i++)
-                    {
-                        <option value="@i">@i $</option>
-                    }
-                </select>
+                <input asp-for="Input.SelectedNumberLivraison" class="form-control" type="number" min="0" data-val="true" />
                 <label asp-for="Input.SelectedNumberLivraison">Prix pour livraison gratuite ($ CAD)</label>
                 <span asp-validation-for="Input.SelectedNumberLivraison" class="text-danger"></span>
             </div>
+
             <div class="form-floating mb-3">
                 <select asp-for="Input.Tax" class="form-control" aria-required="true">
                     <option value="True">True</option>
