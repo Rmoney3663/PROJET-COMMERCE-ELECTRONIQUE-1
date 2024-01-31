@@ -7,7 +7,7 @@ var connectionString = builder.Configuration.GetConnectionString("AuthDbContextC
 
 builder.Services.AddDbContext<AuthDbContext>(options => options.UseSqlServer(connectionString));
 
-builder.Services.AddDefaultIdentity<Utilisateur>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<AuthDbContext>();
+builder.Services.AddDefaultIdentity<Utilisateur>(options => options.SignIn.RequireConfirmedAccount = true).AddRoles<IdentityRole>().AddEntityFrameworkStores<AuthDbContext>();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -34,5 +34,24 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.MapRazorPages();
+
+using (var scope = app.Services.CreateScope())
+{
+    var rolemanagerIdentity = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    //var rolemanagerCustom = scope.ServiceProvider.GetRequiredService<RoleManager<TypesUtilisateur>>();
+
+    var roles = new[] { "Gestionnaire", "Acheteur", "Vendeur" };
+    var types = new[] { "G", "A", "V" };
+
+
+    for (var i = 0; i < roles.Length; i++)
+    {
+        if (!await rolemanagerIdentity.RoleExistsAsync(roles[i]))
+        {
+            var newRole = new IdentityRole(roles[i]);
+            await rolemanagerIdentity.CreateAsync(newRole);
+        }
+    }
+}
 
 app.Run();
