@@ -8858,23 +8858,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\m.nadeau\\.nuget\\packages\\": {},
+    "C:\\Users\\w.burgess\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\m.nadeau\\OneDrive - Cegep Gerald-Godin\\anné3\\Session6\\ProjetIntegration\\PROJET-COMMERCE-ELECTRONIQUE-1\\Projet Web Commerce\\Projet Web Commerce.csproj",
+      "projectUniqueName": "C:\\Users\\w.burgess\\Documents\\GitHub\\PROJET-COMMERCE-LECTRONIQUE-1\\Projet Web Commerce\\Projet Web Commerce.csproj",
       "projectName": "Projet Web Commerce",
-      "projectPath": "C:\\Users\\m.nadeau\\OneDrive - Cegep Gerald-Godin\\anné3\\Session6\\ProjetIntegration\\PROJET-COMMERCE-ELECTRONIQUE-1\\Projet Web Commerce\\Projet Web Commerce.csproj",
-      "packagesPath": "C:\\Users\\m.nadeau\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\m.nadeau\\OneDrive - Cegep Gerald-Godin\\anné3\\Session6\\ProjetIntegration\\PROJET-COMMERCE-ELECTRONIQUE-1\\Projet Web Commerce\\obj\\",
+      "projectPath": "C:\\Users\\w.burgess\\Documents\\GitHub\\PROJET-COMMERCE-LECTRONIQUE-1\\Projet Web Commerce\\Projet Web Commerce.csproj",
+      "packagesPath": "C:\\Users\\w.burgess\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\w.burgess\\Documents\\GitHub\\PROJET-COMMERCE-LECTRONIQUE-1\\Projet Web Commerce\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\m.nadeau\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\w.burgess\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
