@@ -261,6 +261,29 @@ namespace Projet_Web_Commerce.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "PPGestionnaire",
+                columns: table => new
+                {
+                    NoGestionnaire = table.Column<int>(type: "int", nullable: false),
+                    DateCreation = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    AdresseEmail = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    MotDePasse = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Nom = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Prenom = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IdUtilisateur = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PPGestionnaire", x => x.NoGestionnaire);
+                    table.ForeignKey(
+                        name: "FK_PPGestionnaire_AspNetUsers_IdUtilisateur",
+                        column: x => x.IdUtilisateur,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "PPPoidsLivraisons",
                 columns: table => new
                 {
@@ -341,11 +364,11 @@ namespace Projet_Web_Commerce.Migrations
                     MotDePasse = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Nom = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Prenom = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Rue = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Rue = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Ville = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     NoProvince = table.Column<string>(type: "char(2)", nullable: true),
                     CodePostal = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Pays = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Pays = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IdUtilisateur = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
@@ -656,6 +679,11 @@ namespace Projet_Web_Commerce.Migrations
                 column: "NoProduit");
 
             migrationBuilder.CreateIndex(
+                name: "IX_PPGestionnaire_IdUtilisateur",
+                table: "PPGestionnaire",
+                column: "IdUtilisateur");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_PPPoidsLivraisons_CodePoids",
                 table: "PPPoidsLivraisons",
                 column: "CodePoids");
@@ -709,6 +737,9 @@ namespace Projet_Web_Commerce.Migrations
 
             migrationBuilder.DropTable(
                 name: "PPDetailsCommandes");
+
+            migrationBuilder.DropTable(
+                name: "PPGestionnaire");
 
             migrationBuilder.DropTable(
                 name: "PPHistoriquePaiements");

@@ -12,7 +12,7 @@ using Projet_Web_Commerce.Data;
 namespace Projet_Web_Commerce.Migrations
 {
     [DbContext(typeof(AuthDbContext))]
-    [Migration("20240131192314_init")]
+    [Migration("20240131203657_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -427,6 +427,39 @@ namespace Projet_Web_Commerce.Migrations
                     b.ToTable("PPDetailsCommandes");
                 });
 
+            modelBuilder.Entity("Projet_Web_Commerce.Models.PPGestionnaire", b =>
+                {
+                    b.Property<int>("NoGestionnaire")
+                        .HasColumnType("int");
+
+                    b.Property<string>("AdresseEmail")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("DateCreation")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("IdUtilisateur")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("MotDePasse")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Nom")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Prenom")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("NoGestionnaire");
+
+                    b.HasIndex("IdUtilisateur");
+
+                    b.ToTable("PPGestionnaire");
+                });
+
             modelBuilder.Entity("Projet_Web_Commerce.Models.PPHistoriquePaiements", b =>
                 {
                     b.Property<int>("NoHistorique")
@@ -664,7 +697,6 @@ namespace Projet_Web_Commerce.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Pays")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("PoidsMaxLivraison")
@@ -677,7 +709,6 @@ namespace Projet_Web_Commerce.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Rue")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("Statut")
@@ -900,6 +931,17 @@ namespace Projet_Web_Commerce.Migrations
                     b.Navigation("PPProduits");
                 });
 
+            modelBuilder.Entity("Projet_Web_Commerce.Models.PPGestionnaire", b =>
+                {
+                    b.HasOne("Projet_Web_Commerce.Areas.Identity.Data.Utilisateur", "Utilisateur")
+                        .WithMany("PPGestionnaire")
+                        .HasForeignKey("IdUtilisateur")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Utilisateur");
+                });
+
             modelBuilder.Entity("Projet_Web_Commerce.Models.PPPoidsLivraisons", b =>
                 {
                     b.HasOne("Projet_Web_Commerce.Models.PPTypesLivraison", "PPTypesLivraison")
@@ -1000,6 +1042,8 @@ namespace Projet_Web_Commerce.Migrations
             modelBuilder.Entity("Projet_Web_Commerce.Areas.Identity.Data.Utilisateur", b =>
                 {
                     b.Navigation("PPClients");
+
+                    b.Navigation("PPGestionnaire");
 
                     b.Navigation("PPVendeurs");
                 });
