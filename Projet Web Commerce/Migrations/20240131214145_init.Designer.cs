@@ -12,7 +12,7 @@ using Projet_Web_Commerce.Data;
 namespace Projet_Web_Commerce.Migrations
 {
     [DbContext(typeof(AuthDbContext))]
-    [Migration("20240131210308_init")]
+    [Migration("20240131214145_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -528,10 +528,7 @@ namespace Projet_Web_Commerce.Migrations
             modelBuilder.Entity("Projet_Web_Commerce.Models.PPProduits", b =>
                 {
                     b.Property<int>("NoProduit")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("NoProduit"));
 
                     b.Property<DateTime>("DateCreation")
                         .HasColumnType("datetime2");

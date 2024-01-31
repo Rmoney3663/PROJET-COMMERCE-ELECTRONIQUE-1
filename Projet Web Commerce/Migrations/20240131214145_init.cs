@@ -451,8 +451,7 @@ namespace Projet_Web_Commerce.Migrations
                 name: "PPProduits",
                 columns: table => new
                 {
-                    NoProduit = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    NoProduit = table.Column<int>(type: "int", nullable: false),
                     NoVendeur = table.Column<int>(type: "int", nullable: false),
                     NoCategorie = table.Column<int>(type: "int", nullable: false),
                     DateCreation = table.Column<DateTime>(type: "datetime2", nullable: false),
