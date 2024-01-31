@@ -162,12 +162,8 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
 
 
                     PPVendeurs newRecord = new PPVendeurs()
-                    {
-                        IdUtilisateur = user.Id,
-                        NoVendeur = lowestNo,
-                        PoidsMaxLivraison = SelectedNumberPoids,
-                        LivraisonGratuite = SelectedNumberLivraison
-                    };
+                    { IdUtilisateur = user.Id, NoVendeur = lowestNo, 
+                      PoidsMaxLivraison = SelectedNumberPoids, LivraisonGratuite = SelectedNumberLivraison };
 
                     context.PPVendeurs.Add(newRecord);
                     context.SaveChanges();

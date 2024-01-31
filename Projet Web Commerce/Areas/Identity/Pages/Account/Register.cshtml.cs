@@ -137,11 +137,11 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
 
                     var context = new AuthDbContext(optionsBuilder.Options);
 
-                    int lowestNo = context.PPClients.Any() ? context.PPClients.Min(u => u.NoClient) : 10000;
+                    int lowestNo = context.PPClients.Any() ? context.PPClients.Max(u => u.NoClient) + 1 : 10000;
 
                     
                     PPClients newRecord = new PPClients()
-                    { IdUtilisateur = user.Id, NoClient = lowestNo, MotDePasse= Input.Password, DateCreation=DateTime.Now, Statut=0, AdresseEmail=Input.Email };
+                    { IdUtilisateur = user.Id, NoClient = lowestNo, MotDePasse= Input.Password, DateCreation=DateTime.Now, Statut=0, AdresseEmail=Input.Email, NbConnexions=0 };
 
                     context.PPClients.Add(newRecord);
                     context.SaveChanges();
