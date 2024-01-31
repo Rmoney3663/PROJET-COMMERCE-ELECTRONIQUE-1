@@ -32,7 +32,7 @@ namespace Projet_Web_Commerce.Models
         public string MotDePasse { get; set; }
         public string? Nom { get; set; }
         public string? Prenom { get; set; }
-        public string Rue { get; set; }
+        public string? Rue { get; set; }
 
         public string? Ville { get; set; }
 
@@ -40,7 +40,7 @@ namespace Projet_Web_Commerce.Models
         public string? NoProvince { get; set; }
 
         public string? CodePostal { get; set; }
-        public string Pays { get; set; }
+        public string? Pays { get; set; }
         public string IdUtilisateur { get; set; }
 
         [InverseProperty("PPVendeurs")]

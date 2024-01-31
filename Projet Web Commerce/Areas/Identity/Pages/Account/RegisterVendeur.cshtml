@@ -13,6 +13,11 @@
             <hr />
             <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
             <div class="form-floating mb-3">
+                <input asp-for="Input.NomAffaires" class="form-control" autocomplete="Nom d'affaires" aria-required="true" placeholder="Nom d'affaires" />
+                <label asp-for="Input.NomAffaires">Nom d'affaires</label>
+                <span asp-validation-for="Input.NomAffaires" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
                 <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
                 <label asp-for="Input.Email">Email</label>
                 <span asp-validation-for="Input.Email" class="text-danger"></span>
@@ -47,12 +52,42 @@
                 <select asp-for="Input.SelectedNumberLivraison" class="form-control" aria-required="true">
                     @for (int i = 0; i <= 500; i++)
                     {
-                        <option value="@i">@i Kg</option>
+                        <option value="@i">@i $</option>
                     }
                 </select>
                 <label asp-for="Input.SelectedNumberLivraison">Prix pour livraison gratuite ($ CAD)</label>
                 <span asp-validation-for="Input.SelectedNumberLivraison" class="text-danger"></span>
             </div>
+            <div class="form-floating mb-3">
+                <select asp-for="Input.Tax" class="form-control" aria-required="true">
+                    <option value="True">True</option>
+                    <option value="False">False</option>
+                </select>
+                <label asp-for="Input.Tax">Client doit payer taxe ?</label>
+                <span asp-validation-for="Input.Tax" class="text-danger"></span>
+            </div>
+
+            <div class="form-floating mb-3">
+                <select asp-for="Input.SelectedProvince" class="form-control" aria-required="true">
+                    <option value="AB">Alberta</option>
+                    <option value="BC">British Columbia</option>
+                    <option value="MB">Manitoba</option>
+                    <option value="NB">New Brunswick</option>
+                    <option value="NL">Newfoundland and Labrador</option>
+                    <option value="NS">Nova Scotia</option>
+                    <option value="NT">Northwest Territories</option>
+                    <option value="NU">Nunavut</option>
+                    <option value="ON">Ontario</option>
+                    <option value="PE">Prince Edward Island</option>
+                    <option value="QC">Quebec</option>
+                    <option value="SK">Saskatchewan</option>
+                    <option value="YT">Yukon</option>
+                </select>
+                <label asp-for="Input.SelectedProvince">Sélectionner la province</label>
+                <span asp-validation-for="Input.SelectedProvince" class="text-danger"></span>
+            </div>
+
+
 
             <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
         </form>
