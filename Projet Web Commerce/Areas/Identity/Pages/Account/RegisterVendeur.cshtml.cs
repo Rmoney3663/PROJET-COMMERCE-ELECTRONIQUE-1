@@ -180,7 +180,7 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
 
                     PPVendeurs newRecord = new PPVendeurs()
                     { IdUtilisateur = user.Id, NoVendeur = lowestNo, AdresseEmail = email, MotDePasse = password, Taxes = taxe, NomAffaires = Input.NomAffaires,
-                      DateCreation = date, PoidsMaxLivraison = SelectedNumberPoids, LivraisonGratuite = SelectedNumberLivraison };
+                      DateCreation = date, PoidsMaxLivraison = SelectedNumberPoids, LivraisonGratuite = SelectedNumberLivraison, Statut = 0 };
 
                     context.PPVendeurs.Add(newRecord);
                     context.SaveChanges();
