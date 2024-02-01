@@ -125,9 +125,29 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
             public string SelectedProvince { get; set; }
 
             [Required]
+            [Display(Name = "Nom de la ville")]
+            public string Ville { get; set; }
+
+            [Required]
+            [Display(Name = "Nom de la rue")]
+            public string Rue { get; set; }
+
+            [Required]
             [Display(Name = "Nom d'affaires")]
             public string NomAffaires { get; set; }
 
+            [Required]
+            [RegularExpression(@"^[A-Za-z]\d[A-Za-z] \d[A-Za-z]\d$", ErrorMessage = "Le code postal doit être au format A1A 1A1.")]
+            [Display(Name = "Code Postal")]
+            public string CodePostal { get; set; }
+
+            [Required]
+            [Display(Name = "Nom")]
+            public string Nom { get; set; }
+
+            [Required]
+            [Display(Name = "Prenom")]
+            public string Prenom { get; set; }
         }
 
         public async Task OnGetAsync(string returnUrl = null)
@@ -160,6 +180,12 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
                 var date = DateTime.Now;
                 var taxe = Input.Tax;
                 var province = Input.SelectedProvince;
+                var ville = Input.Ville;
+                var rue = Input.Rue;
+                var codePostal = Input.CodePostal;
+                var nom = Input.Nom;
+                var prenom = Input.Prenom;
+
                 var user = CreateUser();
 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
@@ -209,8 +235,11 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
                     PPVendeurs newRecord = new PPVendeurs()
                     { 
                       IdUtilisateur = user.Id, NoVendeur = lowestNo, AdresseEmail = email, MotDePasse = password, Taxes = taxe, NomAffaires = Input.NomAffaires, NoProvince = province,
-                      DateCreation = date, PoidsMaxLivraison = SelectedNumberPoids, LivraisonGratuite = SelectedNumberLivraison, Statut = 0, Pourcentage = (decimal?)pourcentage
+                      DateCreation = date, PoidsMaxLivraison = SelectedNumberPoids, LivraisonGratuite = SelectedNumberLivraison, Statut = 0, Pourcentage = (decimal?)pourcentage,
+                      Ville = ville, Pays = "Canada", Rue = rue, CodePostal = codePostal, Prenom = prenom, Nom = nom,
                     };
+
+
 
                     context.PPVendeurs.Add(newRecord);
                     context.SaveChanges();

@@ -1,5 +1,6 @@
 ﻿@using Microsoft.AspNetCore.Identity
 @using System.Security.Claims
+@model Projet_Web_Commerce.Models.ModelMainMenu
 @inject SignInManager<Projet_Web_Commerce.Areas.Identity.Data.Utilisateur> SignInManager
 @inject UserManager<Projet_Web_Commerce.Areas.Identity.Data.Utilisateur> UserManager
 
@@ -21,15 +22,103 @@
 }
 
 <div class="row">
-    <div class="col-md-4">
+    <div class="col">
         <section>
             @if (SignInManager.IsSignedIn(User))
             {
                 <h1>Vous êtes connecté @role</h1>
+
+                if (role == "Gestionnaire")
+                {
+                    <h3>Liste des Vendeurs à confirmer</h3>
+                    <div class="container mt-4">
+                        @if (role == "Gestionnaire" && Model != null)
+                        {
+                            <div class="row">
+                                @foreach (var item in Model.VendeursList)
+                                {
+                                    <div class="col-md-6 mb-4">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h5 class="card-title">@Html.DisplayFor(modelItem => item.AdresseEmail)</h5>
+                                                <p class="card-text">No Vendeur: @Html.DisplayFor(modelItem => item.NoVendeur)</p>
+                                                <p class="card-text">Date de demande : @Html.DisplayFor(modelItem => item.DateCreation)</p>
+                                                <form asp-controller="MainMenu" method="post">
+                                                    <input type="hidden" name="NoVendeur" value="@item.NoVendeur" />
+                                                    <button type="submit" class="btn btn-primary">Accepter</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <p>Aucun vendeur trouvé avec le statut 0.</p>
+                        }
+                    </div>
+                }
+                else if (role == "Client")
+                {
+                    <h3>Liste des Catégories</h3>
+                    <div class="container mt-4">
+                        @if (Model != null && Model.CategoriesList != null)
+                        {
+                            <div class="row">
+                                @foreach (var category in Model.CategoriesList)
+                                {
+                                    <div class="col-md-4 mb-4">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h2 class="card-title">@Html.DisplayFor(modelItem => category.Description)</h2>
+                                                <h5 class="card-details">@Html.DisplayFor(modelItem => category.Details)</h5>
+                                                <p>Nombre de produits : 0</p>
+                                                <!-- Add other category properties as needed -->
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <p>Aucune catégorie trouvée.</p>
+                        }
+                    </div>
+                }
             }
             else
             {
                 <h1>Vous n'êtes pas connecté</h1>
+
+                <h3>Liste des Catégories</h3>
+                <div class="container mt-4">
+                    @if (Model != null && Model.CategoriesList != null)
+                    {
+                        <div class="row">
+                            @foreach (var category in Model.CategoriesList)
+                            {
+                                <div class="col-md-4 mb-4">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h2 class="card-title">@Html.DisplayFor(modelItem => category.Description)</h2>
+                                            <h5 class="card-details">@Html.DisplayFor(modelItem => category.Details)</h5>
+                                            <p>Nombre de produits : 0</p>
+                                            <!-- Add other category properties as needed -->
+
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <p>Aucune catégorie trouvée.</p>
+                    }
+                </div>
             }
         </section>
     </div>
