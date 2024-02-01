@@ -12,6 +12,16 @@
         <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
             <h2>Créer un nouveau compte.</h2>
             <hr />
+             <div class="form-floating mb-3">
+                <input asp-for="Input.Prenom" class="form-control" autocomplete="Prenom" aria-required="true" placeholder="Prenom" />
+                <label asp-for="Input.Prenom">Prenom</label>
+                <span asp-validation-for="Input.Prenom" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Nom" class="form-control" autocomplete="Nom" aria-required="true" placeholder="Nom" />
+                <label asp-for="Input.Nom">Nom</label>
+                <span asp-validation-for="Input.Nom" class="text-danger"></span>
+            </div>
             <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
             <div class="form-floating mb-3">
                 <input asp-for="Input.NomAffaires" class="form-control" autocomplete="Nom d'affaires" aria-required="true" placeholder="Nom d'affaires" />
@@ -78,6 +88,24 @@
                 </select>
                 <label asp-for="Input.SelectedProvince">Sélectionner la province</label>
                 <span asp-validation-for="Input.SelectedProvince" class="text-danger"></span>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Ville" class="form-control" autocomplete="Nom d'affaires" aria-required="true" placeholder="Nom de la ville" />
+                <label asp-for="Input.Ville">Nom de la ville</label>
+                <span asp-validation-for="Input.Ville" class="text-danger"></span>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Rue" class="form-control" autocomplete="Nom de la rue" aria-required="true" placeholder="Nom de la rue" />
+                <label asp-for="Input.Rue">Nom de la rue</label>
+                <span asp-validation-for="Input.Rue" class="text-danger"></span>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input asp-for="Input.CodePostal" class="form-control" autocomplete="A1A 1A1" aria-required="true" placeholder="A1A 1A1" />
+                <label asp-for="Input.CodePostal">Code Postal</label>
+                <span asp-validation-for="Input.CodePostal" class="text-danger"></span>
             </div>
 
             <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary" style="color: rgb(249, 229, 71); background-color: rgb(124, 105, 146)">S'enregistrer</button>
