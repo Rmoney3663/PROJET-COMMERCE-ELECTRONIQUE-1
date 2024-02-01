@@ -20,23 +20,36 @@ namespace Projet_Web_Commerce.Controllers
         // GET: MainMenuController
         public ActionResult Index()
         {
-            var vendeursStatutZero = _context.PPVendeurs.Where(v => v.Statut == 0).ToList();
-            return View(vendeursStatutZero);
+            if (User.IsInRole("Gestionnaire"))
+            {
+                var vendeursStatutZero = _context.PPVendeurs.Where(v => v.Statut == 0).ToList();
+
+                return View(vendeursStatutZero);
+            }
+            else
+            {
+                return View(); 
+            }
+            
         }
 
         [HttpPost]
         public ActionResult Index(int NoVendeur)
         {
-            var vendeurToUpdate = _context.PPVendeurs.FirstOrDefault(v => v.NoVendeur == NoVendeur);
-
-            if (vendeurToUpdate != null)
+            if (User.IsInRole("Gestionnaire"))
             {
-                // Update the properties of the vendeur
-                vendeurToUpdate.Statut = 1;
+                var vendeurToUpdate = _context.PPVendeurs.FirstOrDefault(v => v.NoVendeur == NoVendeur);
 
-                // Save changes to the database
-                _context.SaveChanges();
+                if (vendeurToUpdate != null)
+                {
+                    // Update the properties of the vendeur
+                    vendeurToUpdate.Statut = 1;
+
+                    // Save changes to the database
+                    _context.SaveChanges();
+                }
             }
+
             return View("Index");
         }
 
