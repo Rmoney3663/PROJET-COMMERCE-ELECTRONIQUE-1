@@ -121,8 +121,9 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
                 var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
-                    var user = await _userManager.FindByEmailAsync(Input.Email);
+                    var user = await _userManager.FindByEmailAsync(Input.Email);                   
                     bool estDansRole = await _userManager.IsInRoleAsync(user, "Vendeur");
+                    bool estClient = await _userManager.IsInRoleAsync(user, "Client");
                     var lstVendeurs = _context.PPVendeurs.ToList();
                     var foundVendeur = lstVendeurs.FirstOrDefault(v => v.AdresseEmail == Input.Email);
 
@@ -135,6 +136,27 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
                         }
                     }
                     _logger.LogInformation("Utilisateur connecté.");
+
+                    if (estClient)
+                    {
+                        var foundClient = _context.PPClients.FirstOrDefault(c => c.AdresseEmail == Input.Email);
+                        if (foundClient != null)
+                        {
+                            foundClient.DateDerniereConnexion = DateTime.Now;
+                            foundClient.NbConnexions++; 
+
+                            try
+                            {
+                                await _context.SaveChangesAsync(); 
+                            }
+                            catch (Exception ex)
+                            {
+                                ModelState.AddModelError(string.Empty, "Une erreur s'est produite lors de la mise à jour des informations du client.");
+                                _logger.LogError(ex, "An error occurred while updating client information.");
+                                return Page();
+                            }
+                        }
+                    }
                     return LocalRedirect(returnUrl);
                 }
                 if (result.RequiresTwoFactor)
