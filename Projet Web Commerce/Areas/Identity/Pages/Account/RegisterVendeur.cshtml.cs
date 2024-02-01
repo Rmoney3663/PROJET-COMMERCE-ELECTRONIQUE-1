@@ -137,7 +137,7 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
             public string NomAffaires { get; set; }
 
             [Required]
-            [RegularExpression(@"^[A-Za-z]\d[A-Za-z] \d[A-Za-z]\d$", ErrorMessage = "Le code postal doit être au format A1A 1A1.")]
+            [RegularExpression(@"^([A-Za-z]\d[A-Za-z] \d[A-Za-z]\d)|([A-Za-z]\d[A-Za-z]\d[A-Za-z]\d)$", ErrorMessage = "Le code postal doit être au format A1A 1A1 ou A1A1A1.")]
             [Display(Name = "Code Postal")]
             public string CodePostal { get; set; }
 
@@ -185,6 +185,11 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
                 var codePostal = Input.CodePostal;
                 var nom = Input.Nom;
                 var prenom = Input.Prenom;
+
+                if (codePostal.Length == 6)
+                {
+                    codePostal.Insert(2, " ");
+                }
 
                 var user = CreateUser();
 

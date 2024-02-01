@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Projet_Web_Commerce.Areas.Identity.Data;
 using Projet_Web_Commerce.Data;
 using Projet_Web_Commerce.Models;
+using System.Globalization;
 
 namespace Projet_Web_Commerce.Controllers
 {
@@ -21,6 +22,7 @@ namespace Projet_Web_Commerce.Controllers
         // GET: MainMenuController
         public ActionResult Index()
         {
+
             var VendeursList = _context.PPVendeurs
                 .Where(v => v.Statut == 0)
                 .OrderBy(v => v.DateCreation)  // Assuming DateCreation is the property you want to order by
@@ -41,6 +43,7 @@ namespace Projet_Web_Commerce.Controllers
         [HttpPost]
         public ActionResult Index(int NoVendeur)
         {
+
             if (User.IsInRole("Gestionnaire"))
             {
                 var vendeurToUpdate = _context.PPVendeurs.FirstOrDefault(v => v.NoVendeur == NoVendeur);
