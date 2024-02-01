@@ -78,14 +78,14 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
-            [Required]
+            [Required(ErrorMessage = "Le email est requis.")]
             [EmailAddress]
             [Display(Name = "Email")]
             public string Email { get; set; }
 
-            [Required]
+            [Required(ErrorMessage = "Retaper le email.")]
             [EmailAddress]
-            [Display(Name = "Confirm Email")]
+            [Display(Name = "Confirmer Email")]
             [Compare("Email", ErrorMessage = "L'email et l'email de confirmation ne correspondent pas.")]
             public string ConfirmEmail { get; set; }
 
@@ -93,10 +93,10 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
-            [Required]
+            [Required(ErrorMessage = "Le mot de passe est requis.")]
             [StringLength(100, ErrorMessage = "Le {0} doit comporter au moins {2} et au maximum {1} caractères.", MinimumLength = 6)]
             [DataType(DataType.Password)]
-            [Display(Name = "Password")]
+            [Display(Name = "Mot de passe")]
             public string Password { get; set; }
 
             /// <summary>
@@ -104,51 +104,58 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
             [DataType(DataType.Password)]
-            [Display(Name = "Confirm password")]
+            [Display(Name = "Confirmer mot de passe")]
             [Compare("Password", ErrorMessage = "Le mot de passe et le mot de passe de confirmation ne correspondent pas.")]
             public string ConfirmPassword { get; set; }
 
-            [Required]
+            [Required(ErrorMessage = "Le poids est requis.")]
             [Display(Name = "Poids max pour livraison (Kg)")]
             public int SelectedNumberPoids { get; set; }
 
-            [Required]
+            [Required(ErrorMessage = "Le prix est requis.")]
             [Display(Name = "Prix pour livraison gratuite ($ CAD)")]
             public int SelectedNumberLivraison { get; set; }
 
-            [Required]
+            [Required(ErrorMessage = "Le taxe est requis.")]
             [Display(Name = "Client doit payer taxe ?")]
             public bool Tax { get; set; }
 
-            [Required]
+            [Required(ErrorMessage = "Le province est requis.")]
             [Display(Name = "Sélectionner la province")]
             public string SelectedProvince { get; set; }
 
-            [Required]
+            [Required(ErrorMessage = "Le nom de la ville est requis.")]
             [Display(Name = "Nom de la ville")]
             public string Ville { get; set; }
 
-            [Required]
+            [Required(ErrorMessage = "Le nom de la rue est requis.")]
             [Display(Name = "Nom de la rue")]
             public string Rue { get; set; }
 
-            [Required]
+            [Required(ErrorMessage = "Le nom d'affaires est requis.")]
             [Display(Name = "Nom d'affaires")]
             public string NomAffaires { get; set; }
 
-            [Required]
+            [Required(ErrorMessage = "Le code postal est requis.")]
             [RegularExpression(@"^([A-Za-z]\d[A-Za-z] \d[A-Za-z]\d)|([A-Za-z]\d[A-Za-z]\d[A-Za-z]\d)$", ErrorMessage = "Le code postal doit être au format A1A 1A1 ou A1A1A1.")]
             [Display(Name = "Code Postal")]
             public string CodePostal { get; set; }
 
-            [Required]
+            [Required(ErrorMessage = "Le nom est requis.")]
             [Display(Name = "Nom")]
             public string Nom { get; set; }
 
-            [Required]
+            [Required(ErrorMessage = "Le prenom est requis.")]
             [Display(Name = "Prenom")]
             public string Prenom { get; set; }
 
+            [RegularExpression(@"^\d{3}-\d{3}-\d{4}$", ErrorMessage = "Le numéro de téléphone doit être au format 999-999-9999.")]
+            [Display(Name = "Numéro de téléphone 1")]
+            public string PhoneNumber1 { get; set; }
+
+            [RegularExpression(@"^\d{3}-\d{3}-\d{4}$", ErrorMessage = "Le numéro de téléphone doit être au format 999-999-9999.")]
+            [Display(Name = "Numéro de téléphone 2")]
+            public string PhoneNumber2 { get; set; }
 
         }
 
@@ -166,7 +173,6 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
 
             Input.SelectedNumberLivraison = 0;
             Input.Tax = true;
-            //Input.SelectedProvince= "QC";
         }
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
@@ -187,6 +193,8 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
                 var codePostal = Input.CodePostal;
                 var nom = Input.Nom;
                 var prenom = Input.Prenom;
+                var phone1 = Input.PhoneNumber1;
+                var phone2 = Input.PhoneNumber2;
 
                 if (codePostal.Length == 6)
                 {
@@ -243,13 +251,34 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
                     { 
                       IdUtilisateur = user.Id, NoVendeur = lowestNo, AdresseEmail = email, MotDePasse = password, Taxes = taxe, NomAffaires = Input.NomAffaires, NoProvince = province,
                       DateCreation = date, PoidsMaxLivraison = SelectedNumberPoids, LivraisonGratuite = SelectedNumberLivraison, Statut = 0, Pourcentage = (decimal?)pourcentage,
-                      Ville = ville, Pays = "Canada", Rue = rue, CodePostal = codePostal, Prenom = prenom, Nom = nom,
+                      Ville = ville, Pays = "Canada", Rue = rue, CodePostal = codePostal, Prenom = prenom, Nom = nom
                     };
-
-
-
                     context.PPVendeurs.Add(newRecord);
                     context.SaveChanges();
+
+                    if (phone1 != null)
+                    {
+                        TelephoneVendeurs telephoneVendeurs1 = new TelephoneVendeurs()
+                        {
+                            NoVendeur = lowestNo,
+                            Tel = phone1
+                        };
+
+                        context.TelephoneVendeurs.Add(telephoneVendeurs1);
+                        context.SaveChanges();
+                    }
+
+                    if (phone2 != null)
+                    {
+                        TelephoneVendeurs telephoneVendeurs2 = new TelephoneVendeurs()
+                        {
+                            NoVendeur = lowestNo,
+                            Tel = phone2
+                        };
+
+                        context.TelephoneVendeurs.Add(telephoneVendeurs2);
+                        context.SaveChanges();
+                    }
 
                     _logger.LogInformation("L'utilisateur a créé un nouveau compte avec un mot de passe.");
 

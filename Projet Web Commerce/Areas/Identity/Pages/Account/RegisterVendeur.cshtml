@@ -110,6 +110,18 @@
                 <span asp-validation-for="Input.CodePostal" class="text-danger"></span>
             </div>
 
+            <div class="form-floating mb-3">
+                <input asp-for="Input.PhoneNumber1" class="form-control" autocomplete="999-999-9999" aria-required="true" placeholder="999-999-9999" />
+                <label asp-for="Input.PhoneNumber1">Numéro de téléphone 1</label>
+                <span asp-validation-for="Input.PhoneNumber1" class="text-danger"></span>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input asp-for="Input.PhoneNumber2" class="form-control" autocomplete="999-999-9999" aria-required="true" placeholder="999-999-9999" />
+                <label asp-for="Input.PhoneNumber2">Numéro de téléphone 2</label>
+                <span asp-validation-for="Input.PhoneNumber2" class="text-danger"></span>
+            </div>
+
             <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary" style="color: rgb(249, 229, 71); background-color: rgb(124, 105, 146)">S'enregistrer</button>
         </form>
     </div>    

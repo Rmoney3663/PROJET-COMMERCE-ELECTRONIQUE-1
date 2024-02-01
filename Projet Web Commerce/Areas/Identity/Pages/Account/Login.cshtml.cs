@@ -71,7 +71,7 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
-            [Required]
+            [Required(ErrorMessage = "Le email est requis.")]
             [EmailAddress]
             public string Email { get; set; }
 
@@ -79,7 +79,7 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
-            [Required]
+            [Required(ErrorMessage = "Le mot de passe est requis.")]
             [DataType(DataType.Password)]
             public string Password { get; set; }
 

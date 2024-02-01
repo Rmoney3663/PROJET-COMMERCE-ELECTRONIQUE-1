@@ -33,7 +33,7 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
 
         public class InputModel
         {
-            [Required]
+            [Required(ErrorMessage = "Le email est requis.")]
             [EmailAddress]
             public string Email { get; set; }
         }
