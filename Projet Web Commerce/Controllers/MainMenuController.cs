@@ -24,6 +24,22 @@ namespace Projet_Web_Commerce.Controllers
             return View(vendeursStatutZero);
         }
 
+        [HttpPost]
+        public ActionResult Index(int NoVendeur)
+        {
+            var vendeurToUpdate = _context.PPVendeurs.FirstOrDefault(v => v.NoVendeur == NoVendeur);
+
+            if (vendeurToUpdate != null)
+            {
+                // Update the properties of the vendeur
+                vendeurToUpdate.Statut = 1;
+
+                // Save changes to the database
+                _context.SaveChanges();
+            }
+            return View("Index");
+        }
+
         // GET: MainMenuController/Details/5
         public ActionResult Details(int id)
         {
