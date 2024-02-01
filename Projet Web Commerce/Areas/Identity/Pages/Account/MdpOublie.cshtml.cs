@@ -19,13 +19,11 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
     {
         private readonly AuthDbContext _context;
         private readonly UserManager<Utilisateur> _userManager;
-        private readonly IEmailSender _emailSender;
 
-        public MdpOublieModel(AuthDbContext context, UserManager<Utilisateur> userManager, IEmailSender emailSender)
+        public MdpOublieModel(AuthDbContext context, UserManager<Utilisateur> userManager)
         {
             _context = context;
             _userManager = userManager;
-            _emailSender = emailSender;
         }
 
         [BindProperty]
@@ -47,29 +45,38 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
                 if (user == null)
                     ModelState.AddModelError(string.Empty, "Cette adresse courriel n'existe pas dans la base de données.");
 
-                var role = "help";
-                var email = "";
-                if (User.IsInRole("Gestionnaire"))
-                    role = "Gestionnaire";
-                else if (User.IsInRole("Vendeur"))
+                var password = "";
+
+                bool estDansRole = await _userManager.IsInRoleAsync(user, "Vendeur");
+                if (estDansRole)
                 {
-                    role = "Vendeur";
                     var lstVendeurs = _context.PPVendeurs.ToList();
-                    email = (from vendeur in lstVendeurs
-                                  where vendeur.AdresseEmail == Input.Email
-                                  select vendeur).FirstOrDefault().ToString();
+                    var foundVendeur = lstVendeurs.FirstOrDefault(v => v.AdresseEmail == Input.Email);
+
+                    password = foundVendeur?.MotDePasse.ToString() ?? "";
                 }
                 else
                 {
-                    role = "Client";
+                    estDansRole = await _userManager.IsInRoleAsync(user, "Client");
+
                     var lstClients = _context.PPClients.ToList();
-                    email = (from client in lstClients
-                             where client.AdresseEmail == Input.Email
-                             select client).FirstOrDefault().ToString();
+                    var foundClient = lstClients.FirstOrDefault(client => client.AdresseEmail == Input.Email);
+
+                    password = foundClient?.MotDePasse.ToString() ?? "";
                 }
 
-                await Methodes.envoyerCourriel(Input.Email, "Oubli du mot de passe",
-                        $"Voici le mot de passe pour l'utilisateur {user.UserName}: {email}");
+                if (password != "")
+                {
+                    await Methodes.envoyerCourriel(Input.Email, "Oubli du mot de passe",
+                        $"Voici le mot de passe pour l'utilisateur {user.UserName}: {password}");
+                    ModelState.AddModelError("",
+                        "Un courriel contenant votre mot de passe vous a été envoyé.");
+                }
+                //else
+                //{
+                //    ModelState.AddModelError(string.Empty,
+                //        "");
+                //}
             }
 
             // If we got this far, something failed, redisplay form
