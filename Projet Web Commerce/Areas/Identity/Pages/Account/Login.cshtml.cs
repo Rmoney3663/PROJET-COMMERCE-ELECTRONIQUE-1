@@ -87,7 +87,7 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
-            [Display(Name = "Remember me?")]
+            [Display(Name = "Se rappelez de moi ?")]
             public bool RememberMe { get; set; }
         }
 
@@ -134,7 +134,7 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
                             return Page();
                         }
                     }
-                    _logger.LogInformation("User logged in.");
+                    _logger.LogInformation("Utilisateur connecté.");
                     return LocalRedirect(returnUrl);
                 }
                 if (result.RequiresTwoFactor)
@@ -143,12 +143,12 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
                 }
                 if (result.IsLockedOut)
                 {
-                    _logger.LogWarning("User account locked out.");
+                    _logger.LogWarning("Compte utilisateur bloqué.");
                     return RedirectToPage("./Lockout");
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                    ModelState.AddModelError(string.Empty, "Tentative de connexion non valide.");
                     return Page();
                 }
             }
