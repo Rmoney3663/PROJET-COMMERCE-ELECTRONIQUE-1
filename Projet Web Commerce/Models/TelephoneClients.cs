@@ -6,6 +6,7 @@ namespace Projet_Web_Commerce.Models
     public class TelephoneClients
     {
         [Key]
+        public int Id { get; set; }
         public int NoClient { get; set; }
         public string Tel { get; set; }
         [ForeignKey("NoClient")]
