@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Projet_Web_Commerce.Areas.Identity.Data;
 using Projet_Web_Commerce.Data;
+using Projet_Web_Commerce.Models;
 
 namespace Projet_Web_Commerce.Controllers
 {
@@ -20,19 +21,20 @@ namespace Projet_Web_Commerce.Controllers
         // GET: MainMenuController
         public ActionResult Index()
         {
-            if (User.IsInRole("Gestionnaire"))
-            {
-                var vendeursStatutZero = _context.PPVendeurs
+            var VendeursList = _context.PPVendeurs
                 .Where(v => v.Statut == 0)
                 .OrderBy(v => v.DateCreation)  // Assuming DateCreation is the property you want to order by
                 .ToList();
 
-                return View(vendeursStatutZero);
-            }
-            else
+            var CategoriesList = _context.PPCategories.ToList();
+
+            var model = new ModelMainMenu
             {
-                return View(); 
-            }
+                VendeursList = VendeursList,
+                CategoriesList = CategoriesList,
+            };
+
+            return View(model);
             
         }
 
@@ -53,9 +55,9 @@ namespace Projet_Web_Commerce.Controllers
                 }
 
                 var vendeursStatutZero = _context.PPVendeurs
-.Where(v => v.Statut == 0)
-.OrderBy(v => v.DateCreation)  // Assuming DateCreation is the property you want to order by
-.ToList();
+                .Where(v => v.Statut == 0)
+                .OrderBy(v => v.DateCreation)  // Assuming DateCreation is the property you want to order by
+                .ToList();
 
                 return View(vendeursStatutZero);
             }
