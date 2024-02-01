@@ -1,4 +1,11 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Identity
+@using System.Security.Claims
+
+@inject SignInManager<Projet_Web_Commerce.Areas.Identity.Data.Utilisateur> SignInManager
+@inject UserManager<Projet_Web_Commerce.Areas.Identity.Data.Utilisateur> UserManager
+
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -37,8 +44,16 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link" style="color: rgb(249, 229, 71); font-size: 23px" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link" style="color: rgb(249, 229, 71); font-size: 23px" asp-area="" asp-controller="MainMenu" asp-action="Catalogue">Catalogue</a>
                         </li>
+
+                        @if (SignInManager.IsSignedIn(User) && User.IsInRole("Gestionnaire"))
+                        {
+                        <li class="nav-item">
+                            <a class="nav-link" style="color: rgb(249, 229, 71); font-size: 23px" asp-area="" asp-controller="MainMenu" asp-action="GestionVendeurs">Gestion vendeurs</a>
+                        </li>
+                        }
+
                     </ul>
                 </div>
                 <partial name="_LoginPartial" />
