@@ -32,7 +32,7 @@
                 {
                     <h3>Liste des Vendeurs à confirmer</h3>
                     <div class="container mt-4">
-                        @if (role == "Gestionnaire" && Model != null && Model.Any())
+                        @if (role == "Gestionnaire" && Model != null)
                         {
                             <div class="row">
                                 @foreach (var item in Model)
@@ -45,7 +45,7 @@
                                                 <p class="card-text">Date de demande : @Html.DisplayFor(modelItem => item.DateCreation)</p>
                                                 <form asp-controller="MainMenu" method="post">
                                                     <input type="hidden" name="NoVendeur" value="@item.NoVendeur" />
-                                                    <button type="submit" class="btn btn-primary">Accepter</button>s
+                                                    <button type="submit" class="btn btn-primary">Accepter</button>
                                                 </form>
                                             </div>
                                         </div>

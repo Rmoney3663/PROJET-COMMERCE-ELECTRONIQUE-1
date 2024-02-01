@@ -22,7 +22,10 @@ namespace Projet_Web_Commerce.Controllers
         {
             if (User.IsInRole("Gestionnaire"))
             {
-                var vendeursStatutZero = _context.PPVendeurs.Where(v => v.Statut == 0).ToList();
+                var vendeursStatutZero = _context.PPVendeurs
+                .Where(v => v.Statut == 0)
+                .OrderBy(v => v.DateCreation)  // Assuming DateCreation is the property you want to order by
+                .ToList();
 
                 return View(vendeursStatutZero);
             }
@@ -48,6 +51,13 @@ namespace Projet_Web_Commerce.Controllers
                     // Save changes to the database
                     _context.SaveChanges();
                 }
+
+                var vendeursStatutZero = _context.PPVendeurs
+.Where(v => v.Statut == 0)
+.OrderBy(v => v.DateCreation)  // Assuming DateCreation is the property you want to order by
+.ToList();
+
+                return View(vendeursStatutZero);
             }
 
             return View("Index");

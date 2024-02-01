@@ -128,18 +128,14 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
 
                     if (foundVendeur != null)
                     {
-                        if (foundVendeur.Statut == 1)
-                        {
-                            _logger.LogInformation("User logged in.");
-                            return LocalRedirect(returnUrl);
-                        }
-                        else
+                        if (foundVendeur.Statut != 1)
                         {
                             ModelState.AddModelError(string.Empty, "Votre compte vendeur à besoin d'être validé par un gestionnaire");
                             return Page();
                         }
                     }
-
+                    _logger.LogInformation("User logged in.");
+                    return LocalRedirect(returnUrl);
                 }
                 if (result.RequiresTwoFactor)
                 {
