@@ -15,6 +15,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using Projet_Web_Commerce.Areas.Identity.Data;
+using Microsoft.EntityFrameworkCore;
+using Projet_Web_Commerce.Data;
 
 namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
 {
@@ -22,9 +24,13 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
     {
         private readonly SignInManager<Utilisateur> _signInManager;
         private readonly ILogger<LoginModel> _logger;
+        private readonly UserManager<Utilisateur> _userManager;
+        private readonly AuthDbContext _context;
 
-        public LoginModel(SignInManager<Utilisateur> signInManager, ILogger<LoginModel> logger)
+        public LoginModel(SignInManager<Utilisateur> signInManager, ILogger<LoginModel> logger, UserManager<Utilisateur> userManager, AuthDbContext context)
         {
+            _context = context;
+            _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
         }
@@ -115,8 +121,21 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
                 var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
-                    _logger.LogInformation("User logged in.");
-                    return LocalRedirect(returnUrl);
+                    var user = await _userManager.FindByEmailAsync(Input.Email);
+                    bool estDansRole = await _userManager.IsInRoleAsync(user, "Vendeur");
+                    var lstVendeurs = _context.PPVendeurs.ToList();
+                    var foundVendeur = lstVendeurs.FirstOrDefault(v => v.AdresseEmail == Input.Email);
+
+                    if (foundVendeur.Statut == 1)
+                    {
+                        _logger.LogInformation("User logged in.");
+                        return LocalRedirect(returnUrl);
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, "Votre compte vendeur à besoin d'être validé par un gestionnaire");
+                        return Page();
+                    }
                 }
                 if (result.RequiresTwoFactor)
                 {
