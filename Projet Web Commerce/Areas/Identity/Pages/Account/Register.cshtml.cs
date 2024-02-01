@@ -86,7 +86,7 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
             [Required]
             [EmailAddress]
             [Display(Name = "Confirm Email")]
-            [Compare("Email", ErrorMessage = "The email and confirmation email do not match.")]
+            [Compare("Email", ErrorMessage = "L'email et l'email de confirmation ne correspondent pas.")]
             public string ConfirmEmail { get; set; }
 
             /// <summary>
@@ -94,7 +94,7 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
             [Required]
-            [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+            [StringLength(100, ErrorMessage = "Le {0} doit comporter au moins {2} et au maximum {1} caractères.", MinimumLength = 6)]
             [DataType(DataType.Password)]
             [Display(Name = "Password")]
             public string Password { get; set; }
@@ -105,7 +105,7 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
             /// </summary>
             [DataType(DataType.Password)]
             [Display(Name = "Confirm password")]
-            [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
+            [Compare("Password", ErrorMessage = "Le mot de passe et le mot de passe de confirmation ne correspondent pas.")]
             public string ConfirmPassword { get; set; }
         }
 
@@ -160,7 +160,7 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
                     context.PPClients.Add(newRecord);
                     context.SaveChanges();
 
-                    _logger.LogInformation("User created a new account with password.");
+                    _logger.LogInformation("L'utilisateur a créé un nouveau compte avec un mot de passe.");
 
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
@@ -212,7 +212,7 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
         {
             if (!_userManager.SupportsUserEmail)
             {
-                throw new NotSupportedException("The default UI requires a user store with email support.");
+                throw new NotSupportedException("L'interface utilisateur par défaut nécessite un magasin d'utilisateurs avec support par courrier électronique.");
             }
             return (IUserEmailStore<Utilisateur>)_userStore;
         }

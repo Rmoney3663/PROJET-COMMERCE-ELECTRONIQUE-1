@@ -48,6 +48,7 @@ namespace Projet_Web_Commerce.Controllers
             {
                 var vendeurToUpdate = _context.PPVendeurs.FirstOrDefault(v => v.NoVendeur == NoVendeur);
 
+
                 if (vendeurToUpdate != null)
                 {
                     // Update the properties of the vendeur
@@ -56,16 +57,22 @@ namespace Projet_Web_Commerce.Controllers
                     // Save changes to the database
                     _context.SaveChanges();
                 }
-
-                var vendeursStatutZero = _context.PPVendeurs
-                .Where(v => v.Statut == 0)
-                .OrderBy(v => v.DateCreation)  // Assuming DateCreation is the property you want to order by
-                .ToList();
-
-                return View(vendeursStatutZero);
             }
 
-            return View("Index");
+            var vendeursStatutZero = _context.PPVendeurs
+            .Where(v => v.Statut == 0)
+            .OrderBy(v => v.DateCreation)  // Assuming DateCreation is the property you want to order by
+            .ToList();
+
+            var CategoriesList = _context.PPCategories.ToList();
+
+            var model = new ModelMainMenu
+            {
+                VendeursList = vendeursStatutZero,
+                CategoriesList = CategoriesList
+            };
+
+            return View(model);
         }
 
         // GET: MainMenuController/Details/5

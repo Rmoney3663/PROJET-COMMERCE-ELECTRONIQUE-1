@@ -5,7 +5,7 @@ using Projet_Web_Commerce.Areas.Identity.Data;
 using Projet_Web_Commerce.Data;
 using Projet_Web_Commerce.Migrations;
 using Projet_Web_Commerce.Models;
-using System.Globalization;
+
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("AuthDbContextConnection") ?? throw new InvalidOperationException("Connection string 'AuthDbContextConnection' not found.");
 

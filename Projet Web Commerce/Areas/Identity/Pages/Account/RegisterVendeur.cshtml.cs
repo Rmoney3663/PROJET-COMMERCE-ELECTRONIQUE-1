@@ -148,6 +148,8 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
             [Required]
             [Display(Name = "Prenom")]
             public string Prenom { get; set; }
+
+
         }
 
         public async Task OnGetAsync(string returnUrl = null)
