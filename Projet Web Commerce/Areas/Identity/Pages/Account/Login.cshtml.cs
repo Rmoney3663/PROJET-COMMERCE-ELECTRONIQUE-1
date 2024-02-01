@@ -126,16 +126,20 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
                     var lstVendeurs = _context.PPVendeurs.ToList();
                     var foundVendeur = lstVendeurs.FirstOrDefault(v => v.AdresseEmail == Input.Email);
 
-                    if (foundVendeur.Statut == 1)
+                    if (foundVendeur != null)
                     {
-                        _logger.LogInformation("User logged in.");
-                        return LocalRedirect(returnUrl);
+                        if (foundVendeur.Statut == 1)
+                        {
+                            _logger.LogInformation("User logged in.");
+                            return LocalRedirect(returnUrl);
+                        }
+                        else
+                        {
+                            ModelState.AddModelError(string.Empty, "Votre compte vendeur à besoin d'être validé par un gestionnaire");
+                            return Page();
+                        }
                     }
-                    else
-                    {
-                        ModelState.AddModelError(string.Empty, "Votre compte vendeur à besoin d'être validé par un gestionnaire");
-                        return Page();
-                    }
+
                 }
                 if (result.RequiresTwoFactor)
                 {
