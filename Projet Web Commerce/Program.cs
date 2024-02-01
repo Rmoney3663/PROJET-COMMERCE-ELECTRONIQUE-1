@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.Blazor;
 using Projet_Web_Commerce.Areas.Identity.Data;
 using Projet_Web_Commerce.Data;
 using Projet_Web_Commerce.Migrations;
@@ -110,6 +111,20 @@ using (var scope = app.Services.CreateScope())
             };
 
             context.AddRange(provinces);
+            context.SaveChanges();
+
+            List<PPCategories> categories = new List<PPCategories>
+            {
+                new PPCategories { NoCategorie = 1, Description = "Appareil Mobiles", Details= "téléphones" },
+                new PPCategories { NoCategorie = 2, Description = "Consoles de jeux", Details= "jeux vidéos" },
+                new PPCategories { NoCategorie = 3, Description = "Fournitures", Details= "meubles de maison" },
+                new PPCategories { NoCategorie = 4, Description = "Vêtements", Details= "Pantalons, chandails" },
+                new PPCategories { NoCategorie = 5, Description = "Équipement de sport", Details= "Ballons etc." },
+                new PPCategories { NoCategorie = 6, Description = "Camping et plein air", Details= "Tente, canne à pêche" },
+                new PPCategories { NoCategorie = 7, Description = "Produits de beauté", Details= "Serums, Masques, exfoliant" },
+            };
+
+            context.AddRange(categories);
             context.SaveChanges();
         }
 
