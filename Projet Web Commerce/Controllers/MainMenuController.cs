@@ -20,24 +20,58 @@ namespace Projet_Web_Commerce.Controllers
             _userManager = userManager;
         }
         // GET: MainMenuController
-        public ActionResult Index()
-        {
 
-            var VendeursList = _context.PPVendeurs
+        public ActionResult Catalogue()
+        {
+            var CategoriesList = _context.PPCategories.ToList();
+
+            return View(CategoriesList);
+        }
+
+        [HttpGet]
+        public ActionResult GestionVendeurs()
+        {
+            if (User.IsInRole("Gestionnaire"))
+            {
+                var vendeursStatutZero = _context.PPVendeurs
                 .Where(v => v.Statut == 0)
                 .OrderBy(v => v.DateCreation)  // Assuming DateCreation is the property you want to order by
                 .ToList();
 
-            var CategoriesList = _context.PPCategories.ToList();
+                return View(vendeursStatutZero);
+            }
 
-            var model = new ModelMainMenu
+            return Redirect("AccessDenied");
+
+        }
+
+
+        [HttpPost]
+        public ActionResult GestionVendeurs(int NoVendeur)
+        {
+            if (User.IsInRole("Gestionnaire"))
             {
-                VendeursList = VendeursList,
-                CategoriesList = CategoriesList,
-            };
+                var vendeurToUpdate = _context.PPVendeurs.FirstOrDefault(v => v.NoVendeur == NoVendeur);
 
-            return View(model);
-            
+                if (vendeurToUpdate != null)
+                {
+                    // Update the properties of the vendeur
+                    vendeurToUpdate.Statut = 1;
+
+                    // Save changes to the database
+                    _context.SaveChanges();
+
+                    var vendeursStatutZero = _context.PPVendeurs
+                    .Where(v => v.Statut == 0)
+                    .OrderBy(v => v.DateCreation)  // Assuming DateCreation is the property you want to order by
+                    .ToList();
+
+                    return View(vendeursStatutZero);
+                }
+            }
+
+            return Redirect("AccessDenied");
+
         }
 
         [HttpPost]
