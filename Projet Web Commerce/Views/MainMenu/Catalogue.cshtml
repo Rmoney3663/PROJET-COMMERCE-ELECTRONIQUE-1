@@ -22,84 +22,54 @@
     }
 }
 
-<div class="row">
-    <div class="col">
-        <section>
-                @if (SignInManager.IsSignedIn(User))
-                {
-                <h1>Vous êtes connecté @role</h1>
-                }
-                else
-                {
-                <h1>Vous n'êtes pas connecté</h1>
-                }
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<!-- Load Slick Carousel -->
+<link rel="stylesheet" type="text/css" href="../slick/slick.css" />
+<link rel="stylesheet" type="text/css" href="../slick/slick-theme.css" />
+<script type="text/javascript" src="../slick/slick.min.js"></script>
+<!-- Your Slick Carousel Initialization Script -->
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('.card').slick({
+            slidesToShow: 3,
+            slidesToScroll: 1,
+            autoplay: true,
+            autoplaySpeed: 2000,
+        });
+    });
+</script>
 
-                <h3>Liste des Catégories</h3>
-                <div class="container mt-4">
-                    @if (Model != null && Model != null)
-                    {
-                        <div class="row">
-                            @foreach (var category in Model)
-                            {
-                                <div class="col-md-4 mb-4">
-                                    <div class="card">
-                                        <div class="card-body">
-                                            <h2 class="card-title">@Html.DisplayFor(modelItem => category.Description)</h2>
-                                            <h5 class="card-details">@Html.DisplayFor(modelItem => category.Details)</h5>
-                                            <p>Nombre de produits : 0</p>
-                                            <!-- Add other category properties as needed -->
 
-                                        </div>
-                                    </div>
-                                </div>
-                            }
-                        </div>
-                    }
-                    else
-                    {
-                        <p>Aucune catégorie trouvée.</p>
-                    }
-                </div>
+@if (SignInManager.IsSignedIn(User))
+{
+<h1>Vous êtes connecté @role</h1>
+}
+else
+{
+<h1>Vous n'êtes pas connecté</h1>
+}
 
-<div id="myCarousel" class="carousel slide" data-ride="carousel">
-    <!-- Carousel items -->
-    <div class="carousel-inner">
-
-        @if (Model != null && Model.Any())
-        {
+<h3>Liste des Catégories</h3>
+<div class="container mt-4">
+    @if (Model != null && Model != null)
+    {
+        <div class="row">
             @foreach (var category in Model)
             {
-                <div class="carousel-item @if (category == Model.First()) { <text>active</text> }">
-                    <div class="col-md-4 mb-4">
-                        <div class="card">
-                            <div class="card-body">
-                                <h2 class="card-title">@Html.DisplayFor(modelItem => category.Description)</h2>
-                                <h5 class="card-details">@Html.DisplayFor(modelItem => category.Details)</h5>
-                                <p>Nombre de produits : 0</p>
-                                <!-- Add other category properties as needed -->
-                            </div>
+                    <div class="card">
+                        <div class="card-body">
+                            <h2 class="card-title">@Html.DisplayFor(modelItem => category.Description)</h2>
+                            <h5 class="card-details">@Html.DisplayFor(modelItem => category.Details)</h5>
+                            <p>Nombre de produits : 0</p>
+                            <!-- Add other category properties as needed -->
+
                         </div>
                     </div>
-                </div>
             }
-        }
-        else
-        {
-            <p>No categories found.</p>
-        }
-
-    </div>
-
-    <!-- Carousel controls -->
-    <a class="carousel-control-prev" href="#myCarousel" role="button" data-slide="prev">
-        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-        <span class="sr-only">Previous</span>
-    </a>
-    <a class="carousel-control-next" href="#myCarousel" role="button" data-slide="next">
-        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-        <span class="sr-only">Next</span>
-    </a>
-</div>
-        </section>
-    </div>
+        </div>
+    }
+    else
+    {
+        <p>Aucune catégorie trouvée.</p>
+    }
 </div>
