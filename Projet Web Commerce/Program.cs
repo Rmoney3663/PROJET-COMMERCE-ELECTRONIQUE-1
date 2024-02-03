@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.Blazor;
 using Projet_Web_Commerce.Areas.Identity.Data;
 using Projet_Web_Commerce.Data;
@@ -61,7 +62,10 @@ using (var scope = app.Services.CreateScope())
 
     // Specify the email you want to check
     var emailToCheck = "william.anthony.burgess@gmail.com";
+    var optionsBuilder = new DbContextOptionsBuilder<AuthDbContext>();
+    optionsBuilder.UseSqlServer("Data Source=tcp:424sql.cgodin.qc.ca,5433;Initial Catalog=BDB68_424Q24;User ID=B68equipe424q24;Password=Password24;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True;Integrated Security=False");
 
+    var context = new AuthDbContext(optionsBuilder.Options);
     // Check if a user with the specified email already exists
     var existingUser = await userManager.FindByEmailAsync(emailToCheck);
     if (existingUser == null)
@@ -82,10 +86,8 @@ using (var scope = app.Services.CreateScope())
         {
             await userManager.AddToRoleAsync(user, "Gestionnaire");
 
-            var optionsBuilder = new DbContextOptionsBuilder<AuthDbContext>();
-            optionsBuilder.UseSqlServer("Data Source=tcp:424sql.cgodin.qc.ca,5433;Initial Catalog=BDB68_424Q24;User ID=B68equipe424q24;Password=Password24;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True;Integrated Security=False");
 
-            var context = new AuthDbContext(optionsBuilder.Options);
+
 
             PPGestionnaire newRecord = new PPGestionnaire()
             { IdUtilisateur = user.Id, NoGestionnaire = 100, MotDePasse = "Password1!", DateCreation = DateTime.Now, AdresseEmail = "william.anthony.burgess@gmail.com",  };
@@ -113,23 +115,27 @@ using (var scope = app.Services.CreateScope())
             context.AddRange(provinces);
             context.SaveChanges();
 
-            List<PPCategories> categories = new List<PPCategories>
-            {
-                new PPCategories { NoCategorie = 1, Description = "Appareil Mobiles", Details= "téléphones" },
-                new PPCategories { NoCategorie = 2, Description = "Consoles de jeux", Details= "jeux vidéos" },
-                new PPCategories { NoCategorie = 3, Description = "Fournitures", Details= "meubles de maison" },
-                new PPCategories { NoCategorie = 4, Description = "Vêtements", Details= "Pantalons, chandails" },
-                new PPCategories { NoCategorie = 5, Description = "Équipement de sport", Details= "Ballons etc." },
-                new PPCategories { NoCategorie = 6, Description = "Camping et plein air", Details= "Tente, canne à pêche" },
-                new PPCategories { NoCategorie = 7, Description = "Produits de beauté", Details= "Serums, Masques, exfoliant" },
-            };
 
-            context.AddRange(categories);
-            context.SaveChanges();
         }
 
     }
+
+    List<PPCategories> categories = new List<PPCategories>
+            {
+            new PPCategories { Description = "iPhone, iPad", Details = "Apple" },
+            new PPCategories { Description = "PlayStation, PS5", Details = "Sony" },
+            new PPCategories { Description = "Meubles pour la maison", Details = "IKEA" },
+            new PPCategories { Description = "Pantalons, Chandails", Details = "Nike" },
+            new PPCategories { Description = "Équipement de sport", Details = "Adidas" },
+            new PPCategories { Description = "Matériel de camping, Canne à pêche", Details = "Coleman" },
+            new PPCategories { Description = "Sérums, Masques, Exfoliants", Details = "L'Oréal" }
+            };
+
+    context.AddRange(categories);
+    context.SaveChanges();
 }
+
+
 
 
 app.Run();
