@@ -5,9 +5,11 @@
 @inject UserManager<Projet_Web_Commerce.Areas.Identity.Data.Utilisateur> UserManager
 
 @{
+    ViewData["Title"] = "Catalogue";
+
 
     var user = await UserManager.GetUserAsync(User);
-    var role = "help";
+    var role = "";
     if (User.IsInRole("Gestionnaire"))
     {
         role = "Gestionnaire";
