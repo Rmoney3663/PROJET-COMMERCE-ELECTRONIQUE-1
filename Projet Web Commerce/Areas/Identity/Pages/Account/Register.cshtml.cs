@@ -78,15 +78,15 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
-            [Required(ErrorMessage = "Le email est requis.")]
+            [Required(ErrorMessage = "Le courriel est requis.")]
             [EmailAddress]
             [Display(Name = "Email")]
             public string Email { get; set; }
 
-            [Required(ErrorMessage = "Retapper le email est requis.")]
+            [Required(ErrorMessage = "Veuillez entrer le courriel à nouveau")]
             [EmailAddress]
             [Display(Name = "Confirmer Email")]
-            [Compare("Email", ErrorMessage = "L'email et l'email de confirmation ne correspondent pas.")]
+            [Compare("Email", ErrorMessage = "Les courriels ne correspondent pas.")]
             public string ConfirmEmail { get; set; }
 
             /// <summary>
@@ -104,8 +104,8 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
             [DataType(DataType.Password)]
-            [Display(Name = "Confirmer password")]
-            [Compare("Password", ErrorMessage = "Le mot de passe et le mot de passe de confirmation ne correspondent pas.")]
+            [Display(Name = "Confirmer le mot de passe")]
+            [Compare("Password", ErrorMessage = "Les mots de passe ne correspondent pas.")]
             public string ConfirmPassword { get; set; }
         }
 

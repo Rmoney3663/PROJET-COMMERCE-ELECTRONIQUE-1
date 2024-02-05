@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Projet_Web_Commerce.Data;
 
@@ -11,9 +12,11 @@ using Projet_Web_Commerce.Data;
 namespace Projet_Web_Commerce.Migrations
 {
     [DbContext(typeof(AuthDbContext))]
-    partial class AuthDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240205142950_Produit")]
+    partial class Produit
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -328,12 +331,6 @@ namespace Projet_Web_Commerce.Migrations
 
                     b.Property<int?>("Statut")
                         .HasColumnType("int");
-
-                    b.Property<string>("Tel1")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Tel2")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Ville")
                         .HasColumnType("nvarchar(max)");
@@ -698,7 +695,7 @@ namespace Projet_Web_Commerce.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NomAffaires")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Pays")
                         .HasColumnType("nvarchar(max)");
@@ -721,12 +718,6 @@ namespace Projet_Web_Commerce.Migrations
                     b.Property<bool?>("Taxes")
                         .HasColumnType("bit");
 
-                    b.Property<string>("Tel1")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Tel2")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Ville")
                         .HasColumnType("nvarchar(max)");
 
@@ -735,10 +726,6 @@ namespace Projet_Web_Commerce.Migrations
                     b.HasIndex("IdUtilisateur");
 
                     b.HasIndex("NoProvince");
-
-                    b.HasIndex("NomAffaires")
-                        .IsUnique()
-                        .HasFilter("[NomAffaires] IS NOT NULL");
 
                     b.ToTable("PPVendeurs");
                 });
@@ -773,6 +760,50 @@ namespace Projet_Web_Commerce.Migrations
                     b.HasKey("ProvinceID");
 
                     b.ToTable("Province");
+                });
+
+            modelBuilder.Entity("Projet_Web_Commerce.Models.TelephoneClients", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("NoClient")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Tel")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NoClient");
+
+                    b.ToTable("TelephoneClients");
+                });
+
+            modelBuilder.Entity("Projet_Web_Commerce.Models.TelephoneVendeurs", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("NoVendeur")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Tel")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NoVendeur");
+
+                    b.ToTable("TelephoneVendeurs");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -1004,6 +1035,28 @@ namespace Projet_Web_Commerce.Migrations
                     b.Navigation("PPVendeurs");
                 });
 
+            modelBuilder.Entity("Projet_Web_Commerce.Models.TelephoneClients", b =>
+                {
+                    b.HasOne("Projet_Web_Commerce.Models.PPClients", "PPClients")
+                        .WithMany("TelephoneClients")
+                        .HasForeignKey("NoClient")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("PPClients");
+                });
+
+            modelBuilder.Entity("Projet_Web_Commerce.Models.TelephoneVendeurs", b =>
+                {
+                    b.HasOne("Projet_Web_Commerce.Models.PPVendeurs", "PPVendeurs")
+                        .WithMany("TelephoneVendeurs")
+                        .HasForeignKey("NoVendeur")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("PPVendeurs");
+                });
+
             modelBuilder.Entity("Projet_Web_Commerce.Areas.Identity.Data.Utilisateur", b =>
                 {
                     b.Navigation("PPClients");
@@ -1025,6 +1078,8 @@ namespace Projet_Web_Commerce.Migrations
                     b.Navigation("PPCommandes");
 
                     b.Navigation("PPVendeursClients");
+
+                    b.Navigation("TelephoneClients");
                 });
 
             modelBuilder.Entity("Projet_Web_Commerce.Models.PPCommandes", b =>
@@ -1060,6 +1115,8 @@ namespace Projet_Web_Commerce.Migrations
                     b.Navigation("PPProduits");
 
                     b.Navigation("PPVendeursClients");
+
+                    b.Navigation("TelephoneVendeurs");
                 });
 
             modelBuilder.Entity("Projet_Web_Commerce.Models.Province", b =>

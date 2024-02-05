@@ -6,7 +6,7 @@
 
 @{
     var user = await UserManager.GetUserAsync(User);
-    var role = "help";
+    var role = "";
     if (User.IsInRole("Gestionnaire"))
     {
         role = "Gestionnaire";
