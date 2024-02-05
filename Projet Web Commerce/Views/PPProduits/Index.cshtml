@@ -1,11 +1,14 @@
 ﻿@model IEnumerable<Projet_Web_Commerce.Models.PPProduits>
 ﻿﻿@using Microsoft.AspNetCore.Identity
+@using Projet_Web_Commerce.Data
+@inject AuthDbContext _context
 @inject UserManager<Projet_Web_Commerce.Areas.Identity.Data.Utilisateur> _userManager
 
 @{
     ViewData["Title"] = "Index";
     var user = await _userManager.GetUserAsync(User);
-    var index = 0;
+    var vendeur = _context.PPVendeurs.FirstOrDefault(v => v.IdUtilisateur == user.Id);
+    var sortedModel = _context.PPProduits.Where(p => p.NoVendeur == vendeur.NoVendeur).ToList();
 }
 
 <h1>Liste de produits</h1>
@@ -14,11 +17,10 @@
     <a asp-action="Create">Ajouter Nouveau</a>
 </p>
 <div class="d-flex flex-wrap align-content-start bg-light" style="margin-bottom:50px">
-    @foreach (var item in Model)
+    @foreach (var item in sortedModel)
     {
-        index++;
-        <div class="card" style="width:300px; margin: 5px;">
-            <img src="~/Logo/@(item.Photo)" alt="./Logo/@(item.Photo)" width="300" height="442" />
+        <div class="card" style="width:320px; margin: 2px;">
+            <img src="~/Logo/@(item.Photo)" alt="./Logo/@(item.Photo)" width="320" height="400" />
             <div class="card-body">
                 <p class="card-text">
                     <b>Nom :</b>
@@ -30,22 +32,24 @@
                 </p>
                 <p class="card-text">
                     <b>Categorie :</b>
-                    @Html.DisplayFor(modelItem => item.PPCategories.NoCategorie)
+                    @Html.DisplayFor(modelItem => item.PPCategories.Description)
                 </p>
                 <p class="card-text">
                     <b>Nombre d'Items :</b>
                     @Html.DisplayFor(modelItem => item.NombreItems)
                 </p>
                 <div>
-                    <a class="btn btn-primary btn-custom" asp-action="Edit" asp-route-id="@item.NoProduit">Modifier </a>
+                    <a class="btn btn-primary" asp-action="Edit" asp-route-id="@item.NoProduit">Modifier</a>
                     <a> | </a>
-                    <a class="btn btn-success btn-custom" asp-action="Details" asp-route-id="@item.NoProduit">Details </a>
+                    <a class="btn btn-success" asp-action="Details" asp-route-id="@item.NoProduit">Details</a>
                     <a> | </a>
-                    <a class="btn btn-danger btn-custom" asp-action="Delete" asp-route-id="@item.NoProduit">Supprimer</a>
+                    <a class="btn btn-danger" asp-action="Delete" asp-route-id="@item.NoProduit">Supprimer</a>
                 
                 </div>
             </div>
         </div>
+        
+        
     }
 
 </div>

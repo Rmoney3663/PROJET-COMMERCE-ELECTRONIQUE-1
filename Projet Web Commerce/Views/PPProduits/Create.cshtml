@@ -25,11 +25,7 @@
             <div class="form-group" style="display:none;">
                 <label asp-for="NoVendeur" class="control-label"></label>
                 <select asp-for="NoVendeur" class="form-control" asp-items="ViewBag.NoVendeur" hidden></select>
-            </div>
-            <div class="form-group" style="display:none;">
-                <label asp-for="NoCategorie" class="control-label"></label>
-                <select asp-for="NoCategorie" class="form-control" asp-items="ViewBag.NoCategorie" hidden></select>
-            </div>
+            </div>          
             <div class="form-group" style="display:none;">
                 <label asp-for="DateCreation" class="control-label"></label>
                 <input asp-for="DateCreation" class="form-control" />
@@ -38,17 +34,24 @@
 
             <div class="form-group">
                 <label asp-for="Nom" class="control-label">Nom :</label>
-                <input asp-for="Nom" class="form-control" />
+                <input asp-for="Nom" class="form-control" required />
                 <span asp-validation-for="Nom" class="text-danger"></span>
             </div>
+            <br>
 
             <div class="form-group">
                 <label asp-for="Description" class="control-label">Description :</label>
-                <textarea asp-for="Description" class="form-control"></textarea>
+                <textarea asp-for="Description" class="form-control" required></textarea>
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
             <br>
-            
+
+            <div class="form-group">
+                <label asp-for="NoCategorie" class="control-label">Categorie : </label>
+                <select asp-for="NoCategorie" class="form-control" asp-items="ViewBag.NoCategorie" required></select>
+            </div>
+            <br>
+
             <div class="form-group">
                 <label asp-for="Photo" class="control-label">Image du Produit :</label>
                 <input type="file" id="file" name="file" accept="image/jpeg" class="form-control" />
@@ -58,15 +61,14 @@
 
             <div class="form-group">
                 <label asp-for="PrixDemande" class="control-label">Prix (CAD$):</label>
-                <input asp-for="PrixDemande" class="form-control" class="form-control" type="number" min="0" data-val="true" />
+                <input asp-for="PrixDemande" class="form-control" class="form-control" type="number" min="0" data-val="true" required />
                 <span asp-validation-for="PrixDemande" class="text-danger"></span>
             </div>
             <br>
 
             <div class="form-group">
                 <label asp-for="Disponibilite" class="control-label">Disponible ?</label>
-                <select asp-for="Disponibilite" class="form-control">
-                    <option value=""></option>
+                <select asp-for="Disponibilite" class="form-control" required>
                     <option value="true">Vrai</option>
                     <option value="false">Faux</option>
                 </select>
@@ -75,29 +77,41 @@
             <br>
 
             <div class="form-group">
-                <label asp-for="Poids" class="control-label"></label>
-                <input asp-for="Poids" class="form-control" />
+                <label asp-for="Poids" class="control-label">Poids (Kg):</label>
+                <input asp-for="Poids" class="form-control" class="form-control" type="number" min="0" data-val="true" required />
                 <span asp-validation-for="Poids" class="text-danger"></span>
             </div>
+            <br>
+
             <div class="form-group">
-                <label asp-for="DateVente" class="control-label"></label>
+                <label asp-for="NombreItems" class="control-label">Nombre d'items :</label>
+                <input asp-for="NombreItems" class="form-control" class="form-control" type="number" min="0" data-val="true" required />
+                <span asp-validation-for="NombreItems" class="text-danger"></span>
+            </div>
+            <br>
+
+            <div class="form-group" style="display:none;">
+                <label asp-for="DateVente" class="control-label" ></label>
                 <input asp-for="DateVente" class="form-control" />
                 <span asp-validation-for="DateVente" class="text-danger"></span>
             </div>
+
             <div class="form-group">
-                <label asp-for="PrixVente" class="control-label"></label>
-                <input asp-for="PrixVente" class="form-control" />
+                <label asp-for="PrixVente" class="control-label">Prix Vente (CAD$):</label>
+                <input asp-for="PrixVente" class="form-control" class="form-control" type="number" min="0" data-val="true" required />
                 <span asp-validation-for="PrixVente" class="text-danger"></span>
             </div>
+            <br>
+
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                <input type="submit" value="Ajouter" class="btn btn-primary" />
             </div>
         </form>
     </div>
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Index">Retour à la liste</a>
 </div>
 
 @section Scripts {
