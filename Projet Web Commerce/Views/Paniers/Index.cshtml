@@ -1,0 +1,17 @@
+﻿@{
+}
+
+<div class="row">
+    <div class="col-md-4">
+        @if (Model != null && Model.Paniers != null){
+            @foreach (var item in Model.Paniers)
+            {
+
+            }
+        }
+        else
+        {
+            <p>Vous n'avez pas d'articles dans votre panier</p>
+        }
+    </div>
+</div>
