@@ -96,8 +96,8 @@ namespace Projet_Web_Commerce.Controllers
 
             if (ModelState.IsValid)
             {
-                int highestNoProduit = _context.PPProduits.Max(p => (int?)p.NoProduit) ?? -1;
-                var id = highestNoProduit + 1;
+                int produitCount = _context.PPProduits.Count();
+                var id = produitCount + 1;
                 int NoVendeur = pPProduits.NoVendeur;
                 string combined = NoVendeur.ToString() + id.ToString();
                 pPProduits.NoProduit = int.Parse(combined);
