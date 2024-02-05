@@ -1,0 +1,91 @@
+﻿@page
+@model ProfilVendeurModel
+@{
+    ViewData["Title"] = "Profil";
+    ViewData["ActivePage"] = ManageNavPages.ProfilVendeur;
+}
+
+<h3>@ViewData["Title"]</h3>
+<partial name="_StatusMessage" for="StatusMessage" />
+<div class="row">
+    <div class="col-md-6">
+        <form id="profile-form" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+            <div class="form-floating mb-3">
+                <input asp-for="Courriel" class="form-control" value="@Model.Courriel" disabled />
+                <label asp-for="Courriel" class="form-label"></label>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Nom" class="form-control" placeholder="Veuillez entrer votre nom." />
+                <label asp-for="Input.Nom" class="form-label"></label>
+                <span asp-validation-for="Input.Prenom" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Prenom" class="form-control" placeholder="Veuillez entrer votre prénom" />
+                <label asp-for="Input.Prenom" class="form-label"></label>
+                <span asp-validation-for="Input.Prenom" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Rue" class="form-control" placeholder="Veuillez entrer votre rue" />
+                <label asp-for="Input.Rue" class="form-label"></label>
+                <span asp-validation-for="Input.Rue" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Ville" class="form-control" placeholder="Veuillez entrer votre ville" />
+                <label asp-for="Input.Ville" class="form-label"></label>
+                <span asp-validation-for="Input.Ville" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <select asp-for="Input.Province" class="form-control">
+                    <option value="AB">Alberta</option>
+                    <option value="BC">Colombie-Britannique</option>
+                    <option value="MB">Manitoba</option>
+                    <option value="NB">Nouveau-Brunswick</option>
+                    <option value="NL">Terre-Neuve-et-Labrador</option>
+                    <option value="NS">Nouvelle-Écosse</option>
+                    <option value="NT">Territoires du Nord-Ouest</option>
+                    <option value="NU">Nunavut</option>
+                    <option value="ON">Ontario</option>
+                    <option value="PE">Île-du-Prince-Édouard</option>
+                    <option value="QC">Québec</option>
+                    <option value="SK">Saskatchewan</option>
+                    <option value="YT">Yukon</option>
+                </select>
+                <label asp-for="Input.Province" class="control-label"></label>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.CodePostal" class="form-control" placeholder="Veuillez entrer votre code postal" />
+                <label asp-for="Input.CodePostal" class="form-label"></label>
+                <span asp-validation-for="Input.CodePostal" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Pays" class="form-control" placeholder="Veuillez entrer votre pays" disabled value="@Model.Input.Pays" />
+                <label asp-for="Input.Pays" class="form-label"></label>
+                <span asp-validation-for="Input.Pays" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Telephone" class="form-control" placeholder="Veuillez entrer votre numéro de téléphone" />
+                <label asp-for="Input.Telephone" class="form-label"></label>
+                <span asp-validation-for="Input.Telephone" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Cellulaire" class="form-control" placeholder="Veuillez entrer votre cellulaire" />
+                <label asp-for="Input.Cellulaire" class="form-label"></label>
+                <span asp-validation-for="Input.Cellulaire" class="text-danger"></span>
+            </div>
+            <button id="update-profile-button" type="submit" class="w-100 btn btn-lg btn-primary">Enregistrer</button>
+        </form>
+    </div>
+    <!-- Section pour les données des vendeurs-->
+    <div class="col-md-6" id="divVendeurs">
+        <div class="form-floating mb-3">
+            <input asp-for="Input.NomAffaires" class="form-control" placeholder="Veuillez entrer votre nom d'affaires" />
+            <label asp-for="Input.NomAffaires" class="form-label"></label>
+            <span asp-validation-for="Input.NomAffaires" class="text-danger"></span>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @* <partial name="_ValidationScriptsPartial" /> *@
+}
