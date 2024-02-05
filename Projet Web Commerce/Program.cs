@@ -121,19 +121,6 @@ using (var scope = app.Services.CreateScope())
 
     }
 
-    List<PPCategories> categories = new List<PPCategories>
-            {
-            new PPCategories { Description = "iPhone, iPad", Details = "Apple" },
-            new PPCategories { Description = "PlayStation, PS5", Details = "Sony" },
-            new PPCategories { Description = "Meubles pour la maison", Details = "IKEA" },
-            new PPCategories { Description = "Pantalons, Chandails", Details = "Nike" },
-            new PPCategories { Description = "Équipement de sport", Details = "Adidas" },
-            new PPCategories { Description = "Matériel de camping, Canne à pêche", Details = "Coleman" },
-            new PPCategories { Description = "Sérums, Masques, Exfoliants", Details = "L'Oréal" }
-            };
-
-    context.AddRange(categories);
-    context.SaveChanges();
 }
 
 
