@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Projet_Web_Commerce.Data;
 using Projet_Web_Commerce.Models;
 
-namespace Projet_Web_Commerce.Views
+namespace Projet_Web_Commerce.Controllers
 {
     public class PPProduitsController : Controller
     {
@@ -49,8 +49,8 @@ namespace Projet_Web_Commerce.Views
         // GET: PPProduits/Create
         public IActionResult Create()
         {
-            ViewData["NoCategorie"] = new SelectList(_context.PPCategories, "NoCategorie", "NoCategorie");
-            ViewData["NoVendeur"] = new SelectList(_context.PPVendeurs, "NoVendeur", "NoVendeur");
+            ViewData["NoCategorie"] = new SelectList(_context.PPCategories, "NoCategorie", "Description");
+            ViewData["NoVendeur"] = new SelectList(_context.PPVendeurs, "NoVendeur", "Nom");
             return View();
         }
 
@@ -67,8 +67,8 @@ namespace Projet_Web_Commerce.Views
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["NoCategorie"] = new SelectList(_context.PPCategories, "NoCategorie", "NoCategorie", pPProduits.NoCategorie);
-            ViewData["NoVendeur"] = new SelectList(_context.PPVendeurs, "NoVendeur", "NoVendeur", pPProduits.NoVendeur);
+            ViewData["NoCategorie"] = new SelectList(_context.PPCategories, "NoCategorie", "Description", pPProduits.NoCategorie);
+            ViewData["NoVendeur"] = new SelectList(_context.PPVendeurs, "NoVendeur", "Nom", pPProduits.NoVendeur);
             return View(pPProduits);
         }
 
