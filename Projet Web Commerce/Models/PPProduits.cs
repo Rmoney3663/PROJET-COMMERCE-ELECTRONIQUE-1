@@ -22,7 +22,7 @@ namespace Projet_Web_Commerce.Models
         public decimal Poids { get; set; }
         public DateTime DateVente { get; set; }
         [Column(TypeName = "smallmoney")]
-        public decimal PrixVente { get; set; }
+        public decimal? PrixVente { get; set; }
 
         [InverseProperty("PPProduits")]
         public virtual ICollection<PPArticlesEnPanier>? PPArticlesEnPanier { get; set; }

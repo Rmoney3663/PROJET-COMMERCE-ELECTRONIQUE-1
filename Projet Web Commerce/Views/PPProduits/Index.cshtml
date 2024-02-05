@@ -19,7 +19,7 @@
 <div class="d-flex flex-wrap align-content-start bg-light" style="margin-bottom:50px">
     @foreach (var item in sortedModel)
     {
-        <div class="card" style="width:320px; margin: 2px;">
+        <div class="card" style="width:320px; margin: 10px;">
             <img src="~/Logo/@(item.Photo)" alt="./Logo/@(item.Photo)" width="320" height="400" />
             <div class="card-body">
                 <p class="card-text">
@@ -37,6 +37,19 @@
                 <p class="card-text">
                     <b>Nombre d'Items :</b>
                     @Html.DisplayFor(modelItem => item.NombreItems)
+                </p>
+                <p class="card-text">
+                    <b>Disponible :</b>
+                    @{
+                        if (item.Disponibilite)
+                        {
+                            <text>oui</text>
+                        }
+                        else
+                        {
+                            <text>non</text>
+                        }
+                    }
                 </p>
                 <div>
                     <a class="btn btn-primary" asp-action="Edit" asp-route-id="@item.NoProduit">Modifier</a>
