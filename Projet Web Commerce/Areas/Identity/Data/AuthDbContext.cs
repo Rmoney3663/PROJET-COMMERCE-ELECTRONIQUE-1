@@ -47,10 +47,6 @@ public class AuthDbContext : IdentityDbContext<Utilisateur>
     public DbSet<PPGestionnaire> PPGestionnaire { get; set; }
     public  DbSet<Province> Province { get; set; }
 
-    public  DbSet<TelephoneClients> TelephoneClients { get; set; }
-
-    public  DbSet<TelephoneVendeurs> TelephoneVendeurs { get; set; } 
-
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -59,10 +55,6 @@ public class AuthDbContext : IdentityDbContext<Utilisateur>
         // For example, you can rename the ASP.NET Identity table names and more.
         // Add your customizations after calling base.OnModelCreating(builder);
 
-        builder.Entity<TelephoneClients>()
-        .HasOne<PPClients>(e => e.PPClients)
-        .WithMany(u => u.TelephoneClients)
-        .OnDelete(DeleteBehavior.Restrict);
 
         builder.Entity<PPVendeursClients>()
         .HasOne<PPClients>(e => e.PPClients)
@@ -82,16 +74,6 @@ public class AuthDbContext : IdentityDbContext<Utilisateur>
         builder.Entity<PPVendeurs>()
         .HasOne<Province>(e => e.Province)
         .WithMany(u => u.PPVendeurs)
-        .OnDelete(DeleteBehavior.Restrict);
-
-        builder.Entity<TelephoneVendeurs>()
-        .HasOne<PPVendeurs>(e => e.PPVendeurs)
-        .WithMany(u => u.TelephoneVendeurs)
-        .OnDelete(DeleteBehavior.Restrict);
-
-        builder.Entity<TelephoneVendeurs>()
-        .HasOne<PPVendeurs>(e => e.PPVendeurs)
-        .WithMany(u => u.TelephoneVendeurs)
         .OnDelete(DeleteBehavior.Restrict);
 
         builder.Entity<PPArticlesEnPanier>()

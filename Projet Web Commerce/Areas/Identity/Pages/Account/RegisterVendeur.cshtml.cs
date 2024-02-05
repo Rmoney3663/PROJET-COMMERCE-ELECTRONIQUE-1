@@ -251,34 +251,11 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
                     { 
                       IdUtilisateur = user.Id, NoVendeur = lowestNo, AdresseEmail = email, MotDePasse = password, Taxes = taxe, NomAffaires = Input.NomAffaires, NoProvince = province,
                       DateCreation = date, PoidsMaxLivraison = SelectedNumberPoids, LivraisonGratuite = SelectedNumberLivraison, Statut = 0, Pourcentage = (decimal?)pourcentage,
-                      Ville = ville, Pays = "Canada", Rue = rue, CodePostal = codePostal, Prenom = prenom, Nom = nom
+                      Ville = ville, Pays = "Canada", Rue = rue, CodePostal = codePostal, Prenom = prenom, Nom = nom, Tel1 = phone1, Tel2 = phone2
                     };
                     context.PPVendeurs.Add(newRecord);
                     context.SaveChanges();
 
-                    if (phone1 != null)
-                    {
-                        TelephoneVendeurs telephoneVendeurs1 = new TelephoneVendeurs()
-                        {
-                            NoVendeur = lowestNo,
-                            Tel = phone1
-                        };
-
-                        context.TelephoneVendeurs.Add(telephoneVendeurs1);
-                        context.SaveChanges();
-                    }
-
-                    if (phone2 != null)
-                    {
-                        TelephoneVendeurs telephoneVendeurs2 = new TelephoneVendeurs()
-                        {
-                            NoVendeur = lowestNo,
-                            Tel = phone2
-                        };
-
-                        context.TelephoneVendeurs.Add(telephoneVendeurs2);
-                        context.SaveChanges();
-                    }
 
                     _logger.LogInformation("L'utilisateur a créé un nouveau compte avec un mot de passe.");
 
