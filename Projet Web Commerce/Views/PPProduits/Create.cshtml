@@ -34,20 +34,21 @@
 
             <div class="form-group">
                 <label asp-for="Nom" class="control-label">Nom :</label>
-                <input asp-for="Nom" class="form-control" />
+                <input asp-for="Nom" class="form-control" required />
                 <span asp-validation-for="Nom" class="text-danger"></span>
             </div>
+            <br>
 
             <div class="form-group">
                 <label asp-for="Description" class="control-label">Description :</label>
-                <textarea asp-for="Description" class="form-control"></textarea>
+                <textarea asp-for="Description" class="form-control" required></textarea>
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
             <br>
 
             <div class="form-group">
                 <label asp-for="NoCategorie" class="control-label">Categorie : </label>
-                <select asp-for="NoCategorie" class="form-control" asp-items="ViewBag.NoCategorie" ></select>
+                <select asp-for="NoCategorie" class="form-control" asp-items="ViewBag.NoCategorie" required></select>
             </div>
             <br>
 
@@ -60,15 +61,14 @@
 
             <div class="form-group">
                 <label asp-for="PrixDemande" class="control-label">Prix (CAD$):</label>
-                <input asp-for="PrixDemande" class="form-control" class="form-control" type="number" min="0" data-val="true" />
+                <input asp-for="PrixDemande" class="form-control" class="form-control" type="number" min="0" data-val="true" required />
                 <span asp-validation-for="PrixDemande" class="text-danger"></span>
             </div>
             <br>
 
             <div class="form-group">
                 <label asp-for="Disponibilite" class="control-label">Disponible ?</label>
-                <select asp-for="Disponibilite" class="form-control">
-                    <option value=""></option>
+                <select asp-for="Disponibilite" class="form-control" required>
                     <option value="true">Vrai</option>
                     <option value="false">Faux</option>
                 </select>
@@ -78,8 +78,15 @@
 
             <div class="form-group">
                 <label asp-for="Poids" class="control-label">Poids (Kg):</label>
-                <input asp-for="Poids" class="form-control" class="form-control" type="number" min="0" data-val="true" />
+                <input asp-for="Poids" class="form-control" class="form-control" type="number" min="0" data-val="true" required />
                 <span asp-validation-for="Poids" class="text-danger"></span>
+            </div>
+            <br>
+
+            <div class="form-group">
+                <label asp-for="NombreItems" class="control-label">Nombre d'items :</label>
+                <input asp-for="NombreItems" class="form-control" class="form-control" type="number" min="0" data-val="true" required />
+                <span asp-validation-for="NombreItems" class="text-danger"></span>
             </div>
             <br>
 
@@ -91,7 +98,7 @@
 
             <div class="form-group">
                 <label asp-for="PrixVente" class="control-label">Prix Vente (CAD$):</label>
-                <input asp-for="PrixVente" class="form-control" class="form-control" type="number" min="0" data-val="true" />
+                <input asp-for="PrixVente" class="form-control" class="form-control" type="number" min="0" data-val="true" required />
                 <span asp-validation-for="PrixVente" class="text-danger"></span>
             </div>
             <br>
