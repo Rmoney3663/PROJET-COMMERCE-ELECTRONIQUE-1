@@ -79,6 +79,12 @@ namespace Projet_Web_Commerce.Controllers
             Console.WriteLine($"Photo: {file.FileName}");
             ModelState.Remove("file");
             ModelState.Remove("Photo");
+
+            if (pPProduits.PrixVente > pPProduits.PrixDemande)
+            {
+                ModelState.AddModelError("PrixVente", "Le prix de vente ne peut pas être supérieur au prix demandé.");
+            }
+
             foreach (var m in ModelState)
             {
                 foreach (var er in m.Value.Errors)
@@ -91,7 +97,10 @@ namespace Projet_Web_Commerce.Controllers
             if (ModelState.IsValid)
             {
                 int highestNoProduit = _context.PPProduits.Max(p => (int?)p.NoProduit) ?? -1;
-                pPProduits.NoProduit = highestNoProduit + 1;
+                var id = highestNoProduit + 1;
+                int NoVendeur = pPProduits.NoVendeur;
+                string combined = NoVendeur.ToString() + id.ToString();
+                pPProduits.NoProduit = int.Parse(combined);
                 var tempFilename = "temp_filename";
                 string extension = Path.GetExtension(file.FileName);
                 pPProduits.Photo = file.FileName;
@@ -104,8 +113,7 @@ namespace Projet_Web_Commerce.Controllers
 
                 _context.Add(pPProduits);
                 await _context.SaveChangesAsync();
-                var id = highestNoProduit + 1;
-                var finalFilename = $"{id}{extension}";
+                var finalFilename = $"{int.Parse(combined)}{extension}";
                 var finalFilePath = Path.Combine("wwwroot/Logo", finalFilename);
                 System.IO.File.Move(tempFilePath, finalFilePath);
 
