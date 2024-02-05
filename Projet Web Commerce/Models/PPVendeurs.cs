@@ -1,4 +1,5 @@
-﻿using Projet_Web_Commerce.Areas.Identity.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using Projet_Web_Commerce.Areas.Identity.Data;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -30,8 +31,8 @@ namespace Projet_Web_Commerce.Models
         public string NoProvince { get; set; }
         public string? CodePostal { get; set; }
         public string? Pays { get; set; }
-        public string Tel1 { get; set; }
-        public string Tel2 { get; set; }
+        public string? Tel1 { get; set; }
+        public string? Tel2 { get; set; }
         public string IdUtilisateur { get; set; }
         [InverseProperty("PPVendeurs")]
         public virtual ICollection<PPVendeursClients>? PPVendeursClients { get; set; }

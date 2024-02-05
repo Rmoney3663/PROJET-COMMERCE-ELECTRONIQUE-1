@@ -247,6 +247,15 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
 
                     }
 
+                    var existingRecord = context.PPVendeurs.FirstOrDefault(v => v.NomAffaires == Input.NomAffaires);
+
+                    if (existingRecord != null)
+                    {
+                        ModelState.AddModelError(string.Empty, "Le nom d'affaires doit être unique.");
+                        return Page(); 
+                    }
+
+
                     PPVendeurs newRecord = new PPVendeurs()
                     { 
                       IdUtilisateur = user.Id, NoVendeur = lowestNo, AdresseEmail = email, MotDePasse = password, Taxes = taxe, NomAffaires = Input.NomAffaires, NoProvince = province,

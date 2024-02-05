@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Projet_Web_Commerce.Areas.Identity.Data;
 using Projet_Web_Commerce.Models;
+using System.Reflection.Emit;
 
 namespace Projet_Web_Commerce.Data;
 
@@ -55,6 +56,9 @@ public class AuthDbContext : IdentityDbContext<Utilisateur>
         // For example, you can rename the ASP.NET Identity table names and more.
         // Add your customizations after calling base.OnModelCreating(builder);
 
+        builder.Entity<PPVendeurs>()
+        .HasIndex(e => e.NomAffaires)
+        .IsUnique();
 
         builder.Entity<PPVendeursClients>()
         .HasOne<PPClients>(e => e.PPClients)
