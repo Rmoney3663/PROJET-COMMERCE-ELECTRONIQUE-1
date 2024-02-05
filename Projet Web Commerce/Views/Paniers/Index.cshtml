@@ -6,7 +6,10 @@
         @if (Model != null && Model.Paniers != null){
             @foreach (var item in Model.Paniers)
             {
-
+                <div class="row"> 
+                    <a asp-page="/Views/Panier">@Model.Paniers.vendeur</a> 
+                    <p>(@Model.Paniers.articles.Count)</p>
+                </div>
             }
         }
         else
