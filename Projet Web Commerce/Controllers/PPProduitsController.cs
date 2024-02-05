@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using NuGet.Packaging.Signing;
+using NuGet.Protocol.Plugins;
 using Projet_Web_Commerce.Areas.Identity.Data;
 using Projet_Web_Commerce.Data;
 using Projet_Web_Commerce.Models;
@@ -150,18 +151,42 @@ namespace Projet_Web_Commerce.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("NoProduit,NoVendeur,NoCategorie,DateCreation,DateMAJ,Nom,Description,Photo,PrixDemande,Disponibilite,Poids,DateVente,PrixVente")] PPProduits pPProduits)
+        public async Task<IActionResult> Edit( [Bind("NoProduit,NoVendeur,NoCategorie,DateCreation,DateMAJ,Nom,Description,Photo,PrixDemande,Disponibilite,Poids,DateVente,PrixVente, NombreItems")] PPProduits pPProduits,
+            IFormFile? file)
         {
-            if (id != pPProduits.NoProduit)
+            ModelState.Remove("file");
+            ModelState.Remove("Photo");
+            foreach (var m in ModelState)
             {
-                return NotFound();
+                foreach (var er in m.Value.Errors)
+                {
+                    Console.WriteLine(m.Key);
+                    Console.WriteLine(er.ErrorMessage);
+                }
             }
-
             if (ModelState.IsValid)
             {
                 try
                 {
+                    var user = await _userManager.GetUserAsync(User);
+                    pPProduits.DateMAJ = DateTime.Now;
+                    
+                    if (file != null && file.Length > 0)
+                    {                        
+                        System.IO.File.Delete("wwwroot/Logo/" + pPProduits.Photo);
+
+                        string extension = Path.GetExtension(file.FileName);
+                        pPProduits.Photo = pPProduits.NoProduit.ToString() + extension;
+                        string tempFilePath = Path.Combine("wwwroot/Logo", pPProduits.NoProduit + extension);
+                        using (Stream fileStream = new FileStream(tempFilePath, FileMode.Create))
+                        {
+                            await file.CopyToAsync(fileStream);
+                        }
+                    }                    
+
                     _context.Update(pPProduits);
+                    Console.WriteLine(" pPProduits : " + pPProduits.DateMAJ);
+                    Console.WriteLine(" pPProduits : " + pPProduits.NombreItems);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
@@ -177,8 +202,8 @@ namespace Projet_Web_Commerce.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["NoCategorie"] = new SelectList(_context.PPCategories, "NoCategorie", "NoCategorie", pPProduits.NoCategorie);
-            ViewData["NoVendeur"] = new SelectList(_context.PPVendeurs, "NoVendeur", "NoVendeur", pPProduits.NoVendeur);
+            ViewData["NoCategorie"] = new SelectList(_context.PPCategories, "NoCategorie", "Description", pPProduits.NoCategorie);
+            ViewData["NoVendeur"] = new SelectList(_context.PPVendeurs, "NoVendeur", "Nom", pPProduits.NoVendeur);
             return View(pPProduits);
         }
 
