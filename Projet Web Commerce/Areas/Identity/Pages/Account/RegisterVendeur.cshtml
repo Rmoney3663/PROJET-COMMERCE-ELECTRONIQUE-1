@@ -13,8 +13,8 @@
             <h2>Créer un nouveau compte.</h2>
             <hr />
              <div class="form-floating mb-3">
-                <input asp-for="Input.Prenom" class="form-control" autocomplete="Prenom" aria-required="true" placeholder="Prenom" />
-                <label asp-for="Input.Prenom">Prenom</label>
+                <input asp-for="Input.Prenom" class="form-control" autocomplete="Prénom" aria-required="true" placeholder="Prénom" />
+                <label asp-for="Input.Prenom">Prénom</label>
                 <span asp-validation-for="Input.Prenom" class="text-danger"></span>
             </div>
             <div class="form-floating mb-3">
@@ -29,23 +29,23 @@
                 <span asp-validation-for="Input.NomAffaires" class="text-danger"></span>
             </div>
             <div class="form-floating mb-3">
-                <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
-                <label asp-for="Input.Email">Email</label>
+                <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="courriel@exemple.com" />
+                <label asp-for="Input.Email">Courriel</label>
                 <span asp-validation-for="Input.Email" class="text-danger"></span>
             </div>
             <div class="form-floating mb-3">
-                <input asp-for="Input.ConfirmEmail" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
-                <label asp-for="Input.ConfirmEmail">Confirmer Email</label>
+                <input asp-for="Input.ConfirmEmail" class="form-control" autocomplete="username" aria-required="true" placeholder="courriel@exemple.com" />
+                <label asp-for="Input.ConfirmEmail">Confirmer le courriel</label>
                 <span asp-validation-for="Input.ConfirmEmail" class="text-danger"></span>
             </div>
             <div class="form-floating mb-3">
-                <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
+                <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="Mot de passe" />
                 <label asp-for="Input.Password">Mot de passe</label>
                 <span asp-validation-for="Input.Password" class="text-danger"></span>
             </div>
             <div class="form-floating mb-3">
-                <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
-                <label asp-for="Input.ConfirmPassword">Confirmer mot de passe</label>
+                <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="Mot de passe" />
+                <label asp-for="Input.ConfirmPassword">Confirmer le mot de passe</label>
                 <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
             </div>    
 
@@ -66,7 +66,7 @@
                     <option value="True">Vrai</option>
                     <option value="False">Faux</option>
                 </select>
-                <label asp-for="Input.Tax">Client doit payer taxe ?</label>
+                <label asp-for="Input.Tax">Client doit payer taxe?</label>
                 <span asp-validation-for="Input.Tax" class="text-danger"></span>
             </div>
 
@@ -104,7 +104,7 @@
 
             <div class="form-floating mb-3">
                 <input asp-for="Input.CodePostal" class="form-control" autocomplete="A1A 1A1" aria-required="true" placeholder="A1A 1A1" />
-                <label asp-for="Input.CodePostal">Code Postal</label>
+                <label asp-for="Input.CodePostal">Code postal</label>
                 <span asp-validation-for="Input.CodePostal" class="text-danger"></span>
             </div>
 

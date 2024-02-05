@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.TagHelpers;
 using Microsoft.AspNetCore.WebUtilities;
 using Projet_Web_Commerce.Areas.Identity.Data;
 
@@ -33,7 +34,7 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
 
         public class InputModel
         {
-            [Required(ErrorMessage = "Le email est requis.")]
+            [Required(ErrorMessage = "Le courriel est requis.")]
             [EmailAddress]
             public string Email { get; set; }
         }
@@ -43,28 +44,32 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
             if (ModelState.IsValid)
             {
                 var user = await _userManager.FindByEmailAsync(Input.Email);
-                if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)))
+                if (user == null) //|| !(await _userManager.IsEmailConfirmedAsync(user))
                 {
+                    ModelState.AddModelError(string.Empty, "Cette adresse courriel n'existe pas dans la base de données.");
+
                     // Don't reveal that the user does not exist or is not confirmed
+                    //return RedirectToPage("./ForgotPasswordConfirmation");
+                }
+                else
+                {
+                    // For more information on how to enable account confirmation and password reset please
+                    // visit https://go.microsoft.com/fwlink/?LinkID=532713
+                    var code = await _userManager.GeneratePasswordResetTokenAsync(user);
+                    code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+                    var callbackUrl = Url.Page(
+                        "/Account/ResetPassword",
+                        pageHandler: null,
+                        values: new { area = "Identity", code },
+                        protocol: Request.Scheme);
+
+                    await Methodes.envoyerCourriel(
+                        Input.Email,
+                        "Réinitialiser le mot de passe",
+                        $"Veuillez réinitialiser votre mot de passe en <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>cliquant ici</a>.");
+
                     return RedirectToPage("./ForgotPasswordConfirmation");
                 }
-
-                // For more information on how to enable account confirmation and password reset please
-                // visit https://go.microsoft.com/fwlink/?LinkID=532713
-                var code = await _userManager.GeneratePasswordResetTokenAsync(user);
-                code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-                var callbackUrl = Url.Page(
-                    "/Account/ResetPassword",
-                    pageHandler: null,
-                    values: new { area = "Identity", code },
-                    protocol: Request.Scheme);
-
-                await _emailSender.SendEmailAsync(
-                    Input.Email,
-                    "Réinitialiser le mot de passe",
-                    $"Veuillez réinitialiser votre mot de passe en <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
-
-                return RedirectToPage("./ForgotPasswordConfirmation");
             }
 
             return Page();

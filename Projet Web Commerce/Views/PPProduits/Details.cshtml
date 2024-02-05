@@ -4,87 +4,96 @@
     ViewData["Title"] = "Details";
 }
 
-<h1>Details</h1>
+<h1>Détails</h1>
 
 <div>
-    <h4>PPProduits</h4>
+    <h4>Produits</h4>
     <hr />
     <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.DateCreation)
+        <dt class="col-sm-2">
+            Photo de l’article :
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.DateCreation)
+        <dd class="col-sm-10">
+            <img src="~/Logo/@(Model.Photo)" alt="@(Model.Photo)" width="140" height="200" />
         </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.DateMAJ)
+
+        <dt class="col-sm-2">
+            Nom du produit :
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.DateMAJ)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Nom)
-        </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Nom)
         </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Description)
+
+        <dt class="col-sm-2">
+            Description plus élaborée :
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Description)
         </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Photo)
+
+        <dt class="col-sm-2">
+            Catégorie du produit :
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Photo)
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.PPCategories.Description)
         </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.PrixDemande)
+
+        <dt class="col-sm-2">
+            Prix demandé :
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.PrixDemande)
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.PrixDemande) $
         </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Disponibilite)
+
+        <dt class="col-sm-2">
+            Disponible ?
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Disponibilite)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Poids)
+        @if (@Model.Disponibilite == true)
+        {
+            <dd class="col-sm-10">
+                Oui
+            </dd>
+        }
+        else
+        {
+            <dd class="col-sm-10">
+                Non
+            </dd>
+        }
+
+        <dt class="col-sm-2">
+            Poids de l’article :
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Poids)
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Poids) Kg
         </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.DateVente)
+
+        <dt class="col-sm-2">
+            Nombre d’items :
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.DateVente)
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.NombreItems)
         </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.PrixVente)
+
+        <dt class="col-sm-2">
+            Prix de vente : 
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.PrixVente)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.PPVendeurs)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.PPVendeurs.NoVendeur)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.PPCategories)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.PPCategories.NoCategorie)
-        </dd>
+        @if (Model.PrixVente != null)
+        {
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.PrixVente) $
+            </dd>
+        }
+        else
+        {
+            <dd class="col-sm-10">
+                Le prix de vente n'est pas précisée
+            </dd>
+        }
+
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model?.NoProduit">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Edit" asp-route-id="@Model?.NoProduit">Modifier</a> |
+    <a asp-action="Index">Retour à la liste</a>
 </div>

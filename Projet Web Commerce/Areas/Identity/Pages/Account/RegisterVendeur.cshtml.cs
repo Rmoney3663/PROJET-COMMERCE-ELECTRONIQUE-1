@@ -1,4 +1,4 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
+// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 #nullable disable
 
@@ -27,6 +27,7 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
 {
     public class RegisterModel2 : PageModel
     {
+        private readonly AuthDbContext _context;
         private readonly SignInManager<Utilisateur> _signInManager;
         private readonly UserManager<Utilisateur> _userManager;
         private readonly IUserStore<Utilisateur> _userStore;
@@ -35,12 +36,14 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
         private readonly IEmailSender _emailSender;
 
         public RegisterModel2(
+            AuthDbContext context,
             UserManager<Utilisateur> userManager,
             IUserStore<Utilisateur> userStore,
             SignInManager<Utilisateur> signInManager,
             ILogger<RegisterModel> logger,
             IEmailSender emailSender)
         {
+            _context = context;
             _userManager = userManager;
             _userStore = userStore;
             _emailStore = GetEmailStore();
@@ -49,60 +52,35 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
             _emailSender = emailSender;
         }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         [BindProperty]
         public InputModel Input { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         public string ReturnUrl { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         public IList<AuthenticationScheme> ExternalLogins { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         public class InputModel
         {
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
-            [Required(ErrorMessage = "Le email est requis.")]
-            [EmailAddress]
-            [Display(Name = "Email")]
+            
+            [Required(ErrorMessage = "Le courriel est requis.")]
+            [EmailAddress(ErrorMessage = "Le champ 'Courriel' n'est pas une adresse courriel valide.")]
+            [Display(Name = "Courriel")]
             public string Email { get; set; }
 
-            [Required(ErrorMessage = "Retaper le email.")]
-            [EmailAddress]
-            [Display(Name = "Confirmer Email")]
-            [Compare("Email", ErrorMessage = "L'email et l'email de confirmation ne correspondent pas.")]
+            //[Required(ErrorMessage = "Retaper le courriel.")]
+            [EmailAddress(ErrorMessage = "Le champ 'Confirmer courriel' n'est pas une adresse courriel valide.")]
+            [Display(Name = "Confirmer courriel")]
+            [Compare("Email", ErrorMessage = "Le courriel et le courriel de confirmation ne correspondent pas.")]
             public string ConfirmEmail { get; set; }
 
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
+            
             [Required(ErrorMessage = "Le mot de passe est requis.")]
             [StringLength(100, ErrorMessage = "Le {0} doit comporter au moins {2} et au maximum {1} caractères.", MinimumLength = 6)]
             [DataType(DataType.Password)]
             [Display(Name = "Mot de passe")]
             public string Password { get; set; }
 
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
+            //[Required(ErrorMessage = "Retaper le mot de passe.")]
             [DataType(DataType.Password)]
             [Display(Name = "Confirmer mot de passe")]
             [Compare("Password", ErrorMessage = "Le mot de passe et le mot de passe de confirmation ne correspondent pas.")]
@@ -117,10 +95,10 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
             public int SelectedNumberLivraison { get; set; }
 
             [Required(ErrorMessage = "Le taxe est requis.")]
-            [Display(Name = "Client doit payer taxe ?")]
+            [Display(Name = "Client doit payer taxe?")]
             public bool Tax { get; set; }
 
-            [Required(ErrorMessage = "Le province est requis.")]
+            [Required(ErrorMessage = "La province est requise.")]
             [Display(Name = "Sélectionner la province")]
             public string SelectedProvince { get; set; }
 
@@ -145,18 +123,18 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
             [Display(Name = "Nom")]
             public string Nom { get; set; }
 
-            [Required(ErrorMessage = "Le prenom est requis.")]
-            [Display(Name = "Prenom")]
+            [Required(ErrorMessage = "Le prénom est requis.")]
+            [Display(Name = "Prénom")]
             public string Prenom { get; set; }
 
-            [RegularExpression(@"^\d{3}-\d{3}-\d{4}$", ErrorMessage = "Le numéro de téléphone doit être au format 999-999-9999.")]
-            [Display(Name = "Numéro de téléphone 1")]
+            [Required(ErrorMessage = "Le numéro de téléphone est requis")]
+            [RegularExpression(@"^\d{3}-\d{3}-\d{4}$", ErrorMessage = "Le numéro de téléphone doit respecter le format 999-999-9999.")]
+            [Display(Name = "Numéro de téléphone")]
             public string PhoneNumber1 { get; set; }
 
-            [RegularExpression(@"^\d{3}-\d{3}-\d{4}$", ErrorMessage = "Le numéro de téléphone doit être au format 999-999-9999.")]
-            [Display(Name = "Numéro de téléphone 2")]
+            [RegularExpression(@"^\d{3}-\d{3}-\d{4}$", ErrorMessage = "Le cellulaire doit respecter le format 999-999-9999.")]
+            [Display(Name = "Cellulaire (optionnel)")]
             public string PhoneNumber2 { get; set; }
-
         }
 
         public async Task OnGetAsync(string returnUrl = null)
@@ -179,6 +157,14 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
         {
             returnUrl ??= Url.Content("~/");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+
+            var compagnieExistante = _context.PPVendeurs.FirstOrDefault(c => c.NomAffaires == Input.NomAffaires);
+
+            if (compagnieExistante != null)
+            {
+                ModelState.AddModelError(string.Empty, "Ce nom d'affaires existe déjà");
+            }
+
             if (ModelState.IsValid)
             {
                 var SelectedNumberPoids = Input.SelectedNumberPoids;
@@ -195,10 +181,11 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
                 var prenom = Input.Prenom;
                 var phone1 = Input.PhoneNumber1;
                 var phone2 = Input.PhoneNumber2;
+                var pays = "Canada";
 
                 if (codePostal.Length == 6)
                 {
-                    codePostal.Insert(2, " ");
+                    codePostal = codePostal.Insert(3, " ");
                 }
 
                 var user = CreateUser();
@@ -214,18 +201,16 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
                     var optionsBuilder = new DbContextOptionsBuilder<AuthDbContext>();
                     optionsBuilder.UseSqlServer("Data Source=tcp:424sql.cgodin.qc.ca,5433;Initial Catalog=BDB68_424Q24;User ID=B68equipe424q24;Password=Password24;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True;Integrated Security=False");
 
-                    var context = new AuthDbContext(optionsBuilder.Options);
-
                     int lowestNo = 10;
 
-                    if (context.PPVendeurs.Any())
+                    if (_context.PPVendeurs.Any())
                     {
                         int minNo = 10;
                         int maxNo = 99;
 
                         for (int i = minNo; i <= maxNo; i++)
                         {
-                            if (!context.PPVendeurs.Any(u => u.NoVendeur == i))
+                            if (!_context.PPVendeurs.Any(u => u.NoVendeur == i))
                             {
                                 lowestNo = i;
                                 break;
@@ -244,41 +229,18 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
                         {
                             pourcentage = 5.00;
                         }
-
                     }
+                 
 
                     PPVendeurs newRecord = new PPVendeurs()
                     { 
                       IdUtilisateur = user.Id, NoVendeur = lowestNo, AdresseEmail = email, MotDePasse = password, Taxes = taxe, NomAffaires = Input.NomAffaires, NoProvince = province,
                       DateCreation = date, PoidsMaxLivraison = SelectedNumberPoids, LivraisonGratuite = SelectedNumberLivraison, Statut = 0, Pourcentage = (decimal?)pourcentage,
-                      Ville = ville, Pays = "Canada", Rue = rue, CodePostal = codePostal, Prenom = prenom, Nom = nom
+                      Ville = ville, Pays = "Canada", Rue = rue, CodePostal = codePostal, Prenom = prenom, Nom = nom, Tel1 = phone1, Tel2 = phone2
                     };
-                    context.PPVendeurs.Add(newRecord);
-                    context.SaveChanges();
+                    _context.PPVendeurs.Add(newRecord);
+                    _context.SaveChanges();
 
-                    if (phone1 != null)
-                    {
-                        TelephoneVendeurs telephoneVendeurs1 = new TelephoneVendeurs()
-                        {
-                            NoVendeur = lowestNo,
-                            Tel = phone1
-                        };
-
-                        context.TelephoneVendeurs.Add(telephoneVendeurs1);
-                        context.SaveChanges();
-                    }
-
-                    if (phone2 != null)
-                    {
-                        TelephoneVendeurs telephoneVendeurs2 = new TelephoneVendeurs()
-                        {
-                            NoVendeur = lowestNo,
-                            Tel = phone2
-                        };
-
-                        context.TelephoneVendeurs.Add(telephoneVendeurs2);
-                        context.SaveChanges();
-                    }
 
                     _logger.LogInformation("L'utilisateur a créé un nouveau compte avec un mot de passe.");
 

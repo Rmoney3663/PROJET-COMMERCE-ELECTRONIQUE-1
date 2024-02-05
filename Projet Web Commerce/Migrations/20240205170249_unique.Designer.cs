@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Projet_Web_Commerce.Data;
 
@@ -11,9 +12,11 @@ using Projet_Web_Commerce.Data;
 namespace Projet_Web_Commerce.Migrations
 {
     [DbContext(typeof(AuthDbContext))]
-    partial class AuthDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240205170249_unique")]
+    partial class unique
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -330,9 +333,11 @@ namespace Projet_Web_Commerce.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Tel1")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Tel2")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Ville")
@@ -572,7 +577,7 @@ namespace Projet_Web_Commerce.Migrations
                     b.Property<decimal>("PrixDemande")
                         .HasColumnType("smallmoney");
 
-                    b.Property<decimal?>("PrixVente")
+                    b.Property<decimal>("PrixVente")
                         .HasColumnType("smallmoney");
 
                     b.HasKey("NoProduit");
@@ -722,9 +727,11 @@ namespace Projet_Web_Commerce.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("Tel1")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Tel2")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Ville")

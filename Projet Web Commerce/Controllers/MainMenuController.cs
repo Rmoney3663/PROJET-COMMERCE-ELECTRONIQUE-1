@@ -19,8 +19,8 @@ namespace Projet_Web_Commerce.Controllers
             _context = context;
             _userManager = userManager;
         }
-        // GET: MainMenuController
 
+        // GET: MainMenuController
         public ActionResult Catalogue()
         {
             var CategoriesList = _context.PPCategories.ToList();
@@ -41,10 +41,9 @@ namespace Projet_Web_Commerce.Controllers
                 return View(vendeursStatutZero);
             }
 
-            return Redirect("AccessDenied");
+            return RedirectToAction("AccesRefuse");
 
         }
-
 
         [HttpPost]
         public ActionResult GestionVendeurs(int NoVendeur)
@@ -70,8 +69,13 @@ namespace Projet_Web_Commerce.Controllers
                 }
             }
 
-            return Redirect("AccessDenied");
+            return Redirect("AccesRefuse");
+        }
 
+        [HttpGet]
+        public ActionResult AccesRefuse()
+        {
+            return View();
         }
 
         [HttpPost]
