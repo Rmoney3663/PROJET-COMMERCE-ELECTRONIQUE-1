@@ -55,7 +55,7 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account.Manage
             /// </summary>
             [Required(ErrorMessage = "Le mot de passe actuel est requis.")]
             [DataType(DataType.Password)]
-            [Display(Name = "mot de passe actuel")]
+            [Display(Name = "Mot de passe actuel")]
             public string OldPassword { get; set; }
 
             /// <summary>
@@ -63,9 +63,9 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account.Manage
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
             [Required(ErrorMessage = "Le nouveau mot de passe est requis.")]
-            [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+            [StringLength(100, ErrorMessage = "Le {0} doit comporter au moins {2} et au maximum {1} caractères.", MinimumLength = 6)]
             [DataType(DataType.Password)]
-            [Display(Name = "nouveau mot de passe")]
+            [Display(Name = "Nouveau mot de passe")]
             public string NewPassword { get; set; }
 
             /// <summary>
@@ -73,8 +73,8 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account.Manage
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
             [DataType(DataType.Password)]
-            [Display(Name = "Confirmer nouveau mot de passe")]
             [Compare("NewPassword", ErrorMessage = "Le nouveau mot de passe et le mot de passe de confirmation ne correspondent pas.")]
+            [Display(Name = "Confirmer le nouveau mot de passe")]
             public string ConfirmPassword { get; set; }
         }
 
