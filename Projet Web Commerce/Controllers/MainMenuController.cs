@@ -65,11 +65,23 @@ namespace Projet_Web_Commerce.Controllers
 
 
             var produitsVendeur = _context.PPProduits
-            .Where(p => p.NoVendeur == vendeur.NoVendeur)
-            .OrderBy(v => v.DateCreation)  // Assuming DateCreation is the property you want to order by
-            .ToList();
+                .Where(p => p.NoVendeur == vendeur.NoVendeur)
+                .OrderBy(v => v.DateCreation)
+                .Take(15)
+                .ToList();
 
-            return View(produitsVendeur);
+            var CategoriesList = _context.PPCategories.ToList();
+            var VendeursList = _context.PPVendeurs.ToList();
+
+
+            ModelCatalogue modelCatalogue = new ModelCatalogue()
+            {
+                CategoriesList = CategoriesList,
+                VendeursList = VendeursList,
+                ProduitsList = produitsVendeur
+            };
+
+            return View(modelCatalogue);
         }
 
 

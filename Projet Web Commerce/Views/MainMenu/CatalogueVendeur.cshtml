@@ -1,35 +1,47 @@
-﻿@model List<Projet_Web_Commerce.Models.PPProduits>
+﻿@model Projet_Web_Commerce.Models.ModelCatalogue
 
 <div class="row">
     <div class="col">
         <section>
-
-            <h3>Liste des Vendeurs à confirmer</h3>
+            <h3>Liste des nouveaux produits </h3>
             <div class="container mt-4">
-                @if (Model != null && Model.Any())
+                @if (Model != null && Model.ProduitsList.Any())
                 {
-                    <div class="row">
-                        @foreach (var item in Model)
-                        {
-                            <div class="col-md-6 mb-4">
-                                <div class="card">
-                                    <div class="card-body">
-                                        <h5 class="card-title">@Html.DisplayFor(modelItem => item.NoProduit)</h5>
-                                        <p class="card-text">No Vendeur: @Html.DisplayFor(modelItem => item.NoVendeur)</p>
-                                        <p class="card-text">Date de demande : @Html.DisplayFor(modelItem => item.DateCreation)</p>
-                                        <form asp-controller="MainMenu" method="post">
-                                            <input type="hidden" name="NoProduit" value="@item.NoProduit" />
-                                            <button type="submit" class="btn btn-primary">Détails</button>
-                                        </form>
+                    <div class="container mt-4">
+                        <div class="row">
+                            @foreach (var item in Model.ProduitsList)
+                            {
+                                <div class="col-lg-4 mb-4 col-md-6 col-xl-3">
+                                    <div class="card">
+                                        <div class="card-body" style="justify-content: center; display: flex;">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <h5 class="card-text">@Html.DisplayFor(modelItem => item.Nom)</h5>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <h5 class="card-text float-end" style="color: orangered">Nouveau !</h5>
+                                                </div>
+
+                                                <img src="~/Logo/@(item.Photo)" alt="./Logo/@(item.Photo)" width="200" height="200" />
+                                                @{
+                                                    var category = Model.CategoriesList.FirstOrDefault(c => c.NoCategorie == item.NoCategorie);
+                                                }
+                                                <p class="card-text">Catégorie : @category.Description</p>
+                                                <p class="card-title">Numéro du produit : @Html.DisplayFor(modelItem => item.NoProduit)</p>
+                                                <p class="card-text">Prix Demandé : @Html.DisplayFor(modelItem => item.PrixDemande)</p>
+                                                <p class="card-text">Prix Demandé : @Html.DisplayFor(modelItem => item.NombreItems)</p>
+                                                <a href="#" class="btn btn-primary">Details</a>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        }
+                            }
+                        </div>
                     </div>
                 }
                 else
                 {
-                    <p>Aucun vendeur à confirmer.</p>
+                    <p>Aucun produits.</p>
                 }
             </div>
         </section>
