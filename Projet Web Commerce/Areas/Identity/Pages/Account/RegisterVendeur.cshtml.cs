@@ -229,6 +229,7 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
                             pourcentage = 5.00;
                         }
                     }
+                 
 
                     PPVendeurs newRecord = new PPVendeurs()
                     { 
