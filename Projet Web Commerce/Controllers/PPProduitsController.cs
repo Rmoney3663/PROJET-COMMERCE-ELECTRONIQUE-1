@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using NuGet.Packaging.Signing;
 using Projet_Web_Commerce.Areas.Identity.Data;
@@ -91,9 +92,10 @@ namespace Projet_Web_Commerce.Controllers
             {
                 int highestNoProduit = _context.PPProduits.Max(p => (int?)p.NoProduit) ?? -1;
                 pPProduits.NoProduit = highestNoProduit + 1;
-
+                var tempFilename = "temp_filename";
+                string extension = Path.GetExtension(file.FileName);
                 pPProduits.Photo = file.FileName;
-                string tempFilePath = Path.Combine("wwwroot/Logo", file.FileName);
+                string tempFilePath = Path.Combine("wwwroot/Logo", tempFilename + extension);
 
                 using (Stream fileStream = new FileStream(tempFilePath, FileMode.Create))
                 {
@@ -102,6 +104,14 @@ namespace Projet_Web_Commerce.Controllers
 
                 _context.Add(pPProduits);
                 await _context.SaveChangesAsync();
+                var id = highestNoProduit + 1;
+                var finalFilename = $"{id}{extension}";
+                var finalFilePath = Path.Combine("wwwroot/Logo", finalFilename);
+                System.IO.File.Move(tempFilePath, finalFilePath);
+
+                pPProduits.Photo = finalFilename;
+                await _context.SaveChangesAsync();
+
                 return RedirectToAction(nameof(Index));
             }
             ViewData["NoCategorie"] = new SelectList(_context.PPCategories, "NoCategorie", "Description", pPProduits.NoCategorie);

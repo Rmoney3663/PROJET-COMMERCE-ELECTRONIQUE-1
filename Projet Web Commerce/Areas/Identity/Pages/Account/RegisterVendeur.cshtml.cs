@@ -229,15 +229,7 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
                             pourcentage = 5.00;
                         }
                     }
-
-                    var existingRecord = context.PPVendeurs.FirstOrDefault(v => v.NomAffaires == Input.NomAffaires);
-
-                    if (existingRecord != null)
-                    {
-                        ModelState.AddModelError(string.Empty, "Le nom d'affaires doit être unique.");
-                        return Page(); 
-                    }
-
+                 
 
                     PPVendeurs newRecord = new PPVendeurs()
                     { 

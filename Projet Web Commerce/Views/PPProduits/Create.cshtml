@@ -54,7 +54,7 @@
 
             <div class="form-group">
                 <label asp-for="Photo" class="control-label">Image du Produit :</label>
-                <input type="file" id="file" name="file" accept="image/jpeg" class="form-control" />
+                <input type="file" id="file" name="file" accept="image/jpeg" class="form-control" required />
                 <span asp-validation-for="Photo" class="text-danger"></span>
             </div>
             <br>
@@ -69,8 +69,8 @@
             <div class="form-group">
                 <label asp-for="Disponibilite" class="control-label">Disponible ?</label>
                 <select asp-for="Disponibilite" class="form-control" required>
-                    <option value="true">Vrai</option>
-                    <option value="false">Faux</option>
+                    <option value="true">Oui</option>
+                    <option value="false">None</option>
                 </select>
                 <span asp-validation-for="Disponibilite" class="text-danger"></span>
             </div>
@@ -85,7 +85,7 @@
 
             <div class="form-group">
                 <label asp-for="NombreItems" class="control-label">Nombre d'items :</label>
-                <input asp-for="NombreItems" class="form-control" class="form-control" type="number" min="0" data-val="true" required />
+                <input asp-for="NombreItems" class="form-control" class="form-control" type="number" min="0" data-val="true" step=".1" required />
                 <span asp-validation-for="NombreItems" class="text-danger"></span>
             </div>
             <br>
