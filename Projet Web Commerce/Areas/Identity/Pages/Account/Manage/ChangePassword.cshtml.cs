@@ -73,7 +73,7 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account.Manage
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
             [DataType(DataType.Password)]
-            [Compare("NewPassword", ErrorMessage = "Le nouveau mot de passe et le mot de passe de confirmation ne correspondent pas.")]
+            [Compare("NewPassword", ErrorMessage = "Les mots de passe ne correspondent pas.")]
             [Display(Name = "Confirmer le nouveau mot de passe")]
             public string ConfirmPassword { get; set; }
         }
