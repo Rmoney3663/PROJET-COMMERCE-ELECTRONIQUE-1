@@ -39,6 +39,7 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=MainMenu}/{action=Catalogue}");
 
+
 app.MapRazorPages();
 
 using (var scope = app.Services.CreateScope())

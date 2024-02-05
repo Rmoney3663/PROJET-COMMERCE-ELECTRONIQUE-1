@@ -24,8 +24,18 @@ namespace Projet_Web_Commerce.Controllers
         public ActionResult Catalogue()
         {
             var CategoriesList = _context.PPCategories.ToList();
+            var VendeursList = _context.PPVendeurs.ToList();
+            var ProduitsList = _context.PPProduits.ToList();
 
-            return View(CategoriesList);
+
+            ModelCatalogue modelCatalogue = new ModelCatalogue()
+            {
+                CategoriesList = CategoriesList,
+                VendeursList = VendeursList,
+                ProduitsList = ProduitsList
+            };
+
+            return View(modelCatalogue);
         }
 
         [HttpGet]
@@ -43,6 +53,23 @@ namespace Projet_Web_Commerce.Controllers
 
             return Redirect("AccessDenied");
 
+        }
+
+        public IActionResult CatalogueVendeur(string id)
+        {
+
+            Console.WriteLine(id);
+            // Action logic
+            var vendeur = _context.PPVendeurs.Where(v => v.NomAffaires == id).FirstOrDefault();
+
+
+
+            var produitsVendeur = _context.PPProduits
+            .Where(p => p.NoVendeur == vendeur.NoVendeur)
+            .OrderBy(v => v.DateCreation)  // Assuming DateCreation is the property you want to order by
+            .ToList();
+
+            return View(produitsVendeur);
         }
 
 
@@ -72,41 +99,6 @@ namespace Projet_Web_Commerce.Controllers
 
             return Redirect("AccessDenied");
 
-        }
-
-        [HttpPost]
-        public ActionResult Index(int NoVendeur)
-        {
-
-            if (User.IsInRole("Gestionnaire"))
-            {
-                var vendeurToUpdate = _context.PPVendeurs.FirstOrDefault(v => v.NoVendeur == NoVendeur);
-
-
-                if (vendeurToUpdate != null)
-                {
-                    // Update the properties of the vendeur
-                    vendeurToUpdate.Statut = 1;
-
-                    // Save changes to the database
-                    _context.SaveChanges();
-                }
-            }
-
-            var vendeursStatutZero = _context.PPVendeurs
-            .Where(v => v.Statut == 0)
-            .OrderBy(v => v.DateCreation)  // Assuming DateCreation is the property you want to order by
-            .ToList();
-
-            var CategoriesList = _context.PPCategories.ToList();
-
-            var model = new ModelMainMenu
-            {
-                VendeursList = vendeursStatutZero,
-                CategoriesList = CategoriesList
-            };
-
-            return View(model);
         }
 
         // GET: MainMenuController/Details/5
