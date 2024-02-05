@@ -10,6 +10,7 @@ namespace Projet_Web_Commerce.Models
         public int NoVendeur { get; set; }
         public int NoCategorie { get; set; }
         public DateTime DateCreation { get; set; }
+        public int NombreItems { get; set; }
         public DateTime DateMAJ { get; set; }
         public string Nom { get; set; }
         public string Description { get; set; }
