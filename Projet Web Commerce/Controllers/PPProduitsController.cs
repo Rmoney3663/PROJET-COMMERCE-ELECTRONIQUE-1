@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using NuGet.Packaging.Signing;
 using Projet_Web_Commerce.Areas.Identity.Data;
@@ -78,6 +79,12 @@ namespace Projet_Web_Commerce.Controllers
             Console.WriteLine($"Photo: {file.FileName}");
             ModelState.Remove("file");
             ModelState.Remove("Photo");
+
+            if (pPProduits.PrixVente > pPProduits.PrixDemande)
+            {
+                ModelState.AddModelError("PrixVente", "Le prix de vente ne peut pas être supérieur au prix demandé.");
+            }
+
             foreach (var m in ModelState)
             {
                 foreach (var er in m.Value.Errors)
@@ -89,11 +96,15 @@ namespace Projet_Web_Commerce.Controllers
 
             if (ModelState.IsValid)
             {
-                int highestNoProduit = _context.PPProduits.Max(p => (int?)p.NoProduit) ?? -1;
-                pPProduits.NoProduit = highestNoProduit + 1;
-
+                int produitCount = _context.PPProduits.Count();
+                var id = produitCount + 1;
+                int NoVendeur = pPProduits.NoVendeur;
+                string combined = NoVendeur.ToString() + id.ToString();
+                pPProduits.NoProduit = int.Parse(combined);
+                var tempFilename = "temp_filename";
+                string extension = Path.GetExtension(file.FileName);
                 pPProduits.Photo = file.FileName;
-                string tempFilePath = Path.Combine("wwwroot/Logo", file.FileName);
+                string tempFilePath = Path.Combine("wwwroot/Logo", tempFilename + extension);
 
                 using (Stream fileStream = new FileStream(tempFilePath, FileMode.Create))
                 {
@@ -102,6 +113,13 @@ namespace Projet_Web_Commerce.Controllers
 
                 _context.Add(pPProduits);
                 await _context.SaveChangesAsync();
+                var finalFilename = $"{int.Parse(combined)}{extension}";
+                var finalFilePath = Path.Combine("wwwroot/Logo", finalFilename);
+                System.IO.File.Move(tempFilePath, finalFilePath);
+
+                pPProduits.Photo = finalFilename;
+                await _context.SaveChangesAsync();
+
                 return RedirectToAction(nameof(Index));
             }
             ViewData["NoCategorie"] = new SelectList(_context.PPCategories, "NoCategorie", "Description", pPProduits.NoCategorie);
