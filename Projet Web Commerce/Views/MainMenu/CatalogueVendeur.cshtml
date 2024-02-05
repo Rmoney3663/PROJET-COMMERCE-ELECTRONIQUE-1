@@ -14,12 +14,12 @@
                             <div class="col-md-6 mb-4">
                                 <div class="card">
                                     <div class="card-body">
-                                        <h5 class="card-title">@Html.DisplayFor(modelItem => item.Description)</h5>
+                                        <h5 class="card-title">@Html.DisplayFor(modelItem => item.NoProduit)</h5>
                                         <p class="card-text">No Vendeur: @Html.DisplayFor(modelItem => item.NoVendeur)</p>
                                         <p class="card-text">Date de demande : @Html.DisplayFor(modelItem => item.DateCreation)</p>
                                         <form asp-controller="MainMenu" method="post">
-                                            <input type="hidden" name="NoVendeur" value="@item.NoVendeur" />
-                                            <button type="submit" class="btn btn-primary">Accepter</button>
+                                            <input type="hidden" name="NoProduit" value="@item.NoProduit" />
+                                            <button type="submit" class="btn btn-primary">Détails</button>
                                         </form>
                                     </div>
                                 </div>
