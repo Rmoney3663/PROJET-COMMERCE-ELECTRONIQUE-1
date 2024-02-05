@@ -47,6 +47,13 @@
                             <a class="nav-link" style="color: rgb(249, 229, 71); font-size: 23px" asp-area="" asp-controller="MainMenu" asp-action="Catalogue">Catalogue</a>
                         </li>
 
+                        @if (SignInManager.IsSignedIn(User) && User.IsInRole("Vendeur"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" style="color: rgb(249, 229, 71); font-size: 23px" asp-area="" asp-controller="PPProduits" asp-action="Index">Mes Produits</a>
+                            </li>
+                        }
+
                         @if (SignInManager.IsSignedIn(User) && User.IsInRole("Gestionnaire"))
                         {
                         <li class="nav-item">
