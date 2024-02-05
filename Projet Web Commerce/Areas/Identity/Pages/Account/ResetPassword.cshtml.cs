@@ -78,7 +78,8 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
             var user = await _userManager.FindByEmailAsync(Input.Email);
             if (user == null)
             {
-                ModelState.AddModelError(string.Empty, "Cette adresse courriel n'existe pas dans la base de données.");
+                ModelState.AddModelError(string.Empty, "Adresse courriel invalide");
+                return Page();
 
                 // Don't reveal that the user does not exist
                 //return RedirectToPage("./ResetPasswordConfirmation");

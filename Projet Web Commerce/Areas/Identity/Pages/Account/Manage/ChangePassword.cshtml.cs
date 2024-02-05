@@ -8,22 +8,27 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Projet_Web_Commerce.Areas.Identity.Data;
+using Projet_Web_Commerce.Data;
 
 namespace Projet_Web_Commerce.Areas.Identity.Pages.Account.Manage
 {
     public class ChangePasswordModel : PageModel
     {
+        private readonly AuthDbContext _context;
         private readonly UserManager<Utilisateur> _userManager;
         private readonly SignInManager<Utilisateur> _signInManager;
         private readonly ILogger<ChangePasswordModel> _logger;
 
         public ChangePasswordModel(
+            AuthDbContext context,
             UserManager<Utilisateur> userManager,
             SignInManager<Utilisateur> signInManager,
             ILogger<ChangePasswordModel> logger)
         {
+            _context = context;
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
@@ -109,11 +114,27 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account.Manage
             }
 
             var changePasswordResult = await _userManager.ChangePasswordAsync(user, Input.OldPassword, Input.NewPassword);
+            bool estDansRole = await _userManager.IsInRoleAsync(user, "Vendeur");
+            if (estDansRole) // Si user est vendeur
+            {
+                var lstVendeurs = _context.PPVendeurs.ToList();
+                lstVendeurs.FirstOrDefault(v => v.AdresseEmail == user.Email).MotDePasse = Input.NewPassword;
+                await _context.SaveChangesAsync();
+            }
+            else // User est client
+            {
+                estDansRole = await _userManager.IsInRoleAsync(user, "Client");
+                var lstClients = _context.PPClients.ToList();
+                lstClients.FirstOrDefault(c => c.AdresseEmail == user.Email).MotDePasse = Input.NewPassword;
+                await _context.SaveChangesAsync();
+            }
+
             if (!changePasswordResult.Succeeded)
             {
                 foreach (var error in changePasswordResult.Errors)
                 {
-                    ModelState.AddModelError(string.Empty, error.Description);
+                    ModelState.AddModelError(string.Empty, "Mot de passe invalide");
+                    //ModelState.AddModelError(string.Empty, error.Description);
                 }
                 return Page();
             }

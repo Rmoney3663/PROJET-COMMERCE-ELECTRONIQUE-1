@@ -195,10 +195,11 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
                 var prenom = Input.Prenom;
                 var phone1 = Input.PhoneNumber1;
                 var phone2 = Input.PhoneNumber2;
+                var pays = "Canada";
 
                 if (codePostal.Length == 6)
                 {
-                    codePostal.Insert(2, " ");
+                    codePostal = codePostal.Insert(3, " ");
                 }
 
                 var user = CreateUser();
@@ -244,14 +245,13 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
                         {
                             pourcentage = 5.00;
                         }
-
                     }
 
                     PPVendeurs newRecord = new PPVendeurs()
                     { 
                       IdUtilisateur = user.Id, NoVendeur = lowestNo, AdresseEmail = email, MotDePasse = password, Taxes = taxe, NomAffaires = Input.NomAffaires, NoProvince = province,
                       DateCreation = date, PoidsMaxLivraison = SelectedNumberPoids, LivraisonGratuite = SelectedNumberLivraison, Statut = 0, Pourcentage = (decimal?)pourcentage,
-                      Ville = ville, Pays = "Canada", Rue = rue, CodePostal = codePostal, Prenom = prenom, Nom = nom
+                      Ville = ville, Pays = pays, Rue = rue, CodePostal = codePostal, Prenom = prenom, Nom = nom
                     };
                     context.PPVendeurs.Add(newRecord);
                     context.SaveChanges();
