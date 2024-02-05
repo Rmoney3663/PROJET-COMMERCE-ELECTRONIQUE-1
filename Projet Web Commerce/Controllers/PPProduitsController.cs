@@ -140,8 +140,8 @@ namespace Projet_Web_Commerce.Controllers
             {
                 return NotFound();
             }
-            ViewData["NoCategorie"] = new SelectList(_context.PPCategories, "NoCategorie", "NoCategorie", pPProduits.NoCategorie);
-            ViewData["NoVendeur"] = new SelectList(_context.PPVendeurs, "NoVendeur", "NoVendeur", pPProduits.NoVendeur);
+            ViewData["NoCategorie"] = new SelectList(_context.PPCategories, "NoCategorie", "Description", pPProduits.NoCategorie);
+            ViewData["NoVendeur"] = new SelectList(_context.PPVendeurs, "NoVendeur", "Nom", pPProduits.NoVendeur);
             return View(pPProduits);
         }
 
