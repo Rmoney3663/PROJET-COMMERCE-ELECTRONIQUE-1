@@ -48,48 +48,22 @@ else
         <section class="autoplay" data-sizes="50vw">
             @foreach (var panier in ViewBag.listPaniers)
             {
-                @*
+                Console.WriteLine("help");
+                Console.WriteLine(panier.vendeur);
+                Console.WriteLine(panier.articles[0]);
+
+                PPVendeurs vendeur = Model.VendeursList.Where(p => p.NoVendeur == panier.vendeur).FirstOrDefault();
+
                     <div class="slide">
                         <div class="card">
                             <div class="card-body">
-                                <h2 class="card-title">@panier</h2>
-                                <h5 class="card-details">@Html.DisplayFor(modelItem => panier)</h5>
-
-
-                            
-                                
-                            @if (category.PPProduits != null)
-                            {
-                                <p>Vendeurs:</p>
-                                @foreach (var group in category.PPProduits
-                               .Where(p => p.PPVendeurs != null && p.PPVendeurs.NomAffaires != null)
-                               .GroupBy(p => p.PPVendeurs.NomAffaires))
-                                {
-                                    if (group.Key != null)
-                                    {
-                                        <a asp-controller="MainMenu"
-                                           asp-route-id="@group.Key"
-                                           asp-action="CatalogueVendeur">
-                                            @group.Key (@group.Count())
-                                        </a><br />
-                                    }
-                                    else
-                                    {
-                                        <p>No Vendeur Name</p>
-                                    }
-                                }
-
-                            }
-                            else
-                            {
-                                <p>Aucun vendeur dans cette catégorie.</p>
-                            }
+                                <h2 class="card-title">@vendeur.NomAffaires</h2>
+                                <h5 class="card-details">Nombre d'articles: @panier.articles.Count</h5>
         
                     
                         </div>
                         </div>
                     </div>
-        *@
             }
         </section>
     }
