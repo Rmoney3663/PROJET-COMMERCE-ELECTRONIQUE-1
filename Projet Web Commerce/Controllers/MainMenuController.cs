@@ -1,6 +1,8 @@
 ﻿using DocumentFormat.OpenXml.Drawing.Diagrams;
+using DocumentFormat.OpenXml.InkML;
 using DocumentFormat.OpenXml.Office2010.Excel;
 using DocumentFormat.OpenXml.Spreadsheet;
+using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
@@ -8,7 +10,9 @@ using Microsoft.EntityFrameworkCore;
 using Projet_Web_Commerce.Areas.Identity.Data;
 using Projet_Web_Commerce.Data;
 using Projet_Web_Commerce.Models;
+using System.Drawing.Printing;
 using System.Globalization;
+using System.IO.Packaging;
 using System.Security.Claims;
 
 namespace Projet_Web_Commerce.Controllers
@@ -60,28 +64,93 @@ namespace Projet_Web_Commerce.Controllers
 
         }
 
-        public IActionResult CatalogueVendeur(string id)
+        public async Task<IActionResult> CatalogueVendeurAsync(string id, string? searchString, string? sortOrder, string? parPage, int? pageNumber)
         {
+
+            Console.WriteLine(sortOrder);
             // Action logic
             var vendeur = _context.PPVendeurs.Where(v => v.NomAffaires == id).FirstOrDefault();
 
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var client = _context.PPClients.FirstOrDefault(c => c.IdUtilisateur == userId);
 
-            var nouveauxProduits = _context.PPProduits
-                .Where(p => p.NoVendeur == vendeur.NoVendeur)
-                .OrderBy(v => v.DateCreation)
-                .Take(15)
-                .ToList();
+            ViewBag.sortOrder = sortOrder;
+            ViewBag.parPage = parPage ?? "15";
+            ViewBag.searchString = searchString;
+            ViewBag.id = id;
+            ViewBag.pageNumber = pageNumber;
 
             var CategoriesList = _context.PPCategories.ToList();
             var VendeursList = _context.PPVendeurs.ToList();
 
-            var ProduitsVendeur = _context.PPProduits
-                .Where(p => p.NoVendeur == vendeur.NoVendeur && p.NombreItems > 0)
-                .ToList();
+            IQueryable<PPProduits> ProduitsVendeur;
+
+            var nouveauxProduits = _context.PPProduits
+               .Where(p => p.NoVendeur == vendeur.NoVendeur)
+               .OrderBy(v => v.DateCreation)
+               .Take(15)
+               .ToList();
+
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                ProduitsVendeur = from p in _context.PPProduits
+                    .Where(p => p.NoVendeur == vendeur.NoVendeur && p.Disponibilite == true && p.Nom.Contains(searchString))
+                                  select p;
+            }
+            else
+            {
+                ProduitsVendeur = from p in _context.PPProduits
+                    .Where(p => p.NoVendeur == vendeur.NoVendeur && p.Disponibilite == true)
+                                  select p;
+            }
+
 
             ModelCatalogueVendeur modelCatalogueVendeur;
+
+            switch (sortOrder)
+            {
+                case "dateAsc":
+                    ProduitsVendeur = ProduitsVendeur.OrderBy(p => p.DateCreation);
+                    break;
+                case "dateDesc":
+                    ProduitsVendeur = ProduitsVendeur.OrderByDescending(p => p.DateCreation);
+                    break;
+                case "numProdAsc":
+                    ProduitsVendeur = ProduitsVendeur.OrderBy(p => p.NoProduit);
+                    break;
+                case "numProdDesc":
+                    ProduitsVendeur = ProduitsVendeur.OrderByDescending(p => p.NoProduit);
+                    break;
+                case "catProdAsc":
+                    ProduitsVendeur = ProduitsVendeur.OrderBy(p => p.NoCategorie);
+                    break;
+                case "catProdDesc":
+                    ProduitsVendeur = ProduitsVendeur.OrderByDescending(p => p.NoCategorie);
+                    break;
+                case "descProdAsc":
+                    ProduitsVendeur = ProduitsVendeur.OrderBy(p => p.Description);
+                    break;
+                case "descProdDesc":
+                    ProduitsVendeur = ProduitsVendeur.OrderByDescending(p => p.Description);
+                    break;
+            }
+            int pageSize;
+
+            if (parPage == null)
+            {
+                pageSize = 15;
+            }
+            else
+            {
+                pageSize = Convert.ToInt32(parPage);
+            }
+
+            var produitsVendeurQueryable = ProduitsVendeur.AsQueryable();
+
+            var produitsVendeurPaginated = await PaginatedList<PPProduits>.CreateAsync(
+                produitsVendeurQueryable,
+                pageNumber ?? 1,
+                pageSize);
 
             if (client != null)
             {
@@ -90,7 +159,7 @@ namespace Projet_Web_Commerce.Controllers
                     nomAffaire = id,
                     CategoriesList = CategoriesList,
                     VendeursList = VendeursList,
-                    ProduitsList = ProduitsVendeur,
+                    ProduitsList = produitsVendeurPaginated,
                     NouveauxProduits = nouveauxProduits,
                     noClient = client.NoClient
                 };
@@ -102,12 +171,14 @@ namespace Projet_Web_Commerce.Controllers
                     nomAffaire = id,
                     CategoriesList = CategoriesList,
                     VendeursList = VendeursList,
-                    ProduitsList = ProduitsVendeur,
+                    ProduitsList = produitsVendeurPaginated,
                     NouveauxProduits = nouveauxProduits
                 };
             }
 
             return View(modelCatalogueVendeur);
+
+
         }
 
 

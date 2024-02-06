@@ -16,12 +16,67 @@
     </div>
 }
 
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
 <div class="row">
     <div class="col">
         <section>
             @if (SignInManager.IsSignedIn(User))
             {
                 <h3>Liste de tout les produits @Model.nomAffaire </h3>
+
+                @using (Html.BeginForm("CatalogueVendeur", "MainMenu", FormMethod.Post))
+                {
+                    @Html.Hidden("id", Model.nomAffaire)
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="input-group">
+                                @Html.TextBox("SearchString", null, new { placeholder = "Rechercher", @class = "form-control" })
+                                <div class="input-group-append">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-search"></i> <!-- Assuming you're using Bootstrap Icons -->
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-2">
+                            <select class="form-select btn-secondary" style="background-color: rgb(124, 105, 146);" aria-label="Trier par" id="sortOrder" name="sortOrder">
+                                <option value="dateAsc" selected="@(ViewBag.sortOrder == "dateAsc")">Date de parution &#8593;</option>
+                                <option value="dateDesc" selected="@(ViewBag.sortOrder == "dateDesc")">Date de parution &#8595;</option>
+                                <option value="numProdAsc" selected="@(ViewBag.sortOrder == "numProdAsc")">Numéro de produit &#8593;</option>
+                                <option value="numProdDesc" selected="@(ViewBag.sortOrder == "numProdDesc")">Numéro de produit &#8595;</option>
+                                <option value="catProdAsc" selected="@(ViewBag.sortOrder == "catProdAsc")">Catégorie particulière de produit &#8593;</option>
+                                <option value="catProdDesc" selected="@(ViewBag.sortOrder == "catProdDesc")">Catégorie particulière de produit &#8595;</option>
+                                <option value="descProdAsc" selected="@(ViewBag.sortOrder == "descProdAsc")">Description du produit &#8593;</option>
+                                <option value="descProdDesc" selected="@(ViewBag.sortOrder == "descProdDesc")">Description du produit &#8595;</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-2">
+                            <select class="form-select btn-secondary" style="background-color: rgb(124, 105, 146);" aria-label="Trier par" id="parPage" name="parPage">
+                                <option value="6" selected="@(ViewBag.parPage == "6")">6</option>
+                                <option value="9" selected="@(ViewBag.parPage == "9")">9</option>
+                                <option value="12" selected="@(ViewBag.parPage == "12")">12</option>
+                                <option value="15" selected="@(ViewBag.parPage == "15")">15</option>
+                                <option value="21" selected="@(ViewBag.parPage == "21")">21</option>
+                                <option value="30" selected="@(ViewBag.parPage == "30")">30</option>
+                                <option value="60" selected="@(ViewBag.parPage == "60")">60</option>
+                                <option value="Tous" selected="@(ViewBag.parPage == "tous")">Tous</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="submit" style="color: rgb(249, 229, 71) ; background-color: rgb(124, 105, 146);" class="btn btn-secondary">Rechercher</button>
+                        </div>
+
+                    </div>
+                }
             }
             else
             {
@@ -65,7 +120,7 @@
                                                     Details
                                                 </a>
 
-                                                @if (SignInManager.IsSignedIn(User) && User.IsInRole("Client"))
+                                                @if (SignInManager.IsSignedIn(User) && User.IsInRole("Client") && item.NombreItems > 0)
                                                 {
                                                     <form asp-controller="MainMenu" asp-action="AjoutPanier" method="post">
                                                         <input type="hidden" name="NoProduit" value="@item.NoProduit" />
@@ -81,7 +136,11 @@
                                                         </select>
                                                     </form>
                                                 }
-                                                
+                                                else if (SignInManager.IsSignedIn(User) && User.IsInRole("Client") && item.NombreItems == 0)
+                                                {
+                                                    <p style="color:red; font-weight:bold">En rupture de stock</p>
+                                                }
+
                                             </div>
                                         </div>
                                     </div>
@@ -98,3 +157,35 @@
         </section>
     </div>
 </div>
+
+@if (Model.ProduitsList.Count > 0)
+{
+    <div class="pagination">
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                @if (Model.ProduitsList.HasPreviousPage)
+                {
+                    <li class="page-item">
+                        <a class="page-link" href="@Url.Action("CatalogueVendeur", new { sortOrder = ViewBag.sortOrder, pageNumber = Model.ProduitsList.PageIndex - 1, parPage = ViewBag.parPage, searchString = ViewBag.searchString, id = ViewBag.id })">Previous</a>
+                    </li>
+                }
+
+                @for (int i = 1; i <= Model.ProduitsList.TotalPages; i++)
+                {
+                    <li class="page-item @(i == Model.ProduitsList.PageIndex ? "active" : "")">
+                        <a class="page-link" href="@Url.Action("CatalogueVendeur", new { sortOrder = ViewBag.sortOrder, pageNumber = i, parPage = ViewBag.parPage, searchString = ViewBag.searchString, id = ViewBag.id })">@i</a>
+                    </li>
+                }
+
+                @if (Model.ProduitsList.HasNextPage)
+                {
+                    <li class="page-item">
+                        <a class="page-link" href="@Url.Action("CatalogueVendeur", new { sortOrder = ViewBag.sortOrder, pageNumber = Model.ProduitsList.PageIndex + 1, parPage = ViewBag.parPage, searchString = ViewBag.searchString, id = ViewBag.id })">Next</a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    </div>
+}
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
