@@ -31,5 +31,18 @@
             }
             
         }
+
+        public static decimal pourcentageTaxes(bool taxe, string province)
+        {
+            if (taxe == true)
+            {
+                if (province == "QC")
+                    return Convert.ToDecimal(14.975);
+                else
+                    return Convert.ToDecimal(5.00);
+            }
+
+            return Convert.ToDecimal(0.00);
+        }
     }
 }
