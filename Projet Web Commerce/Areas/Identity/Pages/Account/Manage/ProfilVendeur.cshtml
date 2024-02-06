@@ -48,11 +48,13 @@
             </div>
             <div class="col-md-6">
                 <div class="form-floating mb-3">
-                    <input asp-for="Input.LivraisonGratuite" class="form-control" />
+                    <input asp-for="Input.LivraisonGratuite" class="form-control" type="number" min="0.00" step="any" data-val="true" required />
+                                            
                     <label asp-for="Input.LivraisonGratuite" class="form-label"></label>
                     <span asp-validation-for="Input.LivraisonGratuite" class="text-danger"></span>
                 </div>
             </div>
+           
             <div class="w-100"></div>
             <div class="col-md-6">
                 <div class="form-floating mb-3">
