@@ -34,7 +34,7 @@ namespace Projet_Web_Commerce.Controllers
             Console.WriteLine("QAAAAAAAAAAAAAAAAAAAAAAAA");
             Console.WriteLine(listPaniers.ToList<object>());
 
-            ViewBag.listPaniers = listPaniers.ToList<object>();
+            ViewData["listPaniers"] = listPaniers.ToList<object>();
 
 
             ModelCatalogue modelCatalogue = new ModelCatalogue()
