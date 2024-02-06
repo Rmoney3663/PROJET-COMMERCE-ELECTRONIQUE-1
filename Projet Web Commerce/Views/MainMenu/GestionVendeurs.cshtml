@@ -3,58 +3,168 @@
     ViewData["Title"] = "Gestion des vendeurs";
 }
 
-<html>
-    <body>
-        <div class="row">
-            <div class="col">
-                <section>
-                    <h3>Liste des vendeurs à confirmer</h3>
-                    <div class="container mt-4">
-                        @if (Model != null && Model.Any())
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+
+<div class="row">
+    <div class="col">
+        <section>
+            <h3>Liste des vendeurs à confirmer</h3>
+            <div class="container mt-4">
+                @if (Model != null && Model.Any())
+                {
+                    <div class="row">
+                        @foreach (var item in Model)
                         {
-                            <div class="row">
-                                @foreach (var item in Model)
-                                {
-                                    <div class="col-md-6 mb-4">
-                                        <div class="card">
-                                            <div class="card-body">
-                                                <h5 class="card-title">@Html.DisplayFor(modelItem => item.AdresseEmail)</h5>
-                                                <p class="card-text">No Vendeur: @Html.DisplayFor(modelItem => item.NoVendeur)</p>
-                                                <p class="card-text">Date de demande : @Html.DisplayFor(modelItem => item.DateCreation)</p>
-                                                <form asp-controller="MainMenu" id="frmGestionVendeur" method="post">
-                                                    <div class="form-floating mb-3">
-                                                        <input type="number" name="Pourcentage" value="0" min="0" max="100" step="0.01" class="form-control" />
-                                                        <label class="form-label">Pourcentage (taux de redevance)</label>
-                                                    </div>
-                                                    <input type="hidden" name="NoVendeur" value="@item.NoVendeur" />
-                                                    <input type="hidden" id="vendeurAccepte" name="vendeurAccepte" />
-                                                    <div class="btn-group" role="group" aria-label="Groupe de boutons">
-                                                        <button onclick="submitForm(true)" class="btn btn-primary">Accepter</button>
-                                                        <button onclick="submitForm(false)" class="btn btn-secondary">Refuser</button>
-                                                    </div>
-                                                </form>
+                            <div class="col-md-6 mb-4">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title">@Html.DisplayFor(modelItem => item.AdresseEmail)</h5>
+                                        <p class="card-text">No Vendeur: @Html.DisplayFor(modelItem => item.NoVendeur)</p>
+                                        <p class="card-text">Date de demande : @Html.DisplayFor(modelItem => item.DateCreation)</p>
+                                        <form asp-controller="MainMenu" id="frmGestionVendeur" method="post">
+                                            <div class="form-floating mb-3">
+                                                <input type="number" name="Pourcentage" value="0" min="0" max="100" step="0.01" class="form-control" />
+                                                <label class="form-label">Pourcentage (taux de redevance)</label>
                                             </div>
-                                        </div>
+                                            <input type="hidden" name="NoVendeur" value="@item.NoVendeur" />
+                                            <input type="hidden" id="vendeurAccepte" name="vendeurAccepte" />
+                                        </form>
+                                        <button href="#" onclick="courrielGestionVendeurs(
+                                            true,
+                                            '@item.NoVendeur',
+                                            '@item.NomAffaires',
+                                            '@item.PoidsMaxLivraison',
+                                            '@item.LivraisonGratuite',
+                                            '@item.Taxes',
+                                            '@item.Pourcentage',
+                                            '@item.DateCreation',
+                                            '@item.DateMAJ',
+                                            '@item.AdresseEmail',
+                                            '@item.Nom',
+                                            '@item.Prenom',
+                                            '@item.Rue',
+                                            '@item.Ville',
+                                            '@item.NoProvince',
+                                            '@item.CodePostal',
+                                            '@item.Pays',
+                                            '@item.Tel1',
+                                            '@item.Tel2'
+                                        )" class="btn btn-primary">
+                                            Accepter
+                                        </button>
+
+                                        <button href="#" onclick="courrielGestionVendeurs(false, '@item.NoVendeur')" class="btn btn-secondary">Refuser</button>
                                     </div>
-                                }
+                                </div>
                             </div>
                         }
-                        else
-                        {
-                            <p>Aucun vendeur à confirmer.</p>
-                        }
                     </div>
-                </section>
+                }
+                else
+                {
+                    <p>Aucun vendeur à confirmer.</p>
+                }
             </div>
-        </div>
+        </section>
+    </div>
+</div>
 
-        <script type="text/javascript">
-            function submitForm(value) {
-                document.getElementById('vendeurAccepte').value = value;
+<script type="text/javascript">
+    // function submitForm(value) {
+    //     document.getElementById('vendeurAccepte').value = value;
 
-                document.getElementById('frmGestionVendeur').submit();
+    //     document.getElementById('frmGestionVendeur').submit();
+    // }
+
+    function courrielGestionVendeurs(
+        accepte,
+        noVendeur,
+        nomAffaires,
+        poidsMaxLivraison,
+        livraisonGratuite,
+        taxes,
+        pourcentageRedevence,
+        dateCreation,
+        dateMAJ,
+        courriel, 
+        nom,
+        prenom, 
+        rue,
+        ville,
+        noProvince,
+        codePostal,
+        pays,
+        tel,
+        cell)
+    {
+        var sujet = "Demande acceptée"
+        var message = `Votre demande a été acceptée. Merci de vous joindre à notre plateforme.
+            Détails du vendeur :
+            - No Vendeur: ${noVendeur}
+            - Nom d'affaires: ${nomAffaires}
+            - Poids maximum de livraison: ${poidsMaxLivraison}
+            - Livraison gratuite: ${livraisonGratuite}
+            - Taxes: ${taxes}
+            - Pourcentage de redevance: ${pourcentageRedevence}
+            - Date de création: ${dateCreation}
+            - Date de mise à jour: ${dateMAJ}
+            - Courriel: ${courriel}
+            - Nom: ${nom}
+            - Prénom: ${prenom}
+            - Rue: ${rue}
+            - Ville: ${ville}
+            - Province: ${noProvince}
+            - Code postal: ${codePostal}
+            - Pays: ${pays}
+            - Téléphone: ${tel}
+            - Cellulaire: ${cell}`;
+        if (accepte == false) {
+            sujet = "Demande refusée";
+            message = "Votre demande a été refusée. Pour plus d'informations, veuillez nous contacter.";
+        }
+
+        Swal.fire({
+            title: 'Courriel envoyé au vendeur',
+            html: `
+            <input id="sujet" style="width:550;" class="swal2-input" value="${sujet}" />
+            <textarea id="message" style="resize:none;width:550;height:300;" class="swal2-input" >${message}</textarea>
+        `,
+            showCancelButton: true,
+            confirmButtonText: 'Envoyer',
+            cancelButtonText: 'Annuler',
+            showLoaderOnConfirm: true,
+            width: '800px',
+            preConfirm: (redevance) => {
+                var url = "/MainMenuController/ValiderAsync?" + $.param({ id: noVendeur, sujet: sujet, message: message, vendeurAccepte: accepte, pourcentageRedevence: pourcentageRedevence })
+                return fetch(url)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(response.statusText);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Response from ValiderWithNumber:', data);
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        Swal.showValidationMessage('Validation failed');
+                    })
+            },
+            allowOutsideClick: () => !Swal.isLoading()
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: "Envoyé!",
+                    text: "Le courriel a été envoyé avec succès",
+                    icon: "success"
+                }).then(() => {
+                    location.reload();
+                };
             }
-        </script>
-    </body>
-</html>
+        });
+
+    }
+</script>
 

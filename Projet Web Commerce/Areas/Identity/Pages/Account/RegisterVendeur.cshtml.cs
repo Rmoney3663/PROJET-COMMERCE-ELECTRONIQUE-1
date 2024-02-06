@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.Encodings.Web;
@@ -182,7 +183,8 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
                 var phone1 = Input.PhoneNumber1;
                 var phone2 = Input.PhoneNumber2;
                 var pays = "Canada";
-                //var pourcentageTaxe = Methodes.
+                var pourcentageTaxe = Methodes.pourcentageTaxes(taxe, province);
+                var pourcentageRedevance = Convert.ToDecimal(0.00);
 
                 if (codePostal.Length == 6)
                 {
@@ -219,16 +221,14 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
                         }
                     }
 
-                    var pourcentageTaxe = Methodes.pourcentageTaxes(taxe, province);
-                    var pourcentage = 0.00;
-
-                    PPVendeurs newRecord = new PPVendeurs()
-                    { 
-                      IdUtilisateur = user.Id, NoVendeur = lowestNo, AdresseEmail = email, MotDePasse = password, Taxes = taxe, NomAffaires = Input.NomAffaires, NoProvince = province,
-                      DateCreation = date, PoidsMaxLivraison = SelectedNumberPoids, LivraisonGratuite = SelectedNumberLivraison, Statut = 0, Pourcentage = (decimal?)pourcentage,
-                        PourcentageTaxe = pourcentageTaxe, Ville = ville, Pays = "Canada", Rue = rue, CodePostal = codePostal, Prenom = prenom, Nom = nom, Tel1 = phone1, Tel2 = phone2
+                    PPVendeurs nouveauVendeur = new PPVendeurs()
+                    {
+                        IdUtilisateur = user.Id, NoVendeur = lowestNo, AdresseEmail = email, MotDePasse = password, Taxes = taxe, NomAffaires = Input.NomAffaires, NoProvince = province,
+                        DateCreation = date, PoidsMaxLivraison = SelectedNumberPoids, LivraisonGratuite = SelectedNumberLivraison, Statut = 0, Pourcentage = pourcentageRedevance,
+                        PourcentageTaxe = pourcentageTaxe, Ville = ville, Pays = "Canada", Rue = rue, CodePostal = codePostal, Prenom = prenom, Nom = nom, Tel1 = phone1, Tel2 = phone2,
                     };
-                    _context.PPVendeurs.Add(newRecord);
+
+                    _context.PPVendeurs.Add(nouveauVendeur);
                     _context.SaveChanges();
 
 

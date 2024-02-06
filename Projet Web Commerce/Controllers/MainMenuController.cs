@@ -1,5 +1,7 @@
 ﻿using DocumentFormat.OpenXml.Office.CustomUI;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Projet_Web_Commerce.Areas.Identity.Data;
@@ -84,6 +86,45 @@ namespace Projet_Web_Commerce.Controllers
         }
 
 
+        [Route("/MainMenuController/ValiderAsync")]
+        [Authorize(Roles = "Gestionnaire")]
+        public async Task<IActionResult> ValiderAsync(int id, string sujet, string message, bool vendeurAccepte, int pourcentage)
+        {
+            var ppvendeur = await _context.PPVendeurs.FindAsync(id);
+
+            await Methodes.envoyerCourriel(ppvendeur.AdresseEmail, sujet, message);
+
+            var vendeurAUpdate = _context.PPVendeurs.FirstOrDefault(v => v.NoVendeur == id);
+
+            if (vendeurAUpdate != null)
+            {
+                if (vendeurAccepte)
+                {
+                    vendeurAUpdate.Statut = 1;
+                    vendeurAUpdate.Pourcentage = Convert.ToDecimal(pourcentage, CultureInfo.InvariantCulture);
+                }
+                else
+                    _context.PPVendeurs.Remove(vendeurAUpdate);
+
+                //var vendeursStatutZero = _context.PPVendeurs
+                //        .Where(v => v.Statut == 0)
+                //        .OrderBy(v => v.DateCreation)
+                //        .ToList();
+
+                _context.SaveChanges();
+
+                //return View(vendeursStatutZero);
+            }
+
+            var result = new
+            {
+                Success = true,
+                Message = $"Courriel envoyé%."
+            };
+
+            return Json(result);
+        }
+
         [HttpPost]
         public ActionResult GestionVendeurs(int NoVendeur, string Pourcentage, bool vendeurAccepte)
         {
@@ -111,9 +152,7 @@ namespace Projet_Web_Commerce.Controllers
                     return View(vendeursStatutZero);
                 }
             }
-
             return Redirect("AccessDenied");
-
         }
 
         // GET: MainMenuController/Details/5
