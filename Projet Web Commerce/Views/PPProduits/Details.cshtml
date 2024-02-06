@@ -1,99 +1,115 @@
-﻿@model Projet_Web_Commerce.Models.PPProduits
-
+﻿@using Microsoft.AspNetCore.Identity
+@inject UserManager<Projet_Web_Commerce.Areas.Identity.Data.Utilisateur> _userManager
+@inject SignInManager<Projet_Web_Commerce.Areas.Identity.Data.Utilisateur> SignInManager
+@model Projet_Web_Commerce.Models.PPProduits
 @{
     ViewData["Title"] = "Details";
+    var user = await _userManager.GetUserAsync(User);    
 }
 
-<h1>Détails</h1>
+@if (!SignInManager.IsSignedIn(User) || User.IsInRole("Client"))
+{
+    Console.WriteLine("yes");
+    <text>
+        <script>
+            debugger;
+            window.location.href = '/PPProduits/ErrorProduit';
+        </script>
+    </text>
+}
+else
+{
+    <h1>Détails</h1>
 
-<div>
-    <h4>Produits</h4>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-2">
-            Photo de l’article :
-        </dt>
-        <dd class="col-sm-10">
-            <img src="~/Logo/@(Model.Photo)" alt="@(Model.Photo)" width="140" height="200" />
-        </dd>
-
-        <dt class="col-sm-2">
-            Nom du produit :
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Nom)
-        </dd>
-
-        <dt class="col-sm-2">
-            Description plus élaborée :
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-
-        <dt class="col-sm-2">
-            Catégorie du produit :
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.PPCategories.Description)
-        </dd>
-
-        <dt class="col-sm-2">
-            Prix demandé :
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.PrixDemande) $
-        </dd>
-
-        <dt class="col-sm-2">
-            Disponible ?
-        </dt>
-        @if (@Model.Disponibilite == true)
-        {
+    <div>
+        <h4>Produits</h4>
+        <hr />
+        <dl class="row">
+            <dt class="col-sm-2">
+                Photo de l’article :
+            </dt>
             <dd class="col-sm-10">
-                Oui
+                <img src="~/Logo/@(Model.Photo)" alt="@(Model.Photo)" width="140" height="200" />
             </dd>
-        }
-        else
-        {
+
+            <dt class="col-sm-2">
+                Nom du produit :
+            </dt>
             <dd class="col-sm-10">
-                Non
+                @Html.DisplayFor(model => model.Nom)
             </dd>
-        }
 
-        <dt class="col-sm-2">
-            Poids de l’article :
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Poids) Kg
-        </dd>
-
-        <dt class="col-sm-2">
-            Nombre d’items :
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.NombreItems)
-        </dd>
-
-        <dt class="col-sm-2">
-            Prix de vente : 
-        </dt>
-        @if (Model.PrixVente != null)
-        {
+            <dt class="col-sm-2">
+                Description plus élaborée :
+            </dt>
             <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.PrixVente) $
+                @Html.DisplayFor(model => model.Description)
             </dd>
-        }
-        else
-        {
-            <dd class="col-sm-10">
-                Le prix de vente n'est pas précisée
-            </dd>
-        }
 
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.NoProduit">Modifier</a> |
-    <a asp-action="Index">Retour à la liste</a>
-</div>
+            <dt class="col-sm-2">
+                Catégorie du produit :
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.PPCategories.Description)
+            </dd>
+
+            <dt class="col-sm-2">
+                Prix demandé :
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.PrixDemande) $
+            </dd>
+
+            <dt class="col-sm-2">
+                Disponible ?
+            </dt>
+            @if (@Model.Disponibilite == true)
+            {
+                <dd class="col-sm-10">
+                    Oui
+                </dd>
+            }
+            else
+            {
+                <dd class="col-sm-10">
+                    Non
+                </dd>
+            }
+
+            <dt class="col-sm-2">
+                Poids de l’article :
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Poids) Kg
+            </dd>
+
+            <dt class="col-sm-2">
+                Nombre d’items :
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.NombreItems)
+            </dd>
+
+            <dt class="col-sm-2">
+                Prix de vente : 
+            </dt>
+            @if (Model.PrixVente != null)
+            {
+                <dd class="col-sm-10">
+                    @Html.DisplayFor(model => model.PrixVente) $
+                </dd>
+            }
+            else
+            {
+                <dd class="col-sm-10">
+                    Le prix de vente n'est pas précisée
+                </dd>
+            }
+
+        </dl>
+    </div>
+    <div>
+        <a asp-action="Edit" asp-route-id="@Model?.NoProduit">Modifier</a> |
+        <a asp-action="Index">Retour à la liste</a>
+    </div>
+}
