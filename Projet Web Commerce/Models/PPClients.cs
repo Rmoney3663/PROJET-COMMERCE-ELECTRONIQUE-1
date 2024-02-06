@@ -45,6 +45,8 @@ namespace Projet_Web_Commerce.Models
         public virtual ICollection<PPArticlesEnPanier>? PPArticlesEnPanier { get; set; }
         [InverseProperty("PPClients")]
         public virtual ICollection<PPCommandes>? PPCommandes { get; set; }
+        [InverseProperty("PPClients")]
+        public virtual ICollection<PPEvaluations>? PPEvaluations { get; set; }
 
         [ForeignKey("NoProvince")]
         [InverseProperty("PPClients")]
