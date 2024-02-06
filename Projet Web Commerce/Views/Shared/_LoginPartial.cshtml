@@ -15,8 +15,18 @@
             
     bool estDansRole = await UserManager.IsInRoleAsync(user, "Client");
 
-        var nom = _context.PPClients.Where(v => v.AdresseEmail == user.UserName).FirstOrDefault().Nom;
-        var prenom = _context.PPClients.Where(v => v.AdresseEmail == user.UserName).FirstOrDefault().Prenom;
+        var nom = "none";
+        var prenom = "none";
+        @if ((estDansRole = await UserManager.IsInRoleAsync(user, "Client")))
+        {
+            nom = _context.PPClients.Where(v => v.AdresseEmail == user.UserName).FirstOrDefault().Nom;
+            prenom = _context.PPClients.Where(v => v.AdresseEmail == user.UserName).FirstOrDefault().Prenom;
+        }
+        else if ((estDansRole = await UserManager.IsInRoleAsync(user, "Vendeur")))
+        {
+            nom = _context.PPVendeurs.Where(v => v.AdresseEmail == user.UserName).FirstOrDefault().Nom;
+            prenom = _context.PPClients.Where(v => v.AdresseEmail == user.UserName).FirstOrDefault().Prenom;
+        }
 
         @if (nom != null && prenom != null){
             <li class="nav-item">
@@ -24,7 +34,7 @@
             </li>
         }
     <li class="nav-item">
-        @if (estDansRole)
+            @if ((estDansRole = await UserManager.IsInRoleAsync(user, "Client")))
         {
                 <a id="manage" class="nav-link" style="color: rgb(249, 229, 71)" asp-area="Identity" asp-page="/Account/Manage/ProfilClient" title="Manage">Mon profil</a>
         }
