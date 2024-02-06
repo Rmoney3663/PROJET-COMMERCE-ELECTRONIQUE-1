@@ -219,25 +219,14 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
                         }
                     }
 
+                    var pourcentageTaxe = Methodes.pourcentageTaxes(taxe, province);
                     var pourcentage = 0.00;
-                    if(taxe == true)
-                    {
-                        if(province == "QC")
-                        {
-                            pourcentage = 14.975;
-                        }
-                        else
-                        {
-                            pourcentage = 5.00;
-                        }
-                    }
-                 
 
                     PPVendeurs newRecord = new PPVendeurs()
                     { 
                       IdUtilisateur = user.Id, NoVendeur = lowestNo, AdresseEmail = email, MotDePasse = password, Taxes = taxe, NomAffaires = Input.NomAffaires, NoProvince = province,
                       DateCreation = date, PoidsMaxLivraison = SelectedNumberPoids, LivraisonGratuite = SelectedNumberLivraison, Statut = 0, Pourcentage = (decimal?)pourcentage,
-                      Ville = ville, Pays = "Canada", Rue = rue, CodePostal = codePostal, Prenom = prenom, Nom = nom, Tel1 = phone1, Tel2 = phone2
+                        PourcentageTaxe = pourcentageTaxe, Ville = ville, Pays = "Canada", Rue = rue, CodePostal = codePostal, Prenom = prenom, Nom = nom, Tel1 = phone1, Tel2 = phone2
                     };
                     _context.PPVendeurs.Add(newRecord);
                     _context.SaveChanges();

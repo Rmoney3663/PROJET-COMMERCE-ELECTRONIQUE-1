@@ -16,6 +16,8 @@ namespace Projet_Web_Commerce.Models
         public bool? Taxes { get; set; }
         [Column(TypeName = "decimal(4,2)")]
         public decimal? Pourcentage { get; set; }
+        [Column(TypeName = "decimal(4,2)")]
+        public decimal? PourcentageTaxe { get; set; }
         public string? Configuration { get; set; }
         public DateTime DateCreation { get; set; }
         public DateTime? DateMAJ { get; set; }
