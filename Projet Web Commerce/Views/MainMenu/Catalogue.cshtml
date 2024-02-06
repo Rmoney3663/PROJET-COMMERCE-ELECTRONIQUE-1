@@ -43,20 +43,21 @@ else
 
 <h3>Liste des Catégories</h3>
 <div class="container mt-4">
-    @if (Model.CategoriesList != null)
+    @if (ViewBag.listPaniers.Count > 0 && SignInManager.IsSignedIn(User))
     {
         <section class="autoplay" data-sizes="50vw">
-            @foreach (var category in Model.CategoriesList)
+            @foreach (var panier in ViewBag.listPaniers)
             {
+                @*
                     <div class="slide">
                         <div class="card">
                             <div class="card-body">
-                                <h2 class="card-title">@Html.DisplayFor(modelItem => category.Description)</h2>
-                                <h5 class="card-details">@Html.DisplayFor(modelItem => category.Details)</h5>
+                                <h2 class="card-title">@panier</h2>
+                                <h5 class="card-details">@Html.DisplayFor(modelItem => panier)</h5>
 
 
                             
-
+                                
                             @if (category.PPProduits != null)
                             {
                                 <p>Vendeurs:</p>
@@ -83,16 +84,22 @@ else
                             {
                                 <p>Aucun vendeur dans cette catégorie.</p>
                             }
+        
+                    
                         </div>
                         </div>
                     </div>
-
+        *@
             }
         </section>
     }
+    else if (SignInManager.IsSignedIn(User))
+    {
+        <p>Vous n'avez aucun panier.</p>
+    }
     else
     {
-        <p>Aucune catégorie trouvée.</p>
+        <p>Connectez-vous pour voir vos paniers.</p>
     }
 </div>
 
