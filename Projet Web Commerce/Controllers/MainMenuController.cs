@@ -1,10 +1,15 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using DocumentFormat.OpenXml.Drawing.Diagrams;
+using DocumentFormat.OpenXml.Office2010.Excel;
+using DocumentFormat.OpenXml.Spreadsheet;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using Projet_Web_Commerce.Areas.Identity.Data;
 using Projet_Web_Commerce.Data;
 using Projet_Web_Commerce.Models;
 using System.Globalization;
+using System.Security.Claims;
 
 namespace Projet_Web_Commerce.Controllers
 {
@@ -57,14 +62,13 @@ namespace Projet_Web_Commerce.Controllers
 
         public IActionResult CatalogueVendeur(string id)
         {
-
-            Console.WriteLine(id);
             // Action logic
             var vendeur = _context.PPVendeurs.Where(v => v.NomAffaires == id).FirstOrDefault();
 
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var client = _context.PPClients.FirstOrDefault(c => c.IdUtilisateur == userId);
 
-
-            var produitsVendeur = _context.PPProduits
+            var nouveauxProduits = _context.PPProduits
                 .Where(p => p.NoVendeur == vendeur.NoVendeur)
                 .OrderBy(v => v.DateCreation)
                 .Take(15)
@@ -73,16 +77,39 @@ namespace Projet_Web_Commerce.Controllers
             var CategoriesList = _context.PPCategories.ToList();
             var VendeursList = _context.PPVendeurs.ToList();
 
+            var ProduitsVendeur = _context.PPProduits
+                .Where(p => p.NoVendeur == vendeur.NoVendeur && p.NombreItems > 0)
+                .ToList();
 
-            ModelCatalogue modelCatalogue = new ModelCatalogue()
+            ModelCatalogueVendeur modelCatalogueVendeur;
+
+            if (client != null)
             {
-                CategoriesList = CategoriesList,
-                VendeursList = VendeursList,
-                ProduitsList = produitsVendeur
-            };
+                modelCatalogueVendeur = new ModelCatalogueVendeur()
+                {
+                    nomAffaire = id,
+                    CategoriesList = CategoriesList,
+                    VendeursList = VendeursList,
+                    ProduitsList = ProduitsVendeur,
+                    NouveauxProduits = nouveauxProduits,
+                    noClient = client.NoClient
+                };
+            }
+            else
+            {
+                modelCatalogueVendeur = new ModelCatalogueVendeur()
+                {
+                    nomAffaire = id,
+                    CategoriesList = CategoriesList,
+                    VendeursList = VendeursList,
+                    ProduitsList = ProduitsVendeur,
+                    NouveauxProduits = nouveauxProduits
+                };
+            }
 
-            return View(modelCatalogue);
+            return View(modelCatalogueVendeur);
         }
+
 
 
         [HttpPost]
@@ -111,6 +138,40 @@ namespace Projet_Web_Commerce.Controllers
 
             return Redirect("AccessDenied");
 
+        }
+
+        [HttpPost]
+        public ActionResult AjoutPanier(int quantite, int NoProduit, int NoClient, int NoVendeur)
+        {
+            var vendeur = _context.PPVendeurs.Where(v => v.NoVendeur == NoVendeur).FirstOrDefault();
+            var produit = _context.PPProduits.Where(v => v.NoProduit == NoProduit).FirstOrDefault();
+
+            if (produit != null && vendeur != null)
+            {
+                var ajoutPanier = new PPArticlesEnPanier
+                {
+                    NoClient = NoClient, // Provide the NoClient value
+                    NoVendeur = NoVendeur, // Provide the NoVendeur value
+                    NoProduit = NoProduit, // Provide the NoProduit value
+                    DateCreation = DateTime.Now, // Set the creation date
+                    NbItems = quantite // Set the number of items
+                };
+
+
+                // Ajout au panier
+                _context.PPArticlesEnPanier.Add(ajoutPanier);
+
+                // Save changes to the database
+                _context.SaveChanges();
+
+                TempData["SuccessMessage"] = $"Le produit {produit.Nom} à été ajout au panier.  ";
+
+                return RedirectToAction("CatalogueVendeur", new { id = vendeur.NomAffaires });
+            }
+
+
+            return RedirectToAction("Catalogue");
+           
         }
 
         // GET: MainMenuController/Details/5

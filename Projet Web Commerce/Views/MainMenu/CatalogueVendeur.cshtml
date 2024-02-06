@@ -1,16 +1,42 @@
-﻿@model Projet_Web_Commerce.Models.ModelCatalogue
+﻿@using Microsoft.AspNetCore.Identity
+@using System.Security.Claims
+
+@model Projet_Web_Commerce.Models.ModelCatalogueVendeur
+@inject SignInManager<Projet_Web_Commerce.Areas.Identity.Data.Utilisateur> SignInManager
+
+@{
+    var productList = SignInManager.IsSignedIn(User) ? Model.ProduitsList : Model.NouveauxProduits;
+}
+
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success" role="alert">
+        @TempData["SuccessMessage"]
+    </div>
+}
 
 <div class="row">
     <div class="col">
         <section>
-            <h3>Liste des nouveaux produits </h3>
+            @if (SignInManager.IsSignedIn(User))
+            {
+                <h3>Liste de tout les produits @Model.nomAffaire </h3>
+            }
+            else
+            {
+                <h3>Liste des nouveaux produits </h3>
+                <a asp-area="Identity" asp-page="/Account/Register">Cliquez ici pour devenir client et accéder à tout le catalogue du vendeur</a>
+            }
+
+            
             <div class="container mt-4">
                 @if (Model != null && Model.ProduitsList.Any())
                 {
                     <div class="container mt-4">
                         <div class="row">
-                            @foreach (var item in Model.ProduitsList)
-                            {
+                            @foreach (var item in productList)
+                                        {
                                 <div class="col-lg-4 mb-4 col-md-6 col-xl-3">
                                     <div class="card">
                                         <div class="card-body" style="justify-content: center; display: flex;">
@@ -18,10 +44,12 @@
                                                 <div class="col-md-6">
                                                     <h5 class="card-text">@Html.DisplayFor(modelItem => item.Nom)</h5>
                                                 </div>
-                                                <div class="col-md-6">
-                                                    <h5 class="card-text float-end" style="color: orangered">Nouveau !</h5>
-                                                </div>
-
+                                                @if (!SignInManager.IsSignedIn(User))
+                                                {
+                                                    <div class="col-md-6">
+                                                        <h5 class="card-text float-end" style="color: orangered">Nouveau !</h5>
+                                                    </div>
+                                                }
                                                 <img src="~/Logo/@(item.Photo)" alt="./Logo/@(item.Photo)" width="200" height="200" />
                                                 @{
                                                     var category = Model.CategoriesList.FirstOrDefault(c => c.NoCategorie == item.NoCategorie);
@@ -30,7 +58,30 @@
                                                 <p class="card-title">Numéro du produit : @Html.DisplayFor(modelItem => item.NoProduit)</p>
                                                 <p class="card-text">Prix Demandé : @Html.DisplayFor(modelItem => item.PrixDemande)</p>
                                                 <p class="card-text">Prix Demandé : @Html.DisplayFor(modelItem => item.NombreItems)</p>
-                                                <a href="#" class="btn btn-primary">Details</a>
+                                                <a asp-controller="PPProduits"
+                                                   asp-route-id="@item.NoProduit"
+                                                   asp-action="Details"
+                                                   class="btn btn-primary">
+                                                    Details
+                                                </a>
+
+                                                @if (SignInManager.IsSignedIn(User) && User.IsInRole("Client"))
+                                                {
+                                                    <form asp-controller="MainMenu" asp-action="AjoutPanier" method="post">
+                                                        <input type="hidden" name="NoProduit" value="@item.NoProduit" />
+                                                        <input type="hidden" name="NoClient" value="@Model.noClient" />
+                                                        <input type="hidden" name="NoVendeur" value="@item.NoVendeur" />
+                                                        <br>
+                                                        <button type="submit" class="btn btn-secondary">Ajouter au panier</button>
+                                                        <select name="quantite">
+                                                            @for (int i = 1; i <= @item.NombreItems; i++)
+                                                            {
+                                                                <option value="@i">@i</option>
+                                                            }
+                                                        </select>
+                                                    </form>
+                                                }
+                                                
                                             </div>
                                         </div>
                                     </div>
