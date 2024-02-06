@@ -218,19 +218,8 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
                         }
                     }
 
-                    var pourcentage = 0.00;
-                    if(taxe == true)
-                    {
-                        if(province == "QC")
-                        {
-                            pourcentage = 14.975;
-                        }
-                        else
-                        {
-                            pourcentage = 5.00;
-                        }
-                    }
-                 
+                    var pourcentage = Methodes.pourcentageTaxes(taxe, province);
+                    var pourcentageTaux = 0.00;
 
                     PPVendeurs newRecord = new PPVendeurs()
                     { 

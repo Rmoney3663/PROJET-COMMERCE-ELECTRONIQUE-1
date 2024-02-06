@@ -246,5 +246,10 @@ namespace Projet_Web_Commerce.Controllers
         {
             return _context.PPProduits.Any(e => e.NoProduit == id);
         }
+
+        public IActionResult ErrorProduit()
+        {
+            return View();
+        }
     }
 }

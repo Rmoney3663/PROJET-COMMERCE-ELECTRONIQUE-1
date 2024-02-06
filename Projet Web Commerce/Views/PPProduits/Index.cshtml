@@ -3,13 +3,36 @@
 @using Projet_Web_Commerce.Data
 @inject AuthDbContext _context
 @inject UserManager<Projet_Web_Commerce.Areas.Identity.Data.Utilisateur> _userManager
+@inject SignInManager<Projet_Web_Commerce.Areas.Identity.Data.Utilisateur> SignInManager
 
 @{
     ViewData["Title"] = "Index";
     var user = await _userManager.GetUserAsync(User);
-    var vendeur = _context.PPVendeurs.FirstOrDefault(v => v.IdUtilisateur == user.Id);
-    var sortedModel = _context.PPProduits.Where(p => p.NoVendeur == vendeur.NoVendeur).ToList();
+    @if (!SignInManager.IsSignedIn(User) || User.IsInRole("Client"))
+    {
+        Console.WriteLine("yes");
+        <text>
+            <script>
+                debugger;
+                window.location.href = '/PPProduits/ErrorProduit';
+            </script>
+        </text>
+    }
+    var vendeur = _context.PPVendeurs.FirstOrDefault(v => v.IdUtilisateur == user.Id);  
 }
+
+@if (vendeur == null)
+{
+    Console.WriteLine("among us");
+    <div>
+        <p>Vous n'avez pas accès à cette page.</p>
+        <a href="/PPProduits/ErrorProduit">Retourner à la catalogue</a>
+    </div>
+}
+else
+{
+    var sortedModel = _context.PPProduits.Where(p => p.NoVendeur == vendeur.NoVendeur).ToList();
+
 
 <h1>Liste de produits</h1>
 
@@ -67,4 +90,4 @@
 
 </div>
 
-
+}
