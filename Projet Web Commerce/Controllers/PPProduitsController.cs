@@ -29,6 +29,7 @@ namespace Projet_Web_Commerce.Controllers
         // GET: PPProduits
         public async Task<IActionResult> Index()
         {
+           
             var authDbContext = _context.PPProduits.Include(p => p.PPCategories).Include(p => p.PPVendeurs);
             return View(await authDbContext.ToListAsync());
         }
