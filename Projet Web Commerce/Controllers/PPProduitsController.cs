@@ -232,22 +232,39 @@ namespace Projet_Web_Commerce.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var pPProduits = await _context.PPProduits.FindAsync(id);
-            if (pPProduits != null)
+            try
             {
-                _context.PPProduits.Remove(pPProduits);
-            }
+                Console.WriteLine("ID : " + id);
+                var pPProduits = await _context.PPProduits.FindAsync(id);
+                if (pPProduits != null)
+                {
+                    Console.WriteLine("Found produit");
+                    System.IO.File.Delete("wwwroot/Logo/" + pPProduits.Photo);
+                    Console.WriteLine("Deleted photo");
+                    _context.PPProduits.Remove(pPProduits);
+                }
 
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            catch
+            {
+                return RedirectToAction("Error", "PPProduits");
+            }
         }
 
         private bool PPProduitsExists(int id)
         {
             return _context.PPProduits.Any(e => e.NoProduit == id);
+
         }
 
         public IActionResult ErrorProduit()
+        {
+            return View();
+        }
+
+        public IActionResult Error()
         {
             return View();
         }
