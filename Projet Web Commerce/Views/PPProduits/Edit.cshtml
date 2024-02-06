@@ -13,6 +13,7 @@
         <form asp-action="Edit" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="NoProduit" />
+            <input type="hidden" asp-for="Photo" />
             <div class="form-group" style="display:none;">
                 <label asp-for="NoProduit" class="control-label"></label>
                 <input asp-for="NoProduit" class="form-control" />
@@ -36,7 +37,7 @@
             <div class="form-group">
                 <label asp-for="Photo" class="control-label">Photo de l’article :</label>
                 <img src="~/Logo/@(Model.Photo)" alt="@(Model.Photo)" width="140" height="200" />
-                <input type="file" id="file" name="file" accept="image/" class="form-control"  />
+                <input type="file" id="file" name="file" accept="image/jpg" class="form-control" />
                 <span asp-validation-for="Photo" class="text-danger"></span>
             </div>
             <br>
@@ -85,7 +86,7 @@
             <div class="form-group">
                 <label asp-for="Poids" class="control-label">Poids de l’article :</label>
                 <div class="input-group">
-                    <input asp-for="Poids" class="form-control" class="form-control" type="number" min="0" step="any" data-val="true" required />
+                    <input asp-for="Poids" class="form-control" type="number" min="0" step="any" data-val="true" required />
                     <span class="input-group-text">(Kg)</span>
                 </div>
                 <span asp-validation-for="Poids" class="text-danger"></span>
@@ -94,7 +95,7 @@
 
             <div class="form-group">
                 <label asp-for="NombreItems" class="control-label">Nombre d’items :</label>
-                <input asp-for="NombreItems" class="form-control" class="form-control" type="number" min="0" data-val="true" step=".1" required />
+                <input asp-for="NombreItems" class="form-control" type="number" min="1" data-val="true" required />
                 <span asp-validation-for="NombreItems" class="text-danger"></span>
             </div>
             <br>
@@ -108,7 +109,7 @@
             <div class="form-group">
                 <label asp-for="PrixVente" class="control-label">Prix de vente (Optionel) :</label>
                 <div class="input-group">
-                    <input asp-for="PrixVente" class="form-control" class="form-control" type="number" min="0" step="any" data-val="true" />
+                    <input asp-for="PrixVente" class="form-control" type="number" min="0" step="any" data-val="true" />
                     <span class="input-group-text">(CAD)</span>
                 </div>
                 <span asp-validation-for="PrixVente" class="text-danger"></span>

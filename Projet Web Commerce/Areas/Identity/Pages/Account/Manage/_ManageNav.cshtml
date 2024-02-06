@@ -1,9 +1,19 @@
 ﻿@inject SignInManager<Utilisateur> SignInManager
+@inject UserManager<Utilisateur> UserManager
 @{
     var hasExternalLogins = (await SignInManager.GetExternalAuthenticationSchemesAsync()).Any();
+    var user = await UserManager.GetUserAsync(User);
+    bool estDansRole = await UserManager.IsInRoleAsync(user, "Client");
 }
 <ul class="nav nav-pills flex-column">
-    <li class="nav-item"><a class="nav-link @ManageNavPages.IndexNavClass(ViewContext)" id="profile" asp-page="./Index">Profil</a></li>
+    @if (estDansRole)
+    {
+        <li class="nav-item"><a class="nav-link @ManageNavPages.ProfilClientNavClass(ViewContext)" id="profile" asp-page="./ProfilClient">Profil</a></li>
+    }
+    else if ((estDansRole = await UserManager.IsInRoleAsync(user, "Vendeur")))
+    {
+        <li class="nav-item"><a class="nav-link @ManageNavPages.ProfilVendeurNavClass(ViewContext)" id="profile" asp-page="./ProfilVendeur">Profil</a></li>
+    }
     @* <li class="nav-item"><a class="nav-link @ManageNavPages.EmailNavClass(ViewContext)" id="email" asp-page="./Email">Email</a></li> *@
     <li class="nav-item"><a class="nav-link @ManageNavPages.ChangePasswordNavClass(ViewContext)" id="change-password" asp-page="./ChangePassword">Mot de passe</a></li>
     @if (hasExternalLogins)

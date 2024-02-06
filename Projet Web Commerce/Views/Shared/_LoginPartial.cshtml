@@ -8,10 +8,19 @@
 @if (SignInManager.IsSignedIn(User))
 {
     <li class="nav-item">
-            <a id="paniers" class="nav-link" style="color: rgb(249, 229, 71)" asp-area="" asp-controller="Paniers" asp-action="Index" title="Paniers">Mes paniers</a>
-    </li>
-    <li class="nav-item">
-            <a id="manage" class="nav-link" style="color: rgb(249, 229, 71)" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Mon profil</a>
+        @{
+            var user = await UserManager.GetUserAsync(User);
+            bool estDansRole = await UserManager.IsInRoleAsync(user, "Client");
+        }
+        @if (estDansRole)
+        {
+            <a id="manage" class="nav-link" style="color: rgb(249, 229, 71)" asp-area="Identity" asp-page="/Account/Manage/ProfilClient" title="Manage">Mon profil</a> @*Hello @UserManager.GetUserName(User)!*@
+        }
+        else if ((estDansRole = await UserManager.IsInRoleAsync(user, "Vendeur")))
+        {
+            <a id="manage" class="nav-link" style="color: rgb(249, 229, 71)" asp-area="Identity" asp-page="/Account/Manage/ProfilVendeur" title="Manage">Mon profil</a> @*Hello @UserManager.GetUserName(User)!*@
+        }
+            
     </li>
     <li class="nav-item">
         <form id="logoutForm" class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
