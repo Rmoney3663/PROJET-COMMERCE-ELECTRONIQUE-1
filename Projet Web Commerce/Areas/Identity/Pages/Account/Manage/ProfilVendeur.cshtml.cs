@@ -1,3 +1,5 @@
+#nullable disable
+
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -79,8 +81,15 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account.Manage
             public int PoidsMaxLivraison { get; set; }
 
             [Required(ErrorMessage = "Le montant minimal pour la livraison gratuite est requis")]
-            [Display(Name = "Nom d'affaires")]
-            public float LivraisonGratuite { get; set; }
+            [Display(Name = "Coût livraison gratuite")]
+            public decimal LivraisonGratuite { get; set; }
+
+            [Required(ErrorMessage = "La taxe est requise")]
+            [Display(Name = "Taxes")]
+            public bool Taxes { get; set; }
+
+            [Display(Name = "Pourcentage")]
+            public decimal Pourcentage { get; set; }
         }
 
         private async Task LoadAsync(Utilisateur user)
@@ -97,6 +106,10 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account.Manage
             var cellulaire = _context.PPVendeurs.FirstOrDefault(x => x.AdresseEmail == email).Tel2;
 
             var nomAffaires = _context.PPVendeurs.FirstOrDefault(x => x.AdresseEmail == email).NomAffaires;
+            var poidsMaxLivraison = (int) _context.PPVendeurs.FirstOrDefault(x => x.AdresseEmail == email).PoidsMaxLivraison;
+            var livraisonGratuite = (decimal) _context.PPVendeurs.FirstOrDefault(x => x.AdresseEmail == email).LivraisonGratuite;
+            var taxes = (bool) _context.PPVendeurs.FirstOrDefault(x => x.AdresseEmail == email).Taxes;
+            var pourcentage = (decimal) _context.PPVendeurs.FirstOrDefault(x => x.AdresseEmail == email).Pourcentage;
 
             Courriel = email;
 
@@ -111,7 +124,12 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account.Manage
                 Pays = pays,
                 Telephone = telephone,
                 Cellulaire = cellulaire,
-                NomAffaires = nomAffaires
+
+                NomAffaires = nomAffaires,
+                PoidsMaxLivraison = poidsMaxLivraison,
+                LivraisonGratuite = livraisonGratuite,
+                Taxes = taxes,
+                Pourcentage = pourcentage
             };
         }
 
@@ -122,12 +140,6 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account.Manage
             {
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
-
-            //bool estDansRole = await _userManager.IsInRoleAsync(user, "Vendeur");
-            //if (estDansRole)
-            //{
-
-            //}
 
             await LoadAsync(user);
 
@@ -142,7 +154,6 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account.Manage
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
 
-            ModelState.Remove("Pays");
             if (!ModelState.IsValid)
             {
                 await LoadAsync(user);
@@ -160,35 +171,36 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account.Manage
             var telephone = Input.Telephone;
             var cellulaire = (Input.Cellulaire == "" ? null : Input.Cellulaire);
 
+            var nomAffaires = Input.NomAffaires;
+            var poidsMaxLivraison = Input.PoidsMaxLivraison;
+            var livraisonGratuite = Input.LivraisonGratuite;
+            var taxes = Input.Taxes;
+
             if (codePostal.Length == 6)
             {
                 codePostal = codePostal.Insert(3, " ");
             }
 
-            bool estDansRole = await _userManager.IsInRoleAsync(user, "Client");
-            if (estDansRole) // Si user est client
-            {
-                var lstClients = _context.PPClients.ToList();
-                var clientCourant = lstClients.FirstOrDefault(c => c.AdresseEmail == user.Email);
-                clientCourant.DateMAJ = dateMAJ;
-                clientCourant.Nom = nom;
-                clientCourant.Prenom = prenom;
-                clientCourant.Rue = rue;
-                clientCourant.Ville = ville;
-                clientCourant.NoProvince = province;
-                clientCourant.CodePostal = codePostal;
-                clientCourant.Pays = pays;
-                clientCourant.Tel1 = telephone;
-                clientCourant.Tel2 = cellulaire;
-                await _context.SaveChangesAsync();
-            }
-            else // User est vendeur
-            {
-                var lstVendeurs = _context.PPVendeurs.ToList();
-                var vendeurCourant = lstVendeurs.FirstOrDefault(v => v.AdresseEmail == user.Email);
-                //vendeurCourant.
-                await _context.SaveChangesAsync();
-            }
+            var lstVendeurs = _context.PPVendeurs.ToList();
+            var vendeurCourant = lstVendeurs.FirstOrDefault(v => v.AdresseEmail == user.Email);
+
+            vendeurCourant.DateMAJ = dateMAJ;
+            vendeurCourant.Nom = nom;
+            vendeurCourant.Prenom = prenom;
+            vendeurCourant.Rue = rue;
+            vendeurCourant.Ville = ville;
+            vendeurCourant.NoProvince = province;
+            vendeurCourant.CodePostal = codePostal;
+            vendeurCourant.Pays = pays;
+            vendeurCourant.Tel1 = telephone;
+            vendeurCourant.Tel2 = cellulaire;
+
+            vendeurCourant.NomAffaires = nomAffaires;
+            vendeurCourant.PoidsMaxLivraison = poidsMaxLivraison;
+            vendeurCourant.LivraisonGratuite = livraisonGratuite;
+            vendeurCourant.Taxes = taxes;
+
+            await _context.SaveChangesAsync();
 
             await _signInManager.RefreshSignInAsync(user);
             StatusMessage = "Votre profil a été mis à jour";

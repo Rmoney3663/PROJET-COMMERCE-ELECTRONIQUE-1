@@ -4,20 +4,19 @@
 @inject SignInManager<Utilisateur> SignInManager
 @inject UserManager<Utilisateur> UserManager
 
-@{
-    var user = await UserManager.GetUserAsync(User);
-    bool estDansRole = await UserManager.IsInRoleAsync(user, "Client");
-}
-
 <ul class="navbar-nav">
 @if (SignInManager.IsSignedIn(User))
 {
     <li class="nav-item">
+        @{
+            var user = await UserManager.GetUserAsync(User);
+            bool estDansRole = await UserManager.IsInRoleAsync(user, "Client");
+        }
         @if (estDansRole)
         {
             <a id="manage" class="nav-link" style="color: rgb(249, 229, 71)" asp-area="Identity" asp-page="/Account/Manage/ProfilClient" title="Manage">Mon profil</a> @*Hello @UserManager.GetUserName(User)!*@
         }
-            else if ((estDansRole = await UserManager.IsInRoleAsync(user, "Vendeur")))
+        else if ((estDansRole = await UserManager.IsInRoleAsync(user, "Vendeur")))
         {
             <a id="manage" class="nav-link" style="color: rgb(249, 229, 71)" asp-area="Identity" asp-page="/Account/Manage/ProfilVendeur" title="Manage">Mon profil</a> @*Hello @UserManager.GetUserName(User)!*@
         }

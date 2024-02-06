@@ -1,3 +1,5 @@
+#nullable disable
+
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Encodings.Web;
@@ -63,7 +65,7 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account.Manage
             public string CodePostal { get; set; }
 
             [Display(Name = "Pays")]
-            public string? Pays { get; set; }
+            public string Pays { get; set; }
 
             [Required(ErrorMessage = "Le numéro de téléphone est requis")]
             [RegularExpression(@"^\d{3}-\d{3}-\d{4}$", ErrorMessage = "Le numéro de téléphone doit respêcter le format 999-999-9999.")]
@@ -87,8 +89,6 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account.Manage
             var pays = _context.PPClients.FirstOrDefault(x => x.AdresseEmail == email).Pays;
             var telephone = _context.PPClients.FirstOrDefault(x => x.AdresseEmail == email).Tel1;
             var cellulaire = _context.PPClients.FirstOrDefault(x => x.AdresseEmail == email).Tel2;
-
-            //var nomAffaires = _context.PPVendeurs.FirstOrDefault(x => x.AdresseEmail == email).NomAffaires;
 
             Courriel = email;
 
@@ -114,12 +114,6 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account.Manage
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
 
-            //bool estDansRole = await _userManager.IsInRoleAsync(user, "Vendeur");
-            //if (estDansRole)
-            //{
-
-            //}
-
             await LoadAsync(user);
 
             return Page();
@@ -133,7 +127,7 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account.Manage
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
 
-            ModelState.Remove("Pays");
+            //ModelState.Remove("Pays");
             if (!ModelState.IsValid)
             {
                 await LoadAsync(user);
@@ -155,31 +149,21 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account.Manage
             {
                 codePostal = codePostal.Insert(3, " ");
             }
+            
+            var lstClients = _context.PPClients.ToList();
+            var clientCourant = lstClients.FirstOrDefault(c => c.AdresseEmail == user.Email);
 
-            bool estDansRole = await _userManager.IsInRoleAsync(user, "Client");
-            if (estDansRole) // Si user est client
-            {
-                var lstClients = _context.PPClients.ToList();
-                var clientCourant = lstClients.FirstOrDefault(c => c.AdresseEmail == user.Email);
-                clientCourant.DateMAJ = dateMAJ;
-                clientCourant.Nom = nom;
-                clientCourant.Prenom = prenom;
-                clientCourant.Rue = rue;
-                clientCourant.Ville = ville;
-                clientCourant.NoProvince = province;
-                clientCourant.CodePostal = codePostal;
-                clientCourant.Pays = pays;
-                clientCourant.Tel1 = telephone;
-                clientCourant.Tel2 = cellulaire;
-                await _context.SaveChangesAsync();
-            }
-            else // User est vendeur
-            {
-                var lstVendeurs = _context.PPVendeurs.ToList();
-                var vendeurCourant = lstVendeurs.FirstOrDefault(v => v.AdresseEmail == user.Email);
-                //vendeurCourant.
-                await _context.SaveChangesAsync();
-            }
+            clientCourant.DateMAJ = dateMAJ;
+            clientCourant.Nom = nom;
+            clientCourant.Prenom = prenom;
+            clientCourant.Rue = rue;
+            clientCourant.Ville = ville;
+            clientCourant.NoProvince = province;
+            clientCourant.CodePostal = codePostal;
+            clientCourant.Pays = pays;
+            clientCourant.Tel1 = telephone;
+            clientCourant.Tel2 = cellulaire;
+            await _context.SaveChangesAsync();
 
             await _signInManager.RefreshSignInAsync(user);
             StatusMessage = "Votre profil a été mis à jour";
