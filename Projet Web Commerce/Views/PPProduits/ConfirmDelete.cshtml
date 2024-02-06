@@ -1,0 +1,11 @@
+﻿@model Projet_Web_Commerce.Models.PPProduits
+
+<h2>Confirmation pour supprimer le produit</h2>
+
+<p>@ViewBag.WarningMessage</p>
+
+<form asp-action="DeleteConfirmed" method="post">
+    <input type="hidden" name="id" value="@ViewBag.ProductId" />
+    <button type="submit" class="btn btn-danger">Confirmer l'effacement</button>
+    <a href="@Url.Action("Index")" class="btn btn-secondary">Annuler</a>
+</form>
