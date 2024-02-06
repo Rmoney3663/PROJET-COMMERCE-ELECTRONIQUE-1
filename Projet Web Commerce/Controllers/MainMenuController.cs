@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using DocumentFormat.OpenXml.Office.CustomUI;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Projet_Web_Commerce.Areas.Identity.Data;
@@ -62,8 +63,6 @@ namespace Projet_Web_Commerce.Controllers
             // Action logic
             var vendeur = _context.PPVendeurs.Where(v => v.NomAffaires == id).FirstOrDefault();
 
-
-
             var produitsVendeur = _context.PPProduits
                 .Where(p => p.NoVendeur == vendeur.NoVendeur)
                 .OrderBy(v => v.DateCreation)
@@ -86,24 +85,28 @@ namespace Projet_Web_Commerce.Controllers
 
 
         [HttpPost]
-        public ActionResult GestionVendeurs(int NoVendeur)
+        public ActionResult GestionVendeurs(int NoVendeur, string Pourcentage, bool vendeurAccepte)
         {
             if (User.IsInRole("Gestionnaire"))
             {
-                var vendeurToUpdate = _context.PPVendeurs.FirstOrDefault(v => v.NoVendeur == NoVendeur);
+                var vendeurAUpdate = _context.PPVendeurs.FirstOrDefault(v => v.NoVendeur == NoVendeur);
 
-                if (vendeurToUpdate != null)
+                if (vendeurAUpdate != null)
                 {
-                    // Update the properties of the vendeur
-                    vendeurToUpdate.Statut = 1;
+                    if (vendeurAccepte)
+                    {
+                        vendeurAUpdate.Statut = 1;
+                        vendeurAUpdate.Pourcentage = Convert.ToDecimal(Pourcentage, CultureInfo.InvariantCulture);
+                    }
+                    else
+                        _context.PPVendeurs.Remove(vendeurAUpdate);
 
-                    // Save changes to the database
                     _context.SaveChanges();
 
                     var vendeursStatutZero = _context.PPVendeurs
-                    .Where(v => v.Statut == 0)
-                    .OrderBy(v => v.DateCreation)  // Assuming DateCreation is the property you want to order by
-                    .ToList();
+                            .Where(v => v.Statut == 0)
+                            .OrderBy(v => v.DateCreation)
+                            .ToList();
 
                     return View(vendeursStatutZero);
                 }

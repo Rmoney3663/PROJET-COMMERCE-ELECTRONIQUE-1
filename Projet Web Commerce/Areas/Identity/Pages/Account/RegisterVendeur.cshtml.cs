@@ -182,6 +182,7 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
                 var phone1 = Input.PhoneNumber1;
                 var phone2 = Input.PhoneNumber2;
                 var pays = "Canada";
+                //var pourcentageTaxe = Methodes.
 
                 if (codePostal.Length == 6)
                 {
