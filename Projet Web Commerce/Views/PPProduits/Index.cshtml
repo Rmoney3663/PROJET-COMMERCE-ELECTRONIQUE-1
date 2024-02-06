@@ -4,7 +4,8 @@
 @inject AuthDbContext _context
 @inject UserManager<Projet_Web_Commerce.Areas.Identity.Data.Utilisateur> _userManager
 @inject SignInManager<Projet_Web_Commerce.Areas.Identity.Data.Utilisateur> SignInManager
-
+@using System.IO
+@inject IWebHostEnvironment env
 @{
     ViewData["Title"] = "Index";
     var user = await _userManager.GetUserAsync(User);
@@ -42,7 +43,14 @@ else
         @foreach (var item in sortedModel)
         {
             <div class="card" style="width:320px; margin: 10px;">
-                <img src="~/Logo/@(item.Photo)" alt="./Logo/@(item.Photo)" width="320" height="400" />
+                @{
+                    var path = System.IO.Path.Combine(env.WebRootPath, "Logo", item.Photo);
+                    string imagePath = item.Photo != null && File.Exists(path) ? $"~/Logo/{item.Photo}" : "~/Logo/DefaultImage.png";
+                    Console.WriteLine("FILE Name : " + item.Photo);
+                    Console.WriteLine("FILE : " + File.Exists(path));
+                }
+
+                <img src="@Url.Content(imagePath)" alt="@item.Photo" width="320" height="400" />
                 <div class="card-body">
                     <p class="card-text">
                         <b>Nom :</b>
