@@ -1,5 +1,3 @@
-ï»¿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
 #nullable disable
 
 using System;
@@ -16,13 +14,13 @@ using Projet_Web_Commerce.Data;
 
 namespace Projet_Web_Commerce.Areas.Identity.Pages.Account.Manage
 {
-    public class IndexModel : PageModel
+    public class ProfilClientModel : PageModel
     {
         private readonly AuthDbContext _context;
         private readonly UserManager<Utilisateur> _userManager;
         private readonly SignInManager<Utilisateur> _signInManager;
 
-        public IndexModel(
+        public ProfilClientModel(
             AuthDbContext context,
             UserManager<Utilisateur> userManager,
             SignInManager<Utilisateur> signInManager)
@@ -32,38 +30,22 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account.Manage
             _signInManager = signInManager;
         }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         public string Courriel { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         [TempData]
         public string StatusMessage { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         [BindProperty]
         public InputModel Input { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         public class InputModel
         {
             [Required(ErrorMessage = "Le nom est requis.")]
             [Display(Name = "Nom")]
             public string Nom { get; set; }
 
-            [Required(ErrorMessage = "Le prÃ©nom est requis.")]
-            [Display(Name = "PrÃ©nom")]
+            [Required(ErrorMessage = "Le prénom est requis.")]
+            [Display(Name = "Prénom")]
             public string Prenom { get; set; }
 
             [Required(ErrorMessage = "La rue est requise.")]
@@ -84,19 +66,44 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account.Manage
 
             [Display(Name = "Pays")]
             public string Pays { get; set; }
+
+            [Required(ErrorMessage = "Le numéro de téléphone est requis")]
+            [RegularExpression(@"^\d{3}-\d{3}-\d{4}$", ErrorMessage = "Le numéro de téléphone doit respêcter le format 999-999-9999.")]
+            [Display(Name = "Numéro de téléphone")]
+            public string Telephone { get; set; }
+
+            [RegularExpression(@"^\d{3}-\d{3}-\d{4}$", ErrorMessage = "Le cellulaire doit respecter le format 999-999-9999.")]
+            [Display(Name = "Cellulaire (optionnel)")]
+            public string Cellulaire { get; set; }
         }
 
         private async Task LoadAsync(Utilisateur user)
         {
             var email = await _userManager.GetEmailAsync(user);
-            var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
+            var nom = _context.PPClients.FirstOrDefault(x => x.AdresseEmail == email).Nom;
+            var prenom = _context.PPClients.FirstOrDefault(x => x.AdresseEmail == email).Prenom;
+            var rue = _context.PPClients.FirstOrDefault(x => x.AdresseEmail == email).Rue;
+            var ville = _context.PPClients.FirstOrDefault(x => x.AdresseEmail == email).Ville;
+            var province = _context.PPClients.FirstOrDefault(x => x.AdresseEmail == email).NoProvince;
+            var codePostal = _context.PPClients.FirstOrDefault(x => x.AdresseEmail == email).CodePostal;
+            var pays = _context.PPClients.FirstOrDefault(x => x.AdresseEmail == email).Pays;
+            var telephone = _context.PPClients.FirstOrDefault(x => x.AdresseEmail == email).Tel1;
+            var cellulaire = _context.PPClients.FirstOrDefault(x => x.AdresseEmail == email).Tel2;
 
             Courriel = email;
 
-            //Input = new InputModel
-            //{
-            //    PhoneNumber = phoneNumber
-            //};
+            Input = new InputModel
+            {
+                Nom = nom,
+                Prenom = prenom,
+                Rue = rue,
+                Ville = ville,
+                Province = province,
+                CodePostal = codePostal,
+                Pays = pays,
+                Telephone = telephone,
+                Cellulaire = cellulaire
+            };
         }
 
         public async Task<IActionResult> OnGetAsync()
@@ -105,12 +112,6 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account.Manage
             if (user == null)
             {
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
-            }
-
-            bool estDansRole = await _userManager.IsInRoleAsync(user, "Vendeur");
-            if (estDansRole)
-            {
-
             }
 
             await LoadAsync(user);
@@ -126,6 +127,7 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account.Manage
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
 
+            //ModelState.Remove("Pays");
             if (!ModelState.IsValid)
             {
                 await LoadAsync(user);
@@ -140,37 +142,31 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account.Manage
             var province = Input.Province;
             var codePostal = Input.CodePostal.ToUpper();
             var pays = "Canada";
+            var telephone = Input.Telephone;
+            var cellulaire = (Input.Cellulaire == "" ? null : Input.Cellulaire);
 
             if (codePostal.Length == 6)
             {
                 codePostal = codePostal.Insert(3, " ");
             }
+            
+            var lstClients = _context.PPClients.ToList();
+            var clientCourant = lstClients.FirstOrDefault(c => c.AdresseEmail == user.Email);
 
-            bool estDansRole = await _userManager.IsInRoleAsync(user, "Vendeur");
-            if (estDansRole) // Si user est vendeur
-            {
-                var lstVendeurs = _context.PPVendeurs.ToList();
-                var vendeurCourant = lstVendeurs.FirstOrDefault(v => v.AdresseEmail == user.Email);
-                //vendeurCourant.
-                await _context.SaveChangesAsync();
-            }
-            else // User est client
-            {
-                var lstClients = _context.PPClients.ToList();
-                var clientCourant = lstClients.FirstOrDefault(c => c.AdresseEmail == user.Email);
-                clientCourant.DateMAJ = dateMAJ;
-                clientCourant.Nom = nom;
-                clientCourant.Prenom = prenom;
-                clientCourant.Rue = rue;
-                clientCourant.Ville = ville;
-                clientCourant.NoProvince = province;
-                clientCourant.CodePostal = codePostal;
-                clientCourant.Pays = pays;
-                await _context.SaveChangesAsync();
-            }
+            clientCourant.DateMAJ = dateMAJ;
+            clientCourant.Nom = nom;
+            clientCourant.Prenom = prenom;
+            clientCourant.Rue = rue;
+            clientCourant.Ville = ville;
+            clientCourant.NoProvince = province;
+            clientCourant.CodePostal = codePostal;
+            clientCourant.Pays = pays;
+            clientCourant.Tel1 = telephone;
+            clientCourant.Tel2 = cellulaire;
+            await _context.SaveChangesAsync();
 
             await _signInManager.RefreshSignInAsync(user);
-            StatusMessage = "Votre profil a Ã©tÃ© mis Ã  jour";
+            StatusMessage = "Votre profil a été mis à jour";
             return RedirectToPage();
         }
     }

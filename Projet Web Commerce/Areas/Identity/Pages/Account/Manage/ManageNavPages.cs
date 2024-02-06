@@ -13,11 +13,9 @@ namespace  Projet_Web_Commerce.Areas.Identity.Pages.Account.Manage
     /// </summary>
     public static class ManageNavPages
     {
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
-        public static string Index => "Index";
+        public static string ProfilClient => "ProfilClient";
+
+        public static string ProfilVendeur => "ProfilVendeur";
 
         /// <summary>
         ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
@@ -65,7 +63,9 @@ namespace  Projet_Web_Commerce.Areas.Identity.Pages.Account.Manage
         ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
         ///     directly from your code. This API may change or be removed in future releases.
         /// </summary>
-        public static string IndexNavClass(ViewContext viewContext) => PageNavClass(viewContext, Index);
+        public static string ProfilClientNavClass(ViewContext viewContext) => PageNavClass(viewContext, ProfilClient);
+
+        public static string ProfilVendeurNavClass(ViewContext viewContext) => PageNavClass(viewContext, ProfilVendeur);
 
         /// <summary>
         ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used

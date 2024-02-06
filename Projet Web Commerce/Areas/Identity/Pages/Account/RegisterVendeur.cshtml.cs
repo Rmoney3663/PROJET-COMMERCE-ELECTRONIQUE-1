@@ -127,12 +127,13 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
             [Display(Name = "Prénom")]
             public string Prenom { get; set; }
 
-            [RegularExpression(@"^\d{3}-\d{3}-\d{4}$", ErrorMessage = "Le numéro de téléphone doit être au format 999-999-9999.")]
-            [Display(Name = "Numéro de téléphone 1")]
+            [Required(ErrorMessage = "Le numéro de téléphone est requis")]
+            [RegularExpression(@"^\d{3}-\d{3}-\d{4}$", ErrorMessage = "Le numéro de téléphone doit respecter le format 999-999-9999.")]
+            [Display(Name = "Numéro de téléphone")]
             public string PhoneNumber1 { get; set; }
 
-            [RegularExpression(@"^\d{3}-\d{3}-\d{4}$", ErrorMessage = "Le numéro de téléphone doit être au format 999-999-9999.")]
-            [Display(Name = "Numéro de téléphone 2")]
+            [RegularExpression(@"^\d{3}-\d{3}-\d{4}$", ErrorMessage = "Le cellulaire doit respecter le format 999-999-9999.")]
+            [Display(Name = "Cellulaire (optionnel)")]
             public string PhoneNumber2 { get; set; }
         }
 

@@ -1,8 +1,8 @@
 ﻿@page
-@model IndexModel
+@model ProfilClientModel
 @{
     ViewData["Title"] = "Profil";
-    ViewData["ActivePage"] = ManageNavPages.Index;
+    ViewData["ActivePage"] = ManageNavPages.ProfilClient;
 }
 
 <h3>@ViewData["Title"]</h3>
@@ -11,6 +11,10 @@
     <div class="col-md-6">
         <form id="profile-form" method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+            <div class="form-floating mb-3">
+                <input asp-for="Courriel" class="form-control" value="@Model.Courriel" disabled />
+                <label asp-for="Courriel" class="form-label"></label>
+            </div>
             <div class="form-floating mb-3">
                 <input asp-for="Input.Nom" class="form-control" placeholder="Veuillez entrer votre nom." />
                 <label asp-for="Input.Nom" class="form-label"></label>
@@ -55,9 +59,19 @@
                 <span asp-validation-for="Input.CodePostal" class="text-danger"></span>
             </div>
             <div class="form-floating mb-3">
-                <input asp-for="Input.Pays" class="form-control" placeholder="Veuillez entrer votre pays" disabled value="Canada"/>
+                <input asp-for="Input.Pays" class="form-control" placeholder="Veuillez entrer votre pays" disabled value="@Model.Input.Pays" />
                 <label asp-for="Input.Pays" class="form-label"></label>
                 <span asp-validation-for="Input.Pays" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Telephone" class="form-control" placeholder="Veuillez entrer votre numéro de téléphone" />
+                <label asp-for="Input.Telephone" class="form-label"></label>
+                <span asp-validation-for="Input.Telephone" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Cellulaire" class="form-control" placeholder="Veuillez entrer votre cellulaire" />
+                <label asp-for="Input.Cellulaire" class="form-label"></label>
+                <span asp-validation-for="Input.Cellulaire" class="text-danger"></span>
             </div>
             <button id="update-profile-button" type="submit" class="w-100 btn btn-lg btn-primary">Enregistrer</button>
         </form>
@@ -65,5 +79,5 @@
 </div>
 
 @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
+    @* <partial name="_ValidationScriptsPartial" /> *@
 }
