@@ -25,7 +25,7 @@
         else if ((estDansRole = await UserManager.IsInRoleAsync(user, "Vendeur")))
         {
             nom = _context.PPVendeurs.Where(v => v.AdresseEmail == user.UserName).FirstOrDefault().Nom;
-            prenom = _context.PPClients.Where(v => v.AdresseEmail == user.UserName).FirstOrDefault().Prenom;
+            prenom = _context.PPVendeurs.Where(v => v.AdresseEmail == user.UserName).FirstOrDefault().Prenom;
         }
 
         @if (nom != null && prenom != null){
