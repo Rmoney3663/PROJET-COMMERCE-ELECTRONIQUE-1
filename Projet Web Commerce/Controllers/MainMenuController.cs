@@ -31,9 +31,6 @@ namespace Projet_Web_Commerce.Controllers
                               group unPanier.NoPanier by unPanier.NoVendeur into grouper
                               select new { vendeur = grouper.Key, articles = grouper.ToList() };
 
-            Console.WriteLine("QAAAAAAAAAAAAAAAAAAAAAAAA");
-            Console.WriteLine(listPaniers.ToList<object>().ToString());
-
             ViewData["listPaniers"] = listPaniers.ToList<object>();
 
 

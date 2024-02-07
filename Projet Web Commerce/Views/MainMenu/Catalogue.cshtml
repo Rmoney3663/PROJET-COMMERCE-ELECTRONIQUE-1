@@ -41,19 +41,16 @@ else
 <h1>Vous n'êtes pas connecté</h1>
 }
 
-<h3>Liste des Catégories</h3>
 <div class="container mt-4">
     @if (ViewBag.listPaniers.Count > 0 && SignInManager.IsSignedIn(User))
     {
+        <h2>Vos paniers</h2>
         <section class="autoplay" data-sizes="50vw">
             @foreach (var panier in ViewBag.listPaniers)
             {
-                Console.WriteLine("help");
-                Console.WriteLine(panier.vendeur);
-                Console.WriteLine(panier.articles[0]);
-
                 PPVendeurs vendeur = Model.VendeursList.Where(p => p.NoVendeur == panier.vendeur).FirstOrDefault();
 
+                <a asp-route-id="@vendeur.NoVendeur" asp-area="" asp-controller="Panier" asp-action="Index">
                     <div class="slide">
                         <div class="card">
                             <div class="card-body">
@@ -64,18 +61,18 @@ else
                         </div>
                         </div>
                     </div>
+                </a>
             }
         </section>
     }
     else if (SignInManager.IsSignedIn(User))
     {
-        <p>Vous n'avez aucun panier.</p>
-    }
-    else
-    {
-        <p>Connectez-vous pour voir vos paniers.</p>
+        <section class="autoplay" style="background-color:rgb(124, 105, 146)">
+            <h3 style="color:rgb(249, 229, 71)">Vous n'avez aucun panier.</h3>
+        </section>
     }
 </div>
+<h3>Nos Catégories</h3>
 <div class="d-flex flex-wrap align-content-start bg-light" style="margin-bottom:50px;">
     @foreach (var category in Model.CategoriesList)
     {
