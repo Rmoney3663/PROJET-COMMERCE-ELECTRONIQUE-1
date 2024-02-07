@@ -1,6 +1,9 @@
-﻿@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Identity
 @using System.Security.Claims
 @using Projet_Web_Commerce.Data;
+@using Microsoft.AspNetCore.Hosting
+@using System.IO
+@inject IWebHostEnvironment env
 
 @model Projet_Web_Commerce.Models.ModelCatalogueVendeur
 @inject SignInManager<Projet_Web_Commerce.Areas.Identity.Data.Utilisateur> SignInManager
@@ -29,7 +32,7 @@
 
 
 
-<div class="row" >
+<div class="row">
     <div class="col">
         <section>
             @if (SignInManager.IsSignedIn(User))
@@ -124,14 +127,14 @@
                 <a asp-area="Identity" asp-page="/Account/Register">Cliquez ici pour devenir client et accéder à tout le catalogue du vendeur</a>
             }
 
-            
+
             <div class="container mt-4">
                 @if (Model != null && Model.ProduitsList.Any())
                 {
                     <div class="container mt-4">
                         <div class="row">
                             @foreach (var item in productList)
-                                        {
+                            {
                                 <div class="col-lg-4 mb-4 col-md-6 col-xl-3">
                                     <div class="card">
                                         <div class="card-body" style="justify-content: center; display: flex;">
@@ -145,7 +148,14 @@
                                                         <h5 class="card-text float-end" style="color: orangered">Nouveau !</h5>
                                                     </div>
                                                 }
-                                                <img src="~/Logo/@(item.Photo)" alt="./Logo/@(item.Photo)" width="200" height="200" />
+                                                @{
+                                                    var path = System.IO.Path.Combine(env.WebRootPath, "Logo", item.Photo);
+                                                    string imagePath = item.Photo != null && File.Exists(path) ? $"~/Logo/{item.Photo}" : "~/Logo/DefaultImage.png";
+                                                    Console.WriteLine("FILE Name : " + item.Photo);
+                                                    Console.WriteLine("FILE : " + File.Exists(path));
+                                                }
+
+                                                <img src="@Url.Content(imagePath)" alt="@item.Photo" width="200" height="200" />
                                                 @{
                                                     var category = Model.CategoriesList.FirstOrDefault(c => c.NoCategorie == item.NoCategorie);
                                                 }
@@ -247,10 +257,10 @@
         text-decoration: none; /* Remove underline */
         transition: color 0.3s; /* Smooth transition for color change */
     }
-        
-    a:hover {
-        color: #ccc; /* Light gray color on hover */
-    }
+
+        a:hover {
+            color: #ccc; /* Light gray color on hover */
+        }
 </style>
 @section Scripts
 {

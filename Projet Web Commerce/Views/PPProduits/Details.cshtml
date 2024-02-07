@@ -7,7 +7,7 @@
     var user = await _userManager.GetUserAsync(User);    
 }
 
-@if (!SignInManager.IsSignedIn(User) || User.IsInRole("Client"))
+@if (!SignInManager.IsSignedIn(User) )
 {
     Console.WriteLine("yes");
     <text>

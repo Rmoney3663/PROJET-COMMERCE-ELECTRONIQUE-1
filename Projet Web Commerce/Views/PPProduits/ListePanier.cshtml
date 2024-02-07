@@ -1,0 +1,165 @@
+﻿@model IEnumerable<Projet_Web_Commerce.Models.PPProduits>
+﻿﻿@using Microsoft.AspNetCore.Identity
+@using Projet_Web_Commerce.Data
+@inject AuthDbContext _context
+@inject UserManager<Projet_Web_Commerce.Areas.Identity.Data.Utilisateur> _userManager
+@inject SignInManager<Projet_Web_Commerce.Areas.Identity.Data.Utilisateur> SignInManager
+@using System.IO
+@inject IWebHostEnvironment env
+@{
+    ViewData["Title"] = "Index";
+    var user = await _userManager.GetUserAsync(User);
+    @if (!SignInManager.IsSignedIn(User) || User.IsInRole("Client"))
+    {
+        Console.WriteLine("yes");
+        <text>
+            <script>
+                debugger;
+                window.location.href = '/PPProduits/ErrorProduit';
+            </script>
+        </text>
+    }
+    var vendeur = _context.PPVendeurs.FirstOrDefault(v => v.IdUtilisateur == user.Id);  
+}
+
+@if (vendeur == null)
+{
+    Console.WriteLine("among us");
+    <div>
+        <p>Vous n'avez pas accès à cette page.</p>
+        <a href="/PPProduits/ErrorProduit">Retourner à la catalogue</a>
+    </div>
+}
+else
+{
+    var clientProducts = _context.PPArticlesEnPanier
+     .Where(p => p.NoVendeur == vendeur.NoVendeur)
+     .GroupBy(p => new { p.NoClient, p.NoProduit })
+     .Select(g => new
+     {
+         NoClient = g.Key.NoClient,
+         NoProduit = g.Key.NoProduit,
+         TotalItems = g.Sum(p => p.NbItems),
+         LowestPanierDate = g.Min(p => p.DateCreation)
+     })
+     .Join(
+         _context.PPClients,
+         cp => cp.NoClient,
+         c => c.NoClient,
+         (cp, c) => new
+         {
+             cp.NoClient,
+             cp.NoProduit,
+             cp.TotalItems,
+             cp.LowestPanierDate,
+             c.Nom,
+             c.Prenom,
+             c.AdresseEmail
+         }
+     )
+     .ToList();
+
+    foreach (var product in clientProducts)
+    {
+        Console.WriteLine($"NoClient: {product.NoClient}, NoProduit: {product.NoProduit}, TotalItems: {product.TotalItems}, LowestPanierDate: {product.LowestPanierDate}, Nom: {product.Nom}, Prenom: {product.Prenom}, Email: {product.AdresseEmail}");
+    }
+
+    var itemsPerClient = clientProducts
+    .GroupBy(p => p.NoClient)
+    .Select(g => new
+    {
+        NoClient = g.Key,
+        TotalItems = g.Sum(p => p.TotalItems)
+    })
+    .ToList();
+    Console.WriteLine("-----CLIENT ITEMS----" );
+    foreach (var clientItems in itemsPerClient)
+    {
+        Console.WriteLine($"NoClient: {clientItems.NoClient}, TotalItems: {clientItems.TotalItems}");
+    }
+
+    var oldestProductDatesPerClient = clientProducts
+    .GroupBy(p => p.NoClient)
+    .Select(g => new
+    {
+        NoClient = g.Key,
+        OldestProductDate = g.Min(p => p.LowestPanierDate)
+    })
+    .ToList();
+
+    Console.WriteLine("-----CLIENT DATE----");
+    foreach (var clientItems in oldestProductDatesPerClient)
+    {
+        Console.WriteLine($"NoClient: {clientItems.NoClient}, DateItems: {clientItems.OldestProductDate}");
+    }
+
+    var distinctClientsCount = clientProducts
+    .Select(p => p.NoClient)
+    .Distinct()
+    .Count();
+    Console.WriteLine("CLIENT Distint : " + distinctClientsCount);
+
+
+    <h1>Liste de panier</h1>
+    <h3>Vous avez @distinctClientsCount Client</h3>
+
+    <div class="d-flex flex-wrap align-content-start bg-light overflow-auto" style="margin-bottom:50px; height:600px;">
+        @foreach (var clientGroup in clientProducts.GroupBy(p => p.NoClient))
+        {
+            var client = clientGroup.First(); 
+
+            <div class="card" style="width:400px; margin: 10px;">
+                <div class="card-body">
+                    <p class="card-text">
+                        <b>Adresse de courriel :</b>
+                        @Html.DisplayFor(modelItem => client.AdresseEmail)
+                    </p>
+                    @if (!string.IsNullOrEmpty(client.Prenom))
+                    {
+                        <p class="card-text">
+                            <b>Prenom :</b>
+                            @Html.DisplayFor(modelItem => client.Prenom)
+                        </p>
+                    }
+                    @if (!string.IsNullOrEmpty(client.Nom))
+                    {
+                        <p class="card-text">
+                            <b>Nom :</b>
+                            @Html.DisplayFor(modelItem => client.Nom)
+                        </p>
+                    }
+                    <p class="card-text">
+                        @{
+                            var nbItems = itemsPerClient.FirstOrDefault(c => c.NoClient == client.NoClient)?.TotalItems;
+                         }
+                        <b>Nombre d'items :</b>
+                        @Html.DisplayFor(modelItem => nbItems)
+                    </p>
+                    <p class="card-text">
+                        @{
+                            var oldestProductDate = oldestProductDatesPerClient.FirstOrDefault(c => c.NoClient == client.NoClient)?.OldestProductDate;
+                        }
+                        <b>Date de creation :</b>
+                        @Html.DisplayFor(modelItem => oldestProductDate)
+                    </p>
+                    <div>
+                        <div>
+                            <a class="btn btn-success" asp-action="DetailsPanier" asp-route-id="@client.NoClient">Details</a>
+                            @{                                
+                                if (oldestProductDate != null && oldestProductDate < DateTime.Now.AddMonths(-6))
+                                {
+                                    <a> | </a>
+                                    <a class="btn btn-danger" asp-action="DeletePanier" asp-route-id="@client.NoClient">Supprimer</a>
+                                }
+                            }
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        }
+    </div>
+
+
+}
+
