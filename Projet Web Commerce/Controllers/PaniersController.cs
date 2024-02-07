@@ -23,15 +23,21 @@ namespace Projet_Web_Commerce.Controllers
         // GET: PanierController
         public ActionResult Index()
         {
-
+            var CategoriesList = _context.PPCategories.ToList();
+            var VendeursList = _context.PPVendeurs.ToList();
+            var ProduitsList = _context.PPProduits.ToList();
             var listPaniers = from unPanier in _context.PPArticlesEnPanier
                               where unPanier.PPClients.AdresseEmail == User.Identity.Name
                               group unPanier.NoPanier by unPanier.NoVendeur into grouper
                               select new { vendeur = grouper.Key, articles = grouper.ToList() };
 
-            var model = new ModelPanier
+            ViewData["listPaniers"] = listPaniers.ToList<object>();
+
+            var model = new ModelCatalogue
             {
-                Paniers = listPaniers.ToList<object>()
+                CategoriesList = CategoriesList,
+                VendeursList = VendeursList,
+                ProduitsList = ProduitsList
             };
 
             return View(model);
