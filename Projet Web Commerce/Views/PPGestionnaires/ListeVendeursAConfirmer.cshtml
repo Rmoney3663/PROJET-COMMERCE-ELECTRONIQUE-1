@@ -1,6 +1,6 @@
 ﻿@model List<Projet_Web_Commerce.Models.PPVendeurs>
 @{
-    ViewData["Title"] = "Gestion des vendeurs";
+    ViewData["Title"] = "Liste des vendeurs à confirmer";
 }
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
@@ -9,7 +9,7 @@
 <div class="row">
     <div class="col">
         <section>
-            <h3>Liste des vendeurs à confirmer</h3>
+            <h3>@ViewData["Title"]</h3>
             <div class="container mt-4">
                 @if (Model != null && Model.Any())
                 {
@@ -133,7 +133,7 @@
             showLoaderOnConfirm: true,
             width: '800px',
             preConfirm: (redevance) => {
-                var url = "/MainMenuController/ValiderAsync?" + $.param({ id: noVendeur, sujet: sujet, message: message, vendeurAccepte: accepte, pourcentageRedevence: pourcentageRedevence })
+                var url = "/PPGestionnairesController/ValiderAsync?" + $.param({ id: noVendeur, sujet: sujet, message: message, vendeurAccepte: accepte, pourcentageRedevence: pourcentageRedevence })
                 return fetch(url)
                     .then(response => {
                         if (!response.ok) {
@@ -161,9 +161,6 @@
                 });
             }
         });
-
-
-
     }
 </script>
 
