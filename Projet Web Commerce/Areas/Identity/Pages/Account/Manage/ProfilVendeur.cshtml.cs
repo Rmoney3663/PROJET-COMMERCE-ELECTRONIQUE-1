@@ -90,6 +90,7 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account.Manage
 
             [Display(Name = "Pourcentage")]
             public decimal Pourcentage { get; set; }
+           
         }
 
         private async Task LoadAsync(Utilisateur user)
@@ -129,7 +130,7 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account.Manage
                 PoidsMaxLivraison = poidsMaxLivraison,
                 LivraisonGratuite = livraisonGratuite,
                 Taxes = taxes,
-                Pourcentage = pourcentage
+                Pourcentage = pourcentage               
             };
         }
 
@@ -198,7 +199,8 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account.Manage
             vendeurCourant.NomAffaires = nomAffaires;
             vendeurCourant.PoidsMaxLivraison = poidsMaxLivraison;
             vendeurCourant.LivraisonGratuite = livraisonGratuite;
-            vendeurCourant.Taxes = taxes;
+            vendeurCourant.Taxes = taxes;           
+            vendeurCourant.PourcentageTaxe = Methodes.pourcentageTaxes(taxes, province);
 
             await _context.SaveChangesAsync();
 

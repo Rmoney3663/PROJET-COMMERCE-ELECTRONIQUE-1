@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Projet_Web_Commerce.Areas.Identity.Data;
 using Projet_Web_Commerce.Data;
 using Projet_Web_Commerce.Models;
@@ -19,6 +20,7 @@ namespace Projet_Web_Commerce.Controllers
 
 
         // GET: PanierController
+        [HttpGet]
         public ActionResult Index(int id)
         {
             var CategoriesList = _context.PPCategories.ToList();
@@ -30,6 +32,7 @@ namespace Projet_Web_Commerce.Controllers
                               select unPanier;
 
             ViewData["Panier"] = listPaniers.ToList<object>();
+            ViewData["VendeurId"] = id;
 
             ModelCatalogue modelCatalogue = new ModelCatalogue()
             {
@@ -41,73 +44,40 @@ namespace Projet_Web_Commerce.Controllers
             return View(modelCatalogue);
         }
 
-        // GET: PanierController/Details/5
-        public ActionResult Details(int id)
-        {
-            return View();
-        }
-
-        // GET: PanierController/Create
-        public ActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: PanierController/Create
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public ActionResult Index(int id, bool delete, int vendeur)
         {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
+            var article = _context.PPArticlesEnPanier.Where(v => v.NoPanier == id).FirstOrDefault();
 
-        // GET: PanierController/Edit/5
-        public ActionResult Edit(int id)
-        {
-            return View();
-        }
+            
+            if (delete)
+            {
+                _context.PPArticlesEnPanier.Remove(article);
+            }
 
-        // POST: PanierController/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
+            _context.SaveChanges();
+            
+            var CategoriesList = _context.PPCategories.ToList();
+            var VendeursList = _context.PPVendeurs.ToList();
+            var ProduitsList = _context.PPProduits.ToList();
+            
 
-        // GET: PanierController/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
+            var listPaniers = from unPanier in _context.PPArticlesEnPanier
+                              where unPanier.PPClients.AdresseEmail == User.Identity.Name
+                              where unPanier.NoVendeur == vendeur
+                              select unPanier;
 
-        // POST: PanierController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
+            ViewData["Panier"] = listPaniers.ToList<object>();
+            ViewData["VendeurId"] = vendeur;
+
+            ModelCatalogue modelCatalogue = new ModelCatalogue()
             {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
+                CategoriesList = CategoriesList,
+                VendeursList = VendeursList,
+                ProduitsList = ProduitsList
+            };
+
+            return View(modelCatalogue);
         }
     }
 }

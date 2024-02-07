@@ -9,6 +9,7 @@ using Projet_Web_Commerce.Areas.Identity.Data;
 using Projet_Web_Commerce.Data;
 using Projet_Web_Commerce.Models;
 using System.Globalization;
+using System.Security.Claims;
 
 namespace Projet_Web_Commerce.Controllers
 {
@@ -65,33 +66,162 @@ namespace Projet_Web_Commerce.Controllers
         //    return Redirect("AccessDenied");
         //}
 
-        public IActionResult CatalogueVendeur(string id)
+        public async Task<IActionResult> CatalogueVendeurAsync(string id, string? searchString, string? sortOrder, string? parPage, int? pageNumber)
         {
 
-            Console.WriteLine(id);
             // Action logic
             var vendeur = _context.PPVendeurs.Where(v => v.NomAffaires == id).FirstOrDefault();
 
-            var produitsVendeur = _context.PPProduits
-                .Where(p => p.NoVendeur == vendeur.NoVendeur)
-                .OrderBy(v => v.DateCreation)
-                .Take(15)
-                .ToList();
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var client = _context.PPClients.FirstOrDefault(c => c.IdUtilisateur == userId);
+
+            ViewBag.sortOrder = sortOrder;
+            ViewBag.parPage = parPage ?? "15";
+            ViewBag.searchString = searchString;
+            ViewBag.id = id;
+            ViewBag.pageNumber = pageNumber;
+
+
+            ViewBag.NumsProduit = _context.PPProduits
+                .Where(p => p.NoVendeur == vendeur.NoVendeur && p.Disponibilite == true) // Filter by NoVendeur
+                .Select(p => p.NoProduit)
+                .OrderBy(n => n) // Order by NoProduit
+                .ToArray();
 
             var CategoriesList = _context.PPCategories.ToList();
             var VendeursList = _context.PPVendeurs.ToList();
 
+            IQueryable<PPProduits> ProduitsVendeur;
 
-            ModelCatalogue modelCatalogue = new ModelCatalogue()
+            var nouveauxProduits = _context.PPProduits
+               .Where(p => p.NoVendeur == vendeur.NoVendeur)
+               .OrderBy(v => v.DateCreation)
+               .Take(15)
+               .ToList();
+
+            if (!String.IsNullOrEmpty(searchString))
             {
-                CategoriesList = CategoriesList,
-                VendeursList = VendeursList,
-                ProduitsList = produitsVendeur
-            };
+                ProduitsVendeur = from p in _context.PPProduits
+                    .Where(p => p.NoVendeur == vendeur.NoVendeur && p.Disponibilite == true && (p.Nom.Contains(searchString) || p.Description.Contains(searchString)))
+                                  select p;
+            }
+            else
+            {
+                ProduitsVendeur = from p in _context.PPProduits
+                    .Where(p => p.NoVendeur == vendeur.NoVendeur && p.Disponibilite == true)
+                                  select p;
+            }
 
-            return View(modelCatalogue);
+
+            ModelCatalogueVendeur modelCatalogueVendeur;
+
+            switch (sortOrder)
+            {
+                case "dateAsc":
+                    ProduitsVendeur = ProduitsVendeur.OrderBy(p => p.DateCreation);
+                    break;
+                case "dateDesc":
+                    ProduitsVendeur = ProduitsVendeur.OrderByDescending(p => p.DateCreation);
+                    break;
+                case "numProdAsc":
+                    ProduitsVendeur = ProduitsVendeur.OrderBy(p => p.NoProduit);
+                    break;
+                case "numProdDesc":
+                    ProduitsVendeur = ProduitsVendeur.OrderByDescending(p => p.NoProduit);
+                    break;
+                case "catProdAsc":
+                    ProduitsVendeur = ProduitsVendeur.OrderBy(p => p.NoCategorie);
+                    break;
+                case "catProdDesc":
+                    ProduitsVendeur = ProduitsVendeur.OrderByDescending(p => p.NoCategorie);
+                    break;
+                case "descProdAsc":
+                    ProduitsVendeur = ProduitsVendeur.OrderBy(p => p.Description);
+                    break;
+                case "descProdDesc":
+                    ProduitsVendeur = ProduitsVendeur.OrderByDescending(p => p.Description);
+                    break;
+            }
+            int pageSize;
+
+            if (parPage == null)
+            {
+                pageSize = 15;
+            }
+            else
+            {
+                pageSize = Convert.ToInt32(parPage);
+            }
+
+            var produitsVendeurQueryable = ProduitsVendeur.AsQueryable();
+
+            var produitsVendeurPaginated = await PaginatedList<PPProduits>.CreateAsync(
+                produitsVendeurQueryable,
+                pageNumber ?? 1,
+                pageSize);
+
+            if (client != null)
+            {
+                modelCatalogueVendeur = new ModelCatalogueVendeur()
+                {
+                    nomAffaire = id,
+                    CategoriesList = CategoriesList,
+                    VendeursList = VendeursList,
+                    ProduitsList = produitsVendeurPaginated,
+                    NouveauxProduits = nouveauxProduits,
+                    noClient = client.NoClient
+                };
+            }
+            else
+            {
+                modelCatalogueVendeur = new ModelCatalogueVendeur()
+                {
+                    nomAffaire = id,
+                    CategoriesList = CategoriesList,
+                    VendeursList = VendeursList,
+                    ProduitsList = produitsVendeurPaginated,
+                    NouveauxProduits = nouveauxProduits
+                };
+            }
+
+            return View(modelCatalogueVendeur);
+
+
         }
 
+        [HttpPost]
+        public ActionResult AjoutPanier(int quantite, int NoProduit, int NoClient, int NoVendeur)
+        {
+            var vendeur = _context.PPVendeurs.Where(v => v.NoVendeur == NoVendeur).FirstOrDefault();
+            var produit = _context.PPProduits.Where(v => v.NoProduit == NoProduit).FirstOrDefault();
+
+            if (produit != null && vendeur != null)
+            {
+                var ajoutPanier = new PPArticlesEnPanier
+                {
+                    NoClient = NoClient, // Provide the NoClient value
+                    NoVendeur = NoVendeur, // Provide the NoVendeur value
+                    NoProduit = NoProduit, // Provide the NoProduit value
+                    DateCreation = DateTime.Now, // Set the creation date
+                    NbItems = quantite // Set the number of items
+                };
+
+
+                // Ajout au panier
+                _context.PPArticlesEnPanier.Add(ajoutPanier);
+
+                // Save changes to the database
+                _context.SaveChanges();
+
+                TempData["SuccessMessage"] = $"Le produit {produit.Nom} à été ajout au panier.  ";
+
+                return RedirectToAction("CatalogueVendeur", new { id = vendeur.NomAffaires });
+            }
+
+
+            return RedirectToAction("Catalogue");
+
+        }
 
         //[Route("/MainMenuController/ValiderAsync")]
         //[Authorize(Roles = "Gestionnaire")]
