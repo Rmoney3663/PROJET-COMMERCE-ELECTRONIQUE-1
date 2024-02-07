@@ -28,11 +28,15 @@ namespace Projet_Web_Commerce.Models
         public virtual ICollection<PPArticlesEnPanier>? PPArticlesEnPanier { get; set; }
         [InverseProperty("PPProduits")]
         public virtual ICollection<PPDetailsCommandes>? PPDetailsCommandes { get; set; }
+        [InverseProperty("PPProduits")]
+        public virtual ICollection<PPEvaluations>? PPEvaluations { get; set; }
+
         [ForeignKey("NoVendeur")]
         [InverseProperty("PPProduits")]
         public virtual PPVendeurs? PPVendeurs { get; set; }
         [ForeignKey("NoCategorie")]
         [InverseProperty("PPProduits")]
         public virtual PPCategories? PPCategories { get; set; }
+
     }
 }
