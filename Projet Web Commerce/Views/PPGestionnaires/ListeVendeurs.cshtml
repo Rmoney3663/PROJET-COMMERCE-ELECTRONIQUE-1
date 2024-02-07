@@ -10,7 +10,19 @@
 <div class="row">
     <div class="col">
         <section>
-            <h3>@ViewData["Title"]</h3>
+            <div class="btn-group btn-group-lg" role="group" aria-label="Basic radio toggle button group">
+                <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked>
+                <label class="btn btn-outline-primary" for="btnradio1">@ViewData["Title"]</label>
+
+                <a class="btn btn-outline-primary" style="background-color:rgb(124, 105, 146); color:rgb(249, 229, 71); border-color:rgb(124, 105, 146); accent-color:rgb(249, 229, 71)" asp-area="" asp-controller="PPGestionnaires" asp-action="ListeVendeursAConfirmer">
+                    Liste des vendeurs à confirmer
+                </a>
+
+                <a class="btn btn-outline-primary" style="background-color:rgb(124, 105, 146); color:rgb(249, 229, 71); border-color:rgb(124, 105, 146); accent-color:rgb(249, 229, 71)" asp-area="" asp-controller="PPGestionnaires" asp-action="ListeVendeursAConfirmer">
+                    Liste des vendeurs inactifs
+                </a>
+            </div>
+            
             <div class="container mt-4">
                 @foreach (var date in Model.MoisAnneesDistinctsList)
                 {
@@ -27,6 +39,7 @@
                                     <tr>
                                         <th scope="col">#</th>
                                         <th scope="col">No de vendeur</th>
+                                        <th scope="col">Courriel</th>
                                         <th scope="col">Nom d'affaires</th>
                                         <th scope="col">Date de création</th>
                                         <th scope="col">Nb de produits inscrits</th>
@@ -41,6 +54,7 @@
                                         <tr>
                                             <td>@(++no)</td>
                                             <td>@Html.DisplayFor(modelItem => item.NoVendeur)</td>
+                                            <td>@Html.DisplayFor(modelItem => item.AdresseEmail)</td>
                                             <td>@Html.DisplayFor(modelItem => item.NomAffaires)</td>
                                             <td>@Html.DisplayFor(modelItem => item.DateCreation)</td>
                                             <td>@Model.ProduitsList.Count(modelItem => modelItem.NoVendeur == item.NoVendeur)</td>
@@ -70,3 +84,9 @@
         </section>
     </div>
 </div>
+
+<script>
+    function lstVendeursAConfirmer() {
+        window.location = "https://localhost:44376/PPGestionnaires/ListeVendeursAConfirmer"
+    }
+</script>

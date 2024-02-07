@@ -9,7 +9,18 @@
 <div class="row">
     <div class="col">
         <section>
-            <h3>@ViewData["Title"]</h3>
+            <div class="btn-group btn-group-lg" role="group" aria-label="Basic radio toggle button group">
+                <a class="btn btn-outline-primary" style="background-color:rgb(124, 105, 146); color:rgb(249, 229, 71); border-color:rgb(124, 105, 146); accent-color:rgb(249, 229, 71)" asp-area="" asp-controller="PPGestionnaires" asp-action="ListeVendeurs">
+                    Liste des vendeurs
+                </a>
+
+                <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off" checked>
+                <label class="btn btn-outline-primary" for="btnradio2">@ViewData["Title"]</label>
+
+                <a class="btn btn-outline-primary" style="background-color:rgb(124, 105, 146); color:rgb(249, 229, 71); border-color:rgb(124, 105, 146); accent-color:rgb(249, 229, 71) " asp-area="" asp-controller="PPGestionnaires" asp-action="ListeVendeursAConfirmer">
+                    Liste des vendeurs inactifs
+                </a>
+            </div>
             <div class="container mt-4">
                 @if (Model != null && Model.Any())
                 {
@@ -76,6 +87,9 @@
 
     //     document.getElementById('frmGestionVendeur').submit();
     // }
+    function lstVendeurs() {
+        window.location = "https://localhost:44376/PPGestionnaires/ListeVendeurs"
+    }
 
     function courrielGestionVendeurs(
         accepte,
