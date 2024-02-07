@@ -1,46 +1,44 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Projet_Web_Commerce.Areas.Identity.Data;
 using Projet_Web_Commerce.Data;
 using Projet_Web_Commerce.Models;
 
 namespace Projet_Web_Commerce.Controllers
 {
-    public class PaniersController : Controller
+    public class PanierController : Controller
     {
-
         private readonly AuthDbContext _context;
         private readonly Microsoft.AspNetCore.Identity.UserManager<Utilisateur> _userManager;
 
-        public PaniersController(AuthDbContext context, Microsoft.AspNetCore.Identity.UserManager<Utilisateur> userManager)
+        public PanierController(AuthDbContext context, Microsoft.AspNetCore.Identity.UserManager<Utilisateur> userManager)
         {
             _context = context;
             _userManager = userManager;
         }
 
+
         // GET: PanierController
-        public ActionResult Index()
+        public ActionResult Index(int id)
         {
             var CategoriesList = _context.PPCategories.ToList();
             var VendeursList = _context.PPVendeurs.ToList();
             var ProduitsList = _context.PPProduits.ToList();
             var listPaniers = from unPanier in _context.PPArticlesEnPanier
                               where unPanier.PPClients.AdresseEmail == User.Identity.Name
-                              group unPanier.NoPanier by unPanier.NoVendeur into grouper
-                              select new { vendeur = grouper.Key, articles = grouper.ToList() };
+                              where unPanier.NoVendeur == id
+                              select unPanier;
 
-            ViewData["listPaniers"] = listPaniers.ToList<object>();
+            ViewData["Panier"] = listPaniers.ToList<object>();
 
-            var model = new ModelCatalogue
+            ModelCatalogue modelCatalogue = new ModelCatalogue()
             {
                 CategoriesList = CategoriesList,
                 VendeursList = VendeursList,
                 ProduitsList = ProduitsList
             };
 
-            return View(model);
+            return View(modelCatalogue);
         }
 
         // GET: PanierController/Details/5

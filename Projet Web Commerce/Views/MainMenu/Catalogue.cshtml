@@ -41,58 +41,75 @@ else
 <h1>Vous n'êtes pas connecté</h1>
 }
 
-<h3>Liste des Catégories</h3>
 <div class="container mt-4">
-    @if (Model.CategoriesList != null)
+    @if (ViewBag.listPaniers.Count > 0 && SignInManager.IsSignedIn(User))
     {
+        <h2>Vos paniers</h2>
         <section class="autoplay" data-sizes="50vw">
-            @foreach (var category in Model.CategoriesList)
+            @foreach (var panier in ViewBag.listPaniers)
             {
+                PPVendeurs vendeur = Model.VendeursList.Where(p => p.NoVendeur == panier.vendeur).FirstOrDefault();
+
+                <a asp-route-id="@vendeur.NoVendeur" asp-area="" asp-controller="Panier" asp-action="Index">
                     <div class="slide">
                         <div class="card">
                             <div class="card-body">
-                                <h2 class="card-title">@Html.DisplayFor(modelItem => category.Description)</h2>
-                                <h5 class="card-details">@Html.DisplayFor(modelItem => category.Details)</h5>
-
-
-                            
-
-                            @if (category.PPProduits != null)
-                            {
-                                <p>Vendeurs:</p>
-                                @foreach (var group in category.PPProduits
-                               .Where(p => p.PPVendeurs != null && p.PPVendeurs.NomAffaires != null)
-                               .GroupBy(p => p.PPVendeurs.NomAffaires))
-                                {
-                                    if (group.Key != null)
-                                    {
-                                        <a asp-controller="MainMenu"
-                                           asp-route-id="@group.Key"
-                                           asp-action="CatalogueVendeur">
-                                            @group.Key (@group.Count())
-                                        </a><br />
-                                    }
-                                    else
-                                    {
-                                        <p>No Vendeur Name</p>
-                                    }
-                                }
-
-                            }
-                            else
-                            {
-                                <p>Aucun vendeur dans cette catégorie.</p>
-                            }
+                                <h2 class="card-title">@vendeur.NomAffaires</h2>
+                                <h5 class="card-details">Nombre d'articles: @panier.articles.Count</h5>
+        
+                    
                         </div>
                         </div>
                     </div>
-
+                </a>
             }
         </section>
     }
-    else
+    else if (SignInManager.IsSignedIn(User))
     {
-        <p>Aucune catégorie trouvée.</p>
+        <section class="autoplay" style="background-color:rgb(124, 105, 146)">
+            <h3 style="color:rgb(249, 229, 71)">Vous n'avez aucun panier.</h3>
+        </section>
+    }
+</div>
+<h3>Nos Catégories</h3>
+<div class="d-flex flex-wrap align-content-start bg-light" style="margin-bottom:50px;">
+    @foreach (var category in Model.CategoriesList)
+    {
+        @if (category.PPProduits != null)
+        {
+            <div class="card" style="width:50%; margin-bottom:10px;">
+                <div class="card-body">
+                    <h2 class="card-title">@Html.DisplayFor(modelItem => category.Description)</h2>
+                    <h5 class="card-details">@Html.DisplayFor(modelItem => category.Details)</h5>
+
+                    <p>Vendeurs:</p>
+                    <div style="height: 40%; width:50%; overflow:auto">
+                        @foreach (var group in category.PPProduits
+                       .Where(p => p.PPVendeurs != null && p.PPVendeurs.NomAffaires != null)
+                       .GroupBy(p => p.PPVendeurs.NomAffaires))
+                        {
+                            if (group.Key != null)
+                            {
+                                <a asp-controller="MainMenu"
+                                   asp-route-id="@group.Key"
+                                   asp-action="CatalogueVendeur">
+                                    @group.Key (@group.Count())
+                                </a>
+
+                                <br />
+                            }
+                            else
+                            {
+                                <p>Vendeur sans nom</p>
+                            }
+                        }
+                    </div>
+
+                </div>
+            </div>
+        }
+        
     }
 </div>
 

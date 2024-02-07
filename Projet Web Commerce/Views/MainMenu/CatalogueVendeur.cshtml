@@ -1,4 +1,7 @@
 ﻿@model Projet_Web_Commerce.Models.ModelCatalogue
+@using Microsoft.AspNetCore.Hosting
+@using System.IO
+@inject IWebHostEnvironment env
 
 <div class="row">
     <div class="col">
@@ -22,7 +25,15 @@
                                                     <h5 class="card-text float-end" style="color: orangered">Nouveau !</h5>
                                                 </div>
 
-                                                <img src="~/Logo/@(item.Photo)" alt="./Logo/@(item.Photo)" width="200" height="200" />
+                                                @{
+                                                    var path = System.IO.Path.Combine(env.WebRootPath, "Logo", item.Photo);
+                                                    string imagePath = item.Photo != null && File.Exists(path) ? $"~/Logo/{item.Photo}" : "~/Logo/DefaultImage.png";
+                                                    Console.WriteLine("FILE Name : " + item.Photo);
+                                                    Console.WriteLine("FILE : " + File.Exists(path));
+                                                }
+
+                                                <img src="@Url.Content(imagePath)" alt="@item.Photo" width="200" height="200" />
+                                               
                                                 @{
                                                     var category = Model.CategoriesList.FirstOrDefault(c => c.NoCategorie == item.NoCategorie);
                                                 }

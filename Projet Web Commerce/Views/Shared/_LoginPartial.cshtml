@@ -1,5 +1,8 @@
 ﻿@using Microsoft.AspNetCore.Identity
 @using Projet_Web_Commerce.Areas.Identity.Data
+@using Projet_Web_Commerce.Data
+
+@inject AuthDbContext _context
 
 @inject SignInManager<Utilisateur> SignInManager
 @inject UserManager<Utilisateur> UserManager
@@ -7,18 +10,40 @@
 <ul class="navbar-nav">
 @if (SignInManager.IsSignedIn(User))
 {
-    <li class="nav-item">
-        @{
-            var user = await UserManager.GetUserAsync(User);
-            bool estDansRole = await UserManager.IsInRoleAsync(user, "Client");
-        }
-        @if (estDansRole)
+    
+    var user = await UserManager.GetUserAsync(User);
+            
+    bool estDansRole = await UserManager.IsInRoleAsync(user, "Client");
+
+        var nom = "none";
+        var prenom = "none";
+        @if ((estDansRole = await UserManager.IsInRoleAsync(user, "Client")))
         {
-            <a id="manage" class="nav-link" style="color: rgb(249, 229, 71)" asp-area="Identity" asp-page="/Account/Manage/ProfilClient" title="Manage">Mon profil</a> @*Hello @UserManager.GetUserName(User)!*@
+            nom = _context.PPClients.Where(v => v.AdresseEmail == user.UserName).FirstOrDefault().Nom;
+            prenom = _context.PPClients.Where(v => v.AdresseEmail == user.UserName).FirstOrDefault().Prenom;
         }
         else if ((estDansRole = await UserManager.IsInRoleAsync(user, "Vendeur")))
         {
-            <a id="manage" class="nav-link" style="color: rgb(249, 229, 71)" asp-area="Identity" asp-page="/Account/Manage/ProfilVendeur" title="Manage">Mon profil</a> @*Hello @UserManager.GetUserName(User)!*@
+            nom = _context.PPVendeurs.Where(v => v.AdresseEmail == user.UserName).FirstOrDefault().Nom;
+            prenom = _context.PPVendeurs.Where(v => v.AdresseEmail == user.UserName).FirstOrDefault().Prenom;
+        }
+
+        @if (nom != null && prenom != null){
+            <li class="nav-item">
+                <p id="nom" class="nav-link" style="color: rgb(249, 229, 71)">Bonjour @prenom @nom!</p>
+            </li>
+        }
+        <li class="nav-item">
+            <a class="nav-link" asp-area="" asp-controller="Paniers" asp-action="Index" style="color: rgb(249, 229, 71)">Paniers</a>
+        </li>
+    <li class="nav-item">
+            @if ((estDansRole = await UserManager.IsInRoleAsync(user, "Client")))
+        {
+                <a id="manage" class="nav-link" style="color: rgb(249, 229, 71)" asp-area="Identity" asp-page="/Account/Manage/ProfilClient" title="Manage">Mon profil</a>
+        }
+        else if ((estDansRole = await UserManager.IsInRoleAsync(user, "Vendeur")))
+        {
+            <a id="manage" class="nav-link" style="color: rgb(249, 229, 71)" asp-area="Identity" asp-page="/Account/Manage/ProfilVendeur" title="Manage">Mon profil</a>
         }
             
     </li>

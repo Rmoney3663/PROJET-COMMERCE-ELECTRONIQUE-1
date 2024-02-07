@@ -29,6 +29,7 @@ namespace Projet_Web_Commerce.Controllers
         // GET: PPProduits
         public async Task<IActionResult> Index()
         {
+           
             var authDbContext = _context.PPProduits.Include(p => p.PPCategories).Include(p => p.PPVendeurs);
             return View(await authDbContext.ToListAsync());
         }
@@ -239,9 +240,43 @@ namespace Projet_Web_Commerce.Controllers
                 if (pPProduits != null)
                 {
                     Console.WriteLine("Found produit");
-                    System.IO.File.Delete("wwwroot/Logo/" + pPProduits.Photo);
-                    Console.WriteLine("Deleted photo");
-                    _context.PPProduits.Remove(pPProduits);
+
+                    var inPanier = await _context.PPArticlesEnPanier.AnyAsync(a => a.NoProduit == id);
+
+                    if (inPanier)
+                    {
+                        ViewBag.WarningMessage = "Ce produit est dans un panier. Êtes-vous sûr de vouloir le supprimer ?";
+                        ViewBag.ProductId = id;
+                        return View("ConfirmDelete", pPProduits);
+                    }
+
+                    var detailsCommandes = await _context.PPDetailsCommandes.FirstOrDefaultAsync(dc => dc.NoProduit == id);
+
+                    if (detailsCommandes != null)
+                    {
+                        pPProduits.Disponibilite = false;
+                        pPProduits.NombreItems = 0;
+                        pPProduits.DateMAJ = DateTime.Now;
+                        var detailsCommandesList = await _context.PPDetailsCommandes
+                            .Where(dc => dc.NoProduit == id)
+                            .ToListAsync();
+
+                        foreach (var dc in detailsCommandesList)
+                        {
+                            dc.Quantité = 0;
+                            _context.PPDetailsCommandes.Update(dc);
+                        }
+                        _context.PPDetailsCommandes.Update(detailsCommandes);
+                        _context.Update(pPProduits);
+                    }
+                    else
+                    {
+                        var articlesToDelete = _context.PPArticlesEnPanier.Where(a => a.NoProduit == id);
+                        _context.PPArticlesEnPanier.RemoveRange(articlesToDelete);
+                        System.IO.File.Delete("wwwroot/Logo/" + pPProduits.Photo);
+                        Console.WriteLine("Deleted photo");
+                        _context.PPProduits.Remove(pPProduits);
+                    }
                 }
 
                 await _context.SaveChangesAsync();
@@ -252,6 +287,58 @@ namespace Projet_Web_Commerce.Controllers
                 return RedirectToAction("Error", "PPProduits");
             }
         }
+
+        [HttpPost, ActionName("DeleteConfirmed")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed2(int id)
+        {
+            try
+            {
+                Console.WriteLine("ID : " + id);
+                var pPProduits = await _context.PPProduits.FindAsync(id);
+                if (pPProduits != null)
+                {
+                    Console.WriteLine("Found produit");
+                    var detailsCommandes = await _context.PPDetailsCommandes.FirstOrDefaultAsync(dc => dc.NoProduit == id);
+                    
+                    var articlesToDelete = _context.PPArticlesEnPanier.Where(a => a.NoProduit == id);
+                    _context.PPArticlesEnPanier.RemoveRange(articlesToDelete);
+
+                    if (detailsCommandes != null)
+                    {
+                        pPProduits.Disponibilite = false;
+                        pPProduits.NombreItems = 0;
+                        pPProduits.DateMAJ = DateTime.Now;
+                        var detailsCommandesList = await _context.PPDetailsCommandes
+                            .Where(dc => dc.NoProduit == id)
+                            .ToListAsync();
+
+                        foreach (var dc in detailsCommandesList)
+                        {
+                            dc.Quantité = 0;
+                            _context.PPDetailsCommandes.Update(dc);
+                        }
+                        _context.PPDetailsCommandes.Update(detailsCommandes);
+                        _context.Update(pPProduits);
+                    }
+                    else
+                    {                        
+                        System.IO.File.Delete("wwwroot/Logo/" + pPProduits.Photo);
+                        Console.WriteLine("Deleted photo");
+                        _context.PPProduits.Remove(pPProduits);
+                    }
+                }
+
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            catch
+            {
+                return RedirectToAction("Error", "PPProduits");
+            }
+        }
+
+
 
         private bool PPProduitsExists(int id)
         {

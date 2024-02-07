@@ -30,6 +30,12 @@ namespace Projet_Web_Commerce.Controllers
             var CategoriesList = _context.PPCategories.ToList();
             var VendeursList = _context.PPVendeurs.ToList();
             var ProduitsList = _context.PPProduits.ToList();
+            var listPaniers = from unPanier in _context.PPArticlesEnPanier
+                              where unPanier.PPClients.AdresseEmail == User.Identity.Name
+                              group unPanier.NoPanier by unPanier.NoVendeur into grouper
+                              select new { vendeur = grouper.Key, articles = grouper.ToList() };
+
+            ViewData["listPaniers"] = listPaniers.ToList<object>();
 
 
             ModelCatalogue modelCatalogue = new ModelCatalogue()

@@ -1,20 +1,21 @@
-﻿@{
-}
+﻿@model Projet_Web_Commerce.Models.ModelCatalogue
 
 <div class="row">
     <div class="col-md-4">
-        @if (Model != null && Model.Paniers != null){
-            @foreach (var item in Model.Paniers)
+        @if (ViewBag.listPaniers.Count > 0)
+        {
+            @foreach (var panier in ViewBag.listPaniers)
             {
-                <div class="row"> 
-                    <a asp-page="/Views/Panier">@Model.Paniers.vendeur</a> 
-                    <p>(@Model.Paniers.articles.Count)</p>
+                PPVendeurs vendeur = Model.VendeursList.Where(p => p.NoVendeur == panier.vendeur).FirstOrDefault();
+                <div class="row">
+                    <a asp-route-id="@vendeur.NoVendeur" asp-area="" asp-controller="Panier" asp-action="Index">@vendeur.NomAffaires</a>
+                    <p>(@panier.articles.Count)</p>
                 </div>
             }
         }
         else
         {
-            <p>Vous n'avez pas d'articles dans votre panier</p>
+            <p>Vous n'avez pas de paniers</p>
         }
     </div>
 </div>
