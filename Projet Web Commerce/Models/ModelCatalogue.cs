@@ -6,5 +6,6 @@
         public List<PPCategories> CategoriesList { get; set; }
 
         public List<PPProduits> ProduitsList { get; set; }
+        public List<PPProduits> NouveauxProduits { get; set; }
     }
 }
