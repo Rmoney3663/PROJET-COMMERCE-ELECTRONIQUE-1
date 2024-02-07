@@ -23,8 +23,11 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
+<link rel="stylesheet" href="filter_multi_select.css" />
 
-<div class="row">
+
+
+<div class="row" >
     <div class="col">
         <section>
             @if (SignInManager.IsSignedIn(User))
@@ -35,16 +38,30 @@
                 {
                     @Html.Hidden("id", Model.nomAffaire)
                     <div class="row">
-                        <div class="col-md-4">
-                            <div class="input-group">
-                                @Html.TextBox("SearchString", null, new { placeholder = "Rechercher", @class = "form-control" })
-                                <div class="input-group-append">
-                                    <span class="input-group-text">
-                                        <i class="bi bi-search"></i> <!-- Assuming you're using Bootstrap Icons -->
-                                    </span>
+                        <div class="col-md-3 d-flex align-items-start">
+
+                            <div class="flex-grow-1">
+                                <div class="input-group" style="width:400px;">
+                                    <!-- Adjust width and remove margin -->
+                                    @Html.TextBox("SearchString", null, new { placeholder = "Rechercher", @class = "form-control" })
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">
+                                            <i class="bi bi-search"></i>
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+
+                        <div class="col-md-3 d-flex align-items-start">
+                            <select multiple name="language" id="languages">
+                                <option value="js">JavaScript</option>
+                                <option value="html">HTML</option>
+                                <option value="css">CSS</option>
+                                ... more options here ...
+                            </select>
+                        </div>
+
 
                         <div class="col-md-2">
                             <select class="form-select btn-secondary" style="background-color: rgb(124, 105, 146);" aria-label="Trier par" id="sortOrder" name="sortOrder">
@@ -57,22 +74,23 @@
                                 <option value="descProdAsc" selected="@(ViewBag.sortOrder == "descProdAsc")">Description du produit &#8593;</option>
                                 <option value="descProdDesc" selected="@(ViewBag.sortOrder == "descProdDesc")">Description du produit &#8595;</option>
                             </select>
-                        </div>
 
-                        <div class="col-md-2">
-                            <select class="form-select btn-secondary" style="background-color: rgb(124, 105, 146);" aria-label="Trier par" id="parPage" name="parPage">
-                                <option value="6" selected="@(ViewBag.parPage == "6")">6</option>
-                                <option value="9" selected="@(ViewBag.parPage == "9")">9</option>
-                                <option value="12" selected="@(ViewBag.parPage == "12")">12</option>
-                                <option value="15" selected="@(ViewBag.parPage == "15")">15</option>
-                                <option value="21" selected="@(ViewBag.parPage == "21")">21</option>
-                                <option value="30" selected="@(ViewBag.parPage == "30")">30</option>
-                                <option value="60" selected="@(ViewBag.parPage == "60")">60</option>
-                                <option value="Tous" selected="@(ViewBag.parPage == "tous")">Tous</option>
-                            </select>
                         </div>
                         <div class="col-md-4">
                             <button type="submit" style="color: rgb(249, 229, 71) ; background-color: rgb(124, 105, 146);" class="btn btn-secondary">Rechercher</button>
+
+                            <div class="float-end">
+                                <select class="form-select btn-secondary" style="background-color: rgb(124, 105, 146); width:100px" aria-label="Trier par" id="parPage" name="parPage">
+                                    <option value="6" selected="@(ViewBag.parPage == "6")">6</option>
+                                    <option value="9" selected="@(ViewBag.parPage == "9")">9</option>
+                                    <option value="12" selected="@(ViewBag.parPage == "12")">12</option>
+                                    <option value="15" selected="@(ViewBag.parPage == "15")">15</option>
+                                    <option value="21" selected="@(ViewBag.parPage == "21")">21</option>
+                                    <option value="30" selected="@(ViewBag.parPage == "30")">30</option>
+                                    <option value="60" selected="@(ViewBag.parPage == "60")">60</option>
+                                    <option value="Tous" selected="@(ViewBag.parPage == "tous")">Tous</option>
+                                </select>
+                            </div>
                         </div>
 
                     </div>
@@ -189,3 +207,4 @@
 }
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+<script src="~/lib"></script>
