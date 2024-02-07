@@ -1,19 +1,137 @@
-﻿@model Projet_Web_Commerce.Models.ModelCatalogueVendeur
-@using Microsoft.AspNetCore.Hosting
-@using System.IO
-@inject IWebHostEnvironment env
+﻿@using Microsoft.AspNetCore.Identity
+@using System.Security.Claims
+@using Projet_Web_Commerce.Data;
 
-<div class="row">
+@model Projet_Web_Commerce.Models.ModelCatalogueVendeur
+@inject SignInManager<Projet_Web_Commerce.Areas.Identity.Data.Utilisateur> SignInManager
+@inject AuthDbContext _context
+
+@{
+    var productList = SignInManager.IsSignedIn(User) ? Model.ProduitsList : Model.NouveauxProduits;
+}
+
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success" role="alert">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css">
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script>
+
+
+
+<div class="row" >
     <div class="col">
         <section>
-            <h3>Liste des nouveaux produits </h3>
+            @if (SignInManager.IsSignedIn(User))
+            {
+                <h3>Liste de tout les produits @Model.nomAffaire </h3>
+
+                @using (Html.BeginForm("CatalogueVendeur", "MainMenu", FormMethod.Post))
+                {
+                    @Html.Hidden("id", Model.nomAffaire)
+                    <div class="row">
+                        <div class="col-md-4 d-flex align-items-start">
+
+                            <div class="flex-grow-1">
+                                <div class="input-group" style="width:400px;">
+                                    <!-- Adjust width and remove margin -->
+                                    @Html.TextBox("SearchString", null, new { placeholder = "Rechercher par Nom ou Description", @class = "form-control" })
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">
+                                            <i class="bi bi-search"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <a href="#" class="show-options-link">Afficher plus d'options       +</a>
+                        </div>
+
+
+                        <div class="col-md-2">
+                            <select class="form-select btn-secondary" style="background-color: rgb(124, 105, 146);" aria-label="Trier par" id="sortOrder" name="sortOrder">
+                                <option value="dateAsc" selected="@(ViewBag.sortOrder == "dateAsc")">Date de parution &#8593;</option>
+                                <option value="dateDesc" selected="@(ViewBag.sortOrder == "dateDesc")">Date de parution &#8595;</option>
+                                <option value="numProdAsc" selected="@(ViewBag.sortOrder == "numProdAsc")">Numéro de produit &#8593;</option>
+                                <option value="numProdDesc" selected="@(ViewBag.sortOrder == "numProdDesc")">Numéro de produit &#8595;</option>
+                                <option value="catProdAsc" selected="@(ViewBag.sortOrder == "catProdAsc")">Catégorie particulière de produit &#8593;</option>
+                                <option value="catProdDesc" selected="@(ViewBag.sortOrder == "catProdDesc")">Catégorie particulière de produit &#8595;</option>
+                                <option value="descProdAsc" selected="@(ViewBag.sortOrder == "descProdAsc")">Description du produit &#8593;</option>
+                                <option value="descProdDesc" selected="@(ViewBag.sortOrder == "descProdDesc")">Description du produit &#8595;</option>
+                            </select>
+
+                        </div>
+                        <div class="col-md-3">
+                            <button type="submit" style="color: rgb(249, 229, 71) ; background-color: rgb(124, 105, 146);" class="btn btn-secondary">Rechercher</button>
+
+                            <div class="float-end">
+                                <select class="form-select btn-secondary" style="background-color: rgb(124, 105, 146); width:100px" aria-label="Trier par" id="parPage" name="parPage">
+                                    <option value="6" selected="@(ViewBag.parPage == "6")">6</option>
+                                    <option value="9" selected="@(ViewBag.parPage == "9")">9</option>
+                                    <option value="12" selected="@(ViewBag.parPage == "12")">12</option>
+                                    <option value="15" selected="@(ViewBag.parPage == "15")">15</option>
+                                    <option value="21" selected="@(ViewBag.parPage == "21")">21</option>
+                                    <option value="30" selected="@(ViewBag.parPage == "30")">30</option>
+                                    <option value="60" selected="@(ViewBag.parPage == "60")">60</option>
+                                    <option value="Tous" selected="@(ViewBag.parPage == "tous")">Tous</option>
+                                </select>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="row toggle-container" style="display: none;">
+                        <div class="col-md-3" style="padding: 5px;">
+                            <select class="form-select btn-secondary" style="background-color: rgb(124, 105, 146); width: 100%;" aria-label="Trier par" id="searchCat" name="searchCat">
+                                @foreach (var cat in Model.CategoriesList)
+                                {
+                                    <option value="@cat.Description">@cat.Description</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-3" style="padding: 5px;">
+                            <select class="form-select btn-secondary" style="background-color: rgb(124, 105, 146); width: 100%;" aria-label="Trier par" id="searchNums" name="searchNums">
+                                @foreach (var nums in ViewBag.NumsProduit)
+                                {
+                                    <option value="@nums">@nums</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-3 input-group date">
+                            <input type="date" class="form-control" id="birthday" name="birthday">
+                            <span class="input-group-text"><i class="bi bi-calendar"></i></span>
+                        </div>
+
+                    </div>
+
+                }
+            }
+            else
+            {
+                <h3>Liste des nouveaux produits </h3>
+                <a asp-area="Identity" asp-page="/Account/Register">Cliquez ici pour devenir client et accéder à tout le catalogue du vendeur</a>
+            }
+
+            
             <div class="container mt-4">
                 @if (Model != null && Model.ProduitsList.Any())
                 {
                     <div class="container mt-4">
                         <div class="row">
-                            @foreach (var item in Model.ProduitsList)
-                            {
+                            @foreach (var item in productList)
+                                        {
                                 <div class="col-lg-4 mb-4 col-md-6 col-xl-3">
                                     <div class="card">
                                         <div class="card-body" style="justify-content: center; display: flex;">
@@ -21,19 +139,13 @@
                                                 <div class="col-md-6">
                                                     <h5 class="card-text">@Html.DisplayFor(modelItem => item.Nom)</h5>
                                                 </div>
-                                                <div class="col-md-6">
-                                                    <h5 class="card-text float-end" style="color: orangered">Nouveau !</h5>
-                                                </div>
-
-                                                @{
-                                                    var path = System.IO.Path.Combine(env.WebRootPath, "Logo", item.Photo);
-                                                    string imagePath = item.Photo != null && File.Exists(path) ? $"~/Logo/{item.Photo}" : "~/Logo/DefaultImage.png";
-                                                    Console.WriteLine("FILE Name : " + item.Photo);
-                                                    Console.WriteLine("FILE : " + File.Exists(path));
+                                                @if (!SignInManager.IsSignedIn(User))
+                                                {
+                                                    <div class="col-md-6">
+                                                        <h5 class="card-text float-end" style="color: orangered">Nouveau !</h5>
+                                                    </div>
                                                 }
-
-                                                <img src="@Url.Content(imagePath)" alt="@item.Photo" width="200" height="200" />
-                                               
+                                                <img src="~/Logo/@(item.Photo)" alt="./Logo/@(item.Photo)" width="200" height="200" />
                                                 @{
                                                     var category = Model.CategoriesList.FirstOrDefault(c => c.NoCategorie == item.NoCategorie);
                                                 }
@@ -41,7 +153,34 @@
                                                 <p class="card-title">Numéro du produit : @Html.DisplayFor(modelItem => item.NoProduit)</p>
                                                 <p class="card-text">Prix Demandé : @Html.DisplayFor(modelItem => item.PrixDemande)</p>
                                                 <p class="card-text">Prix Demandé : @Html.DisplayFor(modelItem => item.NombreItems)</p>
-                                                <a href="#" class="btn btn-primary">Details</a>
+                                                <a asp-controller="PPProduits"
+                                                   asp-route-id="@item.NoProduit"
+                                                   asp-action="Details"
+                                                   class="btn btn-primary">
+                                                    Details
+                                                </a>
+
+                                                @if (SignInManager.IsSignedIn(User) && User.IsInRole("Client") && item.NombreItems > 0)
+                                                {
+                                                    <form asp-controller="MainMenu" asp-action="AjoutPanier" method="post">
+                                                        <input type="hidden" name="NoProduit" value="@item.NoProduit" />
+                                                        <input type="hidden" name="NoClient" value="@Model.noClient" />
+                                                        <input type="hidden" name="NoVendeur" value="@item.NoVendeur" />
+                                                        <br>
+                                                        <button type="submit" class="btn btn-secondary">Ajouter au panier</button>
+                                                        <select name="quantite">
+                                                            @for (int i = 1; i <= @item.NombreItems; i++)
+                                                            {
+                                                                <option value="@i">@i</option>
+                                                            }
+                                                        </select>
+                                                    </form>
+                                                }
+                                                else if (SignInManager.IsSignedIn(User) && User.IsInRole("Client") && item.NombreItems == 0)
+                                                {
+                                                    <p style="color:red; font-weight:bold">En rupture de stock</p>
+                                                }
+
                                             </div>
                                         </div>
                                     </div>
@@ -58,3 +197,95 @@
         </section>
     </div>
 </div>
+
+@if (Model.ProduitsList.Count > 0)
+{
+    <div class="pagination">
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                @if (Model.ProduitsList.HasPreviousPage)
+                {
+                    <li class="page-item">
+                        <a class="page-link" href="@Url.Action("CatalogueVendeur", new { sortOrder = ViewBag.sortOrder, pageNumber = Model.ProduitsList.PageIndex - 1, parPage = ViewBag.parPage, searchString = ViewBag.searchString, id = ViewBag.id })">Previous</a>
+                    </li>
+                }
+
+                @for (int i = 1; i <= Model.ProduitsList.TotalPages; i++)
+                {
+                    <li class="page-item @(i == Model.ProduitsList.PageIndex ? "active" : "")">
+                        <a class="page-link" href="@Url.Action("CatalogueVendeur", new { sortOrder = ViewBag.sortOrder, pageNumber = i, parPage = ViewBag.parPage, searchString = ViewBag.searchString, id = ViewBag.id })">@i</a>
+                    </li>
+                }
+
+                @if (Model.ProduitsList.HasNextPage)
+                {
+                    <li class="page-item">
+                        <a class="page-link" href="@Url.Action("CatalogueVendeur", new { sortOrder = ViewBag.sortOrder, pageNumber = Model.ProduitsList.PageIndex + 1, parPage = ViewBag.parPage, searchString = ViewBag.searchString, id = ViewBag.id })">Next</a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    </div>
+}
+
+
+
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
+
+
+<style>
+    .dropdown-menu {
+        max-height: 200px; /* Set maximum height for the dropdown */
+        overflow-y: auto; /* Enable vertical scrolling if needed */
+    }
+
+    a {
+        color: rgb(124, 105, 146);
+        font-weight: bold; /* Bold font */
+        text-decoration: none; /* Remove underline */
+        transition: color 0.3s; /* Smooth transition for color change */
+    }
+        
+    a:hover {
+        color: #ccc; /* Light gray color on hover */
+    }
+</style>
+@section Scripts
+{
+    <script>
+        $(document).ready(function () {
+            $('#vendeursListBox').mousedown(function (e) {
+                e.preventDefault();
+
+                var originalScrollTop = $(this).scrollTop();
+                $(this).focus();
+                $(this).mousemove(function (e2) {
+                    $(this).scrollTop(originalScrollTop);
+                    $(this).unbind("mousemove");
+                });
+            });
+
+            $('#vendeursListBox option').mousedown(function (e) {
+                e.preventDefault();
+                $(this).prop('selected', !$(this).prop('selected'));
+                return false;
+            });
+
+            $('.dropdown-menu').on('click', function (e) {
+                e.stopPropagation();
+            });
+
+
+            $(document).ready(function () {
+                $("a").click(function () {
+                    $(".toggle-container").animate({
+                        height: 'toggle'
+                    });
+                });
+            });
+        });
+    </script>
+}
+

@@ -76,6 +76,13 @@ namespace Projet_Web_Commerce.Controllers
                 .Take(15)
                 .ToList();
 
+
+            ViewBag.NumsProduit = _context.PPProduits
+                .Where(p => p.NoVendeur == vendeur.NoVendeur && p.Disponibilite == true) // Filter by NoVendeur
+                .Select(p => p.NoProduit)
+                .OrderBy(n => n) // Order by NoProduit
+                .ToArray();
+
             var CategoriesList = _context.PPCategories.ToList();
             var VendeursList = _context.PPVendeurs.ToList();
 
