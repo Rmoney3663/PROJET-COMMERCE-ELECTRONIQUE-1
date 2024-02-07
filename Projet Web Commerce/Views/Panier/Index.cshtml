@@ -1,13 +1,17 @@
 ﻿@model Projet_Web_Commerce.Models.ModelCatalogue
+@{
+    PPVendeurs vendeur = Model.VendeursList.Where(p => p.NoVendeur == ViewBag.Panier[0].NoVendeur).FirstOrDefault();
+}
 
+<h1>Panier associé à @vendeur.NomAffaires</h1>
 <div class="row">
     <div class="col-md-4">
         @foreach (PPArticlesEnPanier articles in ViewBag.Panier)
         {
-            PPVendeurs vendeur = Model.VendeursList.Where(p => p.NoVendeur == articles.NoVendeur).FirstOrDefault();
             <div class="row">
                 <p>@articles.PPProduits.Description</p>
             </div>
+            
         }
     </div>
 </div>
