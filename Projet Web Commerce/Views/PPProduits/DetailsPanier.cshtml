@@ -60,10 +60,24 @@ else
      )
      .ToList();
 
-    foreach (var product in clientProducts)
-    {
-        Console.WriteLine($"NoClient: {product.NoClient}, NoProduit: {product.NoProduit}, TotalItems: {product.TotalItems}, LowestPanierDate: {product.LowestPanierDate}, Nom: {product.Nom}, Prenom: {product.Prenom}, Email: {product.AdresseEmail}");
-    }
+    var oldestProductDatesPerClient = clientProducts
+      .GroupBy(p => p.NoClient)
+      .Select(g => new
+      {
+          NoClient = g.Key,
+          OldestProductDate = g.Min(p => p.LowestPanierDate)
+      })
+      .ToList();
+    var itemsPerClient = clientProducts
+     .GroupBy(p => p.NoClient)
+     .Select(g => new
+     {
+         NoClient = g.Key,
+         TotalItems = g.Sum(p => p.TotalItems)
+     })
+     .ToList();
+
+    
 
     if (Model.Nom != null && Model.Prenom != null)
     {
@@ -74,83 +88,103 @@ else
         <h1>Panier de @Model.AdresseEmail </h1>
     }
     <a asp-action="ListePanier">Retour à la liste</a>
-    <div class="row" style="margin-bottom:50px; height:600px;">
-        <div class="d-flex flex-wrap align-content-start bg-light overflow-auto col-md-12 col-6" style="margin-bottom:50px; width:610px; height:600px;">
-            @foreach (var client in clientProducts)
-            {
-                var item = _context.PPProduits.FirstOrDefault(p => p.NoProduit == client.NoProduit);
-
-                if (item != null)
-                {
-                    <div class="card mb-3">
-                        <div class="card-body row">
-                            @{
-                                var path = System.IO.Path.Combine(env.WebRootPath, "Logo", item.Photo);
-                                string imagePath = item.Photo != null && File.Exists(path) ? $"~/Logo/{item.Photo}" : "~/Logo/DefaultImage.png";
-                                Console.WriteLine("FILE Name : " + item.Photo);
-                                Console.WriteLine("FILE : " + File.Exists(path));
-                            }
-                            <div class="col-12 col-md-2 d-flex align-items-center justify-content-center">
-                                <img src="@Url.Content(imagePath)" alt="@item.Photo" width="100" height="120" />
-                            </div>
-                            <div class="col-12 col-md-2 d-flex align-items-center justify-content-center">
-                                <b>x @Html.DisplayFor(modelItem => client.TotalItems) </b>
-                            </div>
-                            <div class="col-12 col-md-2 d-flex align-items-center justify-content-center">
-                                <b>@Html.DisplayFor(modelItem => item.Nom) </b>
-                            </div>
-                            @if (item.PrixVente != null)
-                            {
-                                var prix = item.PrixVente * client.TotalItems;
-                                <div class="col-12 col-md-3 d-flex align-items-center justify-content-center">
-                                    <b>Prix Total: @Html.DisplayFor(modelItem => prix) $ </b>
+    <div class="container">
+        <div class="row flex-wrap d-flex">
+            <div class="col-md-6 d-flex">
+                <div class="d-flex flex-wrap align-content-start bg-light overflow-auto  " style="margin-bottom:50px; width:900px; height:600px;">
+                    @foreach (var client in clientProducts)
+                    {
+                        var item = _context.PPProduits.FirstOrDefault(p => p.NoProduit == client.NoProduit);
+                        var cat = _context.PPCategories.FirstOrDefault(p => p.NoCategorie == item.NoCategorie);
+                        if (item != null)
+                        {                          
+                            <div class="card mb-1">
+                                <div class="card-body row d-flex ">
+                                    <b>@Html.DisplayFor(modelItem => item.Nom) </b>
+                                    @{
+                                        var path = System.IO.Path.Combine(env.WebRootPath, "Logo", item.Photo);
+                                        string imagePath = item.Photo != null && File.Exists(path) ? $"~/Logo/{item.Photo}" : "~/Logo/DefaultImage.png";
+                                        Console.WriteLine("FILE Name : " + item.Photo);
+                                        Console.WriteLine("FILE : " + File.Exists(path));
+                                    }
+                                    <div class="col-12 col-md-2 d-flex align-items-center justify-content-center">
+                                        <img src="@Url.Content(imagePath)" alt="@item.Photo" width="100" height="120" />
+                                    </div>
+                                    <div class="col-12 col-md-2 d-flex align-items-center justify-content-center">
+                                        <b>x @Html.DisplayFor(modelItem => client.TotalItems) </b>
+                                    </div>
+                                    <div class="col-12 col-md-2 d-flex align-items-center justify-content-center">
+                                        <b>@Html.DisplayFor(modelItem => cat.Description ) </b>
+                                    </div>
+                                    @if (item.PrixVente != null)
+                                    {
+                                        var prix = item.PrixVente * client.TotalItems;
+                                        <div class="col-12 col-md-3 d-flex align-items-center justify-content-center">
+                                            <b>Prix Total: @Html.DisplayFor(modelItem => prix) $ </b>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        var prix = item.PrixDemande * client.TotalItems;
+                                        <div class="col-12 col-md-3 d-flex align-items-center justify-content-center">
+                                            <b>Prix Total: @Html.DisplayFor(modelItem => prix) $ </b>
+                                        </div>
+                                    }
+                                    @{
+                                        var poids = item.Poids * client.TotalItems;
+                                    }
+                                    <div class="col-12 col-md-3 d-flex align-items-center justify-content-center">
+                                        <b>Poids Total: @Html.DisplayFor(modelItem => poids) Kg </b>
+                                    </div>
                                 </div>
-                            }
-                            else
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+            <div class="col-md-6 d-flex">
+                <div class="d-flex flex-column align-items-start bg-light overflow-auto" style="margin-bottom:50px;  height:600px;">
+                    @{
+                        decimal? TotalPrice = 0;
+                        decimal? TotalPoids = 0;
+                        var oldestProductDate = oldestProductDatesPerClient.FirstOrDefault(c => c.NoClient == Model.NoClient)?.OldestProductDate;
+                        var nbTotal = itemsPerClient.FirstOrDefault(c => c.NoClient == Model.NoClient)?.TotalItems;
+                        foreach (var client in clientProducts)
+                        {
+                            var item = _context.PPProduits.FirstOrDefault(p => p.NoProduit == client.NoProduit);
+                            if (item != null)
                             {
-                                var prix = item.PrixDemande * client.TotalItems;
-                                <div class="col-12 col-md-3 d-flex align-items-center justify-content-center">
-                                    <b>Prix Total: @Html.DisplayFor(modelItem => prix) $ </b>
-                                </div>
+                                decimal? prix = 0;
+                                if (item.PrixVente != null)
+                                {
+                                    prix = item.PrixVente * client.TotalItems;
+                                }
+                                else
+                                {
+                                    prix = item.PrixDemande * client.TotalItems;
+                                }
+                                TotalPrice += prix;
+                                TotalPoids += item.Poids * client.TotalItems;
                             }
-                            @{
-                                var poids = item.Poids * client.TotalItems;
-                            }
-                            <div class="col-12 col-md-3 d-flex align-items-center justify-content-center">
-                                <b>Poids Total: @Html.DisplayFor(modelItem => poids) Kg </b>
-                            </div>
-                        </div>
-                    </div>
-                }
-            }
+                        }
+                    }
+                    <h4 style="margin:5px;">Information sure le panier</h4>
+                    <b style="margin:5px;">Prix Total : @Html.DisplayFor(modelItem => TotalPrice) $</b>
+                    <b style="margin:5px;">Poids Total : @Html.DisplayFor(modelItem => TotalPoids) Kg</b>
+                    <b style="margin:5px;">Date Création : @Html.DisplayFor(modelItem => oldestProductDate) </b>
+                    <b style="margin:5px;">Nombre d'Items Total : @Html.DisplayFor(modelItem => nbTotal) </b>
+
+                    <h4 style="margin:5px;">Destination</h4>
+                    <b style="margin:5px;">Pays : @Html.DisplayFor(modelItem => Model.Pays) </b>
+                    <b style="margin:5px;">Province : @Html.DisplayFor(modelItem => Model.Province) </b>
+                    <b style="margin:5px;">Ville : @Html.DisplayFor(modelItem => Model.Ville)</b>
+                    <b style="margin:5px;">Rue : @Html.DisplayFor(modelItem => Model.Rue) </b>
+                    <b style="margin:5px;">Code Postal : @Html.DisplayFor(modelItem => Model.CodePostal) </b>
+                </div>
+            </div>
+
         </div>
-
-
-        <div class="d-flex flex-wrap align-content-start bg-light overflow-auto col-md-8 col-6" style="margin-bottom:50px; height:600px;">
-            @foreach (var client in clientProducts)
-            {
-                var item = _context.PPProduits.FirstOrDefault(p => p.NoProduit == client.NoProduit);
-
-                if (item != null)
-                {
-                    <div class="card" style="width:900px; margin: 2px;">
-                        <div class="card-body row">
-                            @{
-                                var path = System.IO.Path.Combine(env.WebRootPath, "Logo", item.Photo);
-                                string imagePath = item.Photo != null && File.Exists(path) ? $"~/Logo/{item.Photo}" : "~/Logo/DefaultImage.png";
-                                Console.WriteLine("FILE Name : " + item.Photo);
-                                Console.WriteLine("FILE : " + File.Exists(path));
-                            }
-                            <div class="col-2 d-flex align-items-center">
-                                <img src="@Url.Content(imagePath)" alt="@item.Photo" width="100" height="120" />
-                            </div>
-
-                        </div>
-                    </div>
-                }
-            }
-        </div>
-    </div> 
+    </div>
 
 
 }
