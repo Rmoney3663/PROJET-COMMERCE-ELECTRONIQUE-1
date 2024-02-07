@@ -174,12 +174,37 @@ else
                     <b style="margin:5px;">Date Création : @Html.DisplayFor(modelItem => oldestProductDate) </b>
                     <b style="margin:5px;">Nombre d'Items Total : @Html.DisplayFor(modelItem => nbTotal) </b>
 
-                    <h4 style="margin:5px;">Destination</h4>
-                    <b style="margin:5px;">Pays : @Html.DisplayFor(modelItem => Model.Pays) </b>
-                    <b style="margin:5px;">Province : @Html.DisplayFor(modelItem => Model.Province) </b>
-                    <b style="margin:5px;">Ville : @Html.DisplayFor(modelItem => Model.Ville)</b>
-                    <b style="margin:5px;">Rue : @Html.DisplayFor(modelItem => Model.Rue) </b>
-                    <b style="margin:5px;">Code Postal : @Html.DisplayFor(modelItem => Model.CodePostal) </b>
+                    @{
+                        bool displayDestination = Model.Pays != null || Model.Province != null || Model.Ville != null || Model.Rue != null || Model.CodePostal != null;
+                    }
+
+                    @if (displayDestination)
+                    {
+                        <h4 style="margin:5px;">Destination</h4>
+
+                        @if (Model.Pays != null)
+                        {
+                            <b style="margin:5px;">Pays : @Html.DisplayFor(modelItem => Model.Pays) </b>
+                        }
+                        @if (Model.Province != null)
+                        {
+                            <b style="margin:5px;">Province : @Html.DisplayFor(modelItem => Model.Province) </b>
+                        }
+                        @if (Model.Ville != null)
+                        {
+                            <b style="margin:5px;">Ville : @Html.DisplayFor(modelItem => Model.Ville)</b>
+                        }
+                        @if (Model.Rue != null)
+                        {
+                            <b style="margin:5px;">Rue : @Html.DisplayFor(modelItem => Model.Rue) </b>
+                        }
+                        @if (Model.CodePostal != null)
+                        {
+                            <b style="margin:5px;">Code Postal : @Html.DisplayFor(modelItem => Model.CodePostal) </b>
+                        }
+                    }
+
+
                 </div>
             </div>
 
