@@ -67,7 +67,6 @@ namespace Projet_Web_Commerce.Controllers
         public async Task<IActionResult> CatalogueVendeurAsync(string id, string? searchString, string? sortOrder, string? parPage, int? pageNumber)
         {
 
-            Console.WriteLine(sortOrder);
             // Action logic
             var vendeur = _context.PPVendeurs.Where(v => v.NomAffaires == id).FirstOrDefault();
 
@@ -94,7 +93,7 @@ namespace Projet_Web_Commerce.Controllers
             if (!String.IsNullOrEmpty(searchString))
             {
                 ProduitsVendeur = from p in _context.PPProduits
-                    .Where(p => p.NoVendeur == vendeur.NoVendeur && p.Disponibilite == true && p.Nom.Contains(searchString))
+                    .Where(p => p.NoVendeur == vendeur.NoVendeur && p.Disponibilite == true && (p.Nom.Contains(searchString) || p.Description.Contains(searchString)))
                                   select p;
             }
             else
