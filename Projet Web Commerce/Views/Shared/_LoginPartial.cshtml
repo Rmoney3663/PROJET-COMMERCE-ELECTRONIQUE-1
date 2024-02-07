@@ -28,14 +28,24 @@
             prenom = _context.PPVendeurs.Where(v => v.AdresseEmail == user.UserName).FirstOrDefault().Prenom;
         }
 
-        @if (nom != null && prenom != null){
+        @if (nom != "none" && prenom != "none" && nom != null && prenom != null){
             <li class="nav-item">
                 <p id="nom" class="nav-link" style="color: rgb(249, 229, 71)">Bonjour @prenom @nom!</p>
             </li>
         }
-        <li class="nav-item">
-            <a class="nav-link" asp-area="" asp-controller="Paniers" asp-action="Index" style="color: rgb(249, 229, 71)">Paniers</a>
-        </li>
+        else if ((estDansRole = await UserManager.IsInRoleAsync(user, "Gestionnaire")))
+        {
+            <li class="nav-item">
+                <p id="nom" class="nav-link" style="color: rgb(249, 229, 71)">Bonjour!</p>
+            </li>
+        }
+
+        if ((estDansRole = await UserManager.IsInRoleAsync(user, "Client")))
+        {
+            <li class="nav-item">
+                <a class="nav-link" asp-area="" asp-controller="Paniers" asp-action="Index" style="color: rgb(249, 229, 71)">Paniers</a>
+            </li>
+        }
     <li class="nav-item">
             @if ((estDansRole = await UserManager.IsInRoleAsync(user, "Client")))
         {
