@@ -355,5 +355,29 @@ namespace Projet_Web_Commerce.Controllers
         {
             return View();
         }
+
+        public async Task<IActionResult> ListePanier()
+        {
+
+            var authDbContext = _context.PPProduits.Include(p => p.PPCategories).Include(p => p.PPVendeurs);
+            return View(await authDbContext.ToListAsync());
+        }
+
+        public async Task<IActionResult> DetailsPanier(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var pPClients = await _context.PPClients
+                .FirstOrDefaultAsync(m => m.NoClient == id);
+            if (pPClients == null)
+            {
+                return NotFound();
+            }
+
+            return View(pPClients);
+        }
     }
 }

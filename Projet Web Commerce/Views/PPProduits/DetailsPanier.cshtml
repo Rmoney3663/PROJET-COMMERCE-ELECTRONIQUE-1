@@ -1,0 +1,135 @@
+﻿@model Projet_Web_Commerce.Models.PPClients
+﻿﻿@using Microsoft.AspNetCore.Identity
+@using Projet_Web_Commerce.Data
+@inject AuthDbContext _context
+@inject UserManager<Projet_Web_Commerce.Areas.Identity.Data.Utilisateur> _userManager
+@inject SignInManager<Projet_Web_Commerce.Areas.Identity.Data.Utilisateur> SignInManager
+@using System.IO
+@inject IWebHostEnvironment env
+@{
+    ViewData["Title"] = "Index";
+    Console.WriteLine("ID OF CLIENT PANIER : " + Model.NoClient);
+    var user = await _userManager.GetUserAsync(User);
+    @if (!SignInManager.IsSignedIn(User) || User.IsInRole("Client"))
+    {
+        Console.WriteLine("yes");
+        <text>
+            <script>
+                debugger;
+                window.location.href = '/PPProduits/ErrorProduit';
+            </script>
+        </text>
+    }
+    var vendeur = _context.PPVendeurs.FirstOrDefault(v => v.IdUtilisateur == user.Id);  
+}
+
+@if (vendeur == null)
+{
+    Console.WriteLine("among us");
+    <div>
+        <p>Vous n'avez pas accès à cette page.</p>
+        <a href="/PPProduits/ErrorProduit">Retourner à la catalogue</a>
+    </div>
+}
+else
+{
+    var clientProducts = _context.PPArticlesEnPanier
+     .Where(p => p.NoVendeur == vendeur.NoVendeur && p.NoClient == Model.NoClient)
+     .GroupBy(p => new { p.NoClient, p.NoProduit })
+     .Select(g => new
+     {
+         NoClient = g.Key.NoClient,
+         NoProduit = g.Key.NoProduit,
+         TotalItems = g.Sum(p => p.NbItems),
+         LowestPanierDate = g.Min(p => p.DateCreation)
+     })
+     .Join(
+         _context.PPClients,
+         cp => cp.NoClient,
+         c => c.NoClient,
+         (cp, c) => new
+         {
+             cp.NoClient,
+             cp.NoProduit,
+             cp.TotalItems,
+             cp.LowestPanierDate,
+             c.Nom,
+             c.Prenom,
+             c.AdresseEmail
+         }
+     )
+     .ToList();
+
+    foreach (var product in clientProducts)
+    {
+        Console.WriteLine($"NoClient: {product.NoClient}, NoProduit: {product.NoProduit}, TotalItems: {product.TotalItems}, LowestPanierDate: {product.LowestPanierDate}, Nom: {product.Nom}, Prenom: {product.Prenom}, Email: {product.AdresseEmail}");
+    }
+
+    if (Model.Nom != null && Model.Prenom != null)
+    {
+        <h1>Panier de @Model.Prenom @Model.Nom </h1>
+    }
+    else
+    {
+        <h1>Panier de @Model.AdresseEmail </h1>
+    }
+    <a asp-action="ListePanier">Retour à la liste</a>
+
+    <div class="d-flex flex-wrap align-content-start bg-light overflow-auto col-md-8" style="margin-bottom:50px; height:600px;">
+        @foreach (var client in clientProducts)
+        {
+            var item = _context.PPProduits.FirstOrDefault(p => p.NoProduit == client.NoProduit);
+
+            if (item != null)
+            {
+                <div class="card" style="width:900px; margin: 2px;">
+                    <div class="card-body row">
+                        @{
+                            var path = System.IO.Path.Combine(env.WebRootPath, "Logo", item.Photo);
+                            string imagePath = item.Photo != null && File.Exists(path) ? $"~/Logo/{item.Photo}" : "~/Logo/DefaultImage.png";
+                            Console.WriteLine("FILE Name : " + item.Photo);
+                            Console.WriteLine("FILE : " + File.Exists(path));
+                        }
+                        <div class="col-3 d-flex align-items-center">
+                            <img src="@Url.Content(imagePath)" alt="@item.Photo" width="100" height="120" />
+                        </div>                        
+                        <div class="col-3 d-flex align-items-center ">
+                            <b>x @Html.DisplayFor(modelItem => client.TotalItems) </b>
+                        </div>
+                        <div class="col-3 d-flex align-items-center ">
+                            <b> @Html.DisplayFor(modelItem => item.Nom) </b>
+                        </div>
+                        @if(item.PrixVente != null)
+                        {
+                            var prix = item.PrixVente * client.TotalItems;
+                            <div class="col-3 d-flex align-items-center ">
+                                <b>Prix Total: @Html.DisplayFor(modelItem => prix) $ </b>
+                            </div>
+                        }
+                        else
+                        {
+                            var prix = item.PrixDemande * client.TotalItems;
+                            <div class="col-3 d-flex align-items-center ">
+                                <b>Prix Total: @Html.DisplayFor(modelItem => prix) $ </b>
+                            </div>
+                        }
+                        @{
+                            var poids = item.Poids * client.TotalItems;
+                        }
+                       
+                        <div class="col-3 d-flex align-items-center ">
+                            <b>Poids Total: @Html.DisplayFor(modelItem => poids) Kg </b>
+                        </div>
+                        
+                    </div>
+                </div>
+                
+            }
+
+            
+        }
+    </div>
+
+
+
+}
