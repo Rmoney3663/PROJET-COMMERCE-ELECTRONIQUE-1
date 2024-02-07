@@ -1,17 +1,30 @@
 ﻿@model Projet_Web_Commerce.Models.ModelCatalogue
 @{
-    PPVendeurs vendeur = Model.VendeursList.Where(p => p.NoVendeur == ViewBag.Panier[0].NoVendeur).FirstOrDefault();
+    PPVendeurs vendeur = Model.VendeursList.Where(p => p.NoVendeur == ViewBag.VendeurId).FirstOrDefault();
 }
 
 <h1>Panier associé à @vendeur.NomAffaires</h1>
 <div class="row">
     <div class="col-md-4">
-        @foreach (PPArticlesEnPanier articles in ViewBag.Panier)
+        @if (ViewBag.Panier.Count > 0){
+            @foreach (PPArticlesEnPanier articles in ViewBag.Panier)
+            {
+                <div class="row">
+                    <p>@articles.PPProduits.Nom</p>
+
+                    <input type="number" value="@articles.NbItems" min="1" max="@articles.PPProduits.NombreItems" />
+
+                    <form asp-route-id="@articles.NoPanier" asp-route-delete="true" asp-route-vendeur="@articles.NoVendeur" asp-action="Index">
+                        <button type="submit" class="btn btn-danger">Retirer</button>
+                    </form>
+
+                </div>
+
+            }
+        }
+        else
         {
-            <div class="row">
-                <p>@articles.PPProduits.Description</p>
-            </div>
-            
+            <meta http-equiv="refresh" content="0"; url="/Paniers/Index" />
         }
     </div>
 </div>
