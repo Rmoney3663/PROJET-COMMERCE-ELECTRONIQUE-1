@@ -109,7 +109,15 @@ else
         </dl>
     </div>
     <div>
-        <a asp-action="Edit" asp-route-id="@Model?.NoProduit">Modifier</a> |
-        <a asp-action="Index">Retour à la liste</a>
+        @if ( User.IsInRole("Client"))
+        {
+            <a asp-controller="MainMenu"  asp-action="Catalogue">Retour à la Catalogue</a>
+        }
+        else
+        {
+            <a asp-action="Edit" asp-route-id="@Model?.NoProduit">Modifier</a>
+            <text> | </text>
+            <a asp-action="Index">Retour à la liste</a>
+        }
     </div>
 }
