@@ -49,8 +49,8 @@
                                             '@item.CodePostal',
                                             '@item.Pays',
                                             '@item.Tel1',
-                                            '@item.Tel2'
-                                        )" class="btn btn-primary">
+                                            '@item.Tel2')"
+                                            class="btn btn-primary">
                                             Accepter
                                         </button>
 
@@ -125,11 +125,8 @@
         }
 
         Swal.fire({
-            title: 'Courriel envoyé au vendeur',
-            html: `
-            <input id="sujet" style="width:550;" class="swal2-input" value="${sujet}" />
-            <textarea id="message" style="resize:none;width:550;height:300;" class="swal2-input" >${message}</textarea>
-        `,
+            title: 'Courriel a envoyer au vendeur',
+            html: `<input id="sujet" style="width:550;" class="swal2-input" value="${sujet}"/> <textarea id="message" style="resize:none;width:550;height:300;" class="swal2-input">${message}</textarea>`,
             showCancelButton: true,
             confirmButtonText: 'Envoyer',
             cancelButtonText: 'Annuler',
@@ -150,7 +147,7 @@
                     .catch(error => {
                         console.error('Error:', error);
                         Swal.showValidationMessage('Validation failed');
-                    })
+                    });
             },
             allowOutsideClick: () => !Swal.isLoading()
         }).then((result) => {
@@ -161,9 +158,11 @@
                     icon: "success"
                 }).then(() => {
                     location.reload();
-                };
+                });
             }
         });
+
+
 
     }
 </script>

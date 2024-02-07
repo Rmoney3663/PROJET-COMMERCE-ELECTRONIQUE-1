@@ -1,4 +1,5 @@
 ﻿using DocumentFormat.OpenXml.Office.CustomUI;
+using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -90,37 +91,46 @@ namespace Projet_Web_Commerce.Controllers
         [Authorize(Roles = "Gestionnaire")]
         public async Task<IActionResult> ValiderAsync(int id, string sujet, string message, bool vendeurAccepte, int pourcentage)
         {
-            var ppvendeur = await _context.PPVendeurs.FindAsync(id);
-
-            await Methodes.envoyerCourriel(ppvendeur.AdresseEmail, sujet, message);
-
             var vendeurAUpdate = _context.PPVendeurs.FirstOrDefault(v => v.NoVendeur == id);
-
-            if (vendeurAUpdate != null)
-            {
-                if (vendeurAccepte)
-                {
-                    vendeurAUpdate.Statut = 1;
-                    vendeurAUpdate.Pourcentage = Convert.ToDecimal(pourcentage, CultureInfo.InvariantCulture);
-                }
-                else
-                    _context.PPVendeurs.Remove(vendeurAUpdate);
-
-                //var vendeursStatutZero = _context.PPVendeurs
-                //        .Where(v => v.Statut == 0)
-                //        .OrderBy(v => v.DateCreation)
-                //        .ToList();
-
-                _context.SaveChanges();
-
-                //return View(vendeursStatutZero);
-            }
 
             var result = new
             {
-                Success = true,
-                Message = $"Courriel envoyé%."
+                Success = false,
+                Message = $"Erreur%"
             };
+
+            if (vendeurAUpdate != null)
+            {
+                var user = await _userManager.FindByEmailAsync(vendeurAUpdate.AdresseEmail);
+                if (user != null)
+                {
+                    await Methodes.envoyerCourriel(vendeurAUpdate.AdresseEmail, sujet, message);
+                    if (vendeurAccepte)
+                    {
+                        vendeurAUpdate.Statut = 1;
+                        vendeurAUpdate.Pourcentage = Convert.ToDecimal(pourcentage, CultureInfo.InvariantCulture);
+                    }
+                    else
+                    {
+                        _context.PPVendeurs.Remove(vendeurAUpdate);
+                        _userManager.DeleteAsync(user);
+                    }
+                    _context.SaveChanges();
+
+                    var vendeursStatutZero = _context.PPVendeurs
+                            .Where(v => v.Statut == 0)
+                            .OrderBy(v => v.DateCreation)
+                            .ToList();
+
+                    View(vendeursStatutZero);
+
+                    result = new
+                    {
+                        Success = true,
+                        Message = $"Courriel envoyé%."
+                    };
+                }
+            }
 
             return Json(result);
         }
