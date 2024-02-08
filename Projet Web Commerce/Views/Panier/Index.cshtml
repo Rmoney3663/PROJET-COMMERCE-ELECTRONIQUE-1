@@ -1,27 +1,164 @@
 ﻿@model Projet_Web_Commerce.Models.ModelCatalogue
+@using Projet_Web_Commerce.Data
+﻿﻿@using Microsoft.AspNetCore.Identity
+@inject UserManager<Projet_Web_Commerce.Areas.Identity.Data.Utilisateur> UserManager
+@inject SignInManager<Projet_Web_Commerce.Areas.Identity.Data.Utilisateur> SignInManager
+@using System.IO
+@inject AuthDbContext _context
+@inject IWebHostEnvironment env
 @{
     PPVendeurs vendeur = Model.VendeursList.Where(p => p.NoVendeur == ViewBag.VendeurId).FirstOrDefault();
-}
+    var datePlusVieille = DateTime.Now;
+    }
+    @if (!SignInManager.IsSignedIn(User) || User.IsInRole("Vendeur") || User.IsInRole("Gestionnaire"))
+    {
+        Console.WriteLine("yes");
+        <text>
+            <script>
+                debugger;
+                window.location.href = '/MainMenu/Catalogue';
+            </script>
+        </text>
+    }
+    else
+    {
+        var user = await UserManager.GetUserAsync(User);
+        var client = _context.PPClients.Where(p => p.AdresseEmail == user.Email).FirstOrDefault();
 
-@if (vendeur != null)
-{
-    <h1>Panier associé à @vendeur.NomAffaires</h1>
-}
-<div class="row">
-    <div class="col-md-4">
-            @foreach (PPArticlesEnPanier articles in ViewBag.Panier)
-            {
-                <div class="row">
-                    <p>@articles.PPProduits.Nom</p>
+    @if (vendeur != null)
+    {
+        <h1>Panier associé à @vendeur.NomAffaires</h1>
+    }
 
-                    <input type="number" value="@articles.NbItems" min="1" max="@articles.PPProduits.NombreItems" />
+    <div class="container">
+        <div class="row flex-wrap d-flex">
+            <div class="col-md-6 d-flex">
+                <div class="d-flex flex-wrap align-content-start bg-light overflow-auto  " style="margin-bottom:50px; width:900px; height:600px;">
 
-                    <form asp-route-id="@articles.NoPanier" asp-route-delete="true" asp-route-vendeur="@articles.NoVendeur" asp-action="Index">
-                        <button type="submit" class="btn btn-danger">Retirer</button>
-                    </form>
+                    @foreach (PPArticlesEnPanier articles in ViewBag.Panier)
+                    {
+                        if (articles.DateCreation < datePlusVieille)
+                        {
+                            datePlusVieille = articles.DateCreation;
+                        }
+                        var item = _context.PPProduits.FirstOrDefault(p => p.NoProduit == articles.NoProduit);
+                        <div class="card mb-1">
+                            <div class="card-body row d-flex ">
+                                <b>@Html.DisplayFor(modelItem => item.Nom) </b>
+                                @{
+                                    var path = System.IO.Path.Combine(env.WebRootPath, "Logo", item.Photo);
+                                    string imagePath = item.Photo != null && File.Exists(path) ? $"~/Logo/{item.Photo}" : "~/Logo/DefaultImage.png";
+                                    Console.WriteLine("FILE Name : " + item.Photo);
+                                    Console.WriteLine("FILE : " + File.Exists(path));
+                                }
+                                <div class="col-12 col-md-2 d-flex align-items-center justify-content-center">
+                                    <img src="@Url.Content(imagePath)" alt="@item.Photo" width="100" height="120" />
+                                </div>
+                                <div class="col-12 col-md-2 d-flex align-items-center justify-content-center">
+                                    <form asp-route-id="@articles.NoPanier" asp-route-delete="false" asp-route-vendeur="@articles.NoVendeur" asp-action="Index">
+                                        <input type="number" name="nb" value="@articles.NbItems" onchange="this.form.submit()" min="1" max="@articles.PPProduits.NombreItems" />
+                                    </form>
+                                </div>
+                                @if (item.PrixVente != null)
+                                {
+                                    var prix = item.PrixVente * articles.NbItems;
+                                    <div class="col-12 col-md-3 d-flex align-items-center justify-content-center">
+                                        <b>Prix Total: @Html.DisplayFor(modelItem => prix) $ </b>
+                                    </div>
+                                }
+                                else
+                                {
+                                    var prix = item.PrixDemande * articles.NbItems;
+                                    <div class="col-12 col-md-3 d-flex align-items-center justify-content-center">
+                                        <b>Prix Total: @Html.DisplayFor(modelItem => prix) $ </b>
+                                    </div>
+                                }
+                                @{
+                                    var poids = item.Poids * articles.NbItems;
+                                }
+                                <div class="col-12 col-md-3 d-flex align-items-center justify-content-center">
+                                    <b>Poids Total: @Html.DisplayFor(modelItem => poids) Kg </b>
+                                </div>
+
+                                <div class="col-12 col-md-2 d-flex align-items-center justify-content-center">
+                                    <form asp-route-id="@articles.NoPanier" asp-route-delete="true" asp-route-vendeur="@articles.NoVendeur" asp-action="Index">
+                                        <button type="submit" class="btn btn-danger">Retirer</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                    }
 
                 </div>
+            </div>
+            <div class="col-md-6 d-flex">
+                <div class="d-flex flex-column align-items-start bg-light overflow-auto" style="margin-bottom:50px;  height:600px;">
+                    @{
+                        decimal? totalPrice = 0;
+                        decimal? totalPoids = 0;
+                        var nbTotal = 0;
+                        foreach (PPArticlesEnPanier article in ViewBag.Panier)
+                        {
+                            nbTotal += article.NbItems;
+                            var item = _context.PPProduits.FirstOrDefault(p => p.NoProduit == article.NoProduit);
+                            if (item != null)
+                            {
+                                totalPrice += item.PrixVente * article.NbItems;
+                            }
+                            else
+                            {
+                                totalPrice += item.PrixDemande * article.NbItems;
+                            }
+                            totalPoids += item.Poids * article.NbItems;
+                        }
+                    }
+                    <h4 style="margin:5px;">Information sure le panier</h4>
+                    <b style="margin:5px;">Prix Total : @Html.DisplayFor(modelItem => totalPrice) $</b>
+                    <b style="margin:5px;">Poids Total : @Html.DisplayFor(modelItem => totalPoids) Kg</b>
+                    <b style="margin:5px;">Date Création : @Html.DisplayFor(modelItem => datePlusVieille) </b>
+                    <b style="margin:5px;">Nombre d'Items Total : @Html.DisplayFor(modelItem => nbTotal) </b>
 
-            }
+                    @if (client != null)
+                    {
+
+                        bool displayDestination = client.Pays != null || client.Province != null || client.Ville != null || client.Rue != null || client.CodePostal != null;
+
+
+                        @if (displayDestination)
+                        {
+                            <h4 style="margin:5px;">Destination</h4>
+
+                            @if (client.Pays != null)
+                            {
+                                <b style="margin:5px;">Pays : @Html.DisplayFor(modelItem => client.Pays) </b>
+                            }
+                            @if (client.Province != null)
+                            {
+                                <b style="margin:5px;">Province : @Html.DisplayFor(modelItem => client.Province) </b>
+                            }
+                            @if (client.Ville != null)
+                            {
+                                <b style="margin:5px;">Ville : @Html.DisplayFor(modelItem => client.Ville)</b>
+                            }
+                            @if (client.Rue != null)
+                            {
+                                <b style="margin:5px;">Rue : @Html.DisplayFor(modelItem => client.Rue) </b>
+                            }
+                            @if (client.CodePostal != null)
+                            {
+                                <b style="margin:5px;">Code Postal : @Html.DisplayFor(modelItem => client.CodePostal) </b>
+                            }
+                        }
+                    }
+
+
+                </div>
+            </div>
+        </div>
     </div>
-</div>
+
+    <a class="nav-link" asp-area="" asp-controller="Paniers" asp-action="Index">Retour à la liste des paniers</a>
+    }
+
+

@@ -1,21 +1,39 @@
 ﻿@model Projet_Web_Commerce.Models.ModelCatalogue
+@using Projet_Web_Commerce.Data
+﻿﻿@using Microsoft.AspNetCore.Identity
+@inject UserManager<Projet_Web_Commerce.Areas.Identity.Data.Utilisateur> UserManager
+@inject SignInManager<Projet_Web_Commerce.Areas.Identity.Data.Utilisateur> SignInManager
 
-<div class="row">
-    <div class="col-md-4">
-        @if (ViewBag.listPaniers.Count > 0)
-        {
-            @foreach (var panier in ViewBag.listPaniers)
+    @if (!SignInManager.IsSignedIn(User) || User.IsInRole("Vendeur") || User.IsInRole("Gestionnaire"))
+    {
+        Console.WriteLine("yes");
+        <text>
+            <script>
+                debugger;
+                window.location.href = '/MainMenu/Catalogue';
+            </script>
+        </text>
+    }
+    else
+    {
+    <div class="row">
+        <div class="col-md-4">
+            @if (ViewBag.listPaniers.Count > 0)
             {
-                PPVendeurs vendeur = Model.VendeursList.Where(p => p.NoVendeur == panier.vendeur).FirstOrDefault();
-                <div class="row">
-                    <a asp-route-id="@vendeur.NoVendeur" asp-area="" asp-controller="Panier" asp-action="Index">@vendeur.NomAffaires</a>
-                    <p>(@panier.articles.Count)</p>
-                </div>
+                @foreach (var panier in ViewBag.listPaniers)
+                {
+                    PPVendeurs vendeur = Model.VendeursList.Where(p => p.NoVendeur == panier.vendeur).FirstOrDefault();
+                    <div class="row">
+                        <a asp-route-id="@vendeur.NoVendeur" asp-area="" asp-controller="Panier" asp-action="Index">@vendeur.NomAffaires</a>
+                        <p>(@panier.articles.Count)</p>
+                    </div>
+                }
             }
-        }
-        else
-        {
-            <p>Vous n'avez pas de paniers</p>
-        }
+            else
+            {
+                <p>Vous n'avez pas de paniers</p>
+            }
+        </div>
     </div>
-</div>
+    }
+

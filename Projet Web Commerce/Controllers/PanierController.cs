@@ -31,7 +31,7 @@ namespace Projet_Web_Commerce.Controllers
                               where unPanier.NoVendeur == id
                               select unPanier;
 
-            ViewData["Panier"] = listPaniers.ToList<object>();
+            ViewData["Panier"] = listPaniers.ToList<PPArticlesEnPanier>();
             ViewData["VendeurId"] = id;
 
             ModelCatalogue modelCatalogue = new ModelCatalogue()
@@ -45,14 +45,39 @@ namespace Projet_Web_Commerce.Controllers
         }
 
         [HttpPost]
-        public ActionResult Index(int id, bool delete, int vendeur)
+        public ActionResult Index(int id, bool delete, int vendeur, int nb)
         {
             var article = _context.PPArticlesEnPanier.Where(v => v.NoPanier == id).FirstOrDefault();
 
             
-            if (delete)
+            if (article != null)
             {
-                _context.PPArticlesEnPanier.Remove(article);
+                if (delete)
+                {
+                    _context.PPArticlesEnPanier.Remove(article);
+                }
+                else
+                {
+                    var produit = _context.PPProduits.Where(v => v.NoProduit == article.NoProduit).FirstOrDefault();
+                    if (nb <= produit.NombreItems)
+                    {
+                        article.NbItems = nb;
+                        
+                        if (article.NbItems <= 0)
+                        {
+                            article.NbItems = 1;
+                        }
+                    }
+                    else
+                    {
+                        article.NbItems = produit.NombreItems;
+                    }
+                    _context.PPArticlesEnPanier.Update(article);
+                }
+            }
+            else
+            {
+                return RedirectToAction("Index", "Paniers");
             }
 
             _context.SaveChanges();
@@ -67,12 +92,12 @@ namespace Projet_Web_Commerce.Controllers
                               where unPanier.NoVendeur == vendeur
                               select unPanier;
 
-            if (listPaniers.ToList<object>().Count <=0)
+            if (listPaniers.ToList<PPArticlesEnPanier>().Count <=0)
             {
                 return RedirectToAction("Index", "Paniers");
             }
 
-            ViewData["Panier"] = listPaniers.ToList<object>();
+            ViewData["Panier"] = listPaniers.ToList<PPArticlesEnPanier>();
             ViewData["VendeurId"] = vendeur;
 
             ModelCatalogue modelCatalogue = new ModelCatalogue()
