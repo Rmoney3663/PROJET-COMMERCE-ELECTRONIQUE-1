@@ -387,5 +387,48 @@ namespace Projet_Web_Commerce.Controllers
 
             return View(pPClients);
         }
+
+        public async Task<IActionResult> SupprimerPanier(int? id)
+        {
+            if (id == null)
+            {
+                return RedirectToAction("ErrorNoFound", "PPProduits");
+            }
+
+            var pPClients = await _context.PPClients
+                .FirstOrDefaultAsync(m => m.NoClient == id);
+            if (pPClients == null)
+            {
+                return RedirectToAction("ErrorNoFound", "PPProduits");
+            }
+
+            return View(pPClients);
+        }
+
+        [HttpPost, ActionName("SupprimerPanier")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SupprimerPanier(int noVendeur, int noClient)
+        {
+            try
+            {
+                Console.WriteLine("NOCLIENT : " + noVendeur + "   NOCLIENT : " + noClient);
+                var pPClient = await _context.PPClients.FindAsync(noClient);
+                var pPVendeur = await _context.PPVendeurs.FindAsync(noVendeur);
+                if (pPClient != null && pPVendeur != null)
+                {
+                    Console.WriteLine("Found produit");
+
+                    var articlesToDelete = _context.PPArticlesEnPanier.Where(a => a.NoVendeur == noVendeur && a.NoClient == noClient);
+                    _context.PPArticlesEnPanier.RemoveRange(articlesToDelete);
+                }
+
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            catch
+            {
+                return RedirectToAction("Error", "PPProduits");
+            }
+        }
     }
 }
