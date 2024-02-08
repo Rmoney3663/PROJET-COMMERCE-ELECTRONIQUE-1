@@ -1,0 +1,91 @@
+﻿﻿﻿@using Microsoft.AspNetCore.Identity
+@using Projet_Web_Commerce.Data
+@inject AuthDbContext _context
+@inject UserManager<Projet_Web_Commerce.Areas.Identity.Data.Utilisateur> UserManager
+@inject SignInManager<Projet_Web_Commerce.Areas.Identity.Data.Utilisateur> SignInManager
+
+
+@if (!SignInManager.IsSignedIn(User))
+{
+    Console.WriteLine("yes");
+    <text>
+        <script>
+            debugger;
+            window.location.href = '/MainMenu/Catalogue';
+        </script>
+    </text>
+}
+else
+{
+    var user = await UserManager.GetUserAsync(User);
+
+    List<Projet_Web_Commerce.Areas.Identity.Data.Utilisateur> listeUtilisateurs = new List<Projet_Web_Commerce.Areas.Identity.Data.Utilisateur>();
+
+    var listVendeurs = _context.PPVendeurs;
+    var listGestionnaires = _context.PPGestionnaire;
+    var listClients = _context.PPClients;
+
+    if (User.IsInRole("Client"))
+    {
+        foreach (PPVendeurs vendeur in listVendeurs)
+        {
+            listeUtilisateurs.Add(_context.Users.Where(v => v.Email == vendeur.AdresseEmail).FirstOrDefault());
+        }
+        foreach (PPGestionnaire gestionnaire in listGestionnaires)
+        {
+            listeUtilisateurs.Add(_context.Users.Where(v => v.Email == gestionnaire.AdresseEmail).FirstOrDefault());
+        }
+    }
+    else if (User.IsInRole("Vendeur"))
+    {
+        foreach (PPClients client in listClients)
+        {
+            listeUtilisateurs.Add(_context.Users.Where(v => v.Email == client.AdresseEmail).FirstOrDefault());
+        }
+        foreach (PPGestionnaire gestionnaire in listGestionnaires)
+        {
+            listeUtilisateurs.Add(_context.Users.Where(v => v.Email == gestionnaire.AdresseEmail).FirstOrDefault());
+        }
+    }
+    else
+    {
+        foreach (PPVendeurs vendeur in listVendeurs)
+        {
+            listeUtilisateurs.Add(_context.Users.Where(v => v.Email == vendeur.AdresseEmail).FirstOrDefault());
+        }
+        foreach (PPClients client in listClients)
+        {
+            listeUtilisateurs.Add(_context.Users.Where(v => v.Email == client.AdresseEmail).FirstOrDefault());
+        }
+    }
+
+    <div class="row">
+        <div class="col-md-4">
+            <section>
+                <form id="account" method="post" asp-route-envoyeur="@user.Email">
+                    <h2>Envoyer un message</h2>
+                    <hr />
+                    <div class="form-floating mb-3">
+                        <input name="sujet" class="form-control" aria-required="true" />
+                        <label class="form-label">Le sujet</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input name="message" class="form-control" aria-required="true" />
+                        <label class="form-label">Votre message</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <select name="email">
+                            @foreach (var utilisateur in listeUtilisateurs)
+                            {
+                                <option value="@utilisateur.Email">@utilisateur.Email</option>
+                            }
+                        </select>
+                    </div>
+                    <div>
+                        <button id="send" type="submit" class="w-100 btn btn-lg btn-primary" style="color: rgb(249, 229, 71); background-color: rgb(124, 105, 146)">Envoyer</button>
+                    </div>
+                </form>
+            </section>
+        </div>
+    </div>
+}
