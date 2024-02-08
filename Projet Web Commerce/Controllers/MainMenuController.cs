@@ -311,7 +311,7 @@ namespace Projet_Web_Commerce.Controllers
                     // Save changes to the database
                     _context.SaveChanges();
 
-                    TempData["SuccessMessage"] = $"Le produit {produit.Nom} à été ajout au panier.  ";
+                    TempData["SuccessMessage"] = $"Le produit {produit.Nom} à été ajouté au panier.  ";
 
                     return RedirectToAction("CatalogueVendeur", new { id = vendeur.NomAffaires });
                 }
