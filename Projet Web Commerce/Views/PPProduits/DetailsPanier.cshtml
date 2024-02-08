@@ -87,7 +87,6 @@ else
     {
         <h1>Panier de @Model.AdresseEmail </h1>
     }
-    <a asp-action="ListePanier">Retour à la liste</a>
     <div class="container">
         <div class="row flex-wrap d-flex">
             <div class="col-md-6 d-flex">
@@ -210,6 +209,14 @@ else
 
         </div>
     </div>
-
+    <div>
+        @if (oldestProductDate != null && oldestProductDate < DateTime.Now.AddMonths(-6))
+        {
+            <a class="btn btn-danger" asp-action="DeletePanier" asp-route-id="@Model.NoClient">Supprimer</a>
+            <text> | </text>
+        }
+        <a asp-action="ListePanier">Retour à la liste</a>
+        
+    </div>
 
 }

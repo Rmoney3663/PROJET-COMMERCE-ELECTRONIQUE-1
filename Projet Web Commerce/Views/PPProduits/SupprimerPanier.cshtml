@@ -86,7 +86,6 @@ else
     {
         <h1>Panier de @Model.AdresseEmail </h1>
     }
-    <a asp-action="ListePanier">Retour à la liste</a>
     <div class="container">
         <div class="row flex-wrap d-flex">
             <div class="col-md-6 d-flex">
@@ -215,7 +214,7 @@ else
         <button type="submit" class="btn btn-danger" onclick="return confirm('Confirmer Suppression')">
             Supprimer
         </button> |
-        <a asp-action="Index">Retour à la liste</a>
+        <a asp-action="ListePanier">Retour à la liste</a>
     </form>
 
 }
