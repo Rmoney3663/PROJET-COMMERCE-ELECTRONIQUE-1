@@ -106,7 +106,7 @@ namespace Projet_Web_Commerce.Controllers
                 foreach (var produit in _context.PPProduits.Where(v => v.NoVendeur == vendeur.NoVendeur))
                 {
                     var idString = produit.NoProduit.ToString();
-                    var substring = idString.Length > 2 ? idString.Substring(2) : idString; // If the length is less than 2, keep the original string
+                    var substring = idString.Length > 2 ? idString.Substring(2) : idString;
                     var idWithoutFirstTwoDigits = int.Parse(substring);
                     if (idWithoutFirstTwoDigits > highestId)
                     {
