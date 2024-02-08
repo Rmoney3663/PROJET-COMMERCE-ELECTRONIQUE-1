@@ -32,14 +32,12 @@
 
 
 
-<div class="row">
-    <div class="col">
-        <section>
+<div class="row-fluid">
             @if (SignInManager.IsSignedIn(User))
             {
                 <h3>Liste de tout les produits @Model.nomAffaire </h3>
 
-                @using (Html.BeginForm("CatalogueVendeur", "MainMenu", FormMethod.Post))
+        @using (Html.BeginForm("CatalogueVendeur", "MainMenu", FormMethod.Post, new { id = "mainForm" }))
                 {
                     @Html.Hidden("id", Model.nomAffaire)
                     <div class="row">
@@ -148,41 +146,63 @@
             }
 
 
-            <div class="container mt-4">
+            <div class=" mt-4">
                 @if (Model != null && Model.ProduitsList.Any())
                 {
-                    <div class="container mt-4">
-                        <div class="row">
+                    <div class=" mt-4">
+                        <div class="row" style="display:flex">
                             @foreach (var item in productList)
                             {
-                                <div class="col-lg-4 mb-4 col-md-6 col-xl-3">
+                                <div class="col-lg-4 mb-4 col-md-6 col-xl-2">
                                     <div class="card">
                                         <div class="card-body" style="justify-content: center; display: flex;">
                                             <div class="row">
+                                        <div class="row" style="align-items: center;">
+                                            <div class="@if(SignInManager.IsSignedIn(User)) {<text>col-md-12</text> } else {<text>col-md-6</text> }">
+                                                <h5 class="card-text" style="overflow: hidden; text-overflow: ellipsis; font-size: 17px;">@Html.DisplayFor(modelItem => item.Nom)</h5>
+                                            </div>
+                                            @if (!SignInManager.IsSignedIn(User))
+                                            {
                                                 <div class="col-md-6">
-                                                    <h5 class="card-text">@Html.DisplayFor(modelItem => item.Nom)</h5>
+                                                    <h5 class="card-text float-end" style="color: orangered; font-size:15px">Nouveau !</h5>
                                                 </div>
-                                                @if (!SignInManager.IsSignedIn(User))
-                                                {
-                                                    <div class="col-md-6">
-                                                        <h5 class="card-text float-end" style="color: orangered">Nouveau !</h5>
-                                                    </div>
-                                                }
-                                                @{
-                                                    var path = System.IO.Path.Combine(env.WebRootPath, "Logo", item.Photo);
-                                                    string imagePath = item.Photo != null && File.Exists(path) ? $"~/Logo/{item.Photo}" : "~/Logo/DefaultImage.png";
-                                                    Console.WriteLine("FILE Name : " + item.Photo);
-                                                    Console.WriteLine("FILE : " + File.Exists(path));
-                                                }
-
+                                            }
+                                        </div>
+                                        <div class="row" style="align-items: center; margin-top: 30px;">
+                                            @{
+                                                var path = System.IO.Path.Combine(env.WebRootPath, "Logo", item.Photo);
+                                                string imagePath = item.Photo != null && File.Exists(path) ? $"~/Logo/{item.Photo}" : "~/Logo/DefaultImage.png";
+                                                Console.WriteLine("FILE Name : " + item.Photo);
+                                                Console.WriteLine("FILE : " + File.Exists(path));
+                                            }
+                                            <div class="col">
                                                 <img src="@Url.Content(imagePath)" alt="@item.Photo" width="200" height="200" />
+                                            </div>
+                                        </div>
                                                 @{
                                                     var category = Model.CategoriesList.FirstOrDefault(c => c.NoCategorie == item.NoCategorie);
                                                 }
                                                 <p class="card-text">Catégorie : @category.Description</p>
                                                 <p class="card-title">Numéro du produit : @Html.DisplayFor(modelItem => item.NoProduit)</p>
-                                                <p class="card-text">Prix Demandé : @Html.DisplayFor(modelItem => item.PrixDemande)</p>
                                                 <p class="card-text">Items en Stock : @Html.DisplayFor(modelItem => item.NombreItems)</p>
+                                                 @if (item.PrixVente != null && item.DateVente > DateTime.Now)
+                                                {
+                                                    <p class="card-text">
+                                                        Prix :
+                                                        <span style="text-decoration: line-through;">
+                                                            @Html.DisplayFor(modelItem => item.PrixDemande)
+                                                        </span>
+                                                        <span style="color: red; font-weight: bold;">
+                                                            @Html.DisplayFor(modelItem => item.PrixVente) $
+                                                        </span>
+                                                    </p>
+                                                }
+                                                else
+                                                {
+                                                    <p class="card-text">Prix : @Html.DisplayFor(modelItem => item.PrixDemande) $ </p>
+                                                }
+
+
                                                 <a asp-controller="PPProduits"
                                                    asp-route-id="@item.NoProduit"
                                                    asp-action="Details"
@@ -192,14 +212,15 @@
 
                                                 @if (SignInManager.IsSignedIn(User) && User.IsInRole("Client") && item.NombreItems > 0)
                                                 {
-                                                    <form asp-controller="MainMenu" asp-action="AjoutPanier" method="post">
+                                                    <form asp-controller="MainMenu" id="formAjoutPanier" asp-action="AjoutPanier" method="post">
                                                         <input type="hidden" name="NoProduit" value="@item.NoProduit" />
                                                         <input type="hidden" name="NoClient" value="@Model.noClient" />
                                                         <input type="hidden" name="NoVendeur" value="@item.NoVendeur" />
+                                                        <input type="hidden" name="returnUrl" id="returnUrl" value="test" />
                                                         <br>
-                                                        <button type="submit" class="btn btn-secondary">Ajouter au panier</button>
+                                                <button class="btn btn-secondary" type="submit" onclick="getCurrentUrl()">Ajouter au panier</button>
                                                         <select name="quantite">
-                                                            @for (int i = 1; i <= @item.NombreItems; i++)
+                                                            @for (int i = 1; i <= @item.NombreItems && i< 21; i++)
                                                             {
                                                                 <option value="@i">@i</option>
                                                             }
@@ -292,6 +313,13 @@
     input[type="date"]:valid:before {
         content: "";
     }
+
+    .row-fluid {
+        margin-left: -100px;
+        margin-right: -100px;
+    }
+
+    
 </style>
 @section Scripts
 {
@@ -344,6 +372,8 @@
             });
 
         });
+
+
     </script>
 }
 

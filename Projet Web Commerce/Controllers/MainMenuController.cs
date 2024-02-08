@@ -1,4 +1,6 @@
 ﻿using DocumentFormat.OpenXml.InkML;
+using DocumentFormat.OpenXml.Wordprocessing;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -23,6 +25,8 @@ namespace Projet_Web_Commerce.Controllers
         }
         // GET: MainMenuController
 
+        [Authorize(Roles = "Client,Gestionnaire")]
+        [AllowAnonymous]
         public ActionResult Catalogue()
         {
             var CategoriesList = _context.PPCategories.ToList();
@@ -272,6 +276,7 @@ namespace Projet_Web_Commerce.Controllers
             var vendeur = _context.PPVendeurs.Where(v => v.NoVendeur == NoVendeur).FirstOrDefault();
             var produit = _context.PPProduits.Where(v => v.NoProduit == NoProduit).FirstOrDefault();
 
+            
             if (produit != null && vendeur != null)
             {
                 var ajoutPanier = new PPArticlesEnPanier
