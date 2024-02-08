@@ -5,27 +5,12 @@
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
-<style>
-    input[type='radio']:checked:after {
-        width: 15px;
-        height: 15px;
-        border-radius: 15px;
-        top: -2px;
-        left: -1px;
-        position: relative;
-        background-color: #ffa500;
-        content: '';
-        display: inline-block;
-        visibility: visible;
-        border: 2px solid white;
-    }
-</style>
 
 <div class="row">
     <div class="col">
         <section>
             <div>
-                @Html.Partial("GestionVendeursPages", "ListeVendeursAConfirmer")
+                @Html.Partial("GestionVendeursPages", "ListeVendeursInactifs")
             </div>
             <div class="container mt-4">
                 @if (Model != null && Model.Any())

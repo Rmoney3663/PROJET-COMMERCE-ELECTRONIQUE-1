@@ -1,0 +1,66 @@
+﻿@model string
+
+<style>
+    .actif {
+        background-color: rgb(249, 229, 71);
+        color: rgb(124, 105, 146);
+        border-color: rgb(249, 229, 71);
+    }
+
+    .actif:hover {
+        /* color: rgb(19, 20, 12); */
+        /* font-weight:bold; */
+        color: rgb(124, 105, 146);
+        text-decoration:underline;
+    }
+
+    .pasActif {
+        background-color: rgb(124, 105, 146);
+        color: rgb(249, 229, 71);
+        border-color: rgb(124, 105, 146);
+        accent-color: rgb(249, 229, 71);
+    }
+
+    .pasActif:hover {
+        /* color: rgb(236, 235, 243); */
+        color: rgb(249, 229, 71);
+        text-decoration: underline;
+    }
+</style>
+
+<div class="btn-group btn-group-lg" role="group" aria-label="Basic radio toggle button group">
+    <!-- #pragma warning disable CSS024 -->
+
+    @* style="@(Model == "ListeVendeursAConfirmer" ? "background-color:rgb(249, 229, 71); color:rgb(124, 105, 146); border-color:rgb(249, 229, 71);" : "background-color:rgb(124, 105, 146); color:rgb(249, 229, 71); border-color:rgb(124, 105, 146); accent-color:rgb(249, 229, 71);")" *@
+
+    <a class="btn @(Model == "ListeVendeurs" ? "actif" : "pasActif")"
+       asp-area="" asp-controller="PPGestionnaires" asp-action="ListeVendeurs">
+        Liste des vendeurs
+    </a>
+
+    <a class="btn @(Model == "ListeVendeursAConfirmer" ? "actif" : "pasActif")"
+       asp-area="" asp-controller="PPGestionnaires" asp-action="ListeVendeursAConfirmer">
+        Liste des vendeurs à confirmer
+    </a>
+
+    <a class="btn @(Model == "ListeVendeursInactifs" ? "actif" : "pasActif")"
+       asp-area="" asp-controller="PPGestionnaires" asp-action="ListeVendeursInactifs">
+        Liste des vendeurs inactifs
+    </a>
+
+    <!-- #pragma warning restore CSS024 -->
+</div>
+
+@* <div class="btn-group btn-group-lg" role="group" aria-label="Basic radio toggle button group">
+    <a class="btn btn-outline-primary @(Model == "ListeVendeurs" ? "active" : "")" style="background-color:rgb(124, 105, 146); color:rgb(249, 229, 71); border-color:rgb(124, 105, 146); accent-color:rgb(249, 229, 71)" asp-area="" asp-controller="PPGestionnaires" asp-action="ListeVendeurs">
+        Liste des vendeurs
+    </a>
+
+    <a class="btn btn-outline-primary @(Model == "ListeVendeursAConfirmer" ? "active" : "")" style="background-color:rgb(124, 105, 146); color:rgb(249, 229, 71); border-color:rgb(124, 105, 146); accent-color:rgb(249, 229, 71)" asp-area="" asp-controller="PPGestionnaires" asp-action="ListeVendeursAConfirmer">
+        Liste des vendeurs à confirmer
+    </a>
+
+    <a class="btn btn-outline-primary @(Model == "ListeVendeursInactifs" ? "active" : "")" style="background-color:rgb(124, 105, 146); color:rgb(249, 229, 71); border-color:rgb(124, 105, 146); accent-color:rgb(249, 229, 71) " asp-area="" asp-controller="PPGestionnaires" asp-action="ListeVendeursInactifs">
+        Liste des vendeurs inactifs
+    </a>
+</div> *@

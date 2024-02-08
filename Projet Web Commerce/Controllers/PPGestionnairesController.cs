@@ -130,7 +130,17 @@ namespace Projet_Web_Commerce.Controllers
             return Json(result);
         }
 
+        [HttpGet]
+        [Authorize(Roles = "Gestionnaire")]
+        public ActionResult ListeVendeursInactifs()
+        {
+            var vendeursStatutZero = _context.PPVendeurs
+                .Where(v => v.Statut == 0)
+                .OrderBy(v => v.DateCreation)
+                .ToList();
 
+            return View();
+        }
 
 
         // GET: PPGestionnaires
