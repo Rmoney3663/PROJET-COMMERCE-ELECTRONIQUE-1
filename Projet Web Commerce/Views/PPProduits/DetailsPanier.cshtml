@@ -117,7 +117,7 @@
                                         <div class="col-12 col-md-2 d-flex align-items-center justify-content-center">
                                             <b>@Html.DisplayFor(modelItem => cat.Description) </b>
                                         </div>
-                                        @if (item.PrixVente != null)
+                                        @if (item.PrixVente != null && item.DateVente > DateTime.Now)
                                         {
                                             var prix = item.PrixVente * client.TotalItems;
                                             <div class="col-12 col-md-3 d-flex align-items-center justify-content-center">
@@ -156,7 +156,7 @@
                                 if (item != null)
                                 {
                                     decimal? prix = 0;
-                                    if (item.PrixVente != null)
+                                    if (item.PrixVente != null && item.DateVente > DateTime.Now)
                                     {
                                         prix = item.PrixVente * client.TotalItems;
                                     }
