@@ -14,7 +14,7 @@ namespace Projet_Web_Commerce.Controllers
         [HttpPost]
         public ActionResult Index(string sujet, string envoyeur, string message, string email)
         {
-            Methodes.envoyerCourrielUser(email, envoyeur, sujet, message);
+            
             return View();
         }
 
