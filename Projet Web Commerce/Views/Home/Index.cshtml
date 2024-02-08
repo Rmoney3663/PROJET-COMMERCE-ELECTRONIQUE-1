@@ -6,9 +6,18 @@
 
 @if (SignInManager.IsSignedIn(User))
 {
-    <head>
-        <meta http-equiv="refresh" content="0; url=/MainMenu" />
-    </head>
+    if (!User.IsInRole("Vendeur"))
+    {
+        <head>
+            <meta http-equiv="refresh" content="0; url=/MainMenu" />
+        </head>
+    }
+    else
+    {
+        <head>
+            <meta http-equiv="refresh" content="0; url=/PPProduits" />
+        </head>
+    }
 }
 else
 {

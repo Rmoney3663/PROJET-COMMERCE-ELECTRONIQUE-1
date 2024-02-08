@@ -8,7 +8,6 @@
 @inject IWebHostEnvironment env
 @{
     ViewData["Title"] = "Index";
-    Console.WriteLine("ID OF CLIENT PANIER : " + Model.NoClient);
     var user = await _userManager.GetUserAsync(User);
     @if (!SignInManager.IsSignedIn(User) || User.IsInRole("Client"))
     {
@@ -20,7 +19,7 @@
             </script>
         </text>
     }
-    var vendeur = _context.PPVendeurs.FirstOrDefault(v => v.IdUtilisateur == user.Id);  
+    var vendeur = _context.PPVendeurs.FirstOrDefault(v => v.IdUtilisateur == user.Id);
 }
 
 @if (vendeur == null)
@@ -34,31 +33,31 @@
 else
 {
     var clientProducts = _context.PPArticlesEnPanier
-     .Where(p => p.NoVendeur == vendeur.NoVendeur && p.NoClient == Model.NoClient)
-     .GroupBy(p => new { p.NoClient, p.NoProduit })
-     .Select(g => new
-     {
-         NoClient = g.Key.NoClient,
-         NoProduit = g.Key.NoProduit,
-         TotalItems = g.Sum(p => p.NbItems),
-         LowestPanierDate = g.Min(p => p.DateCreation)
-     })
-     .Join(
-         _context.PPClients,
-         cp => cp.NoClient,
-         c => c.NoClient,
-         (cp, c) => new
-         {
-             cp.NoClient,
-             cp.NoProduit,
-             cp.TotalItems,
-             cp.LowestPanierDate,
-             c.Nom,
-             c.Prenom,
-             c.AdresseEmail
-         }
-     )
-     .ToList();
+    .Where(p => p.NoVendeur == vendeur.NoVendeur && p.NoClient == Model.NoClient)
+    .GroupBy(p => new { p.NoClient, p.NoProduit })
+    .Select(g => new
+    {
+        NoClient = g.Key.NoClient,
+        NoProduit = g.Key.NoProduit,
+        TotalItems = g.Sum(p => p.NbItems),
+        LowestPanierDate = g.Min(p => p.DateCreation)
+    })
+    .Join(
+        _context.PPClients,
+        cp => cp.NoClient,
+        c => c.NoClient,
+        (cp, c) => new
+        {
+            cp.NoClient,
+            cp.NoProduit,
+            cp.TotalItems,
+            cp.LowestPanierDate,
+            c.Nom,
+            c.Prenom,
+            c.AdresseEmail
+        }
+    )
+    .ToList();
 
     var oldestProductDatesPerClient = clientProducts
       .GroupBy(p => p.NoClient)
@@ -77,7 +76,7 @@ else
      })
      .ToList();
 
-    
+
 
     if (Model.Nom != null && Model.Prenom != null)
     {
@@ -96,7 +95,7 @@ else
                         var item = _context.PPProduits.FirstOrDefault(p => p.NoProduit == client.NoProduit);
                         var cat = _context.PPCategories.FirstOrDefault(p => p.NoCategorie == item.NoCategorie);
                         if (item != null)
-                        {                          
+                        {
                             <div class="card mb-1">
                                 <div class="card-body row d-flex ">
                                     <b>@Html.DisplayFor(modelItem => item.Nom) </b>
@@ -113,7 +112,7 @@ else
                                         <b>x @Html.DisplayFor(modelItem => client.TotalItems) </b>
                                     </div>
                                     <div class="col-12 col-md-2 d-flex align-items-center justify-content-center">
-                                        <b>@Html.DisplayFor(modelItem => cat.Description ) </b>
+                                        <b>@Html.DisplayFor(modelItem => cat.Description) </b>
                                     </div>
                                     @if (item.PrixVente != null)
                                     {
@@ -209,14 +208,13 @@ else
 
         </div>
     </div>
-    <div>
-        @if (oldestProductDate != null && oldestProductDate < DateTime.Now.AddMonths(-6))
-        {
-            <a class="btn btn-danger" asp-action="DeletePanier" asp-route-id="@Model.NoClient">Supprimer</a>
-            <text> | </text>
-        }
+    <form asp-action="SupprimerPanier">
+        <input type="hidden" asp-for="NoClient" name="noClient" />
+        <input type="hidden" name="noVendeur" value="@vendeur.NoVendeur"  />
+        <button type="submit" class="btn btn-danger" onclick="return confirm('Confirmer Suppression')">
+            Supprimer
+        </button> |
         <a asp-action="ListePanier">Retour à la liste</a>
-        
-    </div>
+    </form>
 
 }

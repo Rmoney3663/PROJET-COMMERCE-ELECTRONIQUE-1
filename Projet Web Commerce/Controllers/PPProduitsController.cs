@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
@@ -39,7 +40,7 @@ namespace Projet_Web_Commerce.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                return RedirectToAction("ErrorNoFound", "PPProduits");
             }
 
             var pPProduits = await _context.PPProduits
@@ -48,7 +49,7 @@ namespace Projet_Web_Commerce.Controllers
                 .FirstOrDefaultAsync(m => m.NoProduit == id);
             if (pPProduits == null)
             {
-                return NotFound();
+                return RedirectToAction("ErrorNoFound", "PPProduits");
             }
 
             return View(pPProduits);
@@ -67,16 +68,17 @@ namespace Projet_Web_Commerce.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("NoVendeur,NoCategorie,Nom,Description,PrixDemande,Disponibilite,Poids,PrixVente, NombreItems")] PPProduits pPProduits,
+        public async Task<IActionResult> Create([Bind("NoVendeur,NoCategorie,Nom,Description,PrixDemande,Disponibilite,Poids,PrixVente, NombreItems, DateVente")] PPProduits pPProduits,
             IFormFile? file)
         {
             var user = await _userManager.GetUserAsync(User);
             var vendeur = _context.PPVendeurs.FirstOrDefault(v => v.IdUtilisateur == user.Id);
             pPProduits.NoVendeur = vendeur.NoVendeur;
             pPProduits.DateCreation = DateTime.Now;
-            pPProduits.DateVente = DateTime.Now;
             pPProduits.DateMAJ = DateTime.Now;
-           
+
+
+            Console.WriteLine("DATE : " + pPProduits.DateVente);
             Console.WriteLine($"User Id: {user?.Id}, User Name: {user?.UserName}");
             Console.WriteLine($"Photo: {file.FileName}");
             ModelState.Remove("file");
@@ -134,13 +136,13 @@ namespace Projet_Web_Commerce.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                return RedirectToAction("ErrorNoFound", "PPProduits");
             }
 
             var pPProduits = await _context.PPProduits.FindAsync(id);
             if (pPProduits == null)
             {
-                return NotFound();
+                return RedirectToAction("ErrorNoFound", "PPProduits");
             }
             ViewData["NoCategorie"] = new SelectList(_context.PPCategories, "NoCategorie", "Description", pPProduits.NoCategorie);
             ViewData["NoVendeur"] = new SelectList(_context.PPVendeurs, "NoVendeur", "Nom", pPProduits.NoVendeur);
@@ -157,6 +159,7 @@ namespace Projet_Web_Commerce.Controllers
         {
             ModelState.Remove("file");
             ModelState.Remove("Photo");
+            Console.WriteLine("DATE : " + pPProduits.DateVente);
             foreach (var m in ModelState)
             {
                 foreach (var er in m.Value.Errors)
@@ -183,9 +186,10 @@ namespace Projet_Web_Commerce.Controllers
                         {
                             await file.CopyToAsync(fileStream);
                         }
-                    }                    
-
+                    } 
+                    
                     _context.Update(pPProduits);
+
                     Console.WriteLine(" pPProduits : " + pPProduits.DateMAJ);
                     Console.WriteLine(" pPProduits : " + pPProduits.NombreItems);
                     await _context.SaveChangesAsync();
@@ -213,7 +217,7 @@ namespace Projet_Web_Commerce.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                return RedirectToAction("ErrorNoFound", "PPProduits");
             }
 
             var pPProduits = await _context.PPProduits
@@ -336,8 +340,7 @@ namespace Projet_Web_Commerce.Controllers
             {
                 return RedirectToAction("Error", "PPProduits");
             }
-        }
-
+        }       
 
 
         private bool PPProduitsExists(int id)
@@ -356,6 +359,11 @@ namespace Projet_Web_Commerce.Controllers
             return View();
         }
 
+        public IActionResult ErrorNoFound()
+        {
+            return View();
+        }
+
         public async Task<IActionResult> ListePanier()
         {
 
@@ -367,17 +375,60 @@ namespace Projet_Web_Commerce.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                return RedirectToAction("ErrorNoFound", "PPProduits");
             }
 
             var pPClients = await _context.PPClients
                 .FirstOrDefaultAsync(m => m.NoClient == id);
             if (pPClients == null)
             {
-                return NotFound();
+                return RedirectToAction("ErrorNoFound", "PPProduits");
             }
 
             return View(pPClients);
+        }
+
+        public async Task<IActionResult> SupprimerPanier(int? id)
+        {
+            if (id == null)
+            {
+                return RedirectToAction("ErrorNoFound", "PPProduits");
+            }
+
+            var pPClients = await _context.PPClients
+                .FirstOrDefaultAsync(m => m.NoClient == id);
+            if (pPClients == null)
+            {
+                return RedirectToAction("ErrorNoFound", "PPProduits");
+            }
+
+            return View(pPClients);
+        }
+
+        [HttpPost, ActionName("SupprimerPanier")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SupprimerPanier(int noVendeur, int noClient)
+        {
+            try
+            {
+                Console.WriteLine("NOCLIENT : " + noVendeur + "   NOCLIENT : " + noClient);
+                var pPClient = await _context.PPClients.FindAsync(noClient);
+                var pPVendeur = await _context.PPVendeurs.FindAsync(noVendeur);
+                if (pPClient != null && pPVendeur != null)
+                {
+                    Console.WriteLine("Found produit");
+
+                    var articlesToDelete = _context.PPArticlesEnPanier.Where(a => a.NoVendeur == noVendeur && a.NoClient == noClient);
+                    _context.PPArticlesEnPanier.RemoveRange(articlesToDelete);
+                }
+
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            catch
+            {
+                return RedirectToAction("Error", "PPProduits");
+            }
         }
     }
 }

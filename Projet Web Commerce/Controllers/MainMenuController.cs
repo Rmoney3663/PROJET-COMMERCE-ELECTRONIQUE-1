@@ -1,5 +1,10 @@
+﻿using DocumentFormat.OpenXml.Office.CustomUI;
+using DocumentFormat.OpenXml.Spreadsheet;
 ﻿using DocumentFormat.OpenXml.InkML;
+using DocumentFormat.OpenXml.Wordprocessing;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Projet_Web_Commerce.Areas.Identity.Data;
@@ -21,10 +26,18 @@ namespace Projet_Web_Commerce.Controllers
             _context = context;
             _userManager = userManager;
         }
+
         // GET: MainMenuController
 
+        
+        [AllowAnonymous]
+        //[Authorize(Roles = "Client,Gestionnaire")]
         public ActionResult Catalogue()
         {
+            if (User.IsInRole("Vendeur"))
+            {
+                return RedirectToAction("Index", "PPProduits", new { area = "" });
+            }
             var CategoriesList = _context.PPCategories.ToList();
             var VendeursList = _context.PPVendeurs.ToList();
             var ProduitsList = _context.PPProduits.ToList();
@@ -46,22 +59,21 @@ namespace Projet_Web_Commerce.Controllers
             return View(modelCatalogue);
         }
 
-        [HttpGet]
-        public ActionResult GestionVendeurs()
-        {
-            if (User.IsInRole("Gestionnaire"))
-            {
-                var vendeursStatutZero = _context.PPVendeurs
-                .Where(v => v.Statut == 0)
-                .OrderBy(v => v.DateCreation)  // Assuming DateCreation is the property you want to order by
-                .ToList();
+        //[HttpGet]
+        //public ActionResult GestionVendeurs()
+        //{
+        //    if (User.IsInRole("Gestionnaire"))
+        //    {
+        //        var vendeursStatutZero = _context.PPVendeurs
+        //        .Where(v => v.Statut == 0)
+        //        .OrderBy(v => v.DateCreation)  // Assuming DateCreation is the property you want to order by
+        //        .ToList();
 
-                return View(vendeursStatutZero);
-            }
+        //        return View(vendeursStatutZero);
+        //    }
 
-            return Redirect("AccessDenied");
-
-        }
+        //    return Redirect("AccessDenied");
+        //}
 
         public async Task<IActionResult> CatalogueVendeurAsync(string id, string? searchString, string? sortOrder, string? parPage, int? pageNumber, string? searchCat, int? searchNums, string? dateApres, string? dateAvant)
         {
@@ -272,6 +284,7 @@ namespace Projet_Web_Commerce.Controllers
             var vendeur = _context.PPVendeurs.Where(v => v.NoVendeur == NoVendeur).FirstOrDefault();
             var produit = _context.PPProduits.Where(v => v.NoProduit == NoProduit).FirstOrDefault();
 
+            
             if (produit != null && vendeur != null)
             {
                 var ajoutPanier = new PPArticlesEnPanier
@@ -300,32 +313,82 @@ namespace Projet_Web_Commerce.Controllers
 
         }
 
+        //[Route("/MainMenuController/ValiderAsync")]
+        //[Authorize(Roles = "Gestionnaire")]
+        //public async Task<IActionResult> ValiderAsync(int id, string sujet, string message, bool vendeurAccepte, int pourcentage)
+        //{
+        //    var vendeurAUpdate = _context.PPVendeurs.FirstOrDefault(v => v.NoVendeur == id);
+
+        //    var result = new
+        //    {
+        //        Success = false,
+        //        Message = $"Erreur%"
+        //    };
+
+        //    if (vendeurAUpdate != null)
+        //    {
+        //        var user = await _userManager.FindByEmailAsync(vendeurAUpdate.AdresseEmail);
+        //        if (user != null)
+        //        {
+        //            await Methodes.envoyerCourriel(vendeurAUpdate.AdresseEmail, sujet, message);
+        //            if (vendeurAccepte)
+        //            {
+        //                vendeurAUpdate.Statut = 1;
+        //                vendeurAUpdate.Pourcentage = Convert.ToDecimal(pourcentage, CultureInfo.InvariantCulture);
+        //            }
+        //            else
+        //            {
+        //                _context.PPVendeurs.Remove(vendeurAUpdate);
+        //                _userManager.DeleteAsync(user);
+        //            }
+        //            _context.SaveChanges();
+
+        //            var vendeursStatutZero = _context.PPVendeurs
+        //                    .Where(v => v.Statut == 0)
+        //                    .OrderBy(v => v.DateCreation)
+        //                    .ToList();
+
+        //            View(vendeursStatutZero);
+
+        //            result = new
+        //            {
+        //                Success = true,
+        //                Message = $"Courriel envoyé%."
+        //            };
+        //        }
+        //    }
+
+        //    return Json(result);
+        //}
+
         [HttpPost]
-        public ActionResult GestionVendeurs(int NoVendeur)
+        public ActionResult GestionVendeurs(int NoVendeur, string Pourcentage, bool vendeurAccepte)
         {
             if (User.IsInRole("Gestionnaire"))
             {
-                var vendeurToUpdate = _context.PPVendeurs.FirstOrDefault(v => v.NoVendeur == NoVendeur);
+                var vendeurAUpdate = _context.PPVendeurs.FirstOrDefault(v => v.NoVendeur == NoVendeur);
 
-                if (vendeurToUpdate != null)
+                if (vendeurAUpdate != null)
                 {
-                    // Update the properties of the vendeur
-                    vendeurToUpdate.Statut = 1;
+                    if (vendeurAccepte)
+                    {
+                        vendeurAUpdate.Statut = 1;
+                        vendeurAUpdate.Pourcentage = Convert.ToDecimal(Pourcentage, CultureInfo.InvariantCulture);
+                    }
+                    else
+                        _context.PPVendeurs.Remove(vendeurAUpdate);
 
-                    // Save changes to the database
                     _context.SaveChanges();
 
                     var vendeursStatutZero = _context.PPVendeurs
-                    .Where(v => v.Statut == 0)
-                    .OrderBy(v => v.DateCreation)  // Assuming DateCreation is the property you want to order by
-                    .ToList();
+                            .Where(v => v.Statut == 0)
+                            .OrderBy(v => v.DateCreation)
+                            .ToList();
 
                     return View(vendeursStatutZero);
                 }
             }
-
             return Redirect("AccessDenied");
-
         }
 
         // GET: MainMenuController/Details/5
