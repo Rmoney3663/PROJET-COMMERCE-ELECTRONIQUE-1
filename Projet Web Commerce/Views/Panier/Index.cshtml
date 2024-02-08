@@ -3,10 +3,12 @@
     PPVendeurs vendeur = Model.VendeursList.Where(p => p.NoVendeur == ViewBag.VendeurId).FirstOrDefault();
 }
 
-<h1>Panier associé à @vendeur.NomAffaires</h1>
+@if (vendeur != null)
+{
+    <h1>Panier associé à @vendeur.NomAffaires</h1>
+}
 <div class="row">
     <div class="col-md-4">
-        @if (ViewBag.Panier.Count > 0){
             @foreach (PPArticlesEnPanier articles in ViewBag.Panier)
             {
                 <div class="row">
@@ -21,10 +23,5 @@
                 </div>
 
             }
-        }
-        else
-        {
-            <meta http-equiv="refresh" content="0"; url="/Paniers/Index" />
-        }
     </div>
 </div>
