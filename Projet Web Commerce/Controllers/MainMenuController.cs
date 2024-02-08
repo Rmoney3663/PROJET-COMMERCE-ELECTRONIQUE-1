@@ -66,7 +66,7 @@ namespace Projet_Web_Commerce.Controllers
         //    return Redirect("AccessDenied");
         //}
 
-        public async Task<IActionResult> CatalogueVendeurAsync(string id, string? searchString, string? sortOrder, string? parPage, int? pageNumber)
+        public async Task<IActionResult> CatalogueVendeurAsync(string id, string? searchString, string? sortOrder, string? parPage, int? pageNumber, string? searchCat, int? searchNums, string? dateApres, string? dateAvant)
         {
 
             // Action logic
@@ -76,10 +76,24 @@ namespace Projet_Web_Commerce.Controllers
             var client = _context.PPClients.FirstOrDefault(c => c.IdUtilisateur == userId);
 
             ViewBag.sortOrder = sortOrder;
-            ViewBag.parPage = parPage ?? "15";
+
+            if (parPage != "Tous")
+            {
+                ViewBag.parPage = parPage ?? "15";
+            }
+            else
+            {
+                ViewBag.parPage = "Tous";
+            }
             ViewBag.searchString = searchString;
             ViewBag.id = id;
             ViewBag.pageNumber = pageNumber;
+
+            ViewBag.searchCat = searchCat;
+            ViewBag.searchNums = searchNums;
+
+            ViewBag.DateAvant = dateAvant;
+            ViewBag.DateApres = dateApres;
 
 
             ViewBag.NumsProduit = _context.PPProduits
@@ -87,6 +101,19 @@ namespace Projet_Web_Commerce.Controllers
                 .Select(p => p.NoProduit)
                 .OrderBy(n => n) // Order by NoProduit
                 .ToArray();
+
+            //ViewBag.CategoriesVendeur = vendeur.PPProduits.Select(p => p.NoCategorie)
+
+            var categoryDetailsArray = _context.PPProduits
+                .Where(p => p.NoVendeur == vendeur.NoVendeur)
+                .Join(_context.PPCategories,
+                    produit => produit.NoCategorie,
+                    categorie => categorie.NoCategorie,
+                    (produit, categorie) => categorie.Description)
+                .Distinct()
+                .ToArray();
+
+            ViewBag.CategoriesVendeur = categoryDetailsArray;
 
             var CategoriesList = _context.PPCategories.ToList();
             var VendeursList = _context.PPVendeurs.ToList();
@@ -99,6 +126,7 @@ namespace Projet_Web_Commerce.Controllers
                .Take(15)
                .ToList();
 
+            // Recherche string description et nom + verif dispo et vendeur selectionner
             if (!String.IsNullOrEmpty(searchString))
             {
                 ProduitsVendeur = from p in _context.PPProduits
@@ -111,6 +139,50 @@ namespace Projet_Web_Commerce.Controllers
                     .Where(p => p.NoVendeur == vendeur.NoVendeur && p.Disponibilite == true)
                                   select p;
             }
+
+            // Recherche par no de produit
+
+            if (searchNums != null)
+            {
+                ProduitsVendeur = ProduitsVendeur
+                .Where(p => p.NoProduit == searchNums);
+
+            }
+
+            // Recherche par date
+            if (dateApres != null)
+            {
+                DateTime dateApres2;
+                if (DateTime.TryParseExact(dateApres, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out dateApres2))
+                {
+                    ProduitsVendeur = ProduitsVendeur.Where(p => p.DateCreation > dateApres2);
+                }
+            }
+
+            if (dateAvant != null)
+            {
+                DateTime dateAvant2;
+                if (DateTime.TryParseExact(dateAvant, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out dateAvant2))
+                {
+                    ProduitsVendeur = ProduitsVendeur.Where(p => p.DateCreation < dateAvant2);
+                }
+            }
+
+            // Filtrer par categorie
+            if (!String.IsNullOrEmpty(searchCat))
+            {
+                var categorySelect = _context.PPCategories
+                .Where(c => c.Description == searchCat)
+                .Select(c => c.NoCategorie)
+                .FirstOrDefault();
+
+                if (categorySelect != null)
+                {
+                    ProduitsVendeur = ProduitsVendeur
+                    .Where(p => p.NoVendeur == vendeur.NoVendeur && p.NoCategorie == categorySelect);
+                }
+            }
+
 
 
             ModelCatalogueVendeur modelCatalogueVendeur;
@@ -150,7 +222,15 @@ namespace Projet_Web_Commerce.Controllers
             }
             else
             {
-                pageSize = Convert.ToInt32(parPage);
+                if (parPage == "Tous")
+                {
+                    pageSize = 999;
+                }
+                else
+                {
+                    pageSize = Convert.ToInt32(parPage);
+                }
+                
             }
 
             var produitsVendeurQueryable = ProduitsVendeur.AsQueryable();
