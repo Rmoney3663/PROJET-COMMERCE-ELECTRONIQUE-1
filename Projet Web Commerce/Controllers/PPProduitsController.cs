@@ -40,7 +40,7 @@ namespace Projet_Web_Commerce.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                return RedirectToAction("ErrorNoFound", "PPProduits");
             }
 
             var pPProduits = await _context.PPProduits
@@ -49,7 +49,7 @@ namespace Projet_Web_Commerce.Controllers
                 .FirstOrDefaultAsync(m => m.NoProduit == id);
             if (pPProduits == null)
             {
-                return NotFound();
+                return RedirectToAction("ErrorNoFound", "PPProduits");
             }
 
             return View(pPProduits);
@@ -136,13 +136,13 @@ namespace Projet_Web_Commerce.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                return RedirectToAction("ErrorNoFound", "PPProduits");
             }
 
             var pPProduits = await _context.PPProduits.FindAsync(id);
             if (pPProduits == null)
             {
-                return NotFound();
+                return RedirectToAction("ErrorNoFound", "PPProduits");
             }
             ViewData["NoCategorie"] = new SelectList(_context.PPCategories, "NoCategorie", "Description", pPProduits.NoCategorie);
             ViewData["NoVendeur"] = new SelectList(_context.PPVendeurs, "NoVendeur", "Nom", pPProduits.NoVendeur);
@@ -217,7 +217,7 @@ namespace Projet_Web_Commerce.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                return RedirectToAction("ErrorNoFound", "PPProduits");
             }
 
             var pPProduits = await _context.PPProduits
@@ -340,8 +340,7 @@ namespace Projet_Web_Commerce.Controllers
             {
                 return RedirectToAction("Error", "PPProduits");
             }
-        }
-
+        }       
 
 
         private bool PPProduitsExists(int id)
@@ -360,6 +359,11 @@ namespace Projet_Web_Commerce.Controllers
             return View();
         }
 
+        public IActionResult ErrorNoFound()
+        {
+            return View();
+        }
+
         public async Task<IActionResult> ListePanier()
         {
 
@@ -371,14 +375,14 @@ namespace Projet_Web_Commerce.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                return RedirectToAction("ErrorNoFound", "PPProduits");
             }
 
             var pPClients = await _context.PPClients
                 .FirstOrDefaultAsync(m => m.NoClient == id);
             if (pPClients == null)
             {
-                return NotFound();
+                return RedirectToAction("ErrorNoFound", "PPProduits");
             }
 
             return View(pPClients);
