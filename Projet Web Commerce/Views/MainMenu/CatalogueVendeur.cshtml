@@ -21,6 +21,15 @@
     </div>
 }
 
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger" role="alert">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+
+
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
 
 
@@ -146,138 +155,124 @@
             }
 
 
-            <div class=" mt-4">
-                @if (Model != null && Model.ProduitsList.Any())
+    <div class="mt-4">
+        @if (Model != null && Model.ProduitsList.Any())
+        {
+            <div class="mt-4 row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-6">
+                @foreach (var item in productList)
                 {
-                    <div class=" mt-4">
-                        <div class="row" style="display:flex">
-                            @foreach (var item in productList)
-                            {
-                                <div class="col-lg-4 mb-4 col-md-6 col-xl-2">
-                                    <div class="card">
-                                        <div class="card-body" style="justify-content: center; display: flex;">
-                                            <div class="row">
-                                        <div class="row" style="align-items: center;">
-                                            <div class="@if(SignInManager.IsSignedIn(User)) {<text>col-md-12</text> } else {<text>col-md-6</text> }">
-                                                <h5 class="card-text" style="overflow: hidden; text-overflow: ellipsis; font-size: 17px;">@Html.DisplayFor(modelItem => item.Nom)</h5>
-                                            </div>
-                                            @if (!SignInManager.IsSignedIn(User))
-                                            {
-                                                <div class="col-md-6">
-                                                    <h5 class="card-text float-end" style="color: orangered; font-size:15px">Nouveau !</h5>
-                                                </div>
-                                            }
-                                        </div>
-                                        <div class="row" style="align-items: center; margin-top: 30px;">
-                                            @{
-                                                var path = System.IO.Path.Combine(env.WebRootPath, "Logo", item.Photo);
-                                                string imagePath = item.Photo != null && File.Exists(path) ? $"~/Logo/{item.Photo}" : "~/Logo/DefaultImage.png";
-                                                Console.WriteLine("FILE Name : " + item.Photo);
-                                                Console.WriteLine("FILE : " + File.Exists(path));
-                                            }
-                                            <div class="col">
-                                                <img src="@Url.Content(imagePath)" alt="@item.Photo" width="200" height="200" />
-                                            </div>
-                                        </div>
-                                                @{
-                                                    var category = Model.CategoriesList.FirstOrDefault(c => c.NoCategorie == item.NoCategorie);
-                                                }
-                                                <p class="card-text">Catégorie : @category.Description</p>
-                                                <p class="card-title">Numéro du produit : @Html.DisplayFor(modelItem => item.NoProduit)</p>
-                                                <p class="card-text">Items en Stock : @Html.DisplayFor(modelItem => item.NombreItems)</p>
-                                                 @if (item.PrixVente != null && item.DateVente > DateTime.Now)
-                                                {
-                                                    <p class="card-text">
-                                                        Prix :
-                                                        <span style="text-decoration: line-through;">
-                                                            @Html.DisplayFor(modelItem => item.PrixDemande)
-                                                        </span>
-                                                        <span style="color: red; font-weight: bold;">
-                                                            @Html.DisplayFor(modelItem => item.PrixVente) $
-                                                        </span>
-                                                    </p>
-                                                }
-                                                else
-                                                {
-                                                    <p class="card-text">Prix : @Html.DisplayFor(modelItem => item.PrixDemande) $ </p>
-                                                }
-
-
-                                                <a asp-controller="PPProduits"
-                                                   asp-route-id="@item.NoProduit"
-                                                   asp-action="Details"
-                                                   class="btn btn-secondary" style="background-color:rgb(124, 105, 146);  color: rgb(249, 229, 71); ">
-                                                    Détails
-                                                </a>
-
-                                                @if (SignInManager.IsSignedIn(User) && User.IsInRole("Client") && item.NombreItems > 0)
-                                                {
-                                                    <form asp-controller="MainMenu" id="formAjoutPanier" asp-action="AjoutPanier" method="post">
-                                                        <input type="hidden" name="NoProduit" value="@item.NoProduit" />
-                                                        <input type="hidden" name="NoClient" value="@Model.noClient" />
-                                                        <input type="hidden" name="NoVendeur" value="@item.NoVendeur" />
-                                                        <input type="hidden" name="returnUrl" id="returnUrl" value="test" />
-                                                        <br>
-                                                <button class="btn btn-secondary" type="submit" onclick="getCurrentUrl()">Ajouter au panier</button>
-                                                        <select name="quantite">
-                                                            @for (int i = 1; i <= @item.NombreItems && i< 21; i++)
-                                                            {
-                                                                <option value="@i">@i</option>
-                                                            }
-                                                        </select>
-                                                    </form>
-                                                }
-                                                else if (SignInManager.IsSignedIn(User) && User.IsInRole("Client") && item.NombreItems == 0)
-                                                {
-                                                    <p style="color:red; font-weight:bold">En rupture de stock</p>
-                                                }
-
-                                            </div>
-                                        </div>
-                                    </div>
+                    <div class="col mb-4">
+                        <div class="card h-100">
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-text" style="overflow: hidden; text-overflow: ellipsis; font-size: 17px;">@Html.DisplayFor(modelItem => item.Nom)</h5>
+                                @if (!SignInManager.IsSignedIn(User))
+                                {
+                                    <h5 class="card-text float-end" style="color: orangered; font-size:15px">Nouveau !</h5>
+                                }
+                                @{
+                                    var path = System.IO.Path.Combine(env.WebRootPath, "Logo", item.Photo);
+                                    string imagePath = item.Photo != null && File.Exists(path) ? $"~/Logo/{item.Photo}" : "~/Logo/DefaultImage.png";
+                                    Console.WriteLine("FILE Name : " + item.Photo);
+                                    Console.WriteLine("FILE : " + File.Exists(path));
+                                }
+                                <div>
+                                    <img src="@Url.Content(imagePath)" alt="@item.Photo" class="card-img-top" width="200" height="200" />
                                 </div>
-                            }
+                                @{
+                                    var category = Model.CategoriesList.FirstOrDefault(c => c.NoCategorie == item.NoCategorie);
+                                }
+                                <p class="card-text">Catégorie : @category.Description</p>
+                                <p class="card-title">Numéro du produit : @Html.DisplayFor(modelItem => item.NoProduit)</p>
+                                <p class="card-text">Items en Stock : @Html.DisplayFor(modelItem => item.NombreItems)</p>
+                                @if (item.PrixVente != null && item.DateVente > DateTime.Now)
+                                {
+                                    <p class="card-text">
+                                        Prix :
+                                        <span style="text-decoration: line-through;">
+                                            @Html.DisplayFor(modelItem => item.PrixDemande)
+                                        </span>
+                                        <span style="color: red; font-weight: bold;">
+                                            @Html.DisplayFor(modelItem => item.PrixVente) $
+                                        </span>
+                                    </p>
+                                }
+                                else
+                                {
+                                    <p class="card-text">Prix : @Html.DisplayFor(modelItem => item.PrixDemande) $ </p>
+                                }
+
+                                <a asp-controller="PPProduits"
+                                   asp-route-id="@item.NoProduit"
+                                   asp-action="Details"
+                                   class="btn btn-secondary mt-auto" style="background-color:rgb(124, 105, 146);  color: rgb(249, 229, 71); ">
+                                    Details
+                                </a>
+
+                                @if (SignInManager.IsSignedIn(User) && User.IsInRole("Client") && item.NombreItems > 0)
+                                {
+                                    <form asp-controller="MainMenu" id="formAjoutPanier" asp-action="AjoutPanier" method="post">
+                                        <input type="hidden" name="NoProduit" value="@item.NoProduit" />
+                                        <input type="hidden" name="NoClient" value="@Model.noClient" />
+                                        <input type="hidden" name="NoVendeur" value="@item.NoVendeur" />
+                                        <br />
+                                        <button class="btn btn-secondary" type="submit">Ajouter au panier</button>
+                                        <select name="quantite">
+                                            @for (int i = 1; i <= @item.NombreItems && i < 21; i++)
+                                            {
+                                                <option value="@i">@i</option>
+                                            }
+                                        </select>
+                                    </form>
+                                }
+                                else if (SignInManager.IsSignedIn(User) && User.IsInRole("Client") && item.NombreItems == 0)
+                                {
+                                    <p style="color:red; font-weight:bold">En rupture de stock</p>
+                                }
+                            </div>
                         </div>
                     </div>
                 }
-                else
-                {
-                    <p>Aucun produits.</p>
-                }
             </div>
-        </section>
+        }
+        else
+        {
+            <p>Aucun produits.</p>
+        }
     </div>
-</div>
 
-@if (Model.ProduitsList.Count > 0)
-{
-    <div class="pagination">
-        <nav aria-label="Page navigation">
-            <ul class="pagination">
-                @if (Model.ProduitsList.HasPreviousPage)
-                {
-                    <li class="page-item">
-                        <a class="page-link" href="@Url.Action("CatalogueVendeur", new { sortOrder = ViewBag.sortOrder, pageNumber = Model.ProduitsList.PageIndex - 1, parPage = ViewBag.parPage, searchString = ViewBag.searchString, id = ViewBag.id })">Previous</a>
-                    </li>
-                }
+    @if (SignInManager.IsSignedIn(User))
+    {
+        @if (Model.ProduitsList.Count > 0)
+        {
+            <div class="pagination">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination">
+                        @if (Model.ProduitsList.HasPreviousPage)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" href="@Url.Action("CatalogueVendeur", new { sortOrder = ViewBag.sortOrder, pageNumber = Model.ProduitsList.PageIndex - 1, parPage = ViewBag.parPage, searchString = ViewBag.searchString, id = ViewBag.id })">Previous</a>
+                            </li>
+                        }
 
-                @for (int i = 1; i <= Model.ProduitsList.TotalPages; i++)
-                {
-                    <li class="page-item @(i == Model.ProduitsList.PageIndex ? "active" : "")">
-                        <a class="page-link" href="@Url.Action("CatalogueVendeur", new { sortOrder = ViewBag.sortOrder, pageNumber = i, parPage = ViewBag.parPage, searchString = ViewBag.searchString, id = ViewBag.id })">@i</a>
-                    </li>
-                }
+                        @for (int i = 1; i <= Model.ProduitsList.TotalPages; i++)
+                        {
+                            <li class="page-item @(i == Model.ProduitsList.PageIndex ? "active" : "")">
+                                <a class="page-link" href="@Url.Action("CatalogueVendeur", new { sortOrder = ViewBag.sortOrder, pageNumber = i, parPage = ViewBag.parPage, searchString = ViewBag.searchString, id = ViewBag.id })">@i</a>
+                            </li>
+                        }
 
-                @if (Model.ProduitsList.HasNextPage)
-                {
-                    <li class="page-item">
-                        <a class="page-link" href="@Url.Action("CatalogueVendeur", new { sortOrder = ViewBag.sortOrder, pageNumber = Model.ProduitsList.PageIndex + 1, parPage = ViewBag.parPage, searchString = ViewBag.searchString, id = ViewBag.id })">Next</a>
-                    </li>
-                }
-            </ul>
-        </nav>
-    </div>
-}
+                        @if (Model.ProduitsList.HasNextPage)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" href="@Url.Action("CatalogueVendeur", new { sortOrder = ViewBag.sortOrder, pageNumber = Model.ProduitsList.PageIndex + 1, parPage = ViewBag.parPage, searchString = ViewBag.searchString, id = ViewBag.id })">Next</a>
+                            </li>
+                        }
+                    </ul>
+                </nav>
+            </div>
+        }
+    }
+
 
 
 

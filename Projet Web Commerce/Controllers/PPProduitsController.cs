@@ -102,8 +102,20 @@ namespace Projet_Web_Commerce.Controllers
 
             if (ModelState.IsValid)
             {
-                int produitCount = _context.PPProduits.Count();
-                var id = produitCount + 1;
+                var highestId = 0;
+                foreach (var produit in _context.PPProduits.Where(v => v.NoVendeur == vendeur.NoVendeur))
+                {
+                    var idString = produit.NoProduit.ToString();
+                    var substring = idString.Length > 2 ? idString.Substring(2) : idString; // If the length is less than 2, keep the original string
+                    var idWithoutFirstTwoDigits = int.Parse(substring);
+                    if (idWithoutFirstTwoDigits > highestId)
+                    {
+                        highestId = idWithoutFirstTwoDigits;
+                    }
+                }
+
+                var id = highestId + 1;
+
                 int NoVendeur = pPProduits.NoVendeur;
                 string combined = NoVendeur.ToString() + id.ToString();
                 pPProduits.NoProduit = int.Parse(combined);

@@ -130,7 +130,6 @@ namespace Projet_Web_Commerce.Controllers
             IQueryable<PPProduits> ProduitsVendeur;
 
             var nouveauxProduits = _context.PPProduits
-               .Where(p => p.NoVendeur == vendeur.NoVendeur)
                .OrderBy(v => v.DateCreation)
                .Take(15)
                .ToList();
@@ -279,32 +278,48 @@ namespace Projet_Web_Commerce.Controllers
         }
 
         [HttpPost]
-        public ActionResult AjoutPanier(int quantite, int NoProduit, int NoClient, int NoVendeur)
+        public ActionResult AjoutPanier(int quantite, int NoProduit, int NoClient, int NoVendeur, string? returnUrl)
         {
             var vendeur = _context.PPVendeurs.Where(v => v.NoVendeur == NoVendeur).FirstOrDefault();
             var produit = _context.PPProduits.Where(v => v.NoProduit == NoProduit).FirstOrDefault();
 
-            
-            if (produit != null && vendeur != null)
+            var articlesEnPanier = _context.PPArticlesEnPanier
+            .Where(a => a.NoProduit == NoProduit)
+            .ToList();
+
+            // Calculate the total quantity of items in the cart for the given product
+            int quantiteDansPanier = articlesEnPanier.Sum(a => a.NbItems);
+
+
+            if (produit.NombreItems >= quantite + quantiteDansPanier)
             {
-                var ajoutPanier = new PPArticlesEnPanier
+                if (produit != null && vendeur != null)
                 {
-                    NoClient = NoClient, // Provide the NoClient value
-                    NoVendeur = NoVendeur, // Provide the NoVendeur value
-                    NoProduit = NoProduit, // Provide the NoProduit value
-                    DateCreation = DateTime.Now, // Set the creation date
-                    NbItems = quantite // Set the number of items
-                };
+                    var ajoutPanier = new PPArticlesEnPanier
+                    {
+                        NoClient = NoClient, // Provide the NoClient value
+                        NoVendeur = NoVendeur, // Provide the NoVendeur value
+                        NoProduit = NoProduit, // Provide the NoProduit value
+                        DateCreation = DateTime.Now, // Set the creation date
+                        NbItems = quantite // Set the number of items
+                    };
 
 
-                // Ajout au panier
-                _context.PPArticlesEnPanier.Add(ajoutPanier);
+                    // Ajout au panier
+                    _context.PPArticlesEnPanier.Add(ajoutPanier);
 
-                // Save changes to the database
-                _context.SaveChanges();
+                    // Save changes to the database
+                    _context.SaveChanges();
 
-                TempData["SuccessMessage"] = $"Le produit {produit.Nom} à été ajout au panier.  ";
+                    TempData["SuccessMessage"] = $"Le produit {produit.Nom} à été ajouté au panier.  ";
 
+                    return RedirectToAction("CatalogueVendeur", new { id = vendeur.NomAffaires });
+                }
+
+            }
+            else
+            {
+                TempData["ErrorMessage"] = $"Le produit {produit.Nom} n'a pas été ajout au panier. Assurez-vous que le panier n'excède pas le nombre d'items en stock. ";
                 return RedirectToAction("CatalogueVendeur", new { id = vendeur.NomAffaires });
             }
 
