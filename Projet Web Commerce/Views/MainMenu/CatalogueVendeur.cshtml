@@ -207,7 +207,7 @@
                                                    asp-route-id="@item.NoProduit"
                                                    asp-action="Details"
                                                    class="btn btn-secondary" style="background-color:rgb(124, 105, 146);  color: rgb(249, 229, 71); ">
-                                                    Details
+                                                    Détails
                                                 </a>
 
                                                 @if (SignInManager.IsSignedIn(User) && User.IsInRole("Client") && item.NombreItems > 0)
