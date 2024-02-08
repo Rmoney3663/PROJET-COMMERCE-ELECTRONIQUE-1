@@ -58,13 +58,13 @@
                             </div>
                         </div>
 
-                        <div class="col-md-3">
-                            <a href="#" class="show-options-link">Afficher plus d'options       +</a>
+                        <div class="col-md-3" style="text-align: center;">
+                            <a href="#" class="show-options-link">Afficher plus d'options +</a>
                         </div>
 
 
                         <div class="col-md-2">
-                            <select class="form-select btn-secondary" style="background-color: rgb(124, 105, 146);" aria-label="Trier par" id="sortOrder" name="sortOrder">
+                            <select class="form-select btn-secondary" style="background-color: rgb(124, 105, 146);" aria-label="Trier par" id="sortOrder" name="sortOrder" onchange="this.form.submit()">
                                 <option value="dateAsc" selected="@(ViewBag.sortOrder == "dateAsc")">Date de parution &#8593;</option>
                                 <option value="dateDesc" selected="@(ViewBag.sortOrder == "dateDesc")">Date de parution &#8595;</option>
                                 <option value="numProdAsc" selected="@(ViewBag.sortOrder == "numProdAsc")">Numéro de produit &#8593;</option>
@@ -77,10 +77,10 @@
 
                         </div>
                         <div class="col-md-3">
-                            <button type="submit" style="color: rgb(249, 229, 71) ; background-color: rgb(124, 105, 146);" class="btn btn-secondary">Rechercher</button>
+                            <button type="submit" style="background-color: rgb(124, 105, 146);" class="btn btn-secondary">Rechercher</button>
 
                             <div class="float-end">
-                                <select class="form-select btn-secondary" style="background-color: rgb(124, 105, 146); width:100px" aria-label="Trier par" id="parPage" name="parPage">
+                                <select class="form-select btn-secondary" style="background-color: rgb(124, 105, 146); width:100px" aria-label="Trier par" id="parPage" name="parPage" onchange="this.form.submit()">
                                     <option value="6" selected="@(ViewBag.parPage == "6")">6</option>
                                     <option value="9" selected="@(ViewBag.parPage == "9")">9</option>
                                     <option value="12" selected="@(ViewBag.parPage == "12")">12</option>
@@ -88,7 +88,7 @@
                                     <option value="21" selected="@(ViewBag.parPage == "21")">21</option>
                                     <option value="30" selected="@(ViewBag.parPage == "30")">30</option>
                                     <option value="60" selected="@(ViewBag.parPage == "60")">60</option>
-                                    <option value="Tous" selected="@(ViewBag.parPage == "tous")">Tous</option>
+                                    <option value="Tous" selected="@(ViewBag.parPage == "Tous")">Tous</option>
                                 </select>
                             </div>
                         </div>
@@ -96,26 +96,46 @@
                     </div>
 
                     <div class="row toggle-container" style="display: none;">
-                        <div class="col-md-3" style="padding: 5px;">
-                            <select class="form-select btn-secondary" style="background-color: rgb(124, 105, 146); width: 100%;" aria-label="Trier par" id="searchCat" name="searchCat">
-                                @foreach (var cat in Model.CategoriesList)
-                                {
-                                    <option value="@cat.Description">@cat.Description</option>
-                                }
-                            </select>
+                        <div class="col-md-4" style="padding-top: 20px;">
+
+                            <div class="row" style="padding-left: 15px;">
+                                <div class="col">
+                                    <select class="btn btn-secondary" style="background-color: rgb(124, 105, 146); width: 100%;" aria-label="Trier par" id="searchCat" name="searchCat">
+                                        <option value="">Catégorie</option>
+                                        @foreach (var cat in ViewBag.CategoriesVendeur)
+                                        {
+                                            <option value="@cat" selected="@(ViewBag.searchCat == cat)">@cat</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="col">
+                                    <select class="btn btn-secondary" style="background-color: rgb(124, 105, 146); width: 100%;" aria-label="Dropdown" aria-haspopup="true" aria-expanded="false" id="searchNums" name="searchNums">
+                                        <option value="">Numéro de produit</option> <!-- This will act as the label -->
+                                        @foreach (var nums in ViewBag.NumsProduit)
+                                        {
+                                            <option value="@nums" selected="@(ViewBag.searchNums == nums)">@nums</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+
                         </div>
-                        <div class="col-md-3" style="padding: 5px;">
-                            <select class="form-select btn-secondary" style="background-color: rgb(124, 105, 146); width: 100%;" aria-label="Trier par" id="searchNums" name="searchNums">
-                                @foreach (var nums in ViewBag.NumsProduit)
-                                {
-                                    <option value="@nums">@nums</option>
-                                }
-                            </select>
+                        <div class="col-md-3" style="padding: 20px;">
+                            <div style="margin-bottom: 20px;">
+                                <div class="input-group date">
+                                    <input type="date" class="form-control" id="dateApres" name="dateApres" placeholder="Parue Après" style="padding-left: 15px; width: 200px; value=" @ViewBag.DateApres"">
+                                </div>
+                            </div>
                         </div>
-                        <div class="col-md-3 input-group date">
-                            <input type="date" class="form-control" id="birthday" name="birthday">
-                            <span class="input-group-text"><i class="bi bi-calendar"></i></span>
+
+                        <div class="col-md-3" style="padding: 20px;">
+                            <div>
+                                <div class="input-group date">
+                                    <input type="date" class="form-control" id="dateAvant" name="dateAvant" placeholder="Parue Avant" style="padding-left: 15px; width: 200px;" value="@ViewBag.DateAvant">
+                                </div>
+                            </div>
                         </div>
+
 
                     </div>
 
@@ -166,7 +186,7 @@
                                                 <a asp-controller="PPProduits"
                                                    asp-route-id="@item.NoProduit"
                                                    asp-action="Details"
-                                                   class="btn btn-primary">
+                                                   class="btn btn-secondary" style="background-color:rgb(124, 105, 146);  color: rgb(249, 229, 71); ">
                                                     Details
                                                 </a>
 
@@ -258,13 +278,26 @@
         transition: color 0.3s; /* Smooth transition for color change */
     }
 
-        a:hover {
-            color: #ccc; /* Light gray color on hover */
-        }
+    a:hover {
+        color: #ccc; /* Light gray color on hover */
+    }
+
+    input[type="date"]:before {
+        content: attr(placeholder) !important;
+        color: #aaa;
+        margin-right: 0.5em;
+    }
+
+    input[type="date"]:focus:before,
+    input[type="date"]:valid:before {
+        content: "";
+    }
 </style>
 @section Scripts
 {
     <script>
+
+
         $(document).ready(function () {
             $('#vendeursListBox').mousedown(function (e) {
                 e.preventDefault();
@@ -289,12 +322,27 @@
 
 
             $(document).ready(function () {
-                $("a").click(function () {
-                    $(".toggle-container").animate({
+                document.getElementById("dateAvant").value = "@ViewBag.DateAvant";
+                document.getElementById("dateApres").value = "@ViewBag.DateApres";
+                var isContainerVisible = false; // Variable to track visibility state
+
+                $(".show-options-link").click(function () {
+                    console.log("Clicked");
+                    var toggleContainer = $(".toggle-container");
+                    toggleContainer.animate({
                         height: 'toggle'
                     });
+
+                    // Toggle the boolean variable
+                    isContainerVisible = !isContainerVisible;
+
+                    // Change the text based on current state
+                    var linkText = isContainerVisible ? 'Diminuer' : 'Afficher plus d\'options +';
+                    console.log("Link Text: ", linkText);
+                    $(this).text(linkText);
                 });
             });
+
         });
     </script>
 }
