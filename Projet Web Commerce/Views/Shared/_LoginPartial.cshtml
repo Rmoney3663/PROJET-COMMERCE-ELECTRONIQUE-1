@@ -8,68 +8,75 @@
 @inject UserManager<Utilisateur> UserManager
 
 <ul class="navbar-nav">
-@if (SignInManager.IsSignedIn(User))
-{
-    
-    var user = await UserManager.GetUserAsync(User);
-            
-    bool estDansRole = await UserManager.IsInRoleAsync(user, "Client");
-
-        var nom = "none";
-        var prenom = "none";
-        @if ((estDansRole = await UserManager.IsInRoleAsync(user, "Client")))
+    @if (SignInManager.IsSignedIn(User))
+    {
+        var user = await UserManager.GetUserAsync(User);
+        if (user != null)
         {
-            nom = _context.PPClients.Where(v => v.AdresseEmail == user.UserName).FirstOrDefault().Nom;
-            prenom = _context.PPClients.Where(v => v.AdresseEmail == user.UserName).FirstOrDefault().Prenom;
-        }
-        else if ((estDansRole = await UserManager.IsInRoleAsync(user, "Vendeur")))
-        {
-            nom = _context.PPVendeurs.Where(v => v.AdresseEmail == user.UserName).FirstOrDefault().Nom;
-            prenom = _context.PPVendeurs.Where(v => v.AdresseEmail == user.UserName).FirstOrDefault().Prenom;
-        }
-
-        @if (nom != "none" && prenom != "none" && nom != null && prenom != null){
-            <li class="nav-item">
-                <p id="nom" class="nav-link" style="color: rgb(249, 229, 71)">Bonjour @prenom @nom!</p>
-            </li>
-        }
-        else if ((estDansRole = await UserManager.IsInRoleAsync(user, "Gestionnaire")))
-        {
-            <li class="nav-item">
-                <p id="nom" class="nav-link" style="color: rgb(249, 229, 71)">Bonjour!</p>
-            </li>
-        }
-
-        if ((estDansRole = await UserManager.IsInRoleAsync(user, "Client")))
-        {
-            <li class="nav-item">
-                <a class="nav-link" asp-area="" asp-controller="Paniers" asp-action="Index" style="color: rgb(249, 229, 71)">Paniers</a>
-            </li>
-        }
-    <li class="nav-item">
+            var courrielUser = await UserManager.GetEmailAsync(user);
+            bool estDansRole = await UserManager.IsInRoleAsync(user, "Client");
+            var statutVendeur = 0;
+            var nom = "none";
+            var prenom = "none";
             @if ((estDansRole = await UserManager.IsInRoleAsync(user, "Client")))
-        {
-                <a id="manage" class="nav-link" style="color: rgb(249, 229, 71)" asp-area="Identity" asp-page="/Account/Manage/ProfilClient" title="Manage">Mon profil</a>
+            {
+                nom = _context.PPClients.Where(v => v.AdresseEmail == user.UserName).FirstOrDefault().Nom;
+                prenom = _context.PPClients.Where(v => v.AdresseEmail == user.UserName).FirstOrDefault().Prenom;
+            }
+            else if ((estDansRole = await UserManager.IsInRoleAsync(user, "Vendeur")))
+            {
+                if (_context.PPVendeurs.FirstOrDefault(v => v.AdresseEmail == courrielUser).Statut == 1)
+                {
+                    statutVendeur = 1;
+                    nom = _context.PPVendeurs.Where(v => v.AdresseEmail == user.UserName).FirstOrDefault().Nom;
+                    prenom = _context.PPVendeurs.Where(v => v.AdresseEmail == user.UserName).FirstOrDefault().Prenom;
+                }
+            }
+
+            @if (nom != "none" && prenom != "none" && nom != null && prenom != null)
+            {
+                <li class="nav-item">
+                    <p id="nom" class="nav-link" style="color: rgb(249, 229, 71)">Bonjour @prenom @nom!</p>
+                </li>
+            }
+            else if ((estDansRole = await UserManager.IsInRoleAsync(user, "Gestionnaire")))
+            {
+                <li class="nav-item">
+                    <p id="nom" class="nav-link" style="color: rgb(249, 229, 71)">Bonjour!</p>
+                </li>
+            }
+
+            if ((estDansRole = await UserManager.IsInRoleAsync(user, "Client")))
+            {
+                <li class="nav-item">
+                    <a class="nav-link" asp-area="" asp-controller="Paniers" asp-action="Index" style="color: rgb(249, 229, 71)">Paniers</a>
+                </li>
+            }
+            <li class="nav-item">
+                @if ((estDansRole = await UserManager.IsInRoleAsync(user, "Client")))
+                {
+                    <a id="manage" class="nav-link" style="color: rgb(249, 229, 71)" asp-area="Identity" asp-page="/Account/Manage/ProfilClient" title="Manage">Mon profil</a>
+                }
+                else if ((estDansRole = await UserManager.IsInRoleAsync(user, "Vendeur")) && statutVendeur == 1)
+                {
+                    <a id="manage" class="nav-link" style="color: rgb(249, 229, 71)" asp-area="Identity" asp-page="/Account/Manage/ProfilVendeur" title="Manage">Mon profil</a>
+                }
+
+            </li>
+            <li class="nav-item">
+                <form id="logoutForm" class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                    <button id="logout" type="submit" style="color: rgb(249, 229, 71)" class="nav-link btn btn-link border-0">Déconnexion</button>
+                </form>
+            </li>
         }
-        else if ((estDansRole = await UserManager.IsInRoleAsync(user, "Vendeur")))
-        {
-            <a id="manage" class="nav-link" style="color: rgb(249, 229, 71)" asp-area="Identity" asp-page="/Account/Manage/ProfilVendeur" title="Manage">Mon profil</a>
-        }
-            
-    </li>
-    <li class="nav-item">
-        <form id="logoutForm" class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-                <button id="logout" type="submit" style="color: rgb(249, 229, 71)" class="nav-link btn btn-link border-0">Déconnexion</button>
-        </form>
-    </li>
-}
-else
-{
-    <li class="nav-item">
-            <a class="nav-link" style="color: rgb(249, 229, 71)" id="register" asp-area="Identity" asp-page="/Account/Register">Inscription</a>
-    </li>
-    <li class="nav-item">
-            <a class="nav-link" style="color: rgb(249, 229, 71)" id="login" asp-area="Identity" asp-page="/Account/Login">Connexion</a>
-    </li>
-}
+    }
+    else
+    {
+        <li class="nav-item">
+                <a class="nav-link" style="color: rgb(249, 229, 71)" id="register" asp-area="Identity" asp-page="/Account/Register">Inscription</a>
+        </li>
+        <li class="nav-item">
+                <a class="nav-link" style="color: rgb(249, 229, 71)" id="login" asp-area="Identity" asp-page="/Account/Login">Connexion</a>
+        </li>
+    }
 </ul>

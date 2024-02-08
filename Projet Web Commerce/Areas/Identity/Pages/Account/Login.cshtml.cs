@@ -116,6 +116,12 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
 
             if (ModelState.IsValid)
             {
+                var foundVendeur = _context.PPVendeurs.FirstOrDefault(v => v.AdresseEmail == Input.Email);
+                if (foundVendeur != null && foundVendeur.Statut != 1)
+                {
+                    ModelState.AddModelError(string.Empty, "Votre compte vendeur a besoin d'être validé par un gestionnaire");
+                    return Page();
+                }
                 // This doesn't count login failures towards account lockout
                 // To enable password failures to trigger account lockout, set lockoutOnFailure: true
                 var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
@@ -125,18 +131,12 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
                     bool estVendeur = await _userManager.IsInRoleAsync(user, "Vendeur");
                     bool estClient = await _userManager.IsInRoleAsync(user, "Client");
                     var lstVendeurs = _context.PPVendeurs.ToList();
-                    var foundVendeur = lstVendeurs.FirstOrDefault(v => v.AdresseEmail == Input.Email);
 
                     if (foundVendeur != null)
                     {
                         if (estVendeur)
                         {
-                            return RedirectToAction("Index", "PPProduits", new { area = ""});
-                        }
-                        if (foundVendeur.Statut != 1)
-                        {
-                            ModelState.AddModelError(string.Empty, "Votre compte vendeur a besoin d'être validé par un gestionnaire");
-                            return Page();
+                            return RedirectToAction("Index", "PPProduits", new { area = "" });
                         }
                     }
                     _logger.LogInformation("Utilisateur connecté.");
