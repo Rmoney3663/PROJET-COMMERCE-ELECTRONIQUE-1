@@ -3,6 +3,8 @@
 ﻿﻿@using Microsoft.AspNetCore.Identity
 @inject UserManager<Projet_Web_Commerce.Areas.Identity.Data.Utilisateur> UserManager
 @inject SignInManager<Projet_Web_Commerce.Areas.Identity.Data.Utilisateur> SignInManager
+@using System.IO
+@inject AuthDbContext _context
 
     @if (!SignInManager.IsSignedIn(User) || User.IsInRole("Vendeur") || User.IsInRole("Gestionnaire"))
     {
@@ -20,14 +22,63 @@
         <div class="col-md-4">
             @if (ViewBag.listPaniers.Count > 0)
             {
-                @foreach (var panier in ViewBag.listPaniers)
-                {
-                    PPVendeurs vendeur = Model.VendeursList.Where(p => p.NoVendeur == panier.vendeur).FirstOrDefault();
-                    <div class="row">
-                        <a asp-route-id="@vendeur.NoVendeur" asp-area="" asp-controller="Panier" asp-action="Index">@vendeur.NomAffaires</a>
-                        <p>(@panier.articles.Count)</p>
-                    </div>
-                }
+                <div class="d-flex flex-wrap align-content-start bg-light overflow-auto" style="margin-bottom:50px; height:600px;">
+                    @foreach (var panier in ViewBag.listPaniers)
+                    {
+                        PPVendeurs vendeur = Model.VendeursList.Where(p => p.NoVendeur == panier.vendeur).FirstOrDefault();
+
+                        <div class="card" style="width:400px; margin: 10px;">
+                            <div class="card-body">
+                                <p class="card-text">
+                                    <b>Adresse de courriel :</b>
+                                    @Html.DisplayFor(modelItem => vendeur.AdresseEmail)
+                                </p>
+                                @if (!string.IsNullOrEmpty(vendeur.Prenom))
+                                {
+                                    <p class="card-text">
+                                        <b>Prenom :</b>
+                                        @Html.DisplayFor(modelItem => vendeur.Prenom)
+                                    </p>
+                                }
+                                @if (!string.IsNullOrEmpty(vendeur.Nom))
+                                {
+                                    <p class="card-text">
+                                        <b>Nom :</b>
+                                        @Html.DisplayFor(modelItem => vendeur.Nom)
+                                    </p>
+                                }
+                                <p class="card-text">
+                                    @{
+                                        int nbItems = panier.articles.Count;
+                                    }
+                                    <b>Nombre d'items :</b>
+                                    @Html.DisplayFor(modelItem => nbItems)
+                                </p>
+                                <p class="card-text">
+                                    @{
+                                        var oldestProductDate = DateTime.Now;
+                                        foreach(int produit in panier.articles)
+                                        {
+                                            PPArticlesEnPanier produitActu = _context.PPArticlesEnPanier.Where(v => v.NoPanier == produit).FirstOrDefault();
+                                            if (produitActu.DateCreation < oldestProductDate)
+                                            {
+                                                oldestProductDate = produitActu.DateCreation;
+                                            }
+                                        }
+                                    }
+                                    <b>Date de creation :</b>
+                                    @Html.DisplayFor(modelItem => oldestProductDate)
+                                </p>
+                                <div>
+                                    <div>
+                                        <a class="btn btn-success" asp-route-id="@vendeur.NoVendeur" asp-area="" asp-controller="Panier" asp-action="Index">Details</a>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    }
+                </div>
             }
             else
             {
