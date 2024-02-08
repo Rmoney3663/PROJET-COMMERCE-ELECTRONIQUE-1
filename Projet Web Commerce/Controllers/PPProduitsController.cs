@@ -103,13 +103,17 @@ namespace Projet_Web_Commerce.Controllers
             if (ModelState.IsValid)
             {
                 var highestId = 0;
-                foreach(var idProduit in _context.PPProduits.Where(v=>v.NoVendeur == vendeur.NoVendeur))
+                foreach (var produit in _context.PPProduits.Where(v => v.NoVendeur == vendeur.NoVendeur))
                 {
-                    if (int.Parse(idProduit.ToString().Substring(2)) > highestId)
+                    var idString = produit.NoProduit.ToString();
+                    var substring = idString.Length > 2 ? idString.Substring(2) : idString;
+                    var idWithoutFirstTwoDigits = int.Parse(substring);
+                    if (idWithoutFirstTwoDigits > highestId)
                     {
-                        highestId = int.Parse(idProduit.ToString().Substring(2));
+                        highestId = idWithoutFirstTwoDigits;
                     }
                 }
+
                 var id = highestId + 1;
 
                 int NoVendeur = pPProduits.NoVendeur;
