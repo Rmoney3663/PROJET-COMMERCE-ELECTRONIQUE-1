@@ -122,16 +122,20 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
                 if (result.Succeeded)
                 {
                     var user = await _userManager.FindByEmailAsync(Input.Email);                   
-                    bool estDansRole = await _userManager.IsInRoleAsync(user, "Vendeur");
+                    bool estVendeur = await _userManager.IsInRoleAsync(user, "Vendeur");
                     bool estClient = await _userManager.IsInRoleAsync(user, "Client");
                     var lstVendeurs = _context.PPVendeurs.ToList();
                     var foundVendeur = lstVendeurs.FirstOrDefault(v => v.AdresseEmail == Input.Email);
 
                     if (foundVendeur != null)
                     {
+                        if (estVendeur)
+                        {
+                            return RedirectToAction("Index", "PPProduits", new { area = ""});
+                        }
                         if (foundVendeur.Statut != 1)
                         {
-                            ModelState.AddModelError(string.Empty, "Votre compte vendeur à besoin d'être validé par un gestionnaire");
+                            ModelState.AddModelError(string.Empty, "Votre compte vendeur a besoin d'être validé par un gestionnaire");
                             return Page();
                         }
                     }
@@ -171,7 +175,6 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
                 else
                 {
                     ModelState.AddModelError(string.Empty, "Tentative de connexion non valide.");
-                    return Page();
                 }
             }
 
