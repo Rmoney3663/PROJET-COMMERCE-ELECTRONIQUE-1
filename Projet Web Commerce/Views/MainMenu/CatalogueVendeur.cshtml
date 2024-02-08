@@ -182,7 +182,7 @@
                                                 <p class="card-text">Catégorie : @category.Description</p>
                                                 <p class="card-title">Numéro du produit : @Html.DisplayFor(modelItem => item.NoProduit)</p>
                                                 <p class="card-text">Prix Demandé : @Html.DisplayFor(modelItem => item.PrixDemande)</p>
-                                                <p class="card-text">Prix Demandé : @Html.DisplayFor(modelItem => item.NombreItems)</p>
+                                                <p class="card-text">Items en Stock : @Html.DisplayFor(modelItem => item.NombreItems)</p>
                                                 <a asp-controller="PPProduits"
                                                    asp-route-id="@item.NoProduit"
                                                    asp-action="Details"
