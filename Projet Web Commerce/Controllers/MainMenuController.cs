@@ -29,10 +29,15 @@ namespace Projet_Web_Commerce.Controllers
 
         // GET: MainMenuController
 
-        [Authorize(Roles = "Client,Gestionnaire")]
+        
         [AllowAnonymous]
+        //[Authorize(Roles = "Client,Gestionnaire")]
         public ActionResult Catalogue()
         {
+            if (User.IsInRole("Vendeur"))
+            {
+                return RedirectToAction("Index", "PPProduits", new { area = "" });
+            }
             var CategoriesList = _context.PPCategories.ToList();
             var VendeursList = _context.PPVendeurs.ToList();
             var ProduitsList = _context.PPProduits.ToList();
