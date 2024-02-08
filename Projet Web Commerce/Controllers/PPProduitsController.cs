@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -16,6 +17,7 @@ using Projet_Web_Commerce.Models;
 
 namespace Projet_Web_Commerce.Controllers
 {
+    [Authorize(Roles = "Vendeur")]
     public class PPProduitsController : Controller
     {
         private readonly AuthDbContext _context;
