@@ -125,7 +125,7 @@ else
         </dl>
     </div>
     <div>
-        @if ( User.IsInRole("Client"))
+        @if ( !User.IsInRole("Vendeur"))
         {
             <a asp-controller="MainMenu"  asp-action="Catalogue">Retour à la Catalogue</a>
         }
