@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -102,8 +102,8 @@ namespace Projet_Web_Commerce.Controllers
 
             if (ModelState.IsValid)
             {
-                var highestId = (_context.PPProduits.Max(p => (int?)p.NoProduit) ?? 100) + 1;
-                var id = highestId.ToString().Substring(2);
+                var highestId = (_context.PPProduits.Max(p => (int?)(p.NoProduit / 100)) ?? 0) + 1;
+                var id = highestId;
 
                 int NoVendeur = pPProduits.NoVendeur;
                 string combined = NoVendeur.ToString() + id.ToString();
