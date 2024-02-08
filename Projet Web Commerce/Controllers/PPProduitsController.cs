@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
@@ -67,16 +68,17 @@ namespace Projet_Web_Commerce.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("NoVendeur,NoCategorie,Nom,Description,PrixDemande,Disponibilite,Poids,PrixVente, NombreItems")] PPProduits pPProduits,
+        public async Task<IActionResult> Create([Bind("NoVendeur,NoCategorie,Nom,Description,PrixDemande,Disponibilite,Poids,PrixVente, NombreItems, DateVente")] PPProduits pPProduits,
             IFormFile? file)
         {
             var user = await _userManager.GetUserAsync(User);
             var vendeur = _context.PPVendeurs.FirstOrDefault(v => v.IdUtilisateur == user.Id);
             pPProduits.NoVendeur = vendeur.NoVendeur;
             pPProduits.DateCreation = DateTime.Now;
-            pPProduits.DateVente = DateTime.Now;
             pPProduits.DateMAJ = DateTime.Now;
-           
+
+
+            Console.WriteLine("DATE : " + pPProduits.DateVente);
             Console.WriteLine($"User Id: {user?.Id}, User Name: {user?.UserName}");
             Console.WriteLine($"Photo: {file.FileName}");
             ModelState.Remove("file");
@@ -157,6 +159,7 @@ namespace Projet_Web_Commerce.Controllers
         {
             ModelState.Remove("file");
             ModelState.Remove("Photo");
+            Console.WriteLine("DATE : " + pPProduits.DateVente);
             foreach (var m in ModelState)
             {
                 foreach (var er in m.Value.Errors)
@@ -183,9 +186,10 @@ namespace Projet_Web_Commerce.Controllers
                         {
                             await file.CopyToAsync(fileStream);
                         }
-                    }                    
-
+                    } 
+                    
                     _context.Update(pPProduits);
+
                     Console.WriteLine(" pPProduits : " + pPProduits.DateMAJ);
                     Console.WriteLine(" pPProduits : " + pPProduits.NombreItems);
                     await _context.SaveChangesAsync();
