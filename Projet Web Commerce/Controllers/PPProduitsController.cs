@@ -17,7 +17,7 @@ using Projet_Web_Commerce.Models;
 
 namespace Projet_Web_Commerce.Controllers
 {
-    [Authorize(Roles = "Vendeur")]
+    [Authorize(Roles = "Vendeur, Client")]
     public class PPProduitsController : Controller
     {
         private readonly AuthDbContext _context;
