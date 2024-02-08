@@ -1,8 +1,9 @@
 ﻿﻿﻿@using Microsoft.AspNetCore.Identity
 @using Projet_Web_Commerce.Data
 @inject AuthDbContext _context
-@inject UserManager<Projet_Web_Commerce.Areas.Identity.Data.Utilisateur> _userManager
+@inject UserManager<Projet_Web_Commerce.Areas.Identity.Data.Utilisateur> UserManager
 @inject SignInManager<Projet_Web_Commerce.Areas.Identity.Data.Utilisateur> SignInManager
+
 
 @if (!SignInManager.IsSignedIn(User))
 {
@@ -16,6 +17,8 @@
 }
 else
 {
+    var user = await UserManager.GetUserAsync(User);
+
     List<Projet_Web_Commerce.Areas.Identity.Data.Utilisateur> listeUtilisateurs = new List<Projet_Web_Commerce.Areas.Identity.Data.Utilisateur>();
 
     var listVendeurs = _context.PPVendeurs;
@@ -59,7 +62,7 @@ else
     <div class="row">
         <div class="col-md-4">
             <section>
-                <form id="account" method="post">
+                <form id="account" method="post" asp-route-envoyeur="@user.Email">
                     <h2>Envoyer un message</h2>
                     <hr />
                     <div class="form-floating mb-3">
@@ -71,7 +74,7 @@ else
                         <label class="form-label">Votre message</label>
                     </div>
                     <div class="form-floating mb-3">
-                        <select>
+                        <select name="email">
                             @foreach (var utilisateur in listeUtilisateurs)
                             {
                                 <option value="@utilisateur.Email">@utilisateur.Email</option>

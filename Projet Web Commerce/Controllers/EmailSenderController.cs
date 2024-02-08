@@ -11,6 +11,13 @@ namespace Projet_Web_Commerce.Controllers
             return View();
         }
 
+        [HttpPost]
+        public ActionResult Index(string sujet, string envoyeur, string message, string email)
+        {
+            Methodes.envoyerCourrielUser(email, envoyeur, sujet, message);
+            return View();
+        }
+
         // GET: EmailSenderController/Details/5
         public ActionResult Details(int id)
         {
