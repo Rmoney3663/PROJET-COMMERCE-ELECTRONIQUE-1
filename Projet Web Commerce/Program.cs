@@ -23,7 +23,7 @@ builder.Services.AddControllersWithViews();
 
 
 var app = builder.Build();
-app.UseStatusCodePagesWithReExecute("/Home/Error", "?statusCode={0}");
+//app.UseStatusCodePagesWithReExecute("/Home/Error", "?statusCode={0}");
 // Configure the HTTP request pipeline.
 
 if (!app.Environment.IsDevelopment())
