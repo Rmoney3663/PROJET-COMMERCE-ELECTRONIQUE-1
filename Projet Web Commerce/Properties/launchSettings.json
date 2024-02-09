@@ -23,9 +23,7 @@
       "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
-      },
-      "nativeDebugging": false,
-      "sqlDebugging": false
+      }
     },
     "WSL": {
       "commandName": "WSL2",
