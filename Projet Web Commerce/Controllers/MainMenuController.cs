@@ -12,6 +12,7 @@ using Projet_Web_Commerce.Data;
 using Projet_Web_Commerce.Models;
 using System.Globalization;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Projet_Web_Commerce.Controllers
 {
@@ -60,86 +61,88 @@ namespace Projet_Web_Commerce.Controllers
         }
 
         //[HttpGet]
-        //public ActionResult GestionVendeurs()
+        //public async Task<IActionResult> CatalogueVendeurAsync(string id)
         //{
-        //    if (User.IsInRole("Gestionnaire"))
-        //    {
-        //        var vendeursStatutZero = _context.PPVendeurs
-        //        .Where(v => v.Statut == 0)
-        //        .OrderBy(v => v.DateCreation)  // Assuming DateCreation is the property you want to order by
-        //        .ToList();
 
-        //        return View(vendeursStatutZero);
-        //    }
+        //    var model = new ModelCatalogueVendeur();
 
-        //    return Redirect("AccessDenied");
+        //    model.sortOrder = 
+
+        //    return View(model);
         //}
 
-        public async Task<IActionResult> CatalogueVendeurAsync(string id, string? searchString, string? sortOrder, string? parPage, int? pageNumber, string? searchCat, int? searchNums, string? dateApres, string? dateAvant)
+        [HttpPost]
+        public async Task<IActionResult> CatalogueVendeurAsync(string id, ModelCatalogueVendeur model)
         {
 
             // Action logic
             var vendeur = _context.PPVendeurs.Where(v => v.NomAffaires == id).FirstOrDefault();
-
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var client = _context.PPClients.FirstOrDefault(c => c.IdUtilisateur == userId);
 
-            ViewBag.sortOrder = sortOrder;
+            model.CategoriesList = _context.PPCategories.ToList();
+            model.NouveauxProduits = _context.PPProduits
+           .OrderBy(v => v.DateCreation)
+           .Take(15)
+           .ToList();
 
-            if (parPage != "Tous")
+            //if (model.parPage != "Tous")
+            //{
+            //    ViewBag.parPage = model.parPage ?? "15";
+            //}
+            //else
+            //{
+            //    ViewBag.parPage = "Tous";
+            //}
+
+            //ViewBag.id = id;
+
+            model.sortOrderOptions = new List<SelectListItem>
             {
-                ViewBag.parPage = parPage ?? "15";
-            }
-            else
+                new SelectListItem { Value = "dateAsc", Text = "Date de parution ↑" },
+                new SelectListItem { Value = "dateDesc", Text = "Date de parution ↓" },
+                new SelectListItem { Value = "numProdAsc", Text = "Numéro de produit ↑" },
+                new SelectListItem { Value = "numProdDesc", Text = "Numéro de produit ↓" },
+                new SelectListItem { Value = "catProdAsc", Text = "Catégorie particulière de produit ↑" },
+                new SelectListItem { Value = "catProdDesc", Text = "Catégorie particulière de produit ↓" },
+                new SelectListItem { Value = "descProdAsc", Text = "Description du produit ↑" },
+                new SelectListItem { Value = "descProdDesc", Text = "Description du produit ↓" }
+            };
+
+            model.parPageOptions = new List<SelectListItem>
             {
-                ViewBag.parPage = "Tous";
-            }
-            ViewBag.searchString = searchString;
-            ViewBag.id = id;
-            ViewBag.pageNumber = pageNumber;
+                new SelectListItem { Value = "6", Text = "6" },
+                new SelectListItem { Value = "9", Text = "9" },
+                new SelectListItem { Value = "12", Text = "12" },
+                new SelectListItem { Value = "15", Text = "15" },
+                new SelectListItem { Value = "21", Text = "21" },
+                new SelectListItem { Value = "30", Text = "30" },
+                new SelectListItem { Value = "60", Text = "60" },
+                new SelectListItem { Value = "Tous", Text = "Tous" }
+            };
 
-            ViewBag.searchCat = searchCat;
-            ViewBag.searchNums = searchNums;
-
-            ViewBag.DateAvant = dateAvant;
-            ViewBag.DateApres = dateApres;
-
-
-            ViewBag.NumsProduit = _context.PPProduits
-                .Where(p => p.NoVendeur == vendeur.NoVendeur && p.Disponibilite == true) // Filter by NoVendeur
-                .Select(p => p.NoProduit)
-                .OrderBy(n => n) // Order by NoProduit
-                .ToArray();
-
-            //ViewBag.CategoriesVendeur = vendeur.PPProduits.Select(p => p.NoCategorie)
-
-            var categoryDetailsArray = _context.PPProduits
-                .Where(p => p.NoVendeur == vendeur.NoVendeur)
-                .Join(_context.PPCategories,
-                    produit => produit.NoCategorie,
-                    categorie => categorie.NoCategorie,
-                    (produit, categorie) => categorie.Description)
-                .Distinct()
-                .ToArray();
-
-            ViewBag.CategoriesVendeur = categoryDetailsArray;
-
-            var CategoriesList = _context.PPCategories.ToList();
-            var VendeursList = _context.PPVendeurs.ToList();
+            model.categorieOptions = _context.PPProduits
+            .Where(p => p.NoVendeur == vendeur.NoVendeur)
+            .Join(_context.PPCategories,
+                produit => produit.NoCategorie,
+                categorie => categorie.NoCategorie,
+                (produit, categorie) => categorie.Description)
+            .Distinct()
+            .Select(category => new SelectListItem
+            {
+                Value = category,
+                Text = category
+            })
+            .ToList();
 
             IQueryable<PPProduits> ProduitsVendeur;
-
-            var nouveauxProduits = _context.PPProduits
-               .OrderBy(v => v.DateCreation)
-               .Take(15)
-               .ToList();
-
             // Recherche string description et nom + verif dispo et vendeur selectionner
-            if (!String.IsNullOrEmpty(searchString))
+            if (!String.IsNullOrEmpty(model.searchString))
             {
+                int intValue;
                 ProduitsVendeur = from p in _context.PPProduits
-                    .Where(p => p.NoVendeur == vendeur.NoVendeur && p.Disponibilite == true && (p.Nom.Contains(searchString) || p.Description.Contains(searchString)))
-                                  select p;
+                    .Where(p => p.NoVendeur == vendeur.NoVendeur && p.Disponibilite == true && (p.Nom.Contains(model.searchString) || p.Description.Contains(model.searchString) || (int.TryParse(model.searchString, out intValue) && p.NoProduit == intValue)))
+                    select p;
             }
             else
             {
@@ -148,39 +151,22 @@ namespace Projet_Web_Commerce.Controllers
                                   select p;
             }
 
-            // Recherche par no de produit
-
-            if (searchNums != null)
-            {
-                ProduitsVendeur = ProduitsVendeur
-                .Where(p => p.NoProduit == searchNums);
-
-            }
-
             // Recherche par date
-            if (dateApres != null)
+            if (model.dateApres != null)
             {
-                DateTime dateApres2;
-                if (DateTime.TryParseExact(dateApres, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out dateApres2))
-                {
-                    ProduitsVendeur = ProduitsVendeur.Where(p => p.DateCreation > dateApres2);
-                }
+                ProduitsVendeur = ProduitsVendeur.Where(p => p.DateCreation > model.dateApres);
             }
 
-            if (dateAvant != null)
+            if (model.dateAvant != null)
             {
-                DateTime dateAvant2;
-                if (DateTime.TryParseExact(dateAvant, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out dateAvant2))
-                {
-                    ProduitsVendeur = ProduitsVendeur.Where(p => p.DateCreation < dateAvant2);
-                }
+                ProduitsVendeur = ProduitsVendeur.Where(p => p.DateCreation < model.dateAvant);
             }
 
             // Filtrer par categorie
-            if (!String.IsNullOrEmpty(searchCat))
+            if (!String.IsNullOrEmpty(model.searchCat))
             {
                 var categorySelect = _context.PPCategories
-                .Where(c => c.Description == searchCat)
+                .Where(c => c.Description == model.searchCat)
                 .Select(c => c.NoCategorie)
                 .FirstOrDefault();
 
@@ -191,11 +177,7 @@ namespace Projet_Web_Commerce.Controllers
                 }
             }
 
-
-
-            ModelCatalogueVendeur modelCatalogueVendeur;
-
-            switch (sortOrder)
+            switch (model.sortOrder)
             {
                 case "dateAsc":
                     ProduitsVendeur = ProduitsVendeur.OrderBy(p => p.DateCreation);
@@ -222,98 +204,86 @@ namespace Projet_Web_Commerce.Controllers
                     ProduitsVendeur = ProduitsVendeur.OrderByDescending(p => p.Description);
                     break;
             }
+
             int pageSize;
 
-            if (parPage == null)
+            if (model.parPage == null)
             {
-                pageSize = 15;
+                model.parPage = "15";
+            }
+
+            if (model.parPage == "Tous")
+            {
+                pageSize = 999;
             }
             else
             {
-                if (parPage == "Tous")
-                {
-                    pageSize = 999;
-                }
-                else
-                {
-                    pageSize = Convert.ToInt32(parPage);
-                }
-                
+                pageSize = Convert.ToInt32(model.parPage);
             }
 
             var produitsVendeurQueryable = ProduitsVendeur.AsQueryable();
 
             var produitsVendeurPaginated = await PaginatedList<PPProduits>.CreateAsync(
                 produitsVendeurQueryable,
-                pageNumber ?? 1,
+                model.pageNumber ?? 1,
                 pageSize);
 
-            if (client != null)
-            {
-                modelCatalogueVendeur = new ModelCatalogueVendeur()
-                {
-                    nomAffaire = id,
-                    CategoriesList = CategoriesList,
-                    VendeursList = VendeursList,
-                    ProduitsList = produitsVendeurPaginated,
-                    NouveauxProduits = nouveauxProduits,
-                    noClient = client.NoClient
-                };
-            }
-            else
-            {
-                modelCatalogueVendeur = new ModelCatalogueVendeur()
-                {
-                    nomAffaire = id,
-                    CategoriesList = CategoriesList,
-                    VendeursList = VendeursList,
-                    ProduitsList = produitsVendeurPaginated,
-                    NouveauxProduits = nouveauxProduits
-                };
-            }
 
-            return View(modelCatalogueVendeur);
+
+            return View(model);
 
 
         }
 
         [HttpPost]
-        public ActionResult AjoutPanier(int quantite, int NoProduit, int NoClient, int NoVendeur, string? returnUrl)
+        public ActionResult AjoutPanier(int quantite, int NoProduit, int NoClient, int NoVendeur, ModelCatalogueVendeur model)
         {
             var vendeur = _context.PPVendeurs.Where(v => v.NoVendeur == NoVendeur).FirstOrDefault();
             var produit = _context.PPProduits.Where(v => v.NoProduit == NoProduit).FirstOrDefault();
 
             var articlesEnPanier = _context.PPArticlesEnPanier
-            .Where(a => a.NoProduit == NoProduit)
+            .Where(a => a.NoProduit == NoProduit && a.NoClient == NoClient)
             .ToList();
 
             // Calculate the total quantity of items in the cart for the given product
             int quantiteDansPanier = articlesEnPanier.Sum(a => a.NbItems);
 
-
-            if (produit.NombreItems >= quantite + quantiteDansPanier)
+            Console.WriteLine(model.searchString);
+            if (produit.NombreItems >= quantite + quantiteDansPanier) // Verif nb items panier plus petit que stock
             {
                 if (produit != null && vendeur != null)
                 {
-                    var ajoutPanier = new PPArticlesEnPanier
+                    if (!articlesEnPanier.Any(a => a.NoProduit == produit.NoProduit)) // Verif si panier meme produit existe
                     {
-                        NoClient = NoClient, // Provide the NoClient value
-                        NoVendeur = NoVendeur, // Provide the NoVendeur value
-                        NoProduit = NoProduit, // Provide the NoProduit value
-                        DateCreation = DateTime.Now, // Set the creation date
-                        NbItems = quantite // Set the number of items
-                    };
+                        var ajoutPanier = new PPArticlesEnPanier
+                        {
+                            NoClient = NoClient, // Provide the NoClient value
+                            NoVendeur = NoVendeur, // Provide the NoVendeur value
+                            NoProduit = NoProduit, // Provide the NoProduit value
+                            DateCreation = DateTime.Now, // Set the creation date
+                            NbItems = quantite // Set the number of items
+                        };
 
 
-                    // Ajout au panier
-                    _context.PPArticlesEnPanier.Add(ajoutPanier);
+                        // Ajout au panier
+                        _context.PPArticlesEnPanier.Add(ajoutPanier);
+                    }
+                    else
+                    {
+                        var panierModif = articlesEnPanier.Where(a => a.NoProduit == produit.NoProduit).FirstOrDefault();
+                        panierModif.NbItems = panierModif.NbItems + quantite;
+                    }
 
-                    // Save changes to the database
                     _context.SaveChanges();
 
                     TempData["SuccessMessage"] = $"Le produit {produit.Nom} à été ajouté au panier.  ";
 
-                    return RedirectToAction("CatalogueVendeur", new { id = vendeur.NomAffaires });
+                    return RedirectToAction("CatalogueVendeur", new
+                    {
+                        id = vendeur.NomAffaires,
+                        searchString = model.searchString
+                    });
+
                 }
 
             }

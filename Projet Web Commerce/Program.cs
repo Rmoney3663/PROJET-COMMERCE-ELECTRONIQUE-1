@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -23,6 +25,7 @@ builder.Services.AddControllersWithViews();
 var app = builder.Build();
 app.UseStatusCodePagesWithReExecute("/Home/Error", "?statusCode={0}");
 // Configure the HTTP request pipeline.
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -128,8 +131,6 @@ using (var scope = app.Services.CreateScope())
     }
 
 }
-
-
 
 
 app.Run();

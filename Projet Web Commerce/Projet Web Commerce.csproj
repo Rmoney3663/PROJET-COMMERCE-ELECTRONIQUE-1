@@ -7,6 +7,7 @@
     <RootNamespace>Projet_Web_Commerce</RootNamespace>
   </PropertyGroup>
 
+
   <ItemGroup>
     <PackageReference Include="DocumentFormat.OpenXml" Version="3.0.1" />
     <PackageReference Include="KendoUICore" Version="2024.1.130" />
