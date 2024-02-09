@@ -20,7 +20,7 @@ namespace Projet_Web_Commerce.Models
         public bool Disponibilite { get; set; }
         [Column(TypeName = "numeric(8,1)")]
         public decimal Poids { get; set; }
-        public DateTime DateVente { get; set; }
+        public DateTime? DateVente { get; set; }
         [Column(TypeName = "smallmoney")]
         public decimal? PrixVente { get; set; }
 
