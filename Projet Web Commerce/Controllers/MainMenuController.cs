@@ -77,10 +77,14 @@ namespace Projet_Web_Commerce.Controllers
             // Action logic
             var vendeur = _context.PPVendeurs.Where(v => v.NomAffaires == id).FirstOrDefault();
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var client = _context.PPClients.FirstOrDefault(c => c.IdUtilisateur == userId);
 
+            if (userId != null)
+            {
+                var client = _context.PPClients.FirstOrDefault(c => c.IdUtilisateur == userId);
+                model.noClient = client.NoClient;
+            }
+            
 
-            model.noClient = client.NoClient;
             model.CategoriesList = _context.PPCategories.ToList();
             model.NouveauxProduits = _context.PPProduits
            .OrderBy(v => v.DateCreation)
@@ -290,7 +294,9 @@ namespace Projet_Web_Commerce.Controllers
                         searchString = model.searchString,
                         parPage = model.parPage,
                         dateApres = model.dateApres,
-                        dateAvant = model.dateAvant
+                        dateAvant = model.dateAvant,
+                        searchCat = model.searchCat,
+                        pageNumber = model.pageNumber
                     });
 
                 }

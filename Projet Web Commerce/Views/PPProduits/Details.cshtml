@@ -4,7 +4,9 @@
 @model Projet_Web_Commerce.Models.PPProduits
 @{
     ViewData["Title"] = "Details";
-    var user = await _userManager.GetUserAsync(User);    
+    var user = await _userManager.GetUserAsync(User);
+
+    var vendeur = Model.PPVendeurs.NomAffaires;
 }
 
 @if (!SignInManager.IsSignedIn(User) )
@@ -125,9 +127,9 @@ else
         </dl>
     </div>
     <div>
-        @if ( !User.IsInRole("Vendeur"))
+        @if ( !User.IsInRole("Vendeur") && vendeur != null)
         {
-            <a asp-controller="MainMenu"  asp-action="Catalogue">Retour à la Catalogue</a>
+            <a asp-controller="MainMenu" asp-route-id="@vendeur"  asp-action="CatalogueVendeur">Retour au catalogue du vendeur</a>
         }
         else
         {
