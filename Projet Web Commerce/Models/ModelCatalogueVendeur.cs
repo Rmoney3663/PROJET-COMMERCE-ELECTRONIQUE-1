@@ -30,5 +30,7 @@ namespace Projet_Web_Commerce.Models
         
         public DateTime? dateApres { get; set; }
         public DateTime? dateAvant { get; set; }
+
+        public bool? menuVis {  get; set; }
     }
 }

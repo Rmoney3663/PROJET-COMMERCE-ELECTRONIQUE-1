@@ -71,7 +71,6 @@ namespace Projet_Web_Commerce.Controllers
         //    return View(model);
         //}
 
-        [HttpPost]
         public async Task<IActionResult> CatalogueVendeurAsync(string id, ModelCatalogueVendeur model)
         {
 
@@ -80,6 +79,8 @@ namespace Projet_Web_Commerce.Controllers
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var client = _context.PPClients.FirstOrDefault(c => c.IdUtilisateur == userId);
 
+
+            model.noClient = client.NoClient;
             model.CategoriesList = _context.PPCategories.ToList();
             model.NouveauxProduits = _context.PPProduits
            .OrderBy(v => v.DateCreation)
@@ -96,6 +97,8 @@ namespace Projet_Web_Commerce.Controllers
             //}
 
             //ViewBag.id = id;
+
+            model.menuVis = model.menuVis ?? true;
 
             model.sortOrderOptions = new List<SelectListItem>
             {
@@ -121,19 +124,6 @@ namespace Projet_Web_Commerce.Controllers
                 new SelectListItem { Value = "Tous", Text = "Tous" }
             };
 
-            model.categorieOptions = _context.PPProduits
-            .Where(p => p.NoVendeur == vendeur.NoVendeur)
-            .Join(_context.PPCategories,
-                produit => produit.NoCategorie,
-                categorie => categorie.NoCategorie,
-                (produit, categorie) => categorie.Description)
-            .Distinct()
-            .Select(category => new SelectListItem
-            {
-                Value = category,
-                Text = category
-            })
-            .ToList();
 
             IQueryable<PPProduits> ProduitsVendeur;
             // Recherche string description et nom + verif dispo et vendeur selectionner
@@ -150,6 +140,22 @@ namespace Projet_Web_Commerce.Controllers
                     .Where(p => p.NoVendeur == vendeur.NoVendeur && p.Disponibilite == true)
                                   select p;
             }
+
+            // First, get the distinct category IDs of the vendeur's products
+            var categoryIds = _context.PPProduits
+                .Where(p => p.NoVendeur == vendeur.NoVendeur)
+                .Select(p => p.NoCategorie)
+                .Distinct();
+
+            // Then, fetch the corresponding category descriptions
+            model.categorieOptions = _context.PPCategories
+                .Where(c => categoryIds.Contains(c.NoCategorie))
+                .Select(c => new SelectListItem
+                {
+                    Value = c.Description,
+                    Text = c.Description
+                })
+                .ToList();
 
             // Recherche par date
             if (model.dateApres != null)
@@ -228,7 +234,7 @@ namespace Projet_Web_Commerce.Controllers
                 model.pageNumber ?? 1,
                 pageSize);
 
-
+            model.ProduitsList = produitsVendeurPaginated;
 
             return View(model);
 
@@ -281,7 +287,10 @@ namespace Projet_Web_Commerce.Controllers
                     return RedirectToAction("CatalogueVendeur", new
                     {
                         id = vendeur.NomAffaires,
-                        searchString = model.searchString
+                        searchString = model.searchString,
+                        parPage = model.parPage,
+                        dateApres = model.dateApres,
+                        dateAvant = model.dateAvant
                     });
 
                 }
