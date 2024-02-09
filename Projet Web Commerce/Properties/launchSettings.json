@@ -24,8 +24,8 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
-      "nativeDebugging": true,
-      "sqlDebugging": true
+      "nativeDebugging": false,
+      "sqlDebugging": false
     },
     "WSL": {
       "commandName": "WSL2",
