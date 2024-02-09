@@ -5,18 +5,11 @@
 @inject SignInManager<Projet_Web_Commerce.Areas.Identity.Data.Utilisateur> SignInManager
 
 
-@if (!SignInManager.IsSignedIn(User))
-{
-    Console.WriteLine("yes");
-    <text>
-        <script>
-            debugger;
-            window.location.href = '/MainMenu/Catalogue';
-        </script>
-    </text>
-}
-else
-{
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+
+@{
     var user = await UserManager.GetUserAsync(User);
 
     List<Projet_Web_Commerce.Areas.Identity.Data.Utilisateur> listeUtilisateurs = new List<Projet_Web_Commerce.Areas.Identity.Data.Utilisateur>();
@@ -58,34 +51,111 @@ else
             listeUtilisateurs.Add(_context.Users.Where(v => v.Email == client.AdresseEmail).FirstOrDefault());
         }
     }
-
-    <div class="row">
-        <div class="col-md-4">
-            <section>
-                <form id="account" method="post" asp-route-envoyeur="@user.Email">
-                    <h2>Envoyer un message</h2>
-                    <hr />
-                    <div class="form-floating mb-3">
-                        <input name="sujet" class="form-control" aria-required="true" />
-                        <label class="form-label">Le sujet</label>
-                    </div>
-                    <div class="form-floating mb-3">
-                        <input name="message" class="form-control" aria-required="true" />
-                        <label class="form-label">Votre message</label>
-                    </div>
-                    <div class="form-floating mb-3">
-                        <select name="email">
-                            @foreach (var utilisateur in listeUtilisateurs)
-                            {
-                                <option value="@utilisateur.Email">@utilisateur.Email</option>
-                            }
-                        </select>
-                    </div>
-                    <div>
-                        <button id="send" type="submit" class="w-100 btn btn-lg btn-primary" style="color: rgb(249, 229, 71); background-color: rgb(124, 105, 146)">Envoyer</button>
-                    </div>
-                </form>
-            </section>
-        </div>
-    </div>
 }
+
+<div class="row">
+    <div class="col-md-4">
+        <section>
+            <form id="frmCourriel" method="post" asp-route-envoyeur="@user.Email" onsubmit="return soumettreForm()">
+                <h2>Envoyer un message</h2>
+                <hr />
+                <div class="form-floating mb-3">
+                    <input name="sujet" class="form-control" aria-required="true" required/>
+                    <label class="form-label">Le sujet</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input name="message" class="form-control" aria-required="true" required/>
+                    <label class="form-label">Votre message</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <div class="card" >
+                        <div class="card-header">
+                            Envoyer à
+                        </div>
+                        <div class="card-body">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="destinataires" id="sendToAll" onclick="cacherDDL()">
+                                <label class="form-check-label" for="sendToAll">
+                                    Tout le monde
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="destinataires" id="sendToGestionnaire" onclick="cacherDDL()">
+                                <label class="form-check-label" for="sendToGestionnaire">
+                                    Au gestionnaire
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="destinataires" id="sendToClients">
+                                <label class="form-check-label" for="sendToClients">
+                                    À un ou plusieurs de vos clients
+                                </label>
+                                <select class="form-select" multiple name="ddlClients" id="ddlClients" style="display:none">
+                                    @foreach (var utilisateur in listeUtilisateurs)
+                                    {
+                                        <option value="@utilisateur.Email">@utilisateur.Email</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <input type="hidden" name="selectedDestinataire" id="selectedDestinataire" value="">
+                </div>
+                <div>
+                    <button id="btnEnvoyer" type="button" class="w-100 btn btn-lg btn-primary" style="color: rgb(249, 229, 71); background-color: rgb(124, 105, 146)">Envoyer</button>
+                </div>
+            </form>
+        </section>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('#sendToClients').change(function () {
+            $('#ddlClients').toggle($(this).is(':checked'));
+        });
+    });
+
+    function cacherDDL() {
+        document.getElementById('ddlClients').style.display = 'none';
+    }
+
+    function soumettreForm() {
+        console.log("ici");
+        var selectedDestinataire = document.getElementById('selectedDestinataire');
+        var valide = true;
+        var msgErreur = "";
+
+        if (document.getElementById('sendToAll').checked) {
+            selectedDestinataire.value = 'Tous';
+        } else if (document.getElementById('sendToGestionnaire').checked) {
+            selectedDestinataire.value = 'Gestionnaire';
+        } else if (document.getElementById('sendToClients').checked) {
+            selectedDestinataire.value = Array.from(ddlClients.selectedOptions).map(option => option.value).join(',');
+        }
+        else {
+            msgErreur = "Veuillez sélectionner une des options de destinataires"
+            valide = false;
+        }
+
+        if (selectedDestinataire.value == null) {
+            msgErreur = "Veuillez sélectionner le(s) destinataire(s) de votre courriel."
+            valide = false;
+        }
+       
+        if (valide) {
+            console.log("ici");
+            // document.getElementById('frmCourriel').submit();
+            return true;
+        }
+        else {
+            Swal.fire({
+                title: "Erreur!",
+                text: msgErreur,
+                icon: "error"
+            }).then(() => {
+                return false;
+            });
+        }
+    }
+</script>
