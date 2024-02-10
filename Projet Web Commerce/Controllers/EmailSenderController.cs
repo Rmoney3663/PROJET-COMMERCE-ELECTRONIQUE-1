@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Projet_Web_Commerce.Controllers
 {
+    [Authorize(Roles = "Gestionnaire, Vendeur, Client")]
     public class EmailSenderController : Controller
     {
         // GET: EmailSenderController
@@ -12,7 +14,7 @@ namespace Projet_Web_Commerce.Controllers
         }
 
         [HttpPost]
-        public ActionResult Index(string sujet, string envoyeur, string message, string email)
+        public ActionResult Index(string sujet, string message, string envoyeur, string selectedDestinataire)
         {
             
             return View();

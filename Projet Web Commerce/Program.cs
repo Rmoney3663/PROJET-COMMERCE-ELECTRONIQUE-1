@@ -5,7 +5,6 @@ using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.Blazor;
 using Projet_Web_Commerce.Areas.Identity.Data;
 using Projet_Web_Commerce.Data;
-using Projet_Web_Commerce.Migrations;
 using Projet_Web_Commerce.Models;
 using System.Collections.Generic;
 
