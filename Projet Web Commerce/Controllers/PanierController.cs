@@ -44,12 +44,22 @@ namespace Projet_Web_Commerce.Controllers
             return View(modelCatalogue);
         }
 
-        [HttpPost]
-        public ActionResult ConfirmerCommande()
+        [HttpGet]
+        public ActionResult ConfirmerCommande(int NoClient, int NoVendeur, decimal poidsTotal, decimal sousTotal)
         {
 
+            var client = _context.PPClients.FirstOrDefault(c => c.NoClient == NoClient);
+            var vendeur = _context.PPVendeurs.FirstOrDefault(v => v.NoVendeur == NoVendeur);
 
-            return View();
+            ModelConfirmerCommande model = new ModelConfirmerCommande()
+            {
+                client = client,
+                vendeur = vendeur,
+                poidsTotal = poidsTotal,
+                sousTotal = sousTotal
+            };
+
+            return View(model);
         }
 
         [HttpPost]

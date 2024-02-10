@@ -178,10 +178,11 @@
                                                 <h5>
                                                     @if (tps.HasValue)
                                                     {
+                                                        prixFinal += tps;
                                                         decimal r = Math.Round(tps.Value, 2);
                                                         @Html.DisplayFor(modelItem => r)
 
-                                                        prixFinal += r;
+                                                        
 
                                                     }
                                                 $</h5>
@@ -198,10 +199,12 @@
                                                     <h5>
                                                         @if (tvq.HasValue)
                                                         {
+                                                            prixFinal += tvq;
+
                                                             decimal r = Math.Round(tvq.Value, 2);
                                                             @Html.DisplayFor(modelItem => r)
 
-                                                            prixFinal += r;
+                                                            
                                                         }
                                                         $
                                                     </h5>
@@ -227,10 +230,18 @@
                                         </div>
 
                                         <div class="text-center">
-                                            <!-- Added class 'text-center' to center the button -->
-                                            <button type="button" class="btn btn-dark btn-lg" data-mdb-ripple-color="dark">
-                                                Passer à la commande
-                                            </button>
+                                            <form asp-controller="Panier" id="formAjoutPanier" asp-action="ConfirmerCommande" method="get">
+
+                                                <input type="hidden" name="sousTotal" value="@prixFinal" />
+                                                <input type="hidden" name="poidsTotal" value="@totalPoids" />
+
+                                                <input type="hidden" name="NoVendeur" value="@vendeur.NoVendeur" />
+                                                <input type="hidden" name="NoClient" value="@client.NoClient" />
+
+                                                <button type="submit" class="btn btn-dark btn-lg" data-mdb-ripple-color="dark">
+                                                    Passer à la commande
+                                                </button>
+                                            </form>
                                         </div>
                                     </div>
                                 </div>

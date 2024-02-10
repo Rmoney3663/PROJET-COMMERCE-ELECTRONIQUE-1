@@ -1,0 +1,139 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+@model Projet_Web_Commerce.Models.ModelConfirmerCommande
+@using Projet_Web_Commerce.Data
+﻿﻿@using Microsoft.AspNetCore.Identity
+@inject UserManager<Projet_Web_Commerce.Areas.Identity.Data.Utilisateur> UserManager
+@inject SignInManager<Projet_Web_Commerce.Areas.Identity.Data.Utilisateur> SignInManager
+@using System.IO
+@inject AuthDbContext _context
+@inject IWebHostEnvironment env
+
+<section class="h-100 h-custom">
+    <div class="container py-5 h-100">
+        <div class="row d-flex justify-content-center align-items-center h-100">
+            <div class="col-12">
+                <div class="card card-registration card-registration-2" style="border-radius: 15px;">
+                    <div class="card-body p-0">
+                        <div class="row g-0">
+                            <div class="col-lg-8">
+                                <div class="p-5">
+                                    <div class="d-flex justify-content-between align-items-center mb-5">
+                                            <h1 class="fw-bold mb-0 text-black">Panier associé à @Model.vendeur.NomAffaires</h1>
+                                    </div>
+                                    <hr class="my-4">
+                                        <div class="row mb-4 d-flex justify-content-between align-items-center">
+
+                                            <div class="col-md-3 col-lg-2 col-xl-2 offset-lg-1">
+                                            <div class="form-group">
+                                                <label asp-for="@Model.client.Rue" class="control-label">Rue :</label>
+                                                <input asp-for="@Model.client.Rue" class="form-control" required />
+                                            </div>
+                                            </div>
+                                            <div class="col-md-1 col-lg-1 col-xl-1 text-end">
+
+                                            </div>
+                                        </div>
+
+                                        <hr class="my-4">
+                                    
+
+
+                                    <div class="pt-5">
+                                        <h6 class="mb-0">
+                                            <a class="nav-link text-body" asp-area="" asp-controller="Panier" asp-action="Index" asp-route-id="@Model.vendeur.NoVendeur">
+                                                <i class="fas fa-long-arrow-alt-left me-2"></i>Retour à mon panier
+                                            </a>
+                                        </h6>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 bg-grey">
+                                <div class="p-5">
+                                    <h3 class="fw-bold mb-5 mt-2 pt-1">Confirmation de la commande</h3>
+                                    <hr class="my-4">
+
+                                    <div class="d-flex justify-content-between mb-4">
+                                        <h5 class="text-uppercase">Sous Total</h5>
+                                        <h5>@Html.DisplayFor(m => m.sousTotal) $</h5>
+                                    </div>
+
+
+
+                                    <div class="d-flex justify-content-between mb-4">
+                                        <h5 class="text-uppercase">Poids Total</h5>
+                                        <h5>@Html.DisplayFor(m => m.poidsTotal) Kg</h5>
+                                    </div>
+
+                                    <hr class="my-4">
+
+
+                                    <hr class="my-4">
+
+
+                                    <div class="text-center">
+                                        <form asp-controller="Panier" id="formAjoutPanier" asp-action="ConfirmerCommande" method="post">
+
+                                            <input type="hidden" name="sousTotal" value="@Model.sousTotal" />
+                                            <button type="submit" class="btn btn-dark btn-lg" data-mdb-ripple-color="dark">
+                                                Passer à la commande
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    @@media (min-width: 1025px) {
+        .h-custom {
+            height: 100vh !important;
+        }
+    }
+
+    .card-registration .select-input.form-control[readonly]:not([disabled]) {
+        font-size: 1rem;
+        line-height: 2.15;
+        padding-left: .75em;
+        padding-right: .75em;
+    }
+
+    .card-registration .select-arrow {
+        top: 13px;
+    }
+
+    .bg-grey {
+        background-color: #eae8e8;
+    }
+
+    @@media (min-width: 992px) {
+        .card-registration-2 .bg-grey {
+            border-top-right-radius: 16px;
+            border-bottom-right-radius: 16px;
+        }
+    }
+
+    @@media (max-width: 991px) {
+        .card-registration-2 .bg-grey {
+            border-bottom-left-radius: 16px;
+            border-bottom-right-radius: 16px;
+        }
+    }
+
+    .submit-button {
+        border: none;
+        background: none;
+        padding: 0;
+    }
+
+</style>
