@@ -45,6 +45,14 @@ namespace Projet_Web_Commerce.Controllers
         }
 
         [HttpPost]
+        public ActionResult ConfirmerCommande()
+        {
+
+
+            return View();
+        }
+
+        [HttpPost]
         public ActionResult Index(int id, bool delete, int vendeur, int nb)
         {
             var article = _context.PPArticlesEnPanier.Where(v => v.NoPanier == id).FirstOrDefault();
