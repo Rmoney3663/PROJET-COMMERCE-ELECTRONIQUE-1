@@ -284,7 +284,7 @@ namespace Projet_Web_Commerce.Controllers
 
                     return RedirectToAction("CatalogueVendeur", new
                     {
-                        id = vendeur.NomAffaires,
+                        nomAffaire = vendeur.NomAffaires,
                         searchString = model.searchString,
                         parPage = model.parPage,
                         dateApres = model.dateApres,
@@ -299,7 +299,7 @@ namespace Projet_Web_Commerce.Controllers
             else
             {
                 TempData["ErrorMessage"] = $"Le produit {produit.Nom} n'a pas été ajout au panier. Assurez-vous que le panier n'excède pas le nombre d'items en stock. ";
-                return RedirectToAction("CatalogueVendeur", new { id = vendeur.NomAffaires });
+                return RedirectToAction("CatalogueVendeur", new { nomAffaire = vendeur.NomAffaires });
             }
 
 
