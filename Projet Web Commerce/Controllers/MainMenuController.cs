@@ -72,11 +72,13 @@ namespace Projet_Web_Commerce.Controllers
         //    return View(model);
         //}
 
-        public async Task<IActionResult> CatalogueVendeurAsync(string id, ModelCatalogueVendeur model)
+        public async Task<IActionResult> CatalogueVendeurAsync(ModelCatalogueVendeur model)
         {
 
             // Action logic
-            var vendeur = _context.PPVendeurs.Where(v => v.NomAffaires == id).FirstOrDefault();
+            var vendeur = _context.PPVendeurs.Where(v => v.NomAffaires == model.nomAffaire).FirstOrDefault();
+
+            model.nomAffaire = model.nomAffaire;
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             if (userId != null)
@@ -92,16 +94,6 @@ namespace Projet_Web_Commerce.Controllers
            .Take(15)
            .ToList();
 
-            //if (model.parPage != "Tous")
-            //{
-            //    ViewBag.parPage = model.parPage ?? "15";
-            //}
-            //else
-            //{
-            //    ViewBag.parPage = "Tous";
-            //}
-
-            //ViewBag.id = id;
 
             model.menuVis = model.menuVis ?? true;
 

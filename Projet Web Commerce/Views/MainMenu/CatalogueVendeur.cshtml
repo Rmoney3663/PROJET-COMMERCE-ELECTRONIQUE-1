@@ -48,7 +48,7 @@
 
         @using (Html.BeginForm("CatalogueVendeur", "MainMenu", FormMethod.Post, new { id = "mainForm" }))
                 {
-                    @Html.Hidden("id", Model.nomAffaire)
+                @Html.HiddenFor(model => model.nomAffaire)
                     <div class="row">
                         <div class="col-md-4 d-flex align-items-start">
 
@@ -229,21 +229,39 @@
                         @if (Model.ProduitsList.HasPreviousPage)
                         {
                             <li class="page-item">
-                                <a class="page-link" href="@Url.Action("CatalogueVendeur", new { sortOrder = ViewBag.sortOrder, pageNumber = Model.ProduitsList.PageIndex - 1, parPage = ViewBag.parPage, searchString = ViewBag.searchString, id = ViewBag.id })">Previous</a>
+                                <a class="page-link" href="@Url.Action("CatalogueVendeur", new {
+    sortOrder = Model.sortOrder,
+    pageNumber = Model.pageNumber - 1,
+    parPage = Model.parPage,
+    searchString = Model.searchString,
+    nomAffaire = Model.nomAffaire
+})">Précédent</a>
                             </li>
                         }
 
                         @for (int i = 1; i <= Model.ProduitsList.TotalPages; i++)
                         {
                             <li class="page-item @(i == Model.ProduitsList.PageIndex ? "active" : "")">
-                                <a class="page-link" href="@Url.Action("CatalogueVendeur", new { sortOrder = ViewBag.sortOrder, pageNumber = i, parPage = ViewBag.parPage, searchString = ViewBag.searchString, id = ViewBag.id })">@i</a>
+                                <a class="page-link" href="@Url.Action("CatalogueVendeur", new {
+    sortOrder = Model.sortOrder,
+    pageNumber = i,
+    parPage = Model.parPage,
+    searchString = Model.searchString,
+    nomAffaire = Model.nomAffaire
+})">@i</a>
                             </li>
                         }
 
                         @if (Model.ProduitsList.HasNextPage)
                         {
                             <li class="page-item">
-                                <a class="page-link" href="@Url.Action("CatalogueVendeur", new { sortOrder = ViewBag.sortOrder, pageNumber = Model.ProduitsList.PageIndex + 1, parPage = ViewBag.parPage, searchString = ViewBag.searchString, id = ViewBag.id })">Next</a>
+                                <a class="page-link" href="@Url.Action("CatalogueVendeur", new {
+    sortOrder = Model.sortOrder,
+    pageNumber = Model.ProduitsList.PageIndex + 1,
+    parPage = Model.parPage,
+    searchString = Model.searchString,
+    nomAffaire = Model.nomAffaire
+})">Suivant</a>
                             </li>
                         }
                     </ul>
