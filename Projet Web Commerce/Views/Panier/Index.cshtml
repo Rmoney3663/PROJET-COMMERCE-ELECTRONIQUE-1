@@ -9,6 +9,29 @@
 @{
     PPVendeurs vendeur = Model.VendeursList.Where(p => p.NoVendeur == ViewBag.VendeurId).FirstOrDefault();
     var datePlusVieille = DateTime.Now;
+
+    decimal? totalPrice = 0;
+    decimal? totalPoids = 0;
+    var nbTotal = 0;
+    foreach (PPArticlesEnPanier article in ViewBag.Panier)
+    {
+        nbTotal += article.NbItems;
+        var item = _context.PPProduits.FirstOrDefault(p => p.NoProduit == article.NoProduit);
+        if (item != null)
+        {
+            totalPrice += item.PrixVente * article.NbItems;
+        }
+        else
+        {
+            totalPrice += item.PrixDemande * article.NbItems;
+        }
+        totalPoids += item.Poids * article.NbItems;
+    }
+
+    decimal? tps = totalPrice * 0.05m;
+    decimal? tvq = totalPrice * 0.09975m;
+
+    decimal? prixFinal = totalPrice;
     }
     @if (!SignInManager.IsSignedIn(User) || User.IsInRole("Vendeur") || User.IsInRole("Gestionnaire"))
     {
@@ -39,43 +62,79 @@
                                             {
                                             <h1 class="fw-bold mb-0 text-black">Panier associé à @vendeur.NomAffaires</h1>
                                             }
-                                            <h6 class="mb-0 text-muted">3 items</h6>
+                                            <h6 class="mb-0 text-muted">@Html.DisplayFor(modelItem => nbTotal) Items</h6>
                                         </div>
                                         <hr class="my-4">
 
-                                        
-                                        <div class="row mb-4 d-flex justify-content-between align-items-center">
-                                            <div class="col-md-2 col-lg-2 col-xl-2">
-                                                <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-shopping-carts/img5.webp"
-                                                     class="img-fluid rounded-3" alt="Cotton T-shirt">
-                                            </div>
-                                            <div class="col-md-3 col-lg-3 col-xl-3">
-                                                <h6 class="text-muted">Shirt</h6>
-                                                <h6 class="text-black mb-0">Cotton T-shirt</h6>
-                                            </div>
-                                            <div class="col-md-3 col-lg-3 col-xl-2 d-flex">
-                                                <button class="btn btn-link px-2"
-                                                        onclick="this.parentNode.querySelector('input[type=number]').stepDown()">
-                                                    <i class="fas fa-minus"></i>
-                                                </button>
+                                        @foreach(PPArticlesEnPanier articles in ViewBag.Panier)
+                                        {
 
-                                                <input id="form1" min="0" name="quantity" value="1" type="number"
-                                                       class="form-control form-control-sm" />
+                                            if (articles.DateCreation < datePlusVieille)
+                                            {
+                                                datePlusVieille = articles.DateCreation;
+                                            }
 
-                                                <button class="btn btn-link px-2"
-                                                        onclick="this.parentNode.querySelector('input[type=number]').stepUp()">
-                                                    <i class="fas fa-plus"></i>
-                                                </button>
-                                            </div>
-                                            <div class="col-md-3 col-lg-2 col-xl-2 offset-lg-1">
-                                                <h6 class="mb-0">€ 44.00</h6>
-                                            </div>
-                                            <div class="col-md-1 col-lg-1 col-xl-1 text-end">
-                                                <a href="#!" class="text-muted"><i class="fas fa-times"></i></a>
-                                            </div>
-                                        </div>
+                                            var item = _context.PPProduits.FirstOrDefault(p => p.NoProduit == articles.NoProduit);
 
-                                        <hr class="my-4">
+                                            var path = System.IO.Path.Combine(env.WebRootPath, "Logo", item.Photo);
+                                            string imagePath = item.Photo != null && File.Exists(path) ? $"~/Logo/{item.Photo}" : "~/Logo/DefaultImage.png";
+                                            Console.WriteLine("FILE Name : " + item.Photo);
+                                            Console.WriteLine("FILE : " + File.Exists(path));
+
+                                            <div class="row mb-4 d-flex justify-content-between align-items-center">
+                                                <div class="col-md-2 col-lg-2 col-xl-2">
+                                                    <img class="img-fluid rounded-3"src="@Url.Content(imagePath)" alt="@item.Photo" width="100" height="120" />
+                                                </div>
+                                                <div class="col-md-3 col-lg-3 col-xl-3">
+                                                    <h6 class="text-muted">@_context.PPCategories.Where(c => c.NoCategorie == item.NoCategorie).FirstOrDefault().Description</h6>
+                                                    <h6 class="text-black mb-0">@Html.DisplayFor(modelItem => item.Nom)</h6>
+                                                </div>
+                                                <div class="col-md-3 col-lg-3 col-xl-2 d-flex">
+                                                    <button class="btn btn-link px-2"
+                                                            onclick="this.parentNode.querySelector('input[type=number]').stepDown()">
+                                                        <i class="fas fa-minus"></i>
+                                                    </button>
+
+                                                    <form asp-route-id="@articles.NoPanier" asp-route-delete="false" asp-route-vendeur="@articles.NoVendeur" asp-action="Index">
+                                                        <input type="number" class="form-control form-control-sm"name="nb" value="@articles.NbItems" onchange="this.form.submit()" min="1" max="@articles.PPProduits.NombreItems" />
+                                                    </form>
+                                                    <button class="btn btn-link px-2"
+                                                            onclick="this.parentNode.querySelector('input[type=number]').stepUp()">
+                                                        <i class="fas fa-plus"></i>
+                                                    </button>
+                                                </div>
+                                                <div class="col-md-3 col-lg-2 col-xl-2 offset-lg-1">
+                                                    
+                                                        @if (item.PrixVente != null)
+                                                        {
+                                                            var prix = item.PrixVente * articles.NbItems;
+                                                            <h6 class="mb-0">
+                                                                @Html.DisplayFor(modelItem => prix) $
+                                                            </h6>
+                                                        }
+                                                        else
+                                                        {
+                                                            var prix = item.PrixDemande * articles.NbItems;
+                                                            <h6 class="mb-0">
+                                                            @Html.DisplayFor(modelItem => prix) $
+                                                            </h6>
+                                                        }
+                                                </div>
+                                                <div class="col-md-1 col-lg-1 col-xl-1 text-end">
+
+                                                    <form asp-route-id="@articles.NoPanier" asp-route-delete="true" asp-route-vendeur="@articles.NoVendeur" asp-action="Index" method="post">
+                                                        <button type="submit" class="submit-button">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
+                                                                <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708" />
+                                                            </svg>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </div>
+
+                                            <hr class="my-4">
+                                        }
+
 
                                         <div class="pt-5">
                                             <h6 class="mb-0">
@@ -88,46 +147,83 @@
                                 </div>
                                 <div class="col-lg-4 bg-grey">
                                     <div class="p-5">
-                                        <h3 class="fw-bold mb-5 mt-2 pt-1">Summary</h3>
+                                        <h3 class="fw-bold mb-5 mt-2 pt-1">Sommaire</h3>
                                         <hr class="my-4">
 
                                         <div class="d-flex justify-content-between mb-4">
-                                            <h5 class="text-uppercase">items 3</h5>
-                                            <h5>€ 132.00</h5>
+                                            <h5 class="text-uppercase">Poids Total</h5>
+                                            <h5>@Html.DisplayFor(modelItem => totalPoids) Kg</h5>
                                         </div>
 
-                                        <h5 class="text-uppercase mb-3">Shipping</h5>
 
-                                        <div class="mb-4 pb-2">
-                                            <select class="select">
-                                                <option value="1">Standard-Delivery- €5.00</option>
-                                                <option value="2">Two</option>
-                                                <option value="3">Three</option>
-                                                <option value="4">Four</option>
-                                            </select>
+
+                                        <div class="d-flex justify-content-between mb-4">
+                                            <h5 class="text-uppercase">Date création</h5>
+                                            <h5>
+                                                @datePlusVieille.ToString("dd/MM/yyyy")
+                                            </h5>
                                         </div>
 
-                                        <h5 class="text-uppercase mb-3">Give code</h5>
+                                        <hr class="my-4">
 
-                                        <div class="mb-5">
-                                            <div class="form-outline">
-                                                <input type="text" id="form3Examplea2" class="form-control form-control-lg" />
-                                                <label class="form-label" for="form3Examplea2">Enter your code</label>
+                                        <div class="d-flex justify-content-between mb-4">
+                                            <h5 class="text-uppercase">@Html.DisplayFor(modelItem => nbTotal) Items</h5>
+                                            <h5>@Html.DisplayFor(modelItem => totalPrice) $</h5>
+                                        </div>
+                                        
+                                        
+                                        <div class="d-flex justify-content-between mb-4">
+                                            <h5 class="text-uppercase">TPS</h5>
+                                            <h5>
+                                                @if (tps.HasValue)
+                                                {
+                                                    decimal r = Math.Round(tps.Value, 2);
+                                                    @Html.DisplayFor(modelItem => r)
+
+                                                    prixFinal += r;
+
+                                                }
+                                            $</h5>
+                                        </div>
+                                        @{
+                                            var quebecProvince = _context.Province.FirstOrDefault(p => p.ProvinceID == "QC");
+                                        }
+                                        
+
+                                        @if (vendeur.Province == quebecProvince)
+                                        {
+                                            <div class="d-flex justify-content-between mb-4">
+                                                <h5 class="text-uppercase">TVQ</h5>
+                                                <h5>
+                                                    @if (tvq.HasValue)
+                                                    {
+                                                        decimal r = Math.Round(tvq.Value, 2);
+                                                        @Html.DisplayFor(modelItem => r)
+
+                                                        prixFinal += r;
+                                                    }
+                                                    $
+                                                </h5>
                                             </div>
-                                        </div>
+                                            totalPrice += tvq;
+                                        }
 
                                         <hr class="my-4">
 
                                         <div class="d-flex justify-content-between mb-5">
-                                            <h5 class="text-uppercase">Total price</h5>
-                                            <h5>€ 137.00</h5>
+                                            <h5 class="text-uppercase">Prix total</h5>
+                                            @if (prixFinal.HasValue)
+                                            {
+                                                <h5>@Math.Round(prixFinal.Value, 2) $</h5>
+                                            }
                                         </div>
 
-                                        <button type="button" class="btn btn-dark btn-block btn-lg"
-                                                data-mdb-ripple-color="dark">
-                                            Register
-                                        </button>
-
+                                        <div class="text-center">
+                                            <!-- Added class 'text-center' to center the button -->
+                                            <button type="button" class="btn btn-dark btn-lg" data-mdb-ripple-color="dark">
+                                                Passer à la commande
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -176,5 +272,11 @@
         border-bottom-right-radius: 16px;
         }
         }
+
+    .submit-button {
+        border: none;
+        background: none;
+        padding: 0;
+    }
 
 </style>
