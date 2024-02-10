@@ -26,19 +26,82 @@
                                             <h1 class="fw-bold mb-0 text-black">Panier associé à @Model.vendeur.NomAffaires</h1>
                                     </div>
                                     <hr class="my-4">
-                                        <div class="row mb-4 d-flex justify-content-between align-items-center">
-
-                                            <div class="col-md-3 col-lg-2 col-xl-2 offset-lg-1">
-                                            <div class="form-group">
-                                                <label asp-for="@Model.client.Rue" class="control-label">Rue :</label>
-                                                <input asp-for="@Model.client.Rue" class="form-control" required />
+                                        <div class="row mb-4 d-flex align-items-center justify-content-center">
+                                            <div class="col-md-3 col-lg-2 col-xl-6">
+                                                <div class="form-floating mb-1">
+                                                    <input asp-for="@Model.client.Nom" class="form-control" placeholder="Veuillez entrer votre nom." />
+                                                    <label asp-for="@Model.client.Nom" class="form-label"></label>
+                                                </div>
                                             </div>
-                                            </div>
-                                            <div class="col-md-1 col-lg-1 col-xl-1 text-end">
 
+                                            <div class="col-md-3 col-lg-2 col-xl-6">
+                                                <div class="form-floating mb-1">
+                                                    <input asp-for="@Model.client.Prenom" class="form-control" placeholder="Veuillez entrer votre nom." />
+                                                    <label asp-for="@Model.client.Prenom" class="form-label">Prénom</label>
+                                                </div>
                                             </div>
                                         </div>
 
+                                        <div class="row mb-4 d-flex justify-content-between align-items-center">
+                                            <div class="col-md-3 col-lg-2 col-xl-9">
+                                                <div class="form-floating mb-3">
+                                                    <input asp-for="@Model.client.AdresseEmail" class="form-control" placeholder="Veuillez entrer votre adresse courriel." />
+                                                <label asp-for="@Model.client.AdresseEmail" class="form-label">Adresse Courriel</label>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-3 col-lg-2 col-xl-3">
+                                                <div class="form-floating mb-3">
+                                                    <input asp-for="@Model.client.Tel1" class="form-control" placeholder="Veuillez entrer votre numéro de téléphone." />
+                                                    <label asp-for="@Model.client.Tel1" class="form-label">Téléphone</label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row mb-4 d-flex justify-content-between align-items-center">
+                                            <div class="col-md-3 col-lg-2 col-xl-8">
+                                                <div class="form-floating mb-3">
+                                                    <input asp-for="@Model.client.Rue" class="form-control" placeholder="Veuillez entrer votre rue." />
+                                                    <label asp-for="@Model.client.Rue" class="form-label"></label>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-3 col-lg-2 col-xl-4">
+                                                <div class="form-floating mb-3">
+                                                    <input asp-for="@Model.client.Ville" class="form-control" placeholder="Veuillez entrer votre ville." />
+                                                    <label asp-for="@Model.client.Ville" class="form-label"></label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    <div class="row mb-4 d-flex justify-content-between align-items-center">
+                                        <div class="col-md-3 col-lg-2 col-xl-4">
+                                            <div class="form-floating mb-3">
+                                                <input asp-for="@Model.client.Pays" class="form-control" placeholder="Veuillez entrer votre pays." />
+                                                <label asp-for="@Model.client.Pays" class="form-label"></label>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-3 col-lg-2 col-xl-4">
+                                            <div class="form-floating mb-3">
+                                                <select asp-for="@Model.client.NoProvince" class="form-select" placeholder="Veuillez entrer votre province.">
+                                                    <option value="">Select Province</option>
+                                                    @foreach (var province in ViewBag.Provinces)
+                                                    {
+                                                        <option value="@province.ProvinceID">@province.Nom</option>
+                                                    }
+                                                </select>
+                                                <label asp-for="@Model.client.NoProvince" class="form-label">Province</label>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-3 col-lg-2 col-xl-4">
+                                            <div class="form-floating mb-3">
+                                                <input asp-for="@Model.client.CodePostal" class="form-control" placeholder="Veuillez entrer votre code postal." />
+                                                <label asp-for="@Model.client.CodePostal" class="form-label">Code Postal</label>
+                                            </div>
+                                        </div>
+                                    </div>
                                         <hr class="my-4">
                                     
 
@@ -87,6 +150,8 @@
                                 </div>
                             </div>
                         </div>
+
+
                     </div>
                 </div>
             </div>

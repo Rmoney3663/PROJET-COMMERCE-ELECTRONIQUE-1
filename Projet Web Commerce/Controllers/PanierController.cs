@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using DocumentFormat.OpenXml.InkML;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Projet_Web_Commerce.Areas.Identity.Data;
@@ -50,6 +51,8 @@ namespace Projet_Web_Commerce.Controllers
 
             var client = _context.PPClients.FirstOrDefault(c => c.NoClient == NoClient);
             var vendeur = _context.PPVendeurs.FirstOrDefault(v => v.NoVendeur == NoVendeur);
+
+            ViewBag.Provinces = _context.Province.ToList();
 
             ModelConfirmerCommande model = new ModelConfirmerCommande()
             {
