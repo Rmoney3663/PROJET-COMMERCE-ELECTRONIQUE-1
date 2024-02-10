@@ -13,6 +13,7 @@ using Projet_Web_Commerce.Models;
 using System.Globalization;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System;
 
 namespace Projet_Web_Commerce.Controllers
 {
@@ -267,6 +268,7 @@ namespace Projet_Web_Commerce.Controllers
                     {
                         var ajoutPanier = new PPArticlesEnPanier
                         {
+                            NoPanier = int.Parse(NoClient.ToString() + NoVendeur.ToString() + NoProduit.ToString()),
                             NoClient = NoClient, // Provide the NoClient value
                             NoVendeur = NoVendeur, // Provide the NoVendeur value
                             NoProduit = NoProduit, // Provide the NoProduit value
