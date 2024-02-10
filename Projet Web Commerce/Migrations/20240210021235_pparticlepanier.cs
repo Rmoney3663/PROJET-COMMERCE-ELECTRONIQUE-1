@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Projet_Web_Commerce.Migrations
 {
     /// <inheritdoc />
-    public partial class init : Migration
+    public partial class pparticlepanier : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -327,6 +327,8 @@ namespace Projet_Web_Commerce.Migrations
                     NoProvince = table.Column<string>(type: "char(2)", nullable: true),
                     CodePostal = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Pays = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Tel1 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Tel2 = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IdUtilisateur = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
@@ -351,11 +353,12 @@ namespace Projet_Web_Commerce.Migrations
                 columns: table => new
                 {
                     NoVendeur = table.Column<int>(type: "int", nullable: false),
-                    NomAffaires = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NomAffaires = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     PoidsMaxLivraison = table.Column<int>(type: "int", nullable: true),
                     LivraisonGratuite = table.Column<decimal>(type: "smallmoney", nullable: true),
                     Taxes = table.Column<bool>(type: "bit", nullable: true),
                     Pourcentage = table.Column<decimal>(type: "decimal(4,2)", nullable: true),
+                    PourcentageTaxe = table.Column<decimal>(type: "decimal(4,2)", nullable: true),
                     Configuration = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     DateCreation = table.Column<DateTime>(type: "datetime2", nullable: false),
                     DateMAJ = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -366,9 +369,11 @@ namespace Projet_Web_Commerce.Migrations
                     Prenom = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Rue = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Ville = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    NoProvince = table.Column<string>(type: "char(2)", nullable: true),
+                    NoProvince = table.Column<string>(type: "char(2)", nullable: false),
                     CodePostal = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Pays = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Tel1 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Tel2 = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IdUtilisateur = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
@@ -385,24 +390,6 @@ namespace Projet_Web_Commerce.Migrations
                         column: x => x.NoProvince,
                         principalTable: "Province",
                         principalColumn: "ProvinceID",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "TelephoneClients",
-                columns: table => new
-                {
-                    NoClient = table.Column<int>(type: "int", nullable: false),
-                    Tel = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_TelephoneClients", x => x.NoClient);
-                    table.ForeignKey(
-                        name: "FK_TelephoneClients_PPClients_NoClient",
-                        column: x => x.NoClient,
-                        principalTable: "PPClients",
-                        principalColumn: "NoClient",
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -455,6 +442,7 @@ namespace Projet_Web_Commerce.Migrations
                     NoVendeur = table.Column<int>(type: "int", nullable: false),
                     NoCategorie = table.Column<int>(type: "int", nullable: false),
                     DateCreation = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    NombreItems = table.Column<int>(type: "int", nullable: false),
                     DateMAJ = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Nom = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -462,8 +450,8 @@ namespace Projet_Web_Commerce.Migrations
                     PrixDemande = table.Column<decimal>(type: "smallmoney", nullable: false),
                     Disponibilite = table.Column<bool>(type: "bit", nullable: false),
                     Poids = table.Column<decimal>(type: "numeric(8,1)", nullable: false),
-                    DateVente = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    PrixVente = table.Column<decimal>(type: "smallmoney", nullable: false)
+                    DateVente = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    PrixVente = table.Column<decimal>(type: "smallmoney", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -508,29 +496,10 @@ namespace Projet_Web_Commerce.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "TelephoneVendeurs",
-                columns: table => new
-                {
-                    NoVendeur = table.Column<int>(type: "int", nullable: false),
-                    Tel = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_TelephoneVendeurs", x => x.NoVendeur);
-                    table.ForeignKey(
-                        name: "FK_TelephoneVendeurs_PPVendeurs_NoVendeur",
-                        column: x => x.NoVendeur,
-                        principalTable: "PPVendeurs",
-                        principalColumn: "NoVendeur",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "PPArticlesEnPanier",
                 columns: table => new
                 {
-                    NoPanier = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    NoPanier = table.Column<int>(type: "int", nullable: false),
                     NoClient = table.Column<int>(type: "int", nullable: false),
                     NoVendeur = table.Column<int>(type: "int", nullable: false),
                     NoProduit = table.Column<int>(type: "int", nullable: false),
@@ -582,6 +551,36 @@ namespace Projet_Web_Commerce.Migrations
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_PPDetailsCommandes_PPProduits_NoProduit",
+                        column: x => x.NoProduit,
+                        principalTable: "PPProduits",
+                        principalColumn: "NoProduit",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PPEvaluations",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    NoClient = table.Column<int>(type: "int", nullable: false),
+                    NoProduit = table.Column<int>(type: "int", nullable: false),
+                    Cote = table.Column<decimal>(type: "numeric(8,2)", nullable: false),
+                    Commentaire = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DateMAJ = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DateCreation = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PPEvaluations", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PPEvaluations_PPClients_NoClient",
+                        column: x => x.NoClient,
+                        principalTable: "PPClients",
+                        principalColumn: "NoClient",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_PPEvaluations_PPProduits_NoProduit",
                         column: x => x.NoProduit,
                         principalTable: "PPProduits",
                         principalColumn: "NoProduit",
@@ -678,6 +677,16 @@ namespace Projet_Web_Commerce.Migrations
                 column: "NoProduit");
 
             migrationBuilder.CreateIndex(
+                name: "IX_PPEvaluations_NoClient",
+                table: "PPEvaluations",
+                column: "NoClient");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PPEvaluations_NoProduit",
+                table: "PPEvaluations",
+                column: "NoProduit");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_PPGestionnaire_IdUtilisateur",
                 table: "PPGestionnaire",
                 column: "IdUtilisateur");
@@ -701,6 +710,13 @@ namespace Projet_Web_Commerce.Migrations
                 name: "IX_PPVendeurs_IdUtilisateur",
                 table: "PPVendeurs",
                 column: "IdUtilisateur");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PPVendeurs_NomAffaires",
+                table: "PPVendeurs",
+                column: "NomAffaires",
+                unique: true,
+                filter: "[NomAffaires] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PPVendeurs_NoProvince",
@@ -738,6 +754,9 @@ namespace Projet_Web_Commerce.Migrations
                 name: "PPDetailsCommandes");
 
             migrationBuilder.DropTable(
+                name: "PPEvaluations");
+
+            migrationBuilder.DropTable(
                 name: "PPGestionnaire");
 
             migrationBuilder.DropTable(
@@ -754,12 +773,6 @@ namespace Projet_Web_Commerce.Migrations
 
             migrationBuilder.DropTable(
                 name: "PPVendeursClients");
-
-            migrationBuilder.DropTable(
-                name: "TelephoneClients");
-
-            migrationBuilder.DropTable(
-                name: "TelephoneVendeurs");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");

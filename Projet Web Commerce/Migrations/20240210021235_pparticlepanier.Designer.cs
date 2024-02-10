@@ -12,8 +12,8 @@ using Projet_Web_Commerce.Data;
 namespace Projet_Web_Commerce.Migrations
 {
     [DbContext(typeof(AuthDbContext))]
-    [Migration("20240205171842_test")]
-    partial class test
+    [Migration("20240210021235_pparticlepanier")]
+    partial class pparticlepanier
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -230,10 +230,7 @@ namespace Projet_Web_Commerce.Migrations
             modelBuilder.Entity("Projet_Web_Commerce.Models.PPArticlesEnPanier", b =>
                 {
                     b.Property<int>("NoPanier")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("NoPanier"));
 
                     b.Property<DateTime>("DateCreation")
                         .HasColumnType("datetime2");
@@ -433,6 +430,42 @@ namespace Projet_Web_Commerce.Migrations
                     b.ToTable("PPDetailsCommandes");
                 });
 
+            modelBuilder.Entity("Projet_Web_Commerce.Models.PPEvaluations", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Commentaire")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("Cote")
+                        .HasColumnType("numeric(8,2)");
+
+                    b.Property<DateTime>("DateCreation")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DateMAJ")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("NoClient")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NoProduit")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NoClient");
+
+                    b.HasIndex("NoProduit");
+
+                    b.ToTable("PPEvaluations");
+                });
+
             modelBuilder.Entity("Projet_Web_Commerce.Models.PPGestionnaire", b =>
                 {
                     b.Property<int>("NoGestionnaire")
@@ -542,7 +575,7 @@ namespace Projet_Web_Commerce.Migrations
                     b.Property<DateTime>("DateMAJ")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("DateVente")
+                    b.Property<DateTime?>("DateVente")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
@@ -575,7 +608,7 @@ namespace Projet_Web_Commerce.Migrations
                     b.Property<decimal>("PrixDemande")
                         .HasColumnType("smallmoney");
 
-                    b.Property<decimal>("PrixVente")
+                    b.Property<decimal?>("PrixVente")
                         .HasColumnType("smallmoney");
 
                     b.HasKey("NoProduit");
@@ -710,6 +743,9 @@ namespace Projet_Web_Commerce.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal?>("Pourcentage")
+                        .HasColumnType("decimal(4,2)");
+
+                    b.Property<decimal?>("PourcentageTaxe")
                         .HasColumnType("decimal(4,2)");
 
                     b.Property<string>("Prenom")
@@ -920,6 +956,25 @@ namespace Projet_Web_Commerce.Migrations
                     b.Navigation("PPProduits");
                 });
 
+            modelBuilder.Entity("Projet_Web_Commerce.Models.PPEvaluations", b =>
+                {
+                    b.HasOne("Projet_Web_Commerce.Models.PPClients", "PPClients")
+                        .WithMany("PPEvaluations")
+                        .HasForeignKey("NoClient")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Projet_Web_Commerce.Models.PPProduits", "PPProduits")
+                        .WithMany("PPEvaluations")
+                        .HasForeignKey("NoProduit")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("PPClients");
+
+                    b.Navigation("PPProduits");
+                });
+
             modelBuilder.Entity("Projet_Web_Commerce.Models.PPGestionnaire", b =>
                 {
                     b.HasOne("Projet_Web_Commerce.Areas.Identity.Data.Utilisateur", "Utilisateur")
@@ -1027,6 +1082,8 @@ namespace Projet_Web_Commerce.Migrations
 
                     b.Navigation("PPCommandes");
 
+                    b.Navigation("PPEvaluations");
+
                     b.Navigation("PPVendeursClients");
                 });
 
@@ -1040,6 +1097,8 @@ namespace Projet_Web_Commerce.Migrations
                     b.Navigation("PPArticlesEnPanier");
 
                     b.Navigation("PPDetailsCommandes");
+
+                    b.Navigation("PPEvaluations");
                 });
 
             modelBuilder.Entity("Projet_Web_Commerce.Models.PPTypesLivraison", b =>

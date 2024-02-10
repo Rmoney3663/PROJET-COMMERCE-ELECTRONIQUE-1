@@ -5,7 +5,7 @@ namespace Projet_Web_Commerce.Models
 {
     public class PPArticlesEnPanier
     {
-        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int NoPanier { get; set; }
 
         public int NoClient { get; set; }

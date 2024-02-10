@@ -227,10 +227,7 @@ namespace Projet_Web_Commerce.Migrations
             modelBuilder.Entity("Projet_Web_Commerce.Models.PPArticlesEnPanier", b =>
                 {
                     b.Property<int>("NoPanier")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("NoPanier"));
 
                     b.Property<DateTime>("DateCreation")
                         .HasColumnType("datetime2");

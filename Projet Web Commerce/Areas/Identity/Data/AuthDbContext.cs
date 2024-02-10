@@ -161,5 +161,6 @@ public class AuthDbContext : IdentityDbContext<Utilisateur>
         builder.Entity<PPVendeurs>().HasKey(x => new { x.NoVendeur });
         builder.Entity<PPGestionnaire>().HasKey(x => new { x.NoGestionnaire });
         builder.Entity<PPProduits>().HasKey(x => new { x.NoProduit });
+        builder.Entity<PPArticlesEnPanier>().HasKey(x => new { x.NoPanier });
     }
 }

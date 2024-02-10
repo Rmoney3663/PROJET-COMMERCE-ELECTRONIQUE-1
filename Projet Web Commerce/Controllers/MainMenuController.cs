@@ -278,7 +278,7 @@ namespace Projet_Web_Commerce.Controllers
         }
 
         [HttpPost]
-        public ActionResult AjoutPanier(int quantite, int NoProduit, int NoClient, int NoVendeur, string? returnUrl)
+        public ActionResult AjoutPanier(int quantite, int NoProduit, int NoClient, int NoVendeur)
         {
             var vendeur = _context.PPVendeurs.Where(v => v.NoVendeur == NoVendeur).FirstOrDefault();
             var produit = _context.PPProduits.Where(v => v.NoProduit == NoProduit).FirstOrDefault();
