@@ -60,11 +60,15 @@
                 <h2>Envoyer un message</h2>
                 <hr />
                 <div class="form-floating mb-3">
-                    <input name="sujet" class="form-control" aria-required="true" required/>
+                    <input name="sujet" class="form-control" aria-required="true" required
+                        oninvalid="setCustomValidity('Veuillez remplir ce champ.')"
+                        oninput="setCustomValidity('')" />
                     <label class="form-label">Le sujet</label>
                 </div>
                 <div class="form-floating mb-3">
-                    <input name="message" class="form-control" aria-required="true" required/>
+                    <input name="message" class="form-control" aria-required="true" required
+                        oninvalid="setCustomValidity('Veuillez remplir ce champ.')"
+                        oninput="setCustomValidity('')" />
                     <label class="form-label">Votre message</label>
                 </div>
                 <div class="form-floating mb-3">
@@ -102,7 +106,7 @@
                     <input type="hidden" name="selectedDestinataire" id="selectedDestinataire" value="">
                 </div>
                 <div>
-                    <button id="btnEnvoyer" type="button" class="w-100 btn btn-lg btn-primary" style="color: rgb(249, 229, 71); background-color: rgb(124, 105, 146)">Envoyer</button>
+                    <button id="btnEnvoyer" type="submit" class="w-100 btn btn-lg btn-primary" style="color: rgb(249, 229, 71); background-color: rgb(124, 105, 146)">Envoyer</button>
                 </div>
             </form>
         </section>
@@ -121,8 +125,9 @@
     }
 
     function soumettreForm() {
-        console.log("ici");
         var selectedDestinataire = document.getElementById('selectedDestinataire');
+        selectedDestinataire.value = "null";
+
         var valide = true;
         var msgErreur = "";
 
@@ -132,23 +137,21 @@
             selectedDestinataire.value = 'Gestionnaire';
         } else if (document.getElementById('sendToClients').checked) {
             selectedDestinataire.value = Array.from(ddlClients.selectedOptions).map(option => option.value).join(',');
-        }
-        else {
+        } else {
             msgErreur = "Veuillez sélectionner une des options de destinataires"
             valide = false;
         }
-
-        if (selectedDestinataire.value == null) {
+        
+        if (selectedDestinataire.value == "") {
             msgErreur = "Veuillez sélectionner le(s) destinataire(s) de votre courriel."
             valide = false;
         }
        
         if (valide) {
-            console.log("ici");
-            // document.getElementById('frmCourriel').submit();
             return true;
         }
         else {
+            console.log("pas valide");
             Swal.fire({
                 title: "Erreur!",
                 text: msgErreur,
@@ -157,5 +160,7 @@
                 return false;
             });
         }
+
+        return false;
     }
 </script>

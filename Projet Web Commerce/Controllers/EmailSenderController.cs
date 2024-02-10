@@ -16,7 +16,6 @@ namespace Projet_Web_Commerce.Controllers
         [HttpPost]
         public ActionResult Index(string sujet, string message, string envoyeur, string selectedDestinataire)
         {
-            
             return View();
         }
 
