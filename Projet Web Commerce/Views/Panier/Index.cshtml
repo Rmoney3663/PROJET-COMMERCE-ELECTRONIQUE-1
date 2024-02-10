@@ -170,42 +170,50 @@
                                             <h5 class="text-uppercase">@Html.DisplayFor(modelItem => nbTotal) Items</h5>
                                             <h5>@Html.DisplayFor(modelItem => totalPrice) $</h5>
                                         </div>
-                                        
-                                        
-                                        <div class="d-flex justify-content-between mb-4">
-                                            <h5 class="text-uppercase">TPS</h5>
-                                            <h5>
-                                                @if (tps.HasValue)
-                                                {
-                                                    decimal r = Math.Round(tps.Value, 2);
-                                                    @Html.DisplayFor(modelItem => r)
 
-                                                    prixFinal += r;
-
-                                                }
-                                            $</h5>
-                                        </div>
-                                        @{
-                                            var quebecProvince = _context.Province.FirstOrDefault(p => p.ProvinceID == "QC");
-                                        }
-                                        
-
-                                        @if (vendeur.Province == quebecProvince)
+                                        @if (vendeur.Taxes == true)
                                         {
                                             <div class="d-flex justify-content-between mb-4">
-                                                <h5 class="text-uppercase">TVQ</h5>
+                                                <h5 class="text-uppercase">TPS</h5>
                                                 <h5>
-                                                    @if (tvq.HasValue)
+                                                    @if (tps.HasValue)
                                                     {
-                                                        decimal r = Math.Round(tvq.Value, 2);
+                                                        decimal r = Math.Round(tps.Value, 2);
                                                         @Html.DisplayFor(modelItem => r)
 
                                                         prixFinal += r;
+
                                                     }
-                                                    $
-                                                </h5>
+                                                $</h5>
                                             </div>
-                                            totalPrice += tvq;
+                                        
+                                            var quebecProvince = _context.Province.FirstOrDefault(p => p.ProvinceID == "QC");
+                                        
+                                        
+
+                                            if (vendeur.Province == quebecProvince)
+                                            {
+                                                <div class="d-flex justify-content-between mb-4">
+                                                    <h5 class="text-uppercase">TVQ</h5>
+                                                    <h5>
+                                                        @if (tvq.HasValue)
+                                                        {
+                                                            decimal r = Math.Round(tvq.Value, 2);
+                                                            @Html.DisplayFor(modelItem => r)
+
+                                                            prixFinal += r;
+                                                        }
+                                                        $
+                                                    </h5>
+                                                </div>
+                                                totalPrice += tvq;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <div class="d-flex justify-content-between mb-4">
+                                                <h5 class="text-uppercase" style="color:red; font-size:15px">Aucune taxe applicable pour se vendeur</h5>
+                                            </div>
                                         }
 
                                         <hr class="my-4">
