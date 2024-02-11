@@ -49,6 +49,10 @@ public class AuthDbContext : IdentityDbContext<Utilisateur>
     public  DbSet<Province> Province { get; set; }
     public DbSet<PPEvaluations> PPEvaluations { get; set; }
 
+    public DbSet<PPMessages> PPMessages { get; set; }
+
+    public DbSet<PPDestinatairesMessage> PPDestinatairesMessage { get; set; }
+
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -150,6 +154,11 @@ public class AuthDbContext : IdentityDbContext<Utilisateur>
        .HasOne<PPClients>(e => e.PPClients)
        .WithMany(u => u.PPEvaluations)
        .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<PPDestinatairesMessage>()
+        .HasOne<PPMessages>(e => e.Message)
+        .WithMany(u => u.Destinataires)
+        .OnDelete(DeleteBehavior.Restrict);
 
         builder.Entity<PPVendeursClients>()
             .HasKey(e => new { e.NoVendeur, e.NoClient, e.DateVisite });

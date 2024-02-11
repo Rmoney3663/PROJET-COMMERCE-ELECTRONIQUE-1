@@ -102,9 +102,32 @@
                                             </div>
                                         </div>
                                     </div>
-                                        <hr class="my-4">
-                                    
 
+                                    <hr class="my-4">
+
+                                    <div class="row mb-4 d-flex justify-content-between align-items-center">
+
+                                        <div class="col-md-3 col-lg-2 col-xl-6">
+                                            <div class="form-floating mb-3">
+                                                <input asp-for="@Model.NoCarte" value="" class="form-control" placeholder="Veuillez entrer votre numéro de carte de crédit." />
+                                                <label asp-for="@Model.NoCarte" class="form-label">Numéro de carte de crédit</label>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-3 col-lg-2 col-xl-3">
+                                            <div class="form-floating mb-3">
+                                                <input asp-for="@Model.dateExpiration" class="form-control" placeholder="Veuillez entrer la date d'expiration de la carte." />
+                                                <label asp-for="@Model.dateExpiration" class="form-label">Date d'expiration (MM/AA)</label>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-3 col-lg-2 col-xl-3">
+                                            <div class="form-floating mb-3">
+                                                <input value="" asp-for="@Model.CVV" class="form-control" placeholder="Veuillez entrer le numéro CVC ou CVV de la carte." type="text"/>
+                                                <label asp-for="@Model.CVV" class="form-label">CVC ou CVV</label>
+                                            </div>
+                                        </div>
+                                    </div>
 
                                     <div class="pt-5">
                                         <h6 class="mb-0">

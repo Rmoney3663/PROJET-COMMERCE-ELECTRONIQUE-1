@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Projet_Web_Commerce.Data;
 
@@ -11,9 +12,11 @@ using Projet_Web_Commerce.Data;
 namespace Projet_Web_Commerce.Migrations
 {
     [DbContext(typeof(AuthDbContext))]
-    partial class AuthDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240211171917_messagerie")]
+    partial class messagerie
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -408,14 +411,12 @@ namespace Projet_Web_Commerce.Migrations
 
                     b.Property<string>("Destinataire")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("NoMessage")
                         .HasColumnType("int");
 
                     b.HasKey("DestinataireId");
-
-                    b.HasIndex("Destinataire");
 
                     b.HasIndex("NoMessage");
 
@@ -577,7 +578,7 @@ namespace Projet_Web_Commerce.Migrations
 
                     b.Property<string>("Auteur")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Message")
                         .IsRequired()
@@ -599,8 +600,6 @@ namespace Projet_Web_Commerce.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("NoMessage");
-
-                    b.HasIndex("Auteur");
 
                     b.ToTable("PPMessages");
                 });
@@ -998,19 +997,11 @@ namespace Projet_Web_Commerce.Migrations
 
             modelBuilder.Entity("Projet_Web_Commerce.Models.PPDestinatairesMessage", b =>
                 {
-                    b.HasOne("Projet_Web_Commerce.Areas.Identity.Data.Utilisateur", "DestinataireUser")
-                        .WithMany()
-                        .HasForeignKey("Destinataire")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Projet_Web_Commerce.Models.PPMessages", "Message")
                         .WithMany("Destinataires")
                         .HasForeignKey("NoMessage")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.Navigation("DestinataireUser");
 
                     b.Navigation("Message");
                 });
@@ -1062,17 +1053,6 @@ namespace Projet_Web_Commerce.Migrations
                         .IsRequired();
 
                     b.Navigation("Utilisateur");
-                });
-
-            modelBuilder.Entity("Projet_Web_Commerce.Models.PPMessages", b =>
-                {
-                    b.HasOne("Projet_Web_Commerce.Areas.Identity.Data.Utilisateur", "AuteurUser")
-                        .WithMany()
-                        .HasForeignKey("Auteur")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("AuteurUser");
                 });
 
             modelBuilder.Entity("Projet_Web_Commerce.Models.PPPoidsLivraisons", b =>

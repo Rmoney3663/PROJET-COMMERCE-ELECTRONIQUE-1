@@ -13,6 +13,7 @@
     decimal? totalPrice = 0;
     decimal? totalPoids = 0;
     var nbTotal = 0;
+
     foreach (PPArticlesEnPanier article in ViewBag.Panier)
     {
         nbTotal += article.NbItems;
@@ -231,9 +232,6 @@
 
                                         <div class="text-center">
                                             <form asp-controller="Panier" id="formAjoutPanier" asp-action="ConfirmerCommande" method="get">
-
-                                                <input type="hidden" name="sousTotal" value="@prixFinal" />
-                                                <input type="hidden" name="poidsTotal" value="@totalPoids" />
 
                                                 <input type="hidden" name="NoVendeur" value="@vendeur.NoVendeur" />
                                                 <input type="hidden" name="NoClient" value="@client.NoClient" />
