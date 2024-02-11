@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using DocumentFormat.OpenXml.InkML;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Projet_Web_Commerce.Areas.Identity.Data;
@@ -44,12 +45,56 @@ namespace Projet_Web_Commerce.Controllers
             return View(modelCatalogue);
         }
 
-        [HttpPost]
-        public ActionResult ConfirmerCommande()
+        [HttpGet]
+        public ActionResult ConfirmerCommande(int NoClient, int NoVendeur)
         {
 
+            var client = _context.PPClients.FirstOrDefault(c => c.NoClient == NoClient);
+            var vendeur = _context.PPVendeurs.FirstOrDefault(v => v.NoVendeur == NoVendeur);
 
-            return View();
+            ViewBag.Provinces = _context.Province.ToList();
+
+            var articlesEnPanier = _context.PPArticlesEnPanier.Where(p => p.NoClient == NoClient && p.NoVendeur == NoVendeur).ToList();
+
+            var poidsTotal = articlesEnPanier
+                .Join(_context.PPProduits,
+                      article => article.NoProduit,
+                      produit => produit.NoProduit,
+                      (article, produit) => article.NbItems * produit.Poids)
+                .Sum();
+
+            var sousTotal = articlesEnPanier
+                .Join(_context.PPProduits,
+                      article => article.NoProduit,
+                      produit => produit.NoProduit,
+                      (article, produit) => produit.PrixVente * article.NbItems ?? produit.PrixDemande * article.NbItems)
+                .Sum();
+
+            decimal taxes = 0;
+
+            if (vendeur.Taxes == true)
+            {
+                if (vendeur.Province == _context.Province.Where(p => p.ProvinceID == "QC").FirstOrDefault())
+                {
+                    var tvq = _context.PPTaxeProvinciale.Select(t => t.TauxTVQ).FirstOrDefault();
+                    taxes += sousTotal * (tvq / 100);
+                }
+
+                var tps = _context.PPTaxeFederale.Select(t => t.TauxTPS).FirstOrDefault();
+                taxes += sousTotal * (tps / 100);
+
+                sousTotal += taxes;
+            }
+
+            ModelConfirmerCommande model = new ModelConfirmerCommande()
+            {
+                client = client,
+                vendeur = vendeur,
+                poidsTotal = poidsTotal,
+                sousTotal = sousTotal
+            };
+
+            return View(model);
         }
 
         [HttpPost]
