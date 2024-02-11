@@ -64,9 +64,9 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
                         protocol: Request.Scheme);
 
                     await Methodes.envoyerCourriel(
-                        Input.Email,
                         "Réinitialiser le mot de passe",
-                        $"Veuillez réinitialiser votre mot de passe en <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>cliquant ici</a>.");
+                        $"Veuillez réinitialiser votre mot de passe en <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>cliquant ici</a>.",
+                        Input.Email);
 
                     return RedirectToPage("./ForgotPasswordConfirmation");
                 }

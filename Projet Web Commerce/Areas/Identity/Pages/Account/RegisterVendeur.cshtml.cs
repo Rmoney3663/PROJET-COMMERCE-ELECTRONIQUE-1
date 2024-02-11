@@ -243,8 +243,10 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
                         values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
                         protocol: Request.Scheme);
 
-                    await Methodes.envoyerCourriel(Input.Email, "Confirmer votre adresse courriel",
-                        $"Veuillez confirmer votre compte en <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>cliquant ici</a>. Votre numéro de vendeur est {lowestNo}");
+                    await Methodes.envoyerCourriel(
+                        "Confirmer votre adresse courriel",
+                        $"Veuillez confirmer votre compte en <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>cliquant ici</a>. Votre numéro de vendeur est {lowestNo}",
+                        Input.Email);
 
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {

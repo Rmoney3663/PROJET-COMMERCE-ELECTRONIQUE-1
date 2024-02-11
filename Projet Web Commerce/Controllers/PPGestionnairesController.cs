@@ -99,7 +99,7 @@ namespace Projet_Web_Commerce.Controllers
                 var user = await _userManager.FindByEmailAsync(vendeurAUpdate.AdresseEmail);
                 if (user != null)
                 {
-                    await Methodes.envoyerCourriel(vendeurAUpdate.AdresseEmail, sujet, message);
+                    await Methodes.envoyerCourriel(sujet, message, vendeurAUpdate.AdresseEmail);
                     if (vendeurAccepte)
                     {
                         vendeurAUpdate.Statut = 1;

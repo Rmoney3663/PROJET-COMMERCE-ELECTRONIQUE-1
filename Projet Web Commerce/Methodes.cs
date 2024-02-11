@@ -6,13 +6,21 @@
 
     public class Methodes
     {
-        public static async Task<bool> envoyerCourriel(string email, string sujet, string message)
+        public static async Task<bool> envoyerCourriel(string sujet, string message, string destinataire, string auteur = null)
         {
             try
             {
                 var mimeMessage = new MimeMessage();
-                mimeMessage.From.Add(new MailboxAddress("Les Petites Puces", "robotcupcake69@outlook.com"));
-                mimeMessage.To.Add(new MailboxAddress("", email));
+
+                string fromAddress = (auteur == null) ? "robotcupcake69@outlook.com" : auteur;
+                mimeMessage.From.Add(new MailboxAddress("Les Petites Puces", fromAddress));
+
+                string[] destinataires = destinataire.Split(',');
+
+                foreach (var dest in destinataires)
+                {
+                    mimeMessage.To.Add(new MailboxAddress("", dest.Trim()));
+                }
                 mimeMessage.Subject = sujet;
                 mimeMessage.Body = new TextPart("html") { Text = message };
 

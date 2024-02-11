@@ -10,6 +10,8 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
 
 @{
+    ViewData["Title"] = "Messagerie";
+
     var user = await UserManager.GetUserAsync(User);
 
     List<Projet_Web_Commerce.Areas.Identity.Data.Utilisateur> listeUtilisateurs = new List<Projet_Web_Commerce.Areas.Identity.Data.Utilisateur>();
@@ -61,18 +63,18 @@
                 <hr />
                 <div class="form-floating mb-3">
                     <input name="sujet" class="form-control" aria-required="true" required
-                        oninvalid="setCustomValidity('Veuillez remplir ce champ.')"
-                        oninput="setCustomValidity('')" />
+                           oninvalid="setCustomValidity('Veuillez remplir ce champ.')"
+                           oninput="setCustomValidity('')" />
                     <label class="form-label">Le sujet</label>
                 </div>
                 <div class="form-floating mb-3">
                     <input name="message" class="form-control" aria-required="true" required
-                        oninvalid="setCustomValidity('Veuillez remplir ce champ.')"
-                        oninput="setCustomValidity('')" />
+                           oninvalid="setCustomValidity('Veuillez remplir ce champ.')"
+                           oninput="setCustomValidity('')" />
                     <label class="form-label">Votre message</label>
                 </div>
                 <div class="form-floating mb-3">
-                    <div class="card" >
+                    <div class="card">
                         <div class="card-header">
                             Envoyer à
                         </div>
@@ -134,19 +136,19 @@
         if (document.getElementById('sendToAll').checked) {
             selectedDestinataire.value = 'Tous';
         } else if (document.getElementById('sendToGestionnaire').checked) {
-            selectedDestinataire.value = 'Gestionnaire';
+            selectedDestinataire.value = 'william.anthony.burgess@gmail.com';
         } else if (document.getElementById('sendToClients').checked) {
             selectedDestinataire.value = Array.from(ddlClients.selectedOptions).map(option => option.value).join(',');
         } else {
             msgErreur = "Veuillez sélectionner une des options de destinataires"
             valide = false;
         }
-        
+
         if (selectedDestinataire.value == "") {
             msgErreur = "Veuillez sélectionner le(s) destinataire(s) de votre courriel."
             valide = false;
         }
-       
+
         if (valide) {
             return true;
         }
