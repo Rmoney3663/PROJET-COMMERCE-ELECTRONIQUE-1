@@ -122,7 +122,7 @@
             else
             {
                 <h3>Liste des nouveaux produits </h3>
-                <a asp-area="Identity" asp-page="/Account/Register">Cliquez ici pour devenir client et accéder à tout le catalogue du vendeur</a>
+                <a asp-area="Identity" asp-page="/Account/Login">Cliquez ici pour devenir client et accéder à tout le catalogue du vendeur</a>
             }
 
 
@@ -172,15 +172,17 @@
                                     <p class="card-text">Prix : @Html.DisplayFor(modelItem => item.PrixDemande) $ </p>
                                 }
 
-                                <a asp-controller="PPProduits"
-                                   asp-route-id="@item.NoProduit"
-                                   asp-action="Details"
-                                   class="btn btn-secondary mt-auto" style="background-color:rgb(124, 105, 146);  color: rgb(249, 229, 71); ">
-                                    Details
-                                </a>
+                                
 
                                 @if (SignInManager.IsSignedIn(User) && User.IsInRole("Client") && item.NombreItems > 0)
                                 {
+                                    <a asp-controller="PPProduits"
+                                       asp-route-id="@item.NoProduit"
+                                       asp-action="Details"
+                                       class="btn btn-secondary mt-auto" style="background-color:rgb(124, 105, 146);  color: rgb(249, 229, 71); ">
+                                        Details
+                                    </a>
+
                                     <form asp-controller="MainMenu" id="formAjoutPanier" asp-action="AjoutPanier" method="post">
                                         <input type="hidden" name="NoProduit" value="@item.NoProduit" />
                                         <input type="hidden" name="NoClient" value="@Model.noClient" />
