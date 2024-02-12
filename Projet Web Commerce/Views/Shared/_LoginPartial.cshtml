@@ -47,23 +47,37 @@
             }
 
             <li class="nav-item">
-                <a class="nav-link" asp-area="" asp-controller="Messagerie" asp-action="BoiteDeReception" style="color: rgb(249, 229, 71)">Messagerie</a>
+                <a class="nav-link" asp-area="" asp-controller="Messagerie" asp-action="BoiteDeReception" title="Messagerie">
+                    <img style="width: 30px; height: 30px; filter: invert(87%) sepia(71%) saturate(1210%) hue-rotate(322deg) brightness(113%) contrast(95%)" src="/Logo/MessageIcon.png" />
+                </a>
             </li>
 
             if ((estDansRole = await UserManager.IsInRoleAsync(user, "Client")))
             {
+                var userId = _context.PPClients.Where(v => v.AdresseEmail == user.UserName).FirstOrDefault().NoClient;
                 <li class="nav-item">
-                    <a class="nav-link" asp-area="" asp-controller="Paniers" asp-action="Index" style="color: rgb(249, 229, 71)">Paniers</a>
+                    <a class="nav-link" asp-area="" asp-controller="Paniers" asp-action="Index" title="Panier">
+                        <div style="position: relative; top:0px; left:0px">
+                            <img style="position:relative; width: 30px; height: 30px; filter: invert(87%) sepia(71%) saturate(1210%) hue-rotate(322deg) brightness(113%) contrast(95%)" src="/Logo/PanierIcon.png" />
+                            @if (_context.PPArticlesEnPanier.Where(v=>v.NoClient == userId).ToList().Count > 0){
+                                <b style="color:red; position:absolute; top:10px; left:30px ">@_context.PPArticlesEnPanier.Where(v => v.NoClient == userId).ToList().Count</b>
+                            }
+                        </div>
+                    </a>
                 </li>
             }
             <li class="nav-item">
                 @if ((estDansRole = await UserManager.IsInRoleAsync(user, "Client")))
                 {
-                    <a id="manage" class="nav-link" style="color: rgb(249, 229, 71)" asp-area="Identity" asp-page="/Account/Manage/ProfilClient" title="Manage">Mon profil</a>
+                    <a id="manage" class="nav-link" asp-area="Identity" asp-page="/Account/Manage/ProfilClient" title="Profil">
+                        <img style="width: 30px; height: 30px; filter: invert(87%) sepia(71%) saturate(1210%) hue-rotate(322deg) brightness(113%) contrast(95%)" src="/Logo/ProfileIcon.png" />
+                    </a>
                 }
                 else if ((estDansRole = await UserManager.IsInRoleAsync(user, "Vendeur")) && statutVendeur == 1)
                 {
-                    <a id="manage" class="nav-link" style="color: rgb(249, 229, 71)" asp-area="Identity" asp-page="/Account/Manage/ProfilVendeur" title="Manage">Mon profil</a>
+                    <a id="manage" class="nav-link" style="color: rgb(249, 229, 71)" asp-area="Identity" asp-page="/Account/Manage/ProfilVendeur" title="Profil">
+                        <img style="width: 30px; height: 30px; filter: invert(87%) sepia(71%) saturate(1210%) hue-rotate(322deg) brightness(113%) contrast(95%)" src="/Logo/ProfileIcon.png" />
+                    </a>
                 }
 
             </li>
