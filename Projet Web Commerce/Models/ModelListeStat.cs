@@ -10,6 +10,10 @@
 
         public List<PPCommandes> CommandesList { get; set; }
 
+        public List<PPVendeursClients> VendeursClientsList { get; set; }
+
+        public List<ModelVisite> VisitesCountData { get; set; }
+
         public List<ModelMoisAnneVendeur> VendeurDate { get; set; }
     }
 }

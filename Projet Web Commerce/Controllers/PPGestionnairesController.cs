@@ -42,6 +42,25 @@ namespace Projet_Web_Commerce.Controllers
             })
             .ToList(); // Materialize the query to execute it and get the results
 
+            var visitesCountData = _context.PPVendeursClients
+            .Include(p => p.PPClients)
+            .Include(p => p.PPVendeurs)
+            .GroupBy(p => new { p.NoClient, p.NoVendeur })
+            .Select(g => new ModelVisite
+            {
+                ClientName = (string.IsNullOrEmpty(g.FirstOrDefault().PPClients.Prenom) && string.IsNullOrEmpty(g.FirstOrDefault().PPClients.Nom))
+                    ? g.FirstOrDefault().PPClients.AdresseEmail
+                    : (g.FirstOrDefault().PPClients.Prenom + " " + g.FirstOrDefault().PPClients.Nom).Trim(),
+                VendeurName = (string.IsNullOrEmpty(g.FirstOrDefault().PPVendeurs.Prenom) && string.IsNullOrEmpty(g.FirstOrDefault().PPVendeurs.Nom))
+                    ? g.FirstOrDefault().PPVendeurs.AdresseEmail
+                    : (g.FirstOrDefault().PPVendeurs.Prenom + " " + g.FirstOrDefault().PPVendeurs.Nom).Trim(),
+                VisitCount = g.Count()
+            })
+            .ToList();
+
+
+
+
             // Log the data
             foreach (var item in vendeurdate)
             {
@@ -64,7 +83,8 @@ namespace Projet_Web_Commerce.Controllers
                 VendeursList = vendeurs,
                 ProduitsList = ProduitsList,
                 CommandesList = CommandesList,
-                VendeurDate = vendeurdate
+                VendeurDate = vendeurdate,
+                VisitesCountData = visitesCountData
             };
 
             return View(modelListeStat);

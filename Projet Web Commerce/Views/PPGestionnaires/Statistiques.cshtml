@@ -1,4 +1,6 @@
 ﻿@model Projet_Web_Commerce.Models.ModelListeStat
+@using System.Text.Json;
+@using System.Text.Json.Serialization
 @{
     ViewData["Title"] = "Liste de statistique";
 }
@@ -25,9 +27,13 @@
             Date de fin :  <input type="month" id="endDate" onchange="generateReport()"><br>
           
             <div id="report"></div>
+            <br />            
+            
+            <p id="visitesCount">
+            </p>
+
+            
             <br />
-
-
 
         </section>
     </div>
@@ -37,6 +43,8 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
         var vendeursListJson = Json.Serialize(Model.VendeursList.Select(p => new { DateCreation = p.DateCreation.ToString("yyyy-MM-dd") }));
+       
+        var visitesCountDataJson = Json.Serialize(Model.VisitesCountData);
     }
 
     <script>
@@ -107,19 +115,31 @@
                     vendeurCount++;
                 }
             }
-
-
-
             return vendeurCount;
         }
 
+        //------------------------------------------------------------------
+        //var ppVendeurClients = Html.Raw(json);
+        var visitesCountData = @Html.Raw(visitesCountDataJson);
+        console.log("VendeursClient List:", visitesCountData);
+        function displayVisitesCount(visitesCountData) {
+            var htmlContent = "<b>Nombre de visites d’un client pour un vendeur : </b><br>";
 
+            for (var i = 0; i < visitesCountData.length; i++) {
+                var visite = visitesCountData[i];
+                console.log("VendeursClient :", visite)
+            }
+           
+            
+            visitesCountData.forEach(function (item) {
+                htmlContent += item.clientName + " a visité " + item.vendeurName + " : " + item.visitCount + " fois<br>";
+            });
 
+            // Display the HTML content within the specified <p> element
+            document.getElementById("visitesCount").innerHTML = htmlContent;
+        }
 
-
-
-
-
-
+        // Call the displayVisitesCount function with the visit count data
+        displayVisitesCount(visitesCountData);
     </script>
 }
