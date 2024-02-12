@@ -19,7 +19,7 @@
                 {
                     <div class="card">
                         <div class="card-body">
-                            <h4 class="card-title"><u>@date.Mois/@date.Annee</u></h4>
+                            <h2 class="card-title"><u>@date.Mois/@date.Annee</u></h2>
                             @{
                                 var groupeParAnnee = Model.VendeursList
                                 .Where(item => item.DateCreation.Month == date.Mois && item.DateCreation.Year == date.Annee)

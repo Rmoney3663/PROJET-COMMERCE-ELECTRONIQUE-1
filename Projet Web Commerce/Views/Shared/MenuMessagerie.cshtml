@@ -1,86 +1,48 @@
 ﻿<style>
-    .menu {
-        padding: 1rem;
-        width: 100px;
+    .pasActif {
+        background-color: rgb(249, 229, 71);
+        color: rgb(124, 105, 146);
+        border-color: rgb(124, 105, 146);
+        accent-color: rgb(249, 229, 71);
     }
-
-    .title {
-        background-color: black;
-        color: white;
-        padding: 1rem;
-        text-align: center;
-        font-size: 1.5rem;
-    }
-
-    ul {
-        padding: 0;
-        margin: 0;
-    }
-
-    .item {
-        cursor: pointer;
-        list-style: none;
-        height: 3rem;
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        justify-content: space-between;
-    }
-
-        .item.noclick {
-            height: 2rem;
-            pointer-events: none;
-        }
-
-            .item.noclick:before, .item.noclick:after {
-                height: 2rem;
-                pointer-events: none;
-            }
-
-        .item i {
-            background-color: black;
-            color: white;
-            width: 4rem;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-left: -1.375rem;
-        }
-
-        .item.active i {
-            color: black;
-            background-color: white;
-            border-top-left-radius: 999px;
-            border-bottom-left-radius: 999px;
-        }
-
-        .item:before, .item:after {
-            content: "";
-            display: inline-block;
-            width: 3rem;
-            height: 3rem;
-            background-color: black;
-        }
-
-        .item:before {
-            width: 4rem;
-        }
-
-        .item.active:after {
-            background-color: white;
-        }
-
-        .item:has(+.active):after {
-            border-bottom-right-radius: 999px;
-        }
-
-        .item.active + .item:after {
-            border-top-right-radius: 999px;
-        }
 </style>
 
-<div class="container-fluid">
+
+<ul class="nav nav-tabs">
+    <li class="nav-item">
+        <a class="nav-link @(Model == "BoiteDeReception" ? "active" : "pasActif")"
+           asp-area="" asp-controller="Messagerie" asp-action="BoiteDeReception">
+            Boîte de réception
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link @(Model == "Envoyes" ? "active" : "pasActif")"
+           asp-area="" asp-controller="Messagerie" asp-action="BoiteDeReception">
+            Envoyés
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link @(Model == "Brouillons" ? "active" : "pasActif")"
+           asp-area="" asp-controller="Messagerie" asp-action="BoiteDeReception">
+            Brouillons
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link @(Model == "Supprimes" ? "active" : "pasActif")"
+           asp-area="" asp-controller="Messagerie" asp-action="BoiteDeReception">
+            Supprimés
+        </a>
+    </li>
+    <li class="nav-item ms-auto">
+        <a class="nav-link @(Model == "EnvoyerMessage" ? "active" : "pasActif")"
+           asp-area="" asp-controller="Messagerie" asp-action="EnvoyerMessage">
+            Envoyer un message
+        </a>
+    </li>
+</ul>
+
+
+@* <div class="container-fluid">
     <div class="row">
 
         <div class="menu">
@@ -95,13 +57,8 @@
                 <li class="item noclick"><div></div></li>
             </ul>
         </div>
-        <div class="card">
-            <div class="card-header">
-                Messagerie
-            </div>
-        </div>
     </div>
-</div>
+</div> *@
 
 <!-- Bootstrap JS and jQuery (optional, depending on your needs) -->
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>

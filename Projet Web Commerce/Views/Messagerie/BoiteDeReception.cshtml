@@ -1,5 +1,6 @@
 ﻿﻿﻿@using Microsoft.AspNetCore.Identity
 @using Projet_Web_Commerce.Data
+@model List<PPMessages>
 @inject AuthDbContext _context
 @inject UserManager<Projet_Web_Commerce.Areas.Identity.Data.Utilisateur> UserManager
 @inject SignInManager<Projet_Web_Commerce.Areas.Identity.Data.Utilisateur> SignInManager
@@ -8,65 +9,60 @@
     ViewData["Title"] = "Boîte de réception";
 }
 
+<style>
+    .truncate {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 150px;
+    }
+</style>
+
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-8">
         <section>
-            @* <form id="frmCourriel" method="post" asp-route-envoyeur="@user.Email" onsubmit="return soumettreForm()"> *@
-                <div class="card">
-                    <h2>Boîte de réception</h2>
+            <div>
+                @Html.Partial("MenuMessagerie", "BoiteDeReception")
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title">Boîte de réception</h2>
+                    <hr />
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Expéditeur</th>
+                                <th scope="col">Objet</th>
+                                <th scope="col">Date de l'envoi</th>
+                                <th scope="col" class="ms-auto"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                var no = 0;
+                            }
+                            @foreach (var msg in Model)
+                            {
+                                <tr>
+                                    <td>@(++no)</td>
+                                    <td>@_context.Users.Where(u => u.Id == msg.Auteur).FirstOrDefault().Email</td>
+                                    <td class="truncate">@Html.DisplayFor(modelItem => msg.Sujet)</td>
+                                    <td>@DateTime.Now.Date</td> @* <td>@Html.DisplayFor(modelItem => msg.Message.DateMessage)</td> *@
+                                    <td class="ms-auto"><button class="ms-auto">Détails</button></td>
+                                </tr>
+                                
+                            }
+                        </tbody>
+                    </table>
                 </div>
-                <h2>Envoyer un message</h2>
-                <hr />
-                <div class="form-floating mb-3">
-                    <input name="sujet" class="form-control" aria-required="true" required
-                           oninvalid="setCustomValidity('Veuillez remplir ce champ.')"
-                           oninput="setCustomValidity('')" />
-                    <label class="form-label">Le sujet</label>
-                </div>
-                <div class="form-floating mb-3">
-                    <input name="message" class="form-control" aria-required="true" required
-                           oninvalid="setCustomValidity('Veuillez remplir ce champ.')"
-                           oninput="setCustomValidity('')" />
-                    <label class="form-label">Votre message</label>
-                </div>
-                <div class="form-floating mb-3">
-                    <div class="card">
-                        <div class="card-header">
-                            Envoyer à
-                        </div>
-                        <div class="card-body">
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="destinataires" id="sendToAll" onclick="cacherDDL()">
-                                <label class="form-check-label" for="sendToAll">
-                                    Tout le monde
-                                </label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="destinataires" id="sendToGestionnaire" onclick="cacherDDL()">
-                                <label class="form-check-label" for="sendToGestionnaire">
-                                    Au gestionnaire
-                                </label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="destinataires" id="sendToClients">
-                                <label class="form-check-label" for="sendToClients">
-                                    À un ou plusieurs de vos clients
-                                </label>
-                                @* <select class="form-select" multiple name="ddlClients" id="ddlClients" style="display:none">
-                                    @foreach (var utilisateur in listeUtilisateurs)
-                                    {
-                                        <option value="@utilisateur.Email">@utilisateur.Email</option>
-                                    }
-                                </select> *@
-                            </div>
-                        </div>
-                    </div>
-                    <input type="hidden" name="selectedDestinataire" id="selectedDestinataire" value="">
-                </div>
-                <div>
-                    <button id="btnEnvoyer" type="submit" class="w-100 btn btn-lg btn-primary" style="color: rgb(249, 229, 71); background-color: rgb(124, 105, 146)">Envoyer</button>
-                </div>
-            @* </form> *@
+            </div>
         </section>
     </div>
 </div>
+
+<script>
+    function test() {
+        alert("huh");
+    }
+</script>
