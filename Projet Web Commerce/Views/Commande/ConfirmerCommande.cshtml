@@ -13,6 +13,11 @@
 @inject AuthDbContext _context
 @inject IWebHostEnvironment env
 
+@using (Html.BeginForm("ConfirmerCommande", "Commande", FormMethod.Post))
+{
+    @Html.HiddenFor(model => model.NoClient)
+    @Html.HiddenFor(model => model.NoVendeur)
+
 <section class="h-100 h-custom">
     <div class="container py-5 h-100">
         <div class="row d-flex justify-content-center align-items-center h-100">
@@ -25,6 +30,8 @@
                                     <div class="d-flex justify-content-between align-items-center mb-5">
                                             <h1 class="fw-bold mb-0 text-black">Panier associé à @Model.vendeur.NomAffaires</h1>
                                     </div>
+
+                                    <h4 class="fw-bold mb-5 mt-2 pt-1">Information d'expédition</h4>
                                     <hr class="my-4">
                                         <div class="row mb-4 d-flex align-items-center justify-content-center">
                                             <div class="col-md-3 col-lg-2 col-xl-6">
@@ -103,6 +110,7 @@
                                         </div>
                                     </div>
 
+                                    <h4 class="fw-bold mb-5 mt-2 pt-1">Information de paiement</h4>
                                     <hr class="my-4">
 
                                     <div class="row mb-4 d-flex justify-content-between align-items-center">
@@ -117,13 +125,13 @@
                                         <div class="col-md-3 col-lg-2 col-xl-3">
                                             <div class="form-floating mb-3">
                                                 <input asp-for="@Model.dateExpiration" class="form-control" placeholder="Veuillez entrer la date d'expiration de la carte." />
-                                                <label asp-for="@Model.dateExpiration" class="form-label">Date d'expiration (MM/AA)</label>
+                                                <label asp-for="@Model.dateExpiration" class="form-label">Expir. (MM-AAAA)</label>
                                             </div>
                                         </div>
 
                                         <div class="col-md-3 col-lg-2 col-xl-3">
                                             <div class="form-floating mb-3">
-                                                <input value="" asp-for="@Model.CVV" class="form-control" placeholder="Veuillez entrer le numéro CVC ou CVV de la carte." type="text"/>
+                                                <input value="" asp-for="@Model.CVV" class="form-control" placeholder="Veuillez entrer le numéro CVC ou CVV de la carte." pattern="[0-9]*" />
                                                 <label asp-for="@Model.CVV" class="form-label">CVC ou CVV</label>
                                             </div>
                                         </div>
@@ -157,18 +165,65 @@
 
                                     <hr class="my-4">
 
+                                        <div class="d-flex justify-content-between mb-4">
+                                            <h5 class="text-uppercase">Frais de livraison</h5>
+                                            <h5>@Html.DisplayFor(m => m.FraisLivraison) $</h5>
+                                         </div>
+
+                                        @if (Model.sousTotal > Model.vendeur.LivraisonGratuite)
+                                    {
+                                            <h5 class="text-uppercase text-center" style="color:red; font-size:15px">Éligible pour la livraison gratuite.</h5>
+
+                                    }
+
+
+
+                                    <div class="form-floating mb-3">
+                                        <select asp-for="@Model.TypeLivraison" onchange="this.form.submit()"class="form-select" placeholder="Veuillez choisir un type de livraison.">
+                                            @foreach (var types in ViewBag.TypesLivraison)
+                                            {
+                                                    <option value="@types.CodeLivraison">
+                                                        @types.Description
+                                                        @if (Model.sousTotal > Model.vendeur.LivraisonGratuite && types.CodeLivraison == 1)
+                                                        {
+                                                            @: (Gratuit)
+                                                        }
+                                                    </option>
+                                            }
+                                        </select>
+                                        <label asp-for="@Model.TypeLivraison" class="form-label">Type Livraison</label>
+                                    </div>
+                                    <hr class="my-4">
+                                        <div class="d-flex justify-content-between mb-4">
+                                            <h5 class="text-uppercase">Solde à payer</h5>
+                                            <h5>@Html.DisplayFor(m => m.total) $</h5>
+                                        </div>
 
                                     <hr class="my-4">
-
-
                                     <div class="text-center">
-                                        <form asp-controller="Panier" id="formAjoutPanier" asp-action="ConfirmerCommande" method="post">
+                                    @if (Model.poidsTotal > Model.vendeur.PoidsMaxLivraison)
+                                    {
 
-                                            <input type="hidden" name="sousTotal" value="@Model.sousTotal" />
-                                            <button type="submit" class="btn btn-dark btn-lg" data-mdb-ripple-color="dark">
-                                                Passer à la commande
-                                            </button>
-                                        </form>
+                                        <h5 class="text-uppercase" style="color:red; font-size:15px">Votre commande dépasse le poids maximal pour la livraison. Assurez vous que le poids total de votre commande est sous @Model.vendeur.PoidsMaxLivraison Kg</h5>
+                                    }
+                                    else if (Model.total < 5)
+                                    {
+                                        <h5 class="text-uppercase" style="color:red; font-size:15px">La solde de la commande doit être d'au moins 5$</h5>
+                                    }
+                                    else
+                                    {
+                                                <form asp-controller="Commande" asp-action="Commander" method="post">
+                                                    <!-- Your input fields for ModelConfirmerCommande -->
+                                                    <input type="hidden" name="NoVendeur" value="@Model.NoVendeur" />
+                                                    <input type="hidden" name="NomVendeur" value="@Model.vendeur.NomAffaires" />
+                                                    <input type="hidden" name="NoCarteCredit" value="@Model.NoCarte" />
+
+                                                    <input type="hidden" name="total" value="@Model.total" />
+                                                    <!-- Add other hidden input fields for other properties of ModelConfirmerCommande -->
+                                                    <!-- Your submit button -->
+                                                    <button type="submit" asp-action="Commander" asp-controller="Commande" class="btn btn-dark btn-lg" data-mdb-ripple-color="dark">Commander</button>
+                                                </form>
+                                    }
                                     </div>
                                 </div>
                             </div>
@@ -181,6 +236,7 @@
         </div>
     </div>
 </section>
+}
 
 <style>
     @@media (min-width: 1025px) {
