@@ -72,6 +72,58 @@ namespace Projet_Web_Commerce.Controllers
 
         [HttpGet]
         [Authorize(Roles = "Gestionnaire")]
+        public ActionResult ListeClients()
+        {           
+
+            var vendeurs = _context.PPVendeurs
+                .Where(v => v.Statut == 1)
+                .OrderByDescending(v => v.NomAffaires)
+                .ToList();
+
+            //var flattenedList = groupedVendeurs
+            //    .SelectMany(group => group.OrderBy(v => v.NomAffaires))
+            //    .ToList();
+
+            var lstMoisAnneesDistincts = _context.PPVendeurs
+                .Where(v => v.Statut == 1)
+                .Select(v => new ModelMoisAnnees { Mois = v.DateCreation.Month, Annee = v.DateCreation.Year })
+                //.Select(v => new { Mois = v.DateCreation.Month, Annee = v.DateCreation.Year })
+                .Distinct()
+                .OrderByDescending(item => item.Annee)
+                .ThenByDescending(item => item.Mois)
+                .ToList();
+
+            var ProduitsList = _context.PPProduits.ToList();
+            
+            var CommandesList = _context.PPCommandes.ToList();
+
+            var VendeursClientsList = _context.PPVendeursClients
+            .GroupBy(vc => vc.NoClient)
+            .Select(group => group.OrderByDescending(vc => vc.DateVisite).FirstOrDefault())
+            .ToList();
+
+
+            var ClientsList = _context.PPClients.ToList();
+
+            var nbProduits = _context.PPProduits
+                .GroupBy(p => p.NoVendeur)
+                .Count();
+
+            ModelListeClients modelListeClients = new ModelListeClients()
+            {
+                VendeursList = vendeurs,
+                ProduitsList = ProduitsList,
+                MoisAnneesDistinctsList = lstMoisAnneesDistincts,
+                ClientsList = ClientsList,
+                CommandesList = CommandesList,
+                VendeursClientsList = VendeursClientsList
+            };
+
+            return View(modelListeClients);
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "Gestionnaire")]
         public ActionResult ListeVendeursAConfirmer()
         {
             var vendeursStatutZero = _context.PPVendeurs
