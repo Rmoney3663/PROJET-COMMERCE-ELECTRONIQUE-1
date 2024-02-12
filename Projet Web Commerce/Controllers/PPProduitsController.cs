@@ -182,6 +182,11 @@ namespace Projet_Web_Commerce.Controllers
                     Console.WriteLine(er.ErrorMessage);
                 }
             }
+            if (pPProduits.PrixVente > pPProduits.PrixDemande)
+            {
+                ModelState.AddModelError("PrixVente", "Le prix de vente ne peut pas être supérieur au prix demandé.");
+            }
+
             if (ModelState.IsValid)
             {
                 try
