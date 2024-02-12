@@ -18,7 +18,7 @@
     {
         nbTotal += article.NbItems;
         var item = _context.PPProduits.FirstOrDefault(p => p.NoProduit == article.NoProduit);
-        if (item != null)
+        if (item.PrixVente != null && item.DateVente > DateTime.Now)
         {
             totalPrice += item.PrixVente * article.NbItems;
         }
@@ -106,7 +106,7 @@
                                                 </div>
                                                 <div class="col-md-3 col-lg-2 col-xl-2 offset-lg-1">
                                                     
-                                                        @if (item.PrixVente != null)
+                                                        @if (item.PrixVente != null && item.DateVente > DateTime.Now)
                                                         {
                                                             var prix = item.PrixVente * articles.NbItems;
                                                             <h6 class="mb-0">
