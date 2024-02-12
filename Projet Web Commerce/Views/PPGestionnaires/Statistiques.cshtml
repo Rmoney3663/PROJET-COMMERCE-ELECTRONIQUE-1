@@ -22,17 +22,23 @@
             </p>
 
             <b>Nombre de vendeurs par mois entre les dates sélectionnées  : </b><br>
-            Date de début : <input type="month" id="startDate" onchange="generateReport()">
+            Date de début : <input type="month" id="startDateV" onchange="generateReportV()">
 
-            Date de fin :  <input type="month" id="endDate" onchange="generateReport()"><br>
+            Date de fin :  <input type="month" id="endDateV" onchange="generateReportV()"><br>
           
-            <div id="report"></div>
+            <div id="reportV"></div>
             <br />            
             
             <p id="visitesCount">
-            </p>
+            </p>            
+            <br />
 
-            
+            <b>Nombre de connexions des clients regrouper par mois  entre les dates sélectionnées : </b><br>
+            Date de début : <input type="month" id="startDateC" onchange="generateReportC()">
+
+            Date de fin :  <input type="month" id="endDateC" onchange="generateReportC()"><br>
+
+            <div id="reportC"></div>
             <br />
 
         </section>
@@ -43,23 +49,66 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
         var vendeursListJson = Json.Serialize(Model.VendeursList.Select(p => new { DateCreation = p.DateCreation.ToString("yyyy-MM-dd") }));
-       
+        var clientsListJson = Json.Serialize(Model.ClientsList.Select(p => new { DateCreation = p.DateCreation.ToString("yyyy-MM-dd") }));
+
         var visitesCountDataJson = Json.Serialize(Model.VisitesCountData);
+        
     }
 
     <script>
         var vendeursList = @Html.Raw(vendeursListJson);
         console.log("Vendeurs List:", vendeursList);
+        var clientsList = @Html.Raw(clientsListJson);
+        console.log("Clients List:", clientsList);
 
-        function generateReport() {
-            var startDateInput = document.getElementById("startDate").value;
-            var endDateInput = document.getElementById("endDate").value;
+        var currentDate = new Date();
+        var currentYearMonth = currentDate.toISOString().slice(0, 7);
+        document.getElementById("endDateV").value = currentYearMonth;
+        document.getElementById("endDateC").value = currentYearMonth;
+
+        var minDateV = new Date();
+        for (var i = 0; i < vendeursList.length; i++) {
+            if (vendeursList[i].DateCreation) {
+                var dateComponents = vendeursList[i].DateCreation.split('-');
+                var year = parseInt(dateComponents[0]);
+                var month = parseInt(dateComponents[1]) - 1; 
+                var currentDate = new Date(year, month);
+                if (currentDate < minDateV) {
+                    minDateV = currentDate;
+                }
+            }
+        }
+
+        var minYearMonthV = minDateV.toISOString().slice(0, 7);
+        document.getElementById("startDateV").value = minYearMonthV;
+        generateReportV();
+
+        var minDateC = new Date();
+        for (var i = 0; i < clientsList.length; i++) {
+            if (clientsList[i].DateCreation) {
+                var dateComponents = clientsList[i].DateCreation.split('-');
+                var year = parseInt(dateComponents[0]);
+                var month = parseInt(dateComponents[1]) - 1;
+                var currentDate = new Date(year, month);
+                if (currentDate < minDateC) {
+                    minDateC = currentDate;
+                }
+            }
+        }
+
+        var minYearMonthC = minDateC.toISOString().slice(0, 7);
+        document.getElementById("startDateC").value = minYearMonthC;
+        generateReportC();
+
+        function generateReportV() {
+            var startDateInput = document.getElementById("startDateV").value;
+            var endDateInput = document.getElementById("endDateV").value;
 
             console.log("Start Date Input:", startDateInput);
             console.log("End Date Input:", endDateInput);
 
             if (!startDateInput || !endDateInput) {
-                document.getElementById("report").innerHTML = "Veuillez sélectionner les dates de début et de fin.";
+                document.getElementById("reportV").innerHTML = "Veuillez sélectionner les dates de début et de fin.";
                 return;
             }
 
@@ -86,13 +135,51 @@
                 currentDate.setMonth(currentDate.getMonth() + 1);
             }
 
-            document.getElementById("report").innerHTML = report;
+            document.getElementById("reportV").innerHTML = report;
+        }
+
+        function generateReportC() {
+            var startDateInput = document.getElementById("startDateC").value;
+            var endDateInput = document.getElementById("endDateC").value;
+
+            console.log("Start Date Input:", startDateInput);
+            console.log("End Date Input:", endDateInput);
+
+            if (!startDateInput || !endDateInput) {
+                document.getElementById("reportC").innerHTML = "Veuillez sélectionner les dates de début et de fin.";
+                return;
+            }
+
+            var startDateComponents = startDateInput.split('-');
+            var startYear = parseInt(startDateComponents[0]);
+            var startMonth = parseInt(startDateComponents[1]);
+            var startDate = new Date(startYear, startMonth - 1, 1);
+
+            var endDateComponents = endDateInput.split('-');
+            var endYear = parseInt(endDateComponents[0]);
+            var endMonth = parseInt(endDateComponents[1]);
+            var endDate = new Date(endYear, endMonth - 1, 1);
+
+            var report = "";
+
+            var currentDate = new Date(startDate);
+            while (currentDate <= endDate) {
+                var month = currentDate.getMonth() + 1;
+                var year = currentDate.getFullYear();
+                var monthYear = getFormattedDate(month, year, true);
+                var clientsCount = calculateClientsCount(month, year, clientsList);
+                report += monthYear + " : " + clientsCount + "<br>";
+
+                currentDate.setMonth(currentDate.getMonth() + 1);
+            }
+
+            document.getElementById("reportC").innerHTML = report;
         }
 
         function getFormattedDate(month, year, monthYearOnly) {
             var monthNames = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
                 "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
-            var monthName = monthNames[month - 1]; // Adjust month index to start from 0
+            var monthName = monthNames[month - 1]; 
             var formattedDate = monthName + " " + year;
 
             if (!monthYearOnly) {
@@ -118,8 +205,24 @@
             return vendeurCount;
         }
 
+        function calculateClientsCount(month, year, clientsList) {
+            var clientCount = 0;
+
+            for (var i = 0; i < clientsList.length; i++) {
+                var client = clientsList[i];
+                var dateComponents = client.dateCreation.split('-');
+                var clientYear = parseInt(dateComponents[0]);
+                var clientMonth = parseInt(dateComponents[1]);
+
+                if (!isNaN(clientMonth) && !isNaN(clientYear) && clientMonth === month && clientYear === year) {
+                    clientCount++;
+                }
+            }
+            return clientCount;
+        }
+
         //------------------------------------------------------------------
-        //var ppVendeurClients = Html.Raw(json);
+       
         var visitesCountData = @Html.Raw(visitesCountDataJson);
         console.log("VendeursClient List:", visitesCountData);
         function displayVisitesCount(visitesCountData) {
@@ -135,11 +238,13 @@
                 htmlContent += item.clientName + " a visité " + item.vendeurName + " : " + item.visitCount + " fois<br>";
             });
 
-            // Display the HTML content within the specified <p> element
             document.getElementById("visitesCount").innerHTML = htmlContent;
         }
 
-        // Call the displayVisitesCount function with the visit count data
         displayVisitesCount(visitesCountData);
+
+        //------------------------------------------------------------------
+
+
     </script>
 }

@@ -58,7 +58,7 @@ namespace Projet_Web_Commerce.Controllers
             })
             .ToList();
 
-
+            var clients = _context.PPClients.ToList();
 
 
             // Log the data
@@ -80,6 +80,7 @@ namespace Projet_Web_Commerce.Controllers
 
             ModelListeStat modelListeStat = new ModelListeStat()
             {
+                ClientsList = clients,
                 VendeursList = vendeurs,
                 ProduitsList = ProduitsList,
                 CommandesList = CommandesList,
