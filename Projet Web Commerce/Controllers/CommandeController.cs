@@ -4,7 +4,7 @@ using Projet_Web_Commerce.API;
 using Projet_Web_Commerce.Areas.Identity.Data;
 using Projet_Web_Commerce.Data;
 using Projet_Web_Commerce.Models;
-
+using System.Net;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -80,6 +80,14 @@ namespace Projet_Web_Commerce.Controllers
                 var client = _context.PPClients.FirstOrDefault(c => c.NoClient == model.NoClient);
                 model.client = client;
                 model.PostalClient = client.CodePostal;
+                model.VilleClient = client.Ville;
+                model.RueClient = client.Rue;
+                model.NomClient = client.Nom;
+                model.PrenomClient = client.Prenom;
+                model.AdresseClient = client.AdresseEmail;
+                model.TelClient = client.Tel1;
+
+                model.ProvinceCLient = client.NoProvince;
             }
 
             
@@ -200,56 +208,56 @@ namespace Projet_Web_Commerce.Controllers
             {
 
                 // Validate Nom
-                if (string.IsNullOrEmpty(model.client.Nom))
+                if (string.IsNullOrEmpty(model.NomClient))
                 {
                     errors.Add("Le nom est requis.");
-                    ModelState.AddModelError("client.Nom", "Le nom est requis.");
+                    ModelState.AddModelError("NomClient", "Le nom est requis.");
                 }
 
                 // Validate Prenom
-                if (string.IsNullOrEmpty(model.client.Prenom))
+                if (string.IsNullOrEmpty(model.PrenomClient))
                 {
                     errors.Add("Le prénom est requis.");
-                    ModelState.AddModelError("client.Prenom", "Le prénom est requis.");
+                    ModelState.AddModelError("PrenomClient", "Le prénom est requis.");
                 }
 
                 // Validate Email
-                if (string.IsNullOrEmpty(model.client.AdresseEmail))
+                if (string.IsNullOrEmpty(model.AdresseClient))
                 {
                     errors.Add("L'adresse email est requise.");
-                    ModelState.AddModelError("client.AdresseEmail", "L'adresse courriel est requise.");
+                    ModelState.AddModelError("AdresseClient", "L'adresse courriel est requise.");
                 }
 
                 // Validate Rue
-                if (string.IsNullOrEmpty(model.client.Rue))
+                if (string.IsNullOrEmpty(model.RueClient))
                 {
                     errors.Add("La rue est requise.");
-                    ModelState.AddModelError("client.Rue", "La rue est requise.");
+                    ModelState.AddModelError("RueClient", "La rue est requise.");
                 }
 
                 // Validate Tel1
-                if (string.IsNullOrEmpty(model.client.Tel1) || !Regex.IsMatch(model.client.Tel1, "^(?:(?:\\+|00)(\\d{1,3})[\\s-]?)?(?:\\(?(\\d{3})\\)?[\\s-]?)?(\\d{3})[\\s-]?(\\d{4})(?:[\\s-]?(?:#|x\\.?|ext\\.?|extension)\\s?(\\d+))?$\r\n"))
+                if (string.IsNullOrEmpty(model.TelClient) || !Regex.IsMatch(model.TelClient, "^(\\+\\d{1,2}\\s)?\\(?\\d{3}\\)?[\\s.-]\\d{3}[\\s.-]\\d{4}$"))
                 {
                     errors.Add("Le numéro de téléphone est requis.");
-                    ModelState.AddModelError("client.Tel1", "Le téléphone est requis.");
+                    ModelState.AddModelError("TelClient", "Le téléphone est requis.");
                 }
 
                 // Validate NoProvince
-                if (string.IsNullOrEmpty(model.client.NoProvince))
+                if (string.IsNullOrEmpty(model.ProvinceCLient))
                 {
                     errors.Add("La province est requise.");
-                    ModelState.AddModelError("client.Province", "La province est requise.");
+                    ModelState.AddModelError("ProvinceClient", "La province est requise.");
                 }
 
                 // Validate Ville
-                if (string.IsNullOrEmpty(model.client.Ville))
+                if (string.IsNullOrEmpty(model.VilleClient))
                 {
                     errors.Add("La ville est requise.");
-                    ModelState.AddModelError("client.Ville", "La ville est requise.");
+                    ModelState.AddModelError("VilleClient", "La ville est requise.");
                 }
 
                 // Validate CodePostal format
-                if (string.IsNullOrEmpty(model.PostalClient) || !Regex.IsMatch(model.PostalClient, "^[A-Za-z]\\d[A-Za-z]\\d[A-Za-z]\\d$"))
+                if (string.IsNullOrEmpty(model.PostalClient) || !Regex.IsMatch(model.PostalClient, "^[A-Za-z]\\d[A-Za-z] \\d[A-Za-z]\\d$"))
                 {
                     errors.Add("Le code postal doit être dans le format A1A1A1.");
                     ModelState.AddModelError("PostalClient", "Le code postal doit être dans le format A1A1A1.");
@@ -285,7 +293,65 @@ namespace Projet_Web_Commerce.Controllers
             }
 
 
+            if (payer != null)
+            {
+                if (model.total < 5)
+                {
+                    return RedirectToAction("Index", "Home");
+                }
+
+                //var PostDataCommander = new PostDataCommander
+                //{
+                //    NoVendeur = model.NoVendeur,
+                //    NomVendeur = model.NomVendeur,
+                //    NoCarteCredit = 1111123412341234,
+                //    DateExpirationCarteCredit = model.dateExpiration,
+                //    MontantPaiement = model.total,
+                //    NomPageRetour = "google.ca",
+                //    InfoSuppl = "Coucou"
+                //};
+
+                //var httpClient = new HttpClient();
+                //httpClient.BaseAddress = new Uri("http://424w.cgodin.qc.ca/lesi-20XX/");
+
+                //var json = JsonSerializer.Serialize(PostDataCommander);
+                //var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                //var response = httpClient.PostAsync("lesi-effectue-paiement.php", content).Result;
+
+                //if (response.IsSuccessStatusCode)
+                //{
+                //    var responseContent = response.Content.ReadAsStringAsync().Result;
+                //    var postResponse = JsonSerializer.Deserialize<PostResponseCommander>(responseContent);
+                //    Console.WriteLine(postResponse.NoAutorisation);
+                //}
+                //else
+                //{
+                //    Console.WriteLine("error : " + response.StatusCode);
+                //}
+
+                WebRequest req = WebRequest.Create("http://424w.cgodin.qc.ca/lesi-20XX/lesi-effectue-paiement.php");
+                string postData = $"?NoVendeur={model.NoVendeur}&NomVendeur={model.NomVendeur}&NoCarteCredit={model.NoCarte}&DateExpirationCarteCredit={model.dateExpiration}&MontantPaiement={model.total}&NomPageRetour={"google.ca"}&InfoSuppl={"test"}";
+
+                byte[] send = Encoding.Default.GetBytes(postData);
+                req.Method = "POST";
+                req.ContentType = "application/x-www-form-urlencoded";
+                req.ContentLength = send.Length;
+
+                Stream sout = req.GetRequestStream();
+                sout.Write(send, 0, send.Length);
+                sout.Flush();
+                sout.Close();
+
+                WebResponse res = req.GetResponse();
+                StreamReader sr = new StreamReader(res.GetResponseStream());
+                string returnvalue = sr.ReadToEnd();
+
+                return View(model);
+            }
+
             return View(model);
+
         }
     }
 }
