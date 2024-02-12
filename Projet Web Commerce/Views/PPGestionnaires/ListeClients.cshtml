@@ -34,21 +34,6 @@
 
                             @{
 
-                                /*
-                                var groupeParAnnee = (from client in Model.ClientsList
-                                                      join vendeurClient in Model.VendeursClientsList
-                                                      on client.NoClient equals vendeurClient.NoClient into vendeurClients
-                                                      where client.DateCreation.Month == date.Mois && client.DateCreation.Year == date.Annee
-                                                      from vc in vendeurClients.DefaultIfEmpty()
-                                                      orderby client.Nom, client.Prenom
-                                                      select new
-                                                      {
-                                                          Client = client,
-                                                          VendeurClient = vc
-                                                      })
-                                .ToList();    
-                                */
-
                                 var groupeParAnnee = (from client in Model.ClientsList
                                                       join vendeurClient in Model.VendeursClientsList
                                                       on client.NoClient equals vendeurClient.NoClient into vendeurClients

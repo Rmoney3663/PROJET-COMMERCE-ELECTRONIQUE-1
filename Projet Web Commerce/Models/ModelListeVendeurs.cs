@@ -10,5 +10,7 @@ namespace Projet_Web_Commerce.Models
         public List<PPProduits> ProduitsList { get; set; }
 
         public List<ModelMoisAnnees> MoisAnneesDistinctsList { get; set; }
+
+        public List<PPCommandes> CommandesList { get; set; }
     }
 }

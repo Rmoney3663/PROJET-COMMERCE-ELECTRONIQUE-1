@@ -1,0 +1,125 @@
+﻿@model Projet_Web_Commerce.Models.ModelListeStat
+@{
+    ViewData["Title"] = "Liste de statistique";
+}
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+
+<div class="row">
+    <div class="col">
+        <section>
+            <div>
+                @Html.Partial("GestionVendeursPages", "Statistiques")
+            </div>
+            <br />
+
+            <p>
+                <b>Nombre total de vendeurs : </b>
+                @Model.VendeursList.Count()
+            </p>
+
+            <b>Nombre de vendeurs par mois entre les dates sélectionnées  : </b><br>
+            Date de début : <input type="month" id="startDate" onchange="generateReport()">
+
+            Date de fin :  <input type="month" id="endDate" onchange="generateReport()"><br>
+          
+            <div id="report"></div>
+            <br />
+
+
+
+        </section>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+        var vendeursListJson = Json.Serialize(Model.VendeursList.Select(p => new { DateCreation = p.DateCreation.ToString("yyyy-MM-dd") }));
+    }
+
+    <script>
+        var vendeursList = @Html.Raw(vendeursListJson);
+        console.log("Vendeurs List:", vendeursList);
+
+        function generateReport() {
+            var startDateInput = document.getElementById("startDate").value;
+            var endDateInput = document.getElementById("endDate").value;
+
+            console.log("Start Date Input:", startDateInput);
+            console.log("End Date Input:", endDateInput);
+
+            if (!startDateInput || !endDateInput) {
+                document.getElementById("report").innerHTML = "Veuillez sélectionner les dates de début et de fin.";
+                return;
+            }
+
+            var startDateComponents = startDateInput.split('-');
+            var startYear = parseInt(startDateComponents[0]);
+            var startMonth = parseInt(startDateComponents[1]);
+            var startDate = new Date(startYear, startMonth - 1, 1); 
+
+            var endDateComponents = endDateInput.split('-');
+            var endYear = parseInt(endDateComponents[0]);
+            var endMonth = parseInt(endDateComponents[1]);
+            var endDate = new Date(endYear, endMonth - 1, 1);           
+
+            var report = "";
+
+            var currentDate = new Date(startDate);
+            while (currentDate <= endDate) {
+                var month = currentDate.getMonth() + 1;
+                var year = currentDate.getFullYear(); 
+                var monthYear = getFormattedDate(month, year, true);
+                var vendeursCount = calculateVendeursCount(month, year, vendeursList);
+                report += monthYear + " : " + vendeursCount + "<br>";
+
+                currentDate.setMonth(currentDate.getMonth() + 1);
+            }
+
+            document.getElementById("report").innerHTML = report;
+        }
+
+        function getFormattedDate(month, year, monthYearOnly) {
+            var monthNames = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
+                "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
+            var monthName = monthNames[month - 1]; // Adjust month index to start from 0
+            var formattedDate = monthName + " " + year;
+
+            if (!monthYearOnly) {
+                formattedDate = "le " + formattedDate;
+            }
+
+            return formattedDate;
+        }
+
+        function calculateVendeursCount(month, year, vendeursList) {
+            var vendeurCount = 0;
+
+            for (var i = 0; i < vendeursList.length; i++) {
+                var vendeur = vendeursList[i];
+                var dateComponents = vendeur.dateCreation.split('-');
+                var vendeurYear = parseInt(dateComponents[0]);
+                var vendeurMonth = parseInt(dateComponents[1]);
+
+                if (!isNaN(vendeurMonth) && !isNaN(vendeurYear) && vendeurMonth === month && vendeurYear === year) {
+                    vendeurCount++;
+                }
+            }
+
+
+
+            return vendeurCount;
+        }
+
+
+
+
+
+
+
+
+
+    </script>
+}

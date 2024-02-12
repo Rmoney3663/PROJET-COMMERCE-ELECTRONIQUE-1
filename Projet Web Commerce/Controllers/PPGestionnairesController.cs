@@ -27,6 +27,51 @@ namespace Projet_Web_Commerce.Controllers
 
         [HttpGet]
         [Authorize(Roles = "Gestionnaire")]
+        public ActionResult Statistiques()
+        {
+
+            var vendeurs = _context.PPVendeurs
+                .Where(v => v.Statut == 1)
+                .ToList();
+
+            var vendeurdate = _context.PPVendeurs
+            .Select(v => new ModelMoisAnneVendeur
+            {
+                Mois = v.DateCreation.Month,
+                Annee = v.DateCreation.Year
+            })
+            .ToList(); // Materialize the query to execute it and get the results
+
+            // Log the data
+            foreach (var item in vendeurdate)
+            {
+                Console.WriteLine($"Month: {item.Mois}, Year: {item.Annee}");
+            }
+
+
+
+            var ProduitsList = _context.PPProduits.ToList();
+
+
+            var CommandesList = _context.PPCommandes
+             .GroupBy(c => c.NoVendeur)
+             .Select(group => group.OrderByDescending(c => c.DateCommande).FirstOrDefault())
+             .ToList();
+
+
+            ModelListeStat modelListeStat = new ModelListeStat()
+            {
+                VendeursList = vendeurs,
+                ProduitsList = ProduitsList,
+                CommandesList = CommandesList,
+                VendeurDate = vendeurdate
+            };
+
+            return View(modelListeStat);
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "Gestionnaire")]
         public ActionResult ListeVendeurs()
         {
             //var groupedVendeurs = _context.PPVendeurs
@@ -60,11 +105,19 @@ namespace Projet_Web_Commerce.Controllers
                 .GroupBy(p => p.NoVendeur)
                 .Count();
 
+            var CommandesList = _context.PPCommandes
+             .GroupBy(c => c.NoVendeur)
+             .Select(group => group.OrderByDescending(c => c.DateCommande).FirstOrDefault())
+             .ToList();
+
+
             ModelListeVendeurs modelListeVendeurs = new ModelListeVendeurs()
             {
                 VendeursList = vendeurs,
                 ProduitsList = ProduitsList,
-                MoisAnneesDistinctsList = lstMoisAnneesDistincts
+                MoisAnneesDistinctsList = lstMoisAnneesDistincts,
+                CommandesList = CommandesList,
+               
             };
 
             return View(modelListeVendeurs);

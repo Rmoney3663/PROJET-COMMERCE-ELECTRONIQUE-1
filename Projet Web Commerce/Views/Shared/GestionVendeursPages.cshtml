@@ -53,6 +53,11 @@
         Liste des vendeurs inactifs
     </a>
 
+    <a class="btn @(Model == "Statistiques" ? "actif" : "pasActif")"
+       asp-area="" asp-controller="PPGestionnaires" asp-action="Statistiques">
+        Statistiques
+    </a>
+
     <!-- #pragma warning restore CSS024 -->
 </div>
 

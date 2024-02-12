@@ -32,9 +32,29 @@
                                 document.write('<h4 class="card-title"><u>' + monthName + ' ' + year + '</u></h4>');
                             </script>
                             @{
+                                /*
                                 var groupeParAnnee = Model.VendeursList
                                 .Where(item => item.DateCreation.Month == date.Mois && item.DateCreation.Year == date.Annee)
+                                .OrderBy(item => item.NomAffaires)
                                 .ToList();
+                                */
+
+                                var groupeParAnnee = (from vendeur in Model.VendeursList
+                                                      where vendeur.DateCreation.Month == date.Mois && vendeur.DateCreation.Year == date.Annee
+                                                      orderby vendeur.NomAffaires
+                                                      join commande in Model.CommandesList
+                                                      on vendeur.NoVendeur equals commande.NoVendeur into vendeurCommandes
+                                                      from vc in vendeurCommandes.DefaultIfEmpty()
+                                                      orderby vc?.DateCommande
+                                                      select new
+                                                      {
+                                                          Vendeur = vendeur,
+                                                          Commande = vc
+                                                      })
+                                .ToList();
+
+
+
                             }
                             <table class="table">
                                 <thead>
@@ -45,6 +65,8 @@
                                         <th scope="col">Nom d'affaires</th>
                                         <th scope="col">Date de création</th>
                                         <th scope="col">Nb de produits inscrits</th>
+                                        <th scope="col">Date de dernière commande</th>
+                                        <th scope="col">Montant total avant taxes </th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -55,19 +77,21 @@
                                     {
                                         <tr>
                                             <td>@(++no)</td>
-                                            <td>@Html.DisplayFor(modelItem => item.NoVendeur)</td>
-                                            @if(item.Nom != null && item.Prenom != null)
+                                            <td>@Html.DisplayFor(modelItem => item.Vendeur.NoVendeur)</td>
+                                            @if (item.Vendeur.Nom != null && item.Vendeur.Prenom != null)
                                             {
-                                                <td>@Html.DisplayFor(modelItem => item.Nom), @Html.DisplayFor(modelItem => item.Prenom)</td>
+                                                <td>@Html.DisplayFor(modelItem => item.Vendeur.Nom), @Html.DisplayFor(modelItem => item.Vendeur.Prenom)</td>
                                             }
                                             else
                                             {
-                                                <td>@Html.DisplayFor(modelItem => item.AdresseEmail)</td>
+                                                <td>@Html.DisplayFor(modelItem => item.Vendeur.AdresseEmail)</td>
                                             }
-                                            
-                                            <td>@Html.DisplayFor(modelItem => item.NomAffaires)</td>
-                                            <td>@Html.DisplayFor(modelItem => item.DateCreation)</td>
-                                            <td>@Model.ProduitsList.Count(modelItem => modelItem.NoVendeur == item.NoVendeur)</td>
+
+                                            <td>@Html.DisplayFor(modelItem => item.Vendeur.NomAffaires)</td>
+                                            <td>@Html.DisplayFor(modelItem => item.Vendeur.DateCreation)</td>
+                                            <td>@Model.ProduitsList.Count(modelItem => modelItem.NoVendeur == item.Vendeur.NoVendeur)</td>
+                                            <td>@Html.DisplayFor(modelItem => item.Commande.DateCommande)</td>
+                                            <td>@Html.DisplayFor(modelItem => item.Commande.MontantTotAvantTaxes)</td>
                                         </tr>
                                     }
                                 </tbody>
