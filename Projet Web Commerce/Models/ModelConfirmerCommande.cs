@@ -20,7 +20,7 @@ namespace Projet_Web_Commerce.Models
         [Range(0000000000000000, 9999999999999999, ErrorMessage = "Le numéro de carte doit contenir 16 numéro.")]
         public string NoCarte { get; set; }
 
-        [ExpirationDateGreaterThanCurrent(ErrorMessage = "La date doit être dans le format MM/AA et doit être après la date d'aujourd'hui.")]
+        [ExpirationDateGreaterThanCurrent(ErrorMessage = "La date doit être dans le format MM/AAAA et doit être après la date d'aujourd'hui.")]
         public string dateExpiration { get; set; }
 
         [Range(0, 9999, ErrorMessage = "Numéro CVV/CVC doit se situer entre 0 et 9999.")]
