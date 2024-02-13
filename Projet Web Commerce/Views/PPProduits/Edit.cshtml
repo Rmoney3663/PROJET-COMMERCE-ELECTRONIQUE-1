@@ -2,6 +2,8 @@
 @inject UserManager<Projet_Web_Commerce.Areas.Identity.Data.Utilisateur> _userManager
 @inject SignInManager<Projet_Web_Commerce.Areas.Identity.Data.Utilisateur> SignInManager
 @model Projet_Web_Commerce.Models.PPProduits
+@using System.IO
+@inject IWebHostEnvironment env
 @{
     ViewData["Title"] = "Edit";
     var user = await _userManager.GetUserAsync(User);    
@@ -48,10 +50,16 @@ else
                     <input asp-for="DateCreation" class="form-control" />
                     <span asp-validation-for="DateCreation" class="text-danger"></span>
                 </div>
+                @{
+                    var path = System.IO.Path.Combine(env.WebRootPath, "Logo", Model.Photo);
+                    string imagePath = Model.Photo != null && File.Exists(path) ? $"~/Logo/{Model.Photo}" : "~/Logo/DefaultImage.png";
+                    Console.WriteLine("FILE Name : " + Model.Photo);
+                    Console.WriteLine("FILE : " + File.Exists(path));
+                }
 
                 <div class="form-group">
                     <label asp-for="Photo" class="control-label">Photo de l’article :</label>
-                    <img src="~/Logo/@(Model.Photo)" alt="@(Model.Photo)" width="140" height="200" />
+                    <img src="@Url.Content(imagePath)" alt="@Model.Photo" width="140" height="200" />
                     <input type="file" id="file" name="file" accept="image/*" class="form-control" />
                     <span asp-validation-for="Photo" class="text-danger"></span>
                 </div>

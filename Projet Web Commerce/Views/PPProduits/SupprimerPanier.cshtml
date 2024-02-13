@@ -8,213 +8,375 @@
 @inject IWebHostEnvironment env
 @{
     ViewData["Title"] = "Index";
+    Console.WriteLine("ID OF CLIENT PANIER : " + Model.NoClient);
     var user = await _userManager.GetUserAsync(User);
-    @if (!SignInManager.IsSignedIn(User) || User.IsInRole("Client"))
-    {
-        Console.WriteLine("yes");
-        <text>
-            <script>
-                debugger;
-                window.location.href = '/PPProduits/ErrorProduit';
-            </script>
-        </text>
-    }
-    var vendeur = _context.PPVendeurs.FirstOrDefault(v => v.IdUtilisateur == user.Id);
 }
-
-@if (vendeur == null)
+@if (!SignInManager.IsSignedIn(User) || User.IsInRole("Client"))
 {
-    Console.WriteLine("among us");
-    <div>
-        <p>Vous n'avez pas accès à cette page.</p>
-        <a href="/PPProduits/ErrorProduit">Retourner à la catalogue</a>
-    </div>
+    Console.WriteLine("yes");
+    <text>
+        <script>
+            debugger;
+            window.location.href = '/PPProduits/ErrorProduit';
+        </script>
+    </text>
 }
 else
 {
-    var clientProducts = _context.PPArticlesEnPanier
-    .Where(p => p.NoVendeur == vendeur.NoVendeur && p.NoClient == Model.NoClient)
-    .GroupBy(p => new { p.NoClient, p.NoProduit })
-    .Select(g => new
+    var vendeur = _context.PPVendeurs.FirstOrDefault(v => v.IdUtilisateur == user.Id);
+
+    @if (vendeur == null)
     {
-        NoClient = g.Key.NoClient,
-        NoProduit = g.Key.NoProduit,
-        TotalItems = g.Sum(p => p.NbItems),
-        LowestPanierDate = g.Min(p => p.DateCreation)
-    })
-    .Join(
-        _context.PPClients,
-        cp => cp.NoClient,
-        c => c.NoClient,
-        (cp, c) => new
-        {
-            cp.NoClient,
-            cp.NoProduit,
-            cp.TotalItems,
-            cp.LowestPanierDate,
-            c.Nom,
-            c.Prenom,
-            c.AdresseEmail
-        }
-    )
-    .ToList();
-
-    var oldestProductDatesPerClient = clientProducts
-      .GroupBy(p => p.NoClient)
-      .Select(g => new
-      {
-          NoClient = g.Key,
-          OldestProductDate = g.Min(p => p.LowestPanierDate)
-      })
-      .ToList();
-    var itemsPerClient = clientProducts
-     .GroupBy(p => p.NoClient)
-     .Select(g => new
-     {
-         NoClient = g.Key,
-         TotalItems = g.Sum(p => p.TotalItems)
-     })
-     .ToList();
-
-
-
-    if (Model.Nom != null && Model.Prenom != null)
-    {
-        <h1>Panier de @Model.Prenom @Model.Nom </h1>
+        Console.WriteLine("among us");
+        <div>
+            <p>Vous n'avez pas accès à cette page.</p>
+            <a href="/PPProduits/ErrorProduit">Retourner à la catalogue</a>
+        </div>
     }
     else
     {
-        <h1>Panier de @Model.AdresseEmail </h1>
-    }
-    <div class="container">
-        <div class="row flex-wrap d-flex">
-            <div class="col-md-6 d-flex">
-                <div class="d-flex flex-wrap align-content-start bg-light overflow-auto  " style="margin-bottom:50px; width:900px; height:600px;">
-                    @foreach (var client in clientProducts)
-                    {
-                        var item = _context.PPProduits.FirstOrDefault(p => p.NoProduit == client.NoProduit);
-                        var cat = _context.PPCategories.FirstOrDefault(p => p.NoCategorie == item.NoCategorie);
-                        if (item != null)
-                        {
-                            <div class="card mb-1">
-                                <div class="card-body row d-flex ">
-                                    <b>@Html.DisplayFor(modelItem => item.Nom) </b>
-                                    @{
-                                        var path = System.IO.Path.Combine(env.WebRootPath, "Logo", item.Photo);
-                                        string imagePath = item.Photo != null && File.Exists(path) ? $"~/Logo/{item.Photo}" : "~/Logo/DefaultImage.png";
-                                        Console.WriteLine("FILE Name : " + item.Photo);
-                                        Console.WriteLine("FILE : " + File.Exists(path));
-                                    }
-                                    <div class="col-12 col-md-2 d-flex align-items-center justify-content-center">
-                                        <img src="@Url.Content(imagePath)" alt="@item.Photo" width="100" height="120" />
-                                    </div>
-                                    <div class="col-12 col-md-2 d-flex align-items-center justify-content-center">
-                                        <b>x @Html.DisplayFor(modelItem => client.TotalItems) </b>
-                                    </div>
-                                    <div class="col-12 col-md-2 d-flex align-items-center justify-content-center">
-                                        <b>@Html.DisplayFor(modelItem => cat.Description) </b>
-                                    </div>
-                                    @if (item.PrixVente != null && item.DateVente > DateTime.Now)
-                                    {
-                                        var prix = item.PrixVente * client.TotalItems;
-                                        <div class="col-12 col-md-3 d-flex align-items-center justify-content-center">
-                                            <b>Prix Total: @Html.DisplayFor(modelItem => prix) $ </b>
+        var clientProducts = _context.PPArticlesEnPanier
+         .Where(p => p.NoVendeur == vendeur.NoVendeur && p.NoClient == Model.NoClient)
+         .GroupBy(p => new { p.NoClient, p.NoProduit })
+         .Select(g => new
+         {
+             NoClient = g.Key.NoClient,
+             NoProduit = g.Key.NoProduit,
+             TotalItems = g.Sum(p => p.NbItems),
+             LowestPanierDate = g.Min(p => p.DateCreation)
+         })
+         .Join(
+             _context.PPClients,
+             cp => cp.NoClient,
+             c => c.NoClient,
+             (cp, c) => new
+             {
+                 cp.NoClient,
+                 cp.NoProduit,
+                 cp.TotalItems,
+                 cp.LowestPanierDate,
+                 c.Nom,
+                 c.Prenom,
+                 c.AdresseEmail
+             }
+         )
+         .ToList();
+
+        var oldestProductDatesPerClient = clientProducts
+          .GroupBy(p => p.NoClient)
+          .Select(g => new
+          {
+              NoClient = g.Key,
+              OldestProductDate = g.Min(p => p.LowestPanierDate)
+          })
+          .ToList();
+        var itemsPerClient = clientProducts
+         .GroupBy(p => p.NoClient)
+         .Select(g => new
+         {
+             NoClient = g.Key,
+             TotalItems = g.Sum(p => p.TotalItems)
+         })
+         .ToList();
+
+        var provinceName = _context.Province
+           .Where(p => p.ProvinceID == Model.NoProvince)
+           .Select(p => p.Nom)
+           .FirstOrDefault();
+
+        decimal? TotalPrice = 0;
+        decimal? TotalPoids = 0;
+        var oldestProductDate = oldestProductDatesPerClient.FirstOrDefault(c => c.NoClient == Model.NoClient)?.OldestProductDate;
+        var nbTotal = itemsPerClient.FirstOrDefault(c => c.NoClient == Model.NoClient)?.TotalItems;
+        foreach (var client in clientProducts)
+        {
+            var item = _context.PPProduits.FirstOrDefault(p => p.NoProduit == client.NoProduit);
+            if (item != null)
+            {
+                decimal? prix = 0;
+                if (item.PrixVente != null && item.DateVente > DateTime.Now)
+                {
+                    prix = item.PrixVente * client.TotalItems;
+                }
+                else
+                {
+                    prix = item.PrixDemande * client.TotalItems;
+                }
+                TotalPrice += prix;
+                TotalPoids += item.Poids * client.TotalItems;
+            }
+        }
+        decimal? tps = TotalPrice * 0.05m;
+        decimal? tvq = TotalPrice * 0.09975m;
+        decimal? prixFinal = TotalPrice;
+        <h1>Confirmer la Suppression du Panier</h1>
+        <section class="h-100 h-custom">
+            <div class="container py-5 h-100">
+                <div class="row d-flex justify-content-center align-items-center h-100">
+                    <div class="col-12">
+                        <div class="card card-registration card-registration-2" style="border-radius: 15px;">
+                            <div class="card-body p-0">
+                                <div class="row g-0">
+                                    <div class="col-lg-8">
+                                        <div class="p-5">
+                                            <div class="d-flex justify-content-between align-items-center mb-5">
+                                                @if (Model.Nom != null && Model.Prenom != null)
+                                                {
+                                                    <h1 class="fw-bold mb-0 text-black">Panier de @Model.Prenom @Model.Nom </h1>
+                                                }
+                                                else
+                                                {
+                                                    <h1 class="fw-bold mb-0 text-black">Panier de @Model.AdresseEmail </h1>
+                                                }
+                                                <h6 class="mb-0 text-muted">@Html.DisplayFor(modelItem => nbTotal) Items</h6>
+                                            </div>
+                                            <hr class="my-4">
+
+                                            @foreach (var client in clientProducts)
+                                            {
+                                                var item = _context.PPProduits.FirstOrDefault(p => p.NoProduit == client.NoProduit);
+                                                var cat = _context.PPCategories.FirstOrDefault(p => p.NoCategorie == item.NoCategorie);
+
+                                                var produit = _context.PPProduits.FirstOrDefault(p => p.NoProduit == item.NoProduit);
+
+                                                var path = System.IO.Path.Combine(env.WebRootPath, "Logo", item.Photo);
+                                                string imagePath = item.Photo != null && File.Exists(path) ? $"~/Logo/{item.Photo}" : "~/Logo/DefaultImage.png";
+                                                Console.WriteLine("FILE Name : " + item.Photo);
+                                                Console.WriteLine("FILE : " + File.Exists(path));
+
+                                                <div class="row mb-4 d-flex justify-content-between align-items-center">
+                                                    <div class="col-md-2 col-lg-2 col-xl-2">
+                                                        <img class="img-fluid rounded-3" src="@Url.Content(imagePath)" alt="@item.Photo" width="100" height="120" />
+                                                    </div>
+                                                    <div class="col-md-3 col-lg-3 col-xl-3">
+                                                        <h6 class="text-muted">@Html.DisplayFor(modelItem => cat.Description) </h6>
+                                                        <h6 class="text-black mb-0">@Html.DisplayFor(modelItem => item.Nom)</h6>
+                                                    </div>
+                                                    <h6 class="col-md-3 col-lg-3 col-xl-2 d-flex">
+                                                        x @Html.DisplayFor(modelItem => client.TotalItems)
+                                                    </h6>
+                                                    <div class="col-md-3 col-lg-2 col-xl-2 offset-lg-1">
+
+                                                        @if (item.PrixVente != null)
+                                                        {
+                                                            var prix = item.PrixVente * client.TotalItems;
+                                                            <h6 class="col-md-12 col-lg-12 col-xl-12">
+                                                                @Html.DisplayFor(modelItem => prix) $
+                                                            </h6>
+                                                        }
+                                                        else
+                                                        {
+                                                            var prix = item.PrixDemande * client.TotalItems;
+                                                            <h6 class="col-md-12 col-lg-12 col-xl-12">
+                                                                @Html.DisplayFor(modelItem => prix) $
+                                                            </h6>
+                                                        }
+                                                    </div>
+                                                </div>
+
+                                                <hr class="my-4">
+                                            }
+
+
+                                            <div class="pt-5">
+                                                <h6 class="mb-0 d-flex justify-content-between">
+                                                    @if (oldestProductDate != null && oldestProductDate < DateTime.Now.AddMonths(-6))
+                                                    {
+                                                        <form asp-action="SupprimerPanier">
+                                                            <input type="hidden" asp-for="NoClient" name="noClient" />
+                                                            <input type="hidden" name="noVendeur" value="@vendeur.NoVendeur" />
+                                                            <button type="submit" class="btn btn-danger" onclick="return confirm('Confirmer Suppression')">
+                                                                Supprimer ce Panier
+                                                            </button> 
+                                                        </form>
+
+                                                       
+                                                    }
+                                                    <a class="nav-link text-body" asp-action="ListePanier">
+                                                        <i class="fas fa-long-arrow-alt-left me-2"></i>Retour à la liste des paniers
+                                                    </a>
+                                                </h6>
+                                            </div>
+
                                         </div>
-                                    }
-                                    else
-                                    {
-                                        var prix = item.PrixDemande * client.TotalItems;
-                                        <div class="col-12 col-md-3 d-flex align-items-center justify-content-center">
-                                            <b>Prix Total: @Html.DisplayFor(modelItem => prix) $ </b>
+                                    </div>
+                                    <div class="col-lg-4 bg-grey">
+                                        <div class="p-5">
+                                            <h3 class="fw-bold mb-5 mt-2 pt-1">Sommaire</h3>
+                                            <hr class="my-4">
+
+                                            <div class="d-flex justify-content-between mb-4">
+                                                <h5 class="text-uppercase">Poids Total</h5>
+                                                <h5>@Html.DisplayFor(modelItem => TotalPoids) Kg</h5>
+                                            </div>
+
+
+
+                                            <div class="d-flex justify-content-between mb-4">
+                                                <h5 class="text-uppercase">Date création</h5>
+                                                <h5>
+                                                    @oldestProductDate?.ToString("dd/MM/yyyy")
+                                                </h5>
+                                            </div>
+
+                                            <hr class="my-4">
+
+                                            <div class="d-flex justify-content-between mb-4">
+                                                <h5 class="text-uppercase">@Html.DisplayFor(modelItem => nbTotal) Items</h5>
+                                                <h5>@Html.DisplayFor(modelItem => TotalPrice) $</h5>
+                                            </div>
+
+                                            @if (vendeur.Taxes == true)
+                                            {
+                                                <div class="d-flex justify-content-between mb-4">
+                                                    <h5 class="text-uppercase">TPS</h5>
+                                                    <h5>
+                                                        @if (tps.HasValue)
+                                                        {
+                                                            prixFinal += tps;
+                                                            decimal r = Math.Round(tps.Value, 2);
+                                                            @Html.DisplayFor(modelItem => r)
+
+
+
+                                                        }
+                                                        $
+                                                    </h5>
+                                                </div>
+
+                                                var quebecProvince = _context.Province.FirstOrDefault(p => p.ProvinceID == "QC");
+
+
+
+                                                if (vendeur.Province == quebecProvince)
+                                                {
+                                                    <div class="d-flex justify-content-between mb-4">
+                                                        <h5 class="text-uppercase">TVQ</h5>
+                                                        <h5>
+                                                            @if (tvq.HasValue)
+                                                            {
+                                                                prixFinal += tvq;
+
+                                                                decimal r = Math.Round(tvq.Value, 2);
+                                                                @Html.DisplayFor(modelItem => r)
+
+
+                                                            }
+                                                            $
+                                                        </h5>
+                                                    </div>
+                                                    TotalPrice += tvq;
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <div class="d-flex justify-content-between mb-4">
+                                                    <h5 class="text-uppercase" style="color:red; font-size:15px">Aucune taxe applicable pour se vendeur</h5>
+                                                </div>
+                                            }
+
+                                            <hr class="my-4">
+
+                                            <div class="d-flex justify-content-between mb-5">
+                                                <h5 class="text-uppercase">Prix total</h5>
+                                                @if (prixFinal.HasValue)
+                                                {
+                                                    <h5>@Math.Round(prixFinal.Value, 2) $</h5>
+                                                }
+                                            </div>
+
+                                            @{
+                                                bool displayDestination = Model.Pays != null && Model.NoProvince != null && Model.Ville != null && Model.Rue != null && Model.CodePostal != null;
+                                            }
+                                            @if (displayDestination)
+                                            {
+                                                <hr class="my-4">
+                                                <h3 class="fw-bold mb-5 mt-2 pt-1">Destination</h3>
+                                                <hr class="my-4">
+
+                                                <div class="d-flex justify-content-between mb-4">
+                                                    <h5 class="text-uppercase">Pays</h5>
+                                                    <h5>@Html.DisplayFor(modelItem => Model.Pays)</h5>
+                                                </div>
+                                                <div class="d-flex justify-content-between mb-4">
+                                                    <h5 class="text-uppercase">Province</h5>
+                                                    <h5>@Html.DisplayFor(modelItem => provinceName)</h5>
+                                                </div>
+                                                <div class="d-flex justify-content-between mb-4">
+                                                    <h5 class="text-uppercase">Ville</h5>
+                                                    <h5>@Html.DisplayFor(modelItem => Model.Ville)</h5>
+                                                </div>
+                                                <div class="d-flex justify-content-between mb-4">
+                                                    <h5 class="text-uppercase">Rue</h5>
+                                                    <h5>@Html.DisplayFor(modelItem => Model.Rue)</h5>
+                                                </div>
+                                                <div class="d-flex justify-content-between mb-4">
+                                                    <h5 class="text-uppercase">CodePostal</h5>
+                                                    <h5>@Html.DisplayFor(modelItem => Model.CodePostal)</h5>
+                                                </div>
+                                            }
+
+                                            <div class="text-center">
+                                                @if (TotalPoids > vendeur.PoidsMaxLivraison)
+                                                {
+                                                    <h5 class="text-uppercase" style="color:red; font-size:15px">La commande dépasse le poids maximal pour la livraison. Le poids total de la commande doit être en-sous de @vendeur.PoidsMaxLivraison Kg</h5>
+
+                                                }
+
+                                            </div>
                                         </div>
-                                    }
-                                    @{
-                                        var poids = item.Poids * client.TotalItems;
-                                    }
-                                    <div class="col-12 col-md-3 d-flex align-items-center justify-content-center">
-                                        <b>Poids Total: @Html.DisplayFor(modelItem => poids) Kg </b>
                                     </div>
                                 </div>
                             </div>
-                        }
-                    }
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="col-md-6 d-flex">
-                <div class="d-flex flex-column align-items-start bg-light overflow-auto" style="margin-bottom:50px;  height:600px;">
-                    @{
-                        decimal? TotalPrice = 0;
-                        decimal? TotalPoids = 0;
-                        var oldestProductDate = oldestProductDatesPerClient.FirstOrDefault(c => c.NoClient == Model.NoClient)?.OldestProductDate;
-                        var nbTotal = itemsPerClient.FirstOrDefault(c => c.NoClient == Model.NoClient)?.TotalItems;
-                        foreach (var client in clientProducts)
-                        {
-                            var item = _context.PPProduits.FirstOrDefault(p => p.NoProduit == client.NoProduit);
-                            if (item != null)
-                            {
-                                decimal? prix = 0;
-                                if (item.PrixVente != null && item.DateVente > DateTime.Now)
-                                {
-                                    prix = item.PrixVente * client.TotalItems;
-                                }
-                                else
-                                {
-                                    prix = item.PrixDemande * client.TotalItems;
-                                }
-                                TotalPrice += prix;
-                                TotalPoids += item.Poids * client.TotalItems;
-                            }
-                        }
-                    }
-                    <h4 style="margin:5px;">Information sure le panier</h4>
-                    <b style="margin:5px;">Prix Total : @Html.DisplayFor(modelItem => TotalPrice) $</b>
-                    <b style="margin:5px;">Poids Total : @Html.DisplayFor(modelItem => TotalPoids) Kg</b>
-                    <b style="margin:5px;">Date Création : @Html.DisplayFor(modelItem => oldestProductDate) </b>
-                    <b style="margin:5px;">Nombre d'Items Total : @Html.DisplayFor(modelItem => nbTotal) </b>
-
-                    @{
-                        bool displayDestination = Model.Pays != null || Model.Province != null || Model.Ville != null || Model.Rue != null || Model.CodePostal != null;
-                    }
-
-                    @if (displayDestination)
-                    {
-                        <h4 style="margin:5px;">Destination</h4>
-
-                        @if (Model.Pays != null)
-                        {
-                            <b style="margin:5px;">Pays : @Html.DisplayFor(modelItem => Model.Pays) </b>
-                        }
-                        @if (Model.Province != null)
-                        {
-                            <b style="margin:5px;">Province : @Html.DisplayFor(modelItem => Model.Province) </b>
-                        }
-                        @if (Model.Ville != null)
-                        {
-                            <b style="margin:5px;">Ville : @Html.DisplayFor(modelItem => Model.Ville)</b>
-                        }
-                        @if (Model.Rue != null)
-                        {
-                            <b style="margin:5px;">Rue : @Html.DisplayFor(modelItem => Model.Rue) </b>
-                        }
-                        @if (Model.CodePostal != null)
-                        {
-                            <b style="margin:5px;">Code Postal : @Html.DisplayFor(modelItem => Model.CodePostal) </b>
-                        }
-                    }
+        </section>
 
 
-                </div>
-            </div>
-
-        </div>
-    </div>
-    <form asp-action="SupprimerPanier">
-        <input type="hidden" asp-for="NoClient" name="noClient" />
-        <input type="hidden" name="noVendeur" value="@vendeur.NoVendeur"  />
-        <button type="submit" class="btn btn-danger" onclick="return confirm('Confirmer Suppression')">
-            Supprimer
-        </button> |
-        <a asp-action="ListePanier">Retour à la liste</a>
-    </form>
-
+    }
 }
+<style>
+    @@media (min-width: 1025px) {
+        .h-custom {
+            height: 100vh !important;
+        }
+    }
+
+    .card-registration .select-input.form-control[readonly]:not([disabled]) {
+        font-size: 1rem;
+        line-height: 2.15;
+        padding-left: .75em;
+        padding-right: .75em;
+    }
+
+    .card-registration .select-arrow {
+        top: 13px;
+    }
+
+    .bg-grey {
+        background-color: #eae8e8;
+    }
+
+    @@media (min-width: 992px) {
+        .card-registration-2 .bg-grey {
+            border-top-right-radius: 16px;
+            border-bottom-right-radius: 16px;
+        }
+    }
+
+    @@media (max-width: 991px) {
+        .card-registration-2 .bg-grey {
+            border-bottom-left-radius: 16px;
+            border-bottom-right-radius: 16px;
+        }
+    }
+
+    .submit-button {
+        border: none;
+        background: none;
+        padding: 0;
+    }
+
+</style>
