@@ -41,6 +41,7 @@
         var textCard = "#000000";
         var backgroundCard = "#FFFFFF";
         var font = "Arial";
+        var logo = "none";
 
         var config = vendeur.Configuration;
 
@@ -48,19 +49,27 @@
         {
             var listParams = config.Split(';');
 
-            if (listParams.Length == 15)
+            if (listParams.Length == 16)
             {
                 text = listParams[0];
                 background = listParams[1];
                 textCard = listParams[2];
                 backgroundCard = listParams[3];
                 font = listParams[14];
+                logo = listParams[15];
             }
         }
 
         var sortedModel = _context.PPProduits.Where(p => p.NoVendeur == vendeur.NoVendeur).ToList();
 
-        <h1 style="color:@text;font-family:@font">Liste de produits</h1>
+        <div class="col-md-4 d-flex align-items-start" style="gap:10px">
+            <h1 style="color:@text;font-family:@font">Liste de produits</h1>
+
+            @if (logo != "none")
+            {
+                <img src="~/Logo/@logo" alt="@logo" width="40" height="40" />
+            }
+            </div>
 
         <p>
             <a asp-action="Create">Ajouter Nouveau</a>

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Projet_Web_Commerce.Areas.Identity.Data;
 using Projet_Web_Commerce.Data;
+using Projet_Web_Commerce.Models;
 
 namespace Projet_Web_Commerce.Controllers
 {
@@ -25,14 +26,33 @@ namespace Projet_Web_Commerce.Controllers
         [HttpPost]
         public ActionResult Index(int id, string text, string background, string textCard, string backgroundCard, string recherche, 
             string textRecherche, string backgroundButtonDetail, string textButtonDetail, string backgroundButtonAjouter, string textButtonAjouter,
-            string backgroundBarre, string textBarre, string backgroundQuantite, string textQuantite, string font)
+            string backgroundBarre, string textBarre, string backgroundQuantite, string textQuantite, string font, IFormFile image)
         {
+            var vendeur = _context.PPVendeurs.Where(v => v.NoVendeur == id).FirstOrDefault();
+            string nomFileImage = vendeur.NoVendeur.ToString();
+            var files = Directory.GetFiles("wwwroot/Logo", nomFileImage + ".*");
+            if (image != null && image.Length > 0)
+            {
+                if (files.Length > 0)
+                    System.IO.File.Delete("wwwroot/Logo/" + files[0].Split("\\")[1]);
+
+                string extension = Path.GetExtension(image.FileName);
+                nomFileImage += extension;
+                string tempFilePath = Path.Combine("wwwroot/Logo", nomFileImage);
+                using (Stream fileStream = new FileStream(tempFilePath, FileMode.Create))
+                {
+                    image.CopyTo(fileStream);
+                }
+            }
+            else if (files.Length > 0)
+                nomFileImage = files[0].Split("\\")[1];
+            else
+                nomFileImage = "none";
+
             string configuration = "";
             configuration += text + ";" + background + ";" + textCard + ";" + backgroundCard + ";" + recherche + ";" + textRecherche + ";" 
                 + backgroundButtonDetail + ";" + textButtonDetail + ";" + backgroundButtonAjouter + ";" + textButtonAjouter + ";" + 
-                backgroundBarre + ";" + textBarre + ";" + backgroundQuantite + ";" + textQuantite + ";" + font;
-
-            var vendeur = _context.PPVendeurs.Where(v => v.NoVendeur == id).FirstOrDefault();
+                backgroundBarre + ";" + textBarre + ";" + backgroundQuantite + ";" + textQuantite + ";" + font + ";" + nomFileImage;
 
             vendeur.Configuration = configuration;
 

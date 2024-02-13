@@ -26,6 +26,7 @@
     var backgroundQuantite = "#FFFFFF";
     var textQuantite = "#000000";
     var font = "Arial";
+    var logo = "none";
 }
 
 
@@ -66,7 +67,7 @@
         {
             var listParams = config.Split(';');
 
-            if (listParams.Length == 15)
+            if (listParams.Length == 16)
             {
                 text = listParams[0];
                 textCard = listParams[2];
@@ -82,11 +83,19 @@
                 backgroundQuantite = listParams[12];
                 textQuantite = listParams[13];
                 font = listParams[14];
+                logo = listParams[15];
             }
         }
-        
 
-                <h3 style="color:@text; font-family:@font">Liste de tout les produits @Model.nomAffaire </h3>
+
+        <div class="col-md-4 d-flex align-items-start" style="gap:10px">
+            <h3 style="color:@text; font-family:@font">Liste de tout les produits @Model.nomAffaire </h3>
+
+            @if (logo != "none")
+            {
+                <img src="~/Logo/@logo" alt="@logo" width="40" height="40" />
+            }
+                </div>
 
         @using (Html.BeginForm("CatalogueVendeur", "MainMenu", FormMethod.Post, new { id = "mainForm" }))
                 {

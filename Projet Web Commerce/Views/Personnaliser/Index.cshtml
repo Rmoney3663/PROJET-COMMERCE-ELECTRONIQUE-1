@@ -36,12 +36,13 @@ else
     var backgroundQuantite = "#FFFFFF";
     var textQuantite = "#000000";
     var font = "Arial";
+    var logo = "none";
 
     if (config != null)
     {
         var listParams = config.Split(';');
 
-        if (listParams.Length == 15)
+        if (listParams.Length == 16)
         {
             text = listParams[0];
             background = listParams[1];
@@ -58,14 +59,29 @@ else
             backgroundQuantite = listParams[12];
             textQuantite = listParams[13];
             font = listParams[14];
+            logo = listParams[15];
         }
     }
 
     <div class="row">
         <div class="col-md-4">
             <section>
-                <form asp-route-id="@vendeur.NoVendeur" id="account" method="post">
+                <form asp-route-id="@vendeur.NoVendeur" id="account" method="post" enctype="multipart/form-data">
                     <h2>Personnalisation de votre page</h2>
+                    <div class="form-floating mb-3">
+                        <h5>Votre logo</h5>
+                        <div class="form-group">
+                            @if (logo != "none")
+                            {
+                                <img src="~/Logo/@logo" alt="@logo" width="140" height="140" />
+                            }
+                            else
+                            {
+                                <p>Aucun</p>
+                            }
+                            <input type="file" id="image" name="image" accept="image/*" class="form-control" />
+                        </div>
+                    </div>
                     <div class="form-floating mb-3">
                         <h5>Police de la page</h5>
                         <select name="font" id="fontSelector">
