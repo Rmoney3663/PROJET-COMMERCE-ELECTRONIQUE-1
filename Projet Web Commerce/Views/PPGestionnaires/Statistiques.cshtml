@@ -4,7 +4,7 @@
 @{
     ViewData["Title"] = "Liste de statistique";
 }
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
 
@@ -41,12 +41,19 @@
             <div id="reportC"></div>
             <br />
 
+            <canvas id="orderChart" style="width:100%;max-width:700px"></canvas>
+            <br />
+
+            <canvas id="salesChart" style="width:100%;max-width:700px"></canvas>
+
+            
         </section>
     </div>
 </div>
 
 @section Scripts {
     @{
+        // NEED TO DO WARNING FOR DATES IF DATE DEBUT IS BIGGER THEN DATE FIN
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
         var vendeursListJson = Json.Serialize(Model.VendeursList.Select(p => new { DateCreation = p.DateCreation.ToString("yyyy-MM-dd") }));
         var clientsListJson = Json.Serialize(Model.ClientsList.Select(p => new { DateCreation = p.DateCreation.ToString("yyyy-MM-dd") }));
@@ -244,6 +251,118 @@
         displayVisitesCount(visitesCountData);
 
         //------------------------------------------------------------------
+
+        function generateRandomColor() {
+            var r = Math.floor(Math.random() * 256);
+            var g = Math.floor(Math.random() * 256);
+            var b = Math.floor(Math.random() * 256);
+            var a = 0.2;
+            return `rgba(${r}, ${g}, ${b}, ${a})`;
+        }
+
+        var orderPercentages = @Html.Raw(Json.Serialize(Model.OrderPercentages));
+
+        console.log("orderPercentages List:", orderPercentages);
+
+        var totalOrders = 0;
+        for (var i = 0; i < orderPercentages.length; i++) {
+            totalOrders += orderPercentages[i].percentage;
+        }
+
+        if (Array.isArray(orderPercentages) && orderPercentages.length > 0) {
+            var labels = orderPercentages.map(op => op.vendeurName);
+            var data = orderPercentages.map(op => op.percentage);
+            console.log("orderPercentages Label:", labels);
+            console.log("orderPercentages Data:", data);
+            var backgroundColors = [];
+            for (var i = 0; i < orderPercentages.length; i++) {
+                backgroundColors.push(generateRandomColor());
+            }
+
+            var ctx = document.getElementById('orderChart').getContext('2d');
+            var chart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: backgroundColors
+                    }]
+                },
+
+                options: {
+                    title: {
+                        display: true,
+                        text: 'Pourcentage de produit vendu par les vendeurs'
+                    },
+                    tooltips: {
+                        callbacks: {
+                            label: function (tooltipItem, data) {
+                                var label = data.labels[tooltipItem.index] || '';
+                                var value = data.datasets[0].data[tooltipItem.index] || 0;
+                                var percentage = ((value / totalOrders) * 100).toFixed(2) + ' %';
+                                var info = label + ': ' + percentage;
+                                console.log("LABEL ", info)
+                                return info;
+                            }
+                        }
+                    }
+                }
+            });
+        } else {
+            console.log("Aucune donnée n'est disponible pour afficher le graphique.");
+        }
+
+        var labels = @Html.Raw(Json.Serialize(Model.Labels));
+        var data = @Html.Raw(Json.Serialize(Model.Data));
+        console.log("Labels : ", labels);
+
+        var datasets = [{
+            data: data,
+            backgroundColor: backgroundColors,
+            borderColor: 'rgba(54, 162, 235, 1)',
+            borderWidth: 1
+        }];
+
+        if (labels.length > 0) {
+            datasets[0].label = labels[0];
+        }
+
+
+
+        var ctx = document.getElementById('salesChart').getContext('2d');
+        var chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: datasets
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
+                },
+                title: {
+                    display: true,
+                    text: 'Montant total des ventes par mois pour les 12 derniers mois'
+                },
+                tooltips: {
+                    callbacks: {
+                        label: function (tooltipItem, data) {
+                            var label = data.labels[tooltipItem.index] || '';
+                            var value = data.datasets[0].data[tooltipItem.index] || 0;
+                            var percentage = ((value / totalOrders) * 100).toFixed(2) + ' $';
+                            var info = label + ': ' + percentage;
+                            console.log("LABEL ", info)
+                            return info;
+                        }
+                    }
+                }
+            }
+        });
 
 
     </script>
