@@ -8,6 +8,14 @@
 @using Projet_Web_Commerce.Data
 ﻿﻿@using Microsoft.AspNetCore.Identity
 
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger" role="alert">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+
 @using (Html.BeginForm("ConfirmerCommande", "Commande", FormMethod.Post))
 {
     @Html.HiddenFor(model => model.NoClient)

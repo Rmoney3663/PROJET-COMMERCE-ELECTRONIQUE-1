@@ -8,6 +8,7 @@ using System.Net;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Projet_Web_Commerce.Controllers
 {
@@ -65,32 +66,45 @@ namespace Projet_Web_Commerce.Controllers
         }
         
 
-        public ActionResult CommandeCompleter(PostResponseCommander response)
+        public ActionResult CommandeCompleter(string NoAutorisation, string DateAutorisation, string FraisMarchand, string InfoSuppl)
         {
-            return View(response);
+            ViewBag.NoAutorisation = NoAutorisation;
+            ViewBag.DateAutorisation = DateAutorisation;
+            ViewBag.FraisMarchand = FraisMarchand;
+            ViewBag.InfoSuppl = InfoSuppl;
+            return View();
         }
 
 
         [HttpPost]
-        public ActionResult ConfirmerCommande(ModelConfirmerCommande model, bool? payer)
+        public async Task<ActionResult> ConfirmerCommandeAsync(ModelConfirmerCommande model, bool? payer, int? NoAutorisation, string? DateAutorisation, string? FraisMarchand, string? InfoSuppl)
         {
 
-            if (model.client == null)
+            if (TempData.ContainsKey("NoVendeur"))
             {
-                var client = _context.PPClients.FirstOrDefault(c => c.NoClient == model.NoClient);
-                model.client = client;
-                model.PostalClient = client.CodePostal;
-                model.VilleClient = client.Ville;
-                model.RueClient = client.Rue;
-                model.NomClient = client.Nom;
-                model.PrenomClient = client.Prenom;
-                model.AdresseClient = client.AdresseEmail;
-                model.TelClient = client.Tel1;
-
-                model.ProvinceCLient = client.NoProvince;
+                // Retrieve the value from TempData and convert it to a string
+                string novendeur = TempData.Peek("NoVendeur").ToString();
+                model.NoVendeur = Convert.ToInt32(novendeur);
             }
 
+            if (TempData.ContainsKey("NoClient"))
+            {
+                // Retrieve the value from TempData and convert it to a string
+                string noclient = TempData.Peek("NoClient").ToString();
+                model.NoClient = Convert.ToInt32(noclient);
+            }
+
+            string nomClient = TempData.ContainsKey("NomClient") ? TempData.Peek("NomClient") as string : null;
+            string prenomClient = TempData.ContainsKey("PrenomClient") ? TempData.Peek("PrenomClient") as string : null;
+            string adresseClient = TempData.ContainsKey("AdresseClient") ? TempData.Peek("AdresseClient") as string : null;
+            string telClient = TempData.ContainsKey("TelClient") ? TempData.Peek("TelClient") as string : null;
+            string rueClient = TempData.ContainsKey("RueClient") ? TempData.Peek("RueClient") as string : null;
+            string villeClient = TempData.ContainsKey("VilleClient") ? TempData.Peek("VilleClient") as string : null;
+            string postalClient = TempData.ContainsKey("PostalClient") ? TempData.Peek("PostalClient") as string : null;
+            string provClient = TempData.ContainsKey("provClient") ? TempData.Peek("provClient") as string : null;
+            string fraisLivraison = TempData.ContainsKey("fraisLivraison") ? TempData.Peek("fraisLivraison") as string : null;
             
+
 
             var vendeur = _context.PPVendeurs.FirstOrDefault(v => v.NoVendeur == model.NoVendeur);
             model.vendeur = vendeur;
@@ -167,6 +181,8 @@ namespace Projet_Web_Commerce.Controllers
                 .Where(t => t.DateEffectiveTPS > DateTime.Now)
                 .Select(t => t.TauxTPS).FirstOrDefault();
 
+
+
             if (vendeur.Taxes == true)
             {
                 if (vendeur.Province == _context.Province.Where(p => p.ProvinceID == "QC").FirstOrDefault())
@@ -190,6 +206,131 @@ namespace Projet_Web_Commerce.Controllers
             }
 
 
+            if (NoAutorisation != null)
+            {
+
+
+                switch (NoAutorisation)
+                {
+
+                    case 0:
+                        TempData["ErrorMessage"] = "Transaction annulée par l'utilisateur ";
+                        break;
+                    case 1:
+                        TempData["ErrorMessage"] = "Transaction refusée: Date expiration dépassée ";
+                        break;
+                    case 2:
+                        TempData["ErrorMessage"] = "Transaction refusée: Limite de crédit atteinte";
+                        break;
+                    case 3:
+                        TempData["ErrorMessage"] = "Contactez notre bureau (514-626-2666) ";
+                        break;
+                    case 1234:
+                        TempData["ErrorMessage"] = "ERREUR";
+                        break;
+                    case 9999:
+                        TempData["ErrorMessage"] = "ERREUR DE VALIDATION ";
+                        break;
+                    default:
+                        bool dispo = true;
+
+                        foreach (PPArticlesEnPanier article in listPaniers)
+                        {
+                            var produit = _context.PPProduits.Where(p => p.NoProduit == article.NoProduit).FirstOrDefault();
+                            if (article.NbItems > produit.NombreItems)
+                            {
+                                dispo = false;
+                            }   
+                        }
+                        if (!dispo) {
+                            TempData["ErrorMessage"] = "Items pas en stock ";
+                            break; }
+
+
+                            var client = _context.PPClients.FirstOrDefault(c => c.NoClient == model.NoClient);
+                        if (client != null)
+                        {
+                            client.Nom = nomClient;
+                            client.Prenom = prenomClient;
+                            client.AdresseEmail = adresseClient;
+                            client.Tel1 = telClient;
+                            client.Rue = rueClient;
+                            client.Ville = villeClient;
+                            client.CodePostal = postalClient;
+                            client.NoProvince = provClient;
+
+                            _context.SaveChanges();
+                        }
+                        decimal fraisLivraisonDecimal = Convert.ToDecimal(fraisLivraison);
+                        decimal roundedFraisLivraison = Math.Round(fraisLivraisonDecimal, 2);
+
+                        var ppCommande = new PPCommandes
+                        {
+                            NoClient = model.NoClient, // Assuming model.NoClient contains the NoClient value
+                            NoVendeur = model.NoVendeur, // Assuming model.NoVendeur contains the NoVendeur value
+                            DateCommande = DateTime.Now, // Set the current date and time for DateCommande
+                            PoidsTotal = poidsTotal, // Assuming model.PoidsTotal contains the PoidsTotal value
+                            Statut = "s", // Set the initial status, e.g., "N" for New
+                            MontantTotAvantTaxes = Math.Round(sousTotal.Value,2), // Assuming model.total contains the total amount before taxes
+                            TPS = Math.Round(sousTotal.Value * (tps / 100),2), // Assuming TPS is 5% of the total amount
+                            TVQ = Math.Round(sousTotal.Value * (tvq / 100),2), // Assuming TVQ is 9.975% of the total amount
+                            CoutLivraison = roundedFraisLivraison, // Assuming model.FraisLivraison contains the delivery cost, handle null case
+                            TypeLivraison = model.TypeLivraison,
+                            NoAutorisation = NoAutorisation.ToString()
+                        };
+
+                        //// Add the newly created PPCommandes object to the context and save changes
+                        _context.PPCommandes.Add(ppCommande);
+                        _context.SaveChanges();
+
+                        foreach (PPArticlesEnPanier article in listPaniers)
+                        {
+                            var produit = _context.PPProduits.Where(p => p.NoProduit == article.NoProduit).FirstOrDefault();
+
+                            decimal prix = 0;
+                            if (produit.PrixVente != null && produit.DateVente > DateTime.Now)
+                            {
+                                prix = produit.PrixVente.Value;
+                            }
+                            else
+                                prix = produit.PrixDemande;
+
+                            var ppDetailsCommande = new PPDetailsCommandes
+                            {
+                                NoCommande = ppCommande.NoCommande,
+                                NoProduit = article.NoProduit,
+                                Quantité = article.NbItems,
+                                PrixVente = prix
+                            };
+
+                            _context.Add(ppDetailsCommande);
+                        }
+
+                        _context.SaveChanges();
+
+                        TempData.Clear();
+
+                        return RedirectToAction("CommandeCompleter", new { NoAutorisation = NoAutorisation, DateAutorisation = DateAutorisation, FraisMarchand = FraisMarchand, InfoSuppl = InfoSuppl });
+                }
+
+            }
+
+
+
+            if (model.client == null)
+            {
+                var client = _context.PPClients.FirstOrDefault(c => c.NoClient == model.NoClient);
+                model.client = client;
+                model.PostalClient = client.CodePostal;
+                model.VilleClient = client.Ville;
+                model.RueClient = client.Rue;
+                model.NomClient = client.Nom;
+                model.PrenomClient = client.Prenom;
+                model.AdresseClient = client.AdresseEmail;
+                model.TelClient = client.Tel1;
+
+                model.ProvinceCLient = client.NoProvince;
+            }
 
 
 
@@ -300,54 +441,83 @@ namespace Projet_Web_Commerce.Controllers
                     return RedirectToAction("Index", "Home");
                 }
 
-                //var PostDataCommander = new PostDataCommander
-                //{
-                //    NoVendeur = model.NoVendeur,
-                //    NomVendeur = model.NomVendeur,
-                //    NoCarteCredit = 1111123412341234,
-                //    DateExpirationCarteCredit = model.dateExpiration,
-                //    MontantPaiement = model.total,
-                //    NomPageRetour = "google.ca",
-                //    InfoSuppl = "Coucou"
-                //};
+                string formPageUrl = "http://424w.informatique.cgodin.qc.ca/lesi-20XX/lesi-effectue-paiement.php";
 
-                //var httpClient = new HttpClient();
-                //httpClient.BaseAddress = new Uri("http://424w.cgodin.qc.ca/lesi-20XX/");
+                // Create an instance of HttpClient
 
-                //var json = JsonSerializer.Serialize(PostDataCommander);
-                //var content = new StringContent(json, Encoding.UTF8, "application/json");
+                var handler = new HttpClientHandler()
+                {
+                    ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => true
+                };
 
-                //var response = httpClient.PostAsync("lesi-effectue-paiement.php", content).Result;
+                using var httpClient = new HttpClient(handler);
 
-                //if (response.IsSuccessStatusCode)
-                //{
-                //    var responseContent = response.Content.ReadAsStringAsync().Result;
-                //    var postResponse = JsonSerializer.Deserialize<PostResponseCommander>(responseContent);
-                //    Console.WriteLine(postResponse.NoAutorisation);
-                //}
-                //else
-                //{
-                //    Console.WriteLine("error : " + response.StatusCode);
-                //}
+                string prixtotString = model.total.ToString("0.00", System.Globalization.CultureInfo.GetCultureInfo("en-US"));
+                // Prepare form data
+                Dictionary<string, string> formDataDictionary = new Dictionary<string, string>
+                {
+                    { "NoVendeur", $"{model.NoVendeur}" },
+                    { "NomVendeur", $"{model.NomVendeur}" },
+                    { "NoCarteCredit", $"{model.NoCarte}"},
+                    { "DateExpirationCarteCredit", $"{model.dateExpiration}" },
+                    { "MontantPaiement",prixtotString },
+                    { "NoSecuriteCarteCredit", $"{model.CVV}" },
+                    { "NomPageRetour", $"https://localhost:44376/Commande/ConfirmerCommande"},
+                    { "InfoSuppl", "Coucou" }
+                    // Add other form fields as needed
+                };
 
-                WebRequest req = WebRequest.Create("http://424w.cgodin.qc.ca/lesi-20XX/lesi-effectue-paiement.php");
-                string postData = $"?NoVendeur={model.NoVendeur}&NomVendeur={model.NomVendeur}&NoCarteCredit={model.NoCarte}&DateExpirationCarteCredit={model.dateExpiration}&MontantPaiement={model.total}&NomPageRetour={"google.ca"}&InfoSuppl={"test"}";
+                var formData = new MultipartFormDataContent();
+                foreach (var kvp in formDataDictionary)
+                {
+                    formData.Add(new StringContent(kvp.Value), kvp.Key);
+                }
 
-                byte[] send = Encoding.Default.GetBytes(postData);
-                req.Method = "POST";
-                req.ContentType = "application/x-www-form-urlencoded";
-                req.ContentLength = send.Length;
+                // Send the POST request to submit the form
+                HttpResponseMessage response = await httpClient.PostAsync(formPageUrl, formData);
 
-                Stream sout = req.GetRequestStream();
-                sout.Write(send, 0, send.Length);
-                sout.Flush();
-                sout.Close();
+                // Check if the request was successful
+                if (response.IsSuccessStatusCode)
+                {
+                    // Read the HTML content of the response
+                    string htmlContent = await response.Content.ReadAsStringAsync();
 
-                WebResponse res = req.GetResponse();
-                StreamReader sr = new StreamReader(res.GetResponseStream());
-                string returnvalue = sr.ReadToEnd();
+                    string scriptToInsert = @"<style>body { display: none; }</style>
+                    <script>
+                        // Find the form element by tag name (assuming it's the first form in the document)
+                        var form = document.getElementById('frmTransmission');
+                        form.submit();
 
-                return View(model);
+                    </script>";
+
+
+
+                    // Insert the script directly into the HTML content
+                    htmlContent += scriptToInsert;
+
+                    TempData["NoVendeur"] = model.NoVendeur;
+                    TempData["NoClient"] = model.NoClient;
+
+                    TempData["NomClient"] = model.NomClient;
+                    TempData["PrenomClient"] = model.PrenomClient;
+                    TempData["AdresseClient"] = model.AdresseClient;
+                    TempData["TelClient"] = model.TelClient;
+                    TempData["RueClient"] = model.RueClient;
+                    TempData["VilleClient"] = model.VilleClient;
+                    TempData["PostalClient"] = model.PostalClient;
+                    TempData["provClient"] = model.ProvinceCLient;
+
+                    string tempFrais = model.FraisLivraison.ToString();
+                    TempData["fraisLivraison"] = tempFrais;
+
+                    TempData.Keep();
+
+                    return Content(htmlContent, "text/html");
+                }
+
+
+
+                    return View(model);
             }
 
             return View(model);
