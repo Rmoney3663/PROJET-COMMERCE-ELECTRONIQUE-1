@@ -3,6 +3,7 @@ using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Org.BouncyCastle.Asn1.Cmp;
 using Projet_Web_Commerce.Areas.Identity.Data;
 using Projet_Web_Commerce.Data;
@@ -67,59 +68,23 @@ namespace Projet_Web_Commerce.Controllers
 
             var listClients = _context.PPClients.ToList();
             var destinatairesList = new List<PPDestinatairesMessage>();
-            if (selectedDestinataire == "Tous" || selectedDestinataire == "william.anthony.burgess@gmail.com")
+
+            string[] selectedDestinataireArray = selectedDestinataire.Split(',');
+
+            foreach (string email in selectedDestinataireArray)
             {
-                // Ajouter gestionnaire
-                var user = _context.Users.Where(v => v.Email == "william.anthony.burgess@gmail.com").FirstOrDefault();
+                var user = _context.Users.Where(v => v.Email == email).FirstOrDefault();
+
                 if (user != null)
                 {
-                    PPDestinatairesMessage destinatairesMessage = new PPDestinatairesMessage();
+                    PPDestinatairesMessage destinatairesMessage = new PPDestinatairesMessage
                     {
-                        destinatairesMessage.NoMessage = nouveauMessage.NoMessage;
-                        destinatairesMessage.Destinataire = user.Email;
-                        destinatairesMessage.DestinataireUser = await _userManager.FindByEmailAsync(user.Email);
-                    }
+                        NoMessage = nouveauMessage.NoMessage,
+                        Destinataire = user.Email,
+                        DestinataireUser = await _userManager.FindByEmailAsync(user.Email)
+                    };
+
                     destinatairesList.Add(destinatairesMessage);
-                }
-
-                if (selectedDestinataire == "Tous")
-                {
-                    foreach (PPClients client in listClients)
-                    {
-                        user = _context.Users.Where(v => v.Email == client.AdresseEmail).FirstOrDefault();
-
-                        if (user != null)
-                        {
-                            PPDestinatairesMessage destinatairesMessage = new PPDestinatairesMessage();
-                            {
-                                destinatairesMessage.NoMessage = nouveauMessage.NoMessage;
-                                destinatairesMessage.Destinataire = user.Email;
-                                destinatairesMessage.DestinataireUser = await _userManager.FindByEmailAsync(user.Email);
-                            }
-                            destinatairesList.Add(destinatairesMessage);
-                        }
-                    }
-                }
-            }
-            else
-            {
-                string[] selectedDestinataireArray = selectedDestinataire.Split(',');
-
-                foreach (string email in selectedDestinataireArray)
-                {
-                    var user = _context.Users.Where(v => v.Email == email).FirstOrDefault();
-
-                    if (user != null)
-                    {
-                        PPDestinatairesMessage destinatairesMessage = new PPDestinatairesMessage
-                        {
-                            NoMessage = nouveauMessage.NoMessage,
-                            Destinataire = user.Email,
-                            DestinataireUser = await _userManager.FindByEmailAsync(user.Email)
-                        };
-
-                        destinatairesList.Add(destinatairesMessage);
-                    }
                 }
             }
 
@@ -129,10 +94,23 @@ namespace Projet_Web_Commerce.Controllers
             return View();
         }
 
-        // GET: EmailSenderController/Details/5
-        public ActionResult Details(int id)
+        [HttpGet]
+        public ActionResult Envoyes()
         {
-            return View();
+            var currentUserEmail = _userManager.Users.Where(u => u.Email == User.Identity.Name).FirstOrDefault().Id;
+            var msgEnvoyes = _context.PPMessages
+                .Where(message => message.Auteur == currentUserEmail 
+                && message.TypeMessage == 0)
+                .ToList();
+            return View(msgEnvoyes);
+        }
+
+        // GET: EmailSenderController/Details/5
+        public async Task<ActionResult> Details(int idMessage)
+        {
+            var messageCourant = await _context.PPMessages
+                .FirstOrDefaultAsync(m => m.NoMessage == idMessage);
+            return View(messageCourant);
         }
 
         // GET: EmailSenderController/Create
