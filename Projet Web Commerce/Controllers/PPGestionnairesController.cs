@@ -95,21 +95,10 @@ namespace Projet_Web_Commerce.Controllers
         [Authorize(Roles = "Gestionnaire")]
         public ActionResult ListeVendeurs()
         {
-            //var groupedVendeurs = _context.PPVendeurs
-            //    .Where(v => v.Statut == 1)
-            //    .GroupBy(v => new List<int>{ v.DateCreation.Month, v.DateCreation.Year })
-            //    .SelectMany(group => group.OrderBy(v => v.NomAffaires))
-            //    .ToDictionary(
-            //        group => new List<int>{ group.DateCreation.Month, group.DateCreation.Year });
-
             var vendeurs = _context.PPVendeurs
                 .Where(v => v.Statut == 1)
                 .OrderByDescending(v => v.NomAffaires)
                 .ToList();
-
-            //var flattenedList = groupedVendeurs
-            //    .SelectMany(group => group.OrderBy(v => v.NomAffaires))
-            //    .ToList();
 
             var lstMoisAnneesDistincts = _context.PPVendeurs
                 .Where(v => v.Statut == 1)
@@ -410,5 +399,40 @@ namespace Projet_Web_Commerce.Controllers
         {
             return _context.PPGestionnaire.Any(e => e.NoGestionnaire == id);
         }
+
+        public IActionResult Test()
+        {
+            var orderCountsByVendeur = _context.PPCommandes
+                .GroupBy(o => o.NoVendeur)
+                .Select(g => new { VendeurId = g.Key, OrderCount = g.Count() })
+                .ToList();
+
+            var totalOrders = orderCountsByVendeur.Sum(o => o.OrderCount);
+
+            var orderPercentagesByVendeur = orderCountsByVendeur
+                .Select(o => new
+                {
+                    VendeurId = o.VendeurId,
+                    OrderCount = o.OrderCount,
+                    VendeurName = _context.PPVendeurs.FirstOrDefault(v => v.NoVendeur == o.VendeurId)?.Prenom + " " + _context.PPVendeurs.FirstOrDefault(v => v.NoVendeur == o.VendeurId)?.Nom
+                })
+                .Select(o => new OrderPercentage
+                {
+                    VendeurId = o.VendeurId,
+                    VendeurName = o.VendeurName,
+                    Percentage = Math.Round((decimal)o.OrderCount / totalOrders * 100, 2)
+
+                })
+                .ToList();
+
+            var viewModel = new OrderPercentagesViewModel
+            {
+                OrderPercentages = orderPercentagesByVendeur
+            };
+
+            return View(viewModel);
+        }
+
+
     }
 }
