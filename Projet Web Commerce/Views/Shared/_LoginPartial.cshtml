@@ -60,7 +60,13 @@
                         <div style="position: relative; top:0px; left:0px">
                             <img style="position:relative; width: 30px; height: 30px; filter: invert(87%) sepia(71%) saturate(1210%) hue-rotate(322deg) brightness(113%) contrast(95%)" src="/Logo/PanierIcon.png" />
                             @if (_context.PPArticlesEnPanier.Where(v=>v.NoClient == userId).ToList().Count > 0){
-                                <b style="color:red; position:absolute; top:10px; left:30px ">@_context.PPArticlesEnPanier.Where(v => v.NoClient == userId).ToList().Count</b>
+                                var listArticlesEnPanier = _context.PPArticlesEnPanier.Where(v => v.NoClient == userId).ToList();
+                                var tot = 0;
+                                foreach (var article in listArticlesEnPanier)
+                                {
+                                    tot += article.NbItems;
+                                }
+                                <b style="color:red; position:absolute; top:10px; left:30px ">@tot</b>
                             }
                         </div>
                     </a>
