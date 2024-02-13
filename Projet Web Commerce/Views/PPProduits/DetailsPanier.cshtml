@@ -169,11 +169,18 @@
                                 }
                             }
                         }
-                        <h4 style="margin:5px;">Information sure le panier</h4>
-                        <b style="margin:5px;">Prix Total : @Html.DisplayFor(modelItem => TotalPrice) $</b>
+                        <h4 style="margin:5px;">Information sur le panier</h4>
+                        <b style="margin:5px;">@Html.DisplayFor(modelItem => nbTotal) Items  @Html.DisplayFor(modelItem => TotalPrice) $ </b>
+                        @{
+                            if (vendeur.Taxes == true)
+                            {
+                                TotalPrice += (TotalPrice * (vendeur.PourcentageTaxe/100));
+                            }
+                        }
+                        <b style="margin:5px;">Prix Total (avec taxe) : @Html.DisplayFor(modelItem => TotalPrice ) $</b>
                         <b style="margin:5px;">Poids Total : @Html.DisplayFor(modelItem => TotalPoids) Kg</b>
                         <b style="margin:5px;">Date Création : @Html.DisplayFor(modelItem => oldestProductDate) </b>
-                        <b style="margin:5px;">Nombre d'Items Total : @Html.DisplayFor(modelItem => nbTotal) </b>
+                        
 
                         @{
                             bool displayDestination = Model.Pays != null || Model.Province != null || Model.Ville != null || Model.Rue != null || Model.CodePostal != null;
