@@ -12,7 +12,13 @@ namespace Projet_Web_Commerce.Models
         public string Sujet { get; set; }
         public string Message { get; set; }
         public string Auteur { get; set; }
+
+        // -1 = Supprimé
+        // 0  = Envoyé
+        // 1  = Lu
+        // 2  = Brouillon
         public int TypeMessage { get; set; }
+
         public string PieceJointe { get; set; }
         public string Transfemetteur { get; set; }
 
