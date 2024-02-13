@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using DocumentFormat.OpenXml.InkML;
+using DocumentFormat.OpenXml.Spreadsheet;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Org.BouncyCastle.Asn1.Cmp;
@@ -21,10 +23,16 @@ namespace Projet_Web_Commerce.Controllers
             _userManager = userManager;
         }
 
-        // GET: EmailSenderController
+        // GET: MessagerieController
         public ActionResult BoiteDeReception()
         {
-            return View();
+            var currentUserEmail = _userManager.Users.Where(u => u.Email == User.Identity.Name).FirstOrDefault().Id;
+            var msgRecus = _context.PPDestinatairesMessage
+                .Where(dest => dest.Destinataire == currentUserEmail)
+                .Select(dest => dest.Message)
+                .ToList();
+
+            return View(msgRecus);
         }
 
         [HttpPost]
@@ -44,37 +52,79 @@ namespace Projet_Web_Commerce.Controllers
         [HttpPost]
         public async Task<ActionResult> EnvoyerMessage(string sujet, string message, string selectedDestinataire, string auteur)
         {
-            var listClients = _context.PPClients.ToList();
-            if (selectedDestinataire == "Tous")
+            PPMessages nouveauMessage = new PPMessages();
             {
-                selectedDestinataire = string.Empty;
-                StringBuilder selectedDestinataireBuilder = new StringBuilder();
-                foreach (PPClients client in listClients)
+                nouveauMessage.Sujet = sujet;
+                nouveauMessage.Message = message;
+                nouveauMessage.Auteur = auteur;
+                nouveauMessage.AuteurUser = await _userManager.FindByEmailAsync(auteur);
+                nouveauMessage.TypeMessage = 0;
+                nouveauMessage.PieceJointe = "";
+                nouveauMessage.Transfemetteur = "";
+            }
+            _context.PPMessages.Add(nouveauMessage);
+            await _context.SaveChangesAsync();
+
+            var listClients = _context.PPClients.ToList();
+            var destinatairesList = new List<PPDestinatairesMessage>();
+            if (selectedDestinataire == "Tous" || selectedDestinataire == "william.anthony.burgess@gmail.com")
+            {
+                // Ajouter gestionnaire
+                var user = _context.Users.Where(v => v.Email == "william.anthony.burgess@gmail.com").FirstOrDefault();
+                if (user != null)
                 {
-                    var user = _context.Users.Where(v => v.Email == client.AdresseEmail).FirstOrDefault();
-
-                    if (user != null)
+                    PPDestinatairesMessage destinatairesMessage = new PPDestinatairesMessage();
                     {
-                        selectedDestinataireBuilder.Append(user.Email);
+                        destinatairesMessage.NoMessage = nouveauMessage.NoMessage;
+                        destinatairesMessage.Destinataire = user.Email;
+                        destinatairesMessage.DestinataireUser = await _userManager.FindByEmailAsync(user.Email);
+                    }
+                    destinatairesList.Add(destinatairesMessage);
+                }
 
-                        if (listClients.IndexOf(client) < listClients.Count - 1)
+                if (selectedDestinataire == "Tous")
+                {
+                    foreach (PPClients client in listClients)
+                    {
+                        user = _context.Users.Where(v => v.Email == client.AdresseEmail).FirstOrDefault();
+
+                        if (user != null)
                         {
-                            selectedDestinataireBuilder.Append(",");
+                            PPDestinatairesMessage destinatairesMessage = new PPDestinatairesMessage();
+                            {
+                                destinatairesMessage.NoMessage = nouveauMessage.NoMessage;
+                                destinatairesMessage.Destinataire = user.Email;
+                                destinatairesMessage.DestinataireUser = await _userManager.FindByEmailAsync(user.Email);
+                            }
+                            destinatairesList.Add(destinatairesMessage);
                         }
                     }
                 }
-                selectedDestinataire = selectedDestinataireBuilder.ToString();
+            }
+            else
+            {
+                string[] selectedDestinataireArray = selectedDestinataire.Split(',');
+
+                foreach (string email in selectedDestinataireArray)
+                {
+                    var user = _context.Users.Where(v => v.Email == email).FirstOrDefault();
+
+                    if (user != null)
+                    {
+                        PPDestinatairesMessage destinatairesMessage = new PPDestinatairesMessage
+                        {
+                            NoMessage = nouveauMessage.NoMessage,
+                            Destinataire = user.Email,
+                            DestinataireUser = await _userManager.FindByEmailAsync(user.Email)
+                        };
+
+                        destinatairesList.Add(destinatairesMessage);
+                    }
+                }
             }
 
-            //PPMessages nouveauMessage = new PPMessages();
-            //{
-            //    nouveauMessage.Sujet = sujet;
-            //    nouveauMessage.Message = message;
-            //    nouveauMessage.Destinataire = selectedDestinataire;
-            //    nouveauMessage.Auteur = auteur;
-            //}
-            //_context.PPMessages.Add(nouveauMessage);
-            //_context.SaveChanges();
+            _context.PPDestinatairesMessage.AddRange(destinatairesList);
+            await _context.SaveChangesAsync();
 
             return View();
         }

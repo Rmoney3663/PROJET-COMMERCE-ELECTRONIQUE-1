@@ -27,6 +27,72 @@ namespace Projet_Web_Commerce.Controllers
 
         [HttpGet]
         [Authorize(Roles = "Gestionnaire")]
+        public ActionResult Statistiques()
+        {
+
+            var vendeurs = _context.PPVendeurs
+                .Where(v => v.Statut == 1)
+                .ToList();
+
+            var vendeurdate = _context.PPVendeurs
+            .Select(v => new ModelMoisAnneVendeur
+            {
+                Mois = v.DateCreation.Month,
+                Annee = v.DateCreation.Year
+            })
+            .ToList(); // Materialize the query to execute it and get the results
+
+            var visitesCountData = _context.PPVendeursClients
+            .Include(p => p.PPClients)
+            .Include(p => p.PPVendeurs)
+            .GroupBy(p => new { p.NoClient, p.NoVendeur })
+            .Select(g => new ModelVisite
+            {
+                ClientName = (string.IsNullOrEmpty(g.FirstOrDefault().PPClients.Prenom) && string.IsNullOrEmpty(g.FirstOrDefault().PPClients.Nom))
+                    ? g.FirstOrDefault().PPClients.AdresseEmail
+                    : (g.FirstOrDefault().PPClients.Prenom + " " + g.FirstOrDefault().PPClients.Nom).Trim(),
+                VendeurName = (string.IsNullOrEmpty(g.FirstOrDefault().PPVendeurs.Prenom) && string.IsNullOrEmpty(g.FirstOrDefault().PPVendeurs.Nom))
+                    ? g.FirstOrDefault().PPVendeurs.AdresseEmail
+                    : (g.FirstOrDefault().PPVendeurs.Prenom + " " + g.FirstOrDefault().PPVendeurs.Nom).Trim(),
+                VisitCount = g.Count()
+            })
+            .ToList();
+
+            var clients = _context.PPClients.ToList();
+
+
+            // Log the data
+            foreach (var item in vendeurdate)
+            {
+                Console.WriteLine($"Month: {item.Mois}, Year: {item.Annee}");
+            }
+
+
+
+            var ProduitsList = _context.PPProduits.ToList();
+
+
+            var CommandesList = _context.PPCommandes
+             .GroupBy(c => c.NoVendeur)
+             .Select(group => group.OrderByDescending(c => c.DateCommande).FirstOrDefault())
+             .ToList();
+
+
+            ModelListeStat modelListeStat = new ModelListeStat()
+            {
+                ClientsList = clients,
+                VendeursList = vendeurs,
+                ProduitsList = ProduitsList,
+                CommandesList = CommandesList,
+                VendeurDate = vendeurdate,
+                VisitesCountData = visitesCountData
+            };
+
+            return View(modelListeStat);
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "Gestionnaire")]
         public ActionResult ListeVendeurs()
         {
             //var groupedVendeurs = _context.PPVendeurs
@@ -60,14 +126,74 @@ namespace Projet_Web_Commerce.Controllers
                 .GroupBy(p => p.NoVendeur)
                 .Count();
 
+            var CommandesList = _context.PPCommandes
+             .GroupBy(c => c.NoVendeur)
+             .Select(group => group.OrderByDescending(c => c.DateCommande).FirstOrDefault())
+             .ToList();
+
+
             ModelListeVendeurs modelListeVendeurs = new ModelListeVendeurs()
             {
                 VendeursList = vendeurs,
                 ProduitsList = ProduitsList,
-                MoisAnneesDistinctsList = lstMoisAnneesDistincts
+                MoisAnneesDistinctsList = lstMoisAnneesDistincts,
+                CommandesList = CommandesList,
+               
             };
 
             return View(modelListeVendeurs);
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "Gestionnaire")]
+        public ActionResult ListeClients()
+        {           
+
+            var vendeurs = _context.PPVendeurs
+                .Where(v => v.Statut == 1)
+                .OrderByDescending(v => v.NomAffaires)
+                .ToList();
+
+            //var flattenedList = groupedVendeurs
+            //    .SelectMany(group => group.OrderBy(v => v.NomAffaires))
+            //    .ToList();
+
+            var lstMoisAnneesDistincts = _context.PPVendeurs
+                .Where(v => v.Statut == 1)
+                .Select(v => new ModelMoisAnnees { Mois = v.DateCreation.Month, Annee = v.DateCreation.Year })
+                //.Select(v => new { Mois = v.DateCreation.Month, Annee = v.DateCreation.Year })
+                .Distinct()
+                .OrderByDescending(item => item.Annee)
+                .ThenByDescending(item => item.Mois)
+                .ToList();
+
+            var ProduitsList = _context.PPProduits.ToList();
+            
+            var CommandesList = _context.PPCommandes.ToList();
+
+            var VendeursClientsList = _context.PPVendeursClients
+            .GroupBy(vc => vc.NoClient)
+            .Select(group => group.OrderByDescending(vc => vc.DateVisite).FirstOrDefault())
+            .ToList();
+
+
+            var ClientsList = _context.PPClients.ToList();
+
+            var nbProduits = _context.PPProduits
+                .GroupBy(p => p.NoVendeur)
+                .Count();
+
+            ModelListeClients modelListeClients = new ModelListeClients()
+            {
+                VendeursList = vendeurs,
+                ProduitsList = ProduitsList,
+                MoisAnneesDistinctsList = lstMoisAnneesDistincts,
+                ClientsList = ClientsList,
+                CommandesList = CommandesList,
+                VendeursClientsList = VendeursClientsList
+            };
+
+            return View(modelListeClients);
         }
 
         [HttpGet]

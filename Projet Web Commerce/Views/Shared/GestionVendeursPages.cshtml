@@ -38,6 +38,11 @@
         Liste des vendeurs
     </a>
 
+    <a class="btn @(Model == "ListeClients" ? "actif" : "pasActif")"
+       asp-area="" asp-controller="PPGestionnaires" asp-action="ListeClients">
+        Liste des clients
+    </a>
+
     <a class="btn @(Model == "ListeVendeursAConfirmer" ? "actif" : "pasActif")"
        asp-area="" asp-controller="PPGestionnaires" asp-action="ListeVendeursAConfirmer">
         Liste des vendeurs à confirmer
@@ -46,6 +51,11 @@
     <a class="btn @(Model == "ListeVendeursInactifs" ? "actif" : "pasActif")"
        asp-area="" asp-controller="PPGestionnaires" asp-action="ListeVendeursInactifs">
         Liste des vendeurs inactifs
+    </a>
+
+    <a class="btn @(Model == "Statistiques" ? "actif" : "pasActif")"
+       asp-area="" asp-controller="PPGestionnaires" asp-action="Statistiques">
+        Statistiques
     </a>
 
     <!-- #pragma warning restore CSS024 -->
