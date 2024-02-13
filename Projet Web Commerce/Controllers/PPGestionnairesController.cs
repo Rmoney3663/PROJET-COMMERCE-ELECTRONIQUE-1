@@ -29,67 +29,95 @@ namespace Projet_Web_Commerce.Controllers
         [Authorize(Roles = "Gestionnaire")]
         public ActionResult Statistiques()
         {
-
             var vendeurs = _context.PPVendeurs
                 .Where(v => v.Statut == 1)
                 .ToList();
 
             var vendeurdate = _context.PPVendeurs
-            .Select(v => new ModelMoisAnneVendeur
-            {
-                Mois = v.DateCreation.Month,
-                Annee = v.DateCreation.Year
-            })
-            .ToList(); // Materialize the query to execute it and get the results
+                .Select(v => new ModelMoisAnneVendeur
+                {
+                    Mois = v.DateCreation.Month,
+                    Annee = v.DateCreation.Year
+                })
+                .ToList();
 
             var visitesCountData = _context.PPVendeursClients
-            .Include(p => p.PPClients)
-            .Include(p => p.PPVendeurs)
-            .GroupBy(p => new { p.NoClient, p.NoVendeur })
-            .Select(g => new ModelVisite
-            {
-                ClientName = (string.IsNullOrEmpty(g.FirstOrDefault().PPClients.Prenom) && string.IsNullOrEmpty(g.FirstOrDefault().PPClients.Nom))
-                    ? g.FirstOrDefault().PPClients.AdresseEmail
-                    : (g.FirstOrDefault().PPClients.Prenom + " " + g.FirstOrDefault().PPClients.Nom).Trim(),
-                VendeurName = (string.IsNullOrEmpty(g.FirstOrDefault().PPVendeurs.Prenom) && string.IsNullOrEmpty(g.FirstOrDefault().PPVendeurs.Nom))
-                    ? g.FirstOrDefault().PPVendeurs.AdresseEmail
-                    : (g.FirstOrDefault().PPVendeurs.Prenom + " " + g.FirstOrDefault().PPVendeurs.Nom).Trim(),
-                VisitCount = g.Count()
-            })
-            .ToList();
+                .Include(p => p.PPClients)
+                .Include(p => p.PPVendeurs)
+                .GroupBy(p => new { p.NoClient, p.NoVendeur })
+                .Select(g => new ModelVisite
+                {
+                    ClientName = (string.IsNullOrEmpty(g.FirstOrDefault().PPClients.Prenom) && string.IsNullOrEmpty(g.FirstOrDefault().PPClients.Nom))
+                        ? g.FirstOrDefault().PPClients.AdresseEmail
+                        : (g.FirstOrDefault().PPClients.Prenom + " " + g.FirstOrDefault().PPClients.Nom).Trim(),
+                    VendeurName = (string.IsNullOrEmpty(g.FirstOrDefault().PPVendeurs.Prenom) && string.IsNullOrEmpty(g.FirstOrDefault().PPVendeurs.Nom))
+                        ? g.FirstOrDefault().PPVendeurs.AdresseEmail
+                        : (g.FirstOrDefault().PPVendeurs.Prenom + " " + g.FirstOrDefault().PPVendeurs.Nom).Trim(),
+                    VisitCount = g.Count()
+                })
+                .ToList();
 
             var clients = _context.PPClients.ToList();
 
-
-            // Log the data
-            foreach (var item in vendeurdate)
-            {
-                Console.WriteLine($"Month: {item.Mois}, Year: {item.Annee}");
-            }
-
-
-
             var ProduitsList = _context.PPProduits.ToList();
 
-
             var CommandesList = _context.PPCommandes
-             .GroupBy(c => c.NoVendeur)
-             .Select(group => group.OrderByDescending(c => c.DateCommande).FirstOrDefault())
-             .ToList();
+                .GroupBy(c => c.NoVendeur)
+                .Select(group => group.OrderByDescending(c => c.DateCommande).FirstOrDefault())
+                .ToList();
 
+            var orderCountsByVendeur = _context.PPCommandes
+                .Where(c => c.PPDetailsCommandes.Any())
+                .GroupBy(o => o.NoVendeur)
+                .Select(g => new
+                {
+                    VendeurId = g.Key,
+                    OrderCount = g.SelectMany(c => c.PPDetailsCommandes).Sum(d => d.Quantité)
+                })
+                .ToList();
 
-            ModelListeStat modelListeStat = new ModelListeStat()
+            var totalOrders = orderCountsByVendeur.Sum(o => o.OrderCount);
+
+            var orderPercentagesByVendeur = orderCountsByVendeur
+                .Select(o => new OrderPercentage
+                {
+                    VendeurId = o.VendeurId,
+                    VendeurName = _context.PPVendeurs.FirstOrDefault(v => v.NoVendeur == o.VendeurId)?.Prenom + " " + _context.PPVendeurs.FirstOrDefault(v => v.NoVendeur == o.VendeurId)?.Nom,
+                    Percentage = Math.Round((decimal)o.OrderCount / totalOrders * 100, 2)
+                })
+                .ToList();
+
+            // Retrieve sales data for the last 12 months
+            var currentDate = DateTime.Now;
+            var startDate = currentDate.AddMonths(-12);
+            var monthlySales = _context.PPCommandes
+                .Where(c => c.DateCommande >= startDate && c.DateCommande <= currentDate)
+                .GroupBy(c => new { Year = c.DateCommande.Year, Month = c.DateCommande.Month })
+                .Select(g => new { Year = g.Key.Year, Month = g.Key.Month, TotalMoney = g.Sum(c => c.MontantTotAvantTaxes) })
+                .OrderBy(g => g.Year)
+                .ThenBy(g => g.Month)
+                .ToList();
+
+            // Format Data
+            var labels = monthlySales.Select(s => $"{CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(s.Month)} {s.Year}").ToList();
+            var data = monthlySales.Select(s => s.TotalMoney).ToList();
+
+            var modelListeStat = new ModelListeStat()
             {
                 ClientsList = clients,
                 VendeursList = vendeurs,
                 ProduitsList = ProduitsList,
                 CommandesList = CommandesList,
                 VendeurDate = vendeurdate,
-                VisitesCountData = visitesCountData
+                OrderPercentages = orderPercentagesByVendeur,
+                VisitesCountData = visitesCountData,
+                Labels = labels,
+                Data = data
             };
 
             return View(modelListeStat);
         }
+
 
         [HttpGet]
         [Authorize(Roles = "Gestionnaire")]
@@ -400,38 +428,8 @@ namespace Projet_Web_Commerce.Controllers
             return _context.PPGestionnaire.Any(e => e.NoGestionnaire == id);
         }
 
-        public IActionResult Test()
-        {
-            var orderCountsByVendeur = _context.PPCommandes
-                .GroupBy(o => o.NoVendeur)
-                .Select(g => new { VendeurId = g.Key, OrderCount = g.Count() })
-                .ToList();
+       
 
-            var totalOrders = orderCountsByVendeur.Sum(o => o.OrderCount);
-
-            var orderPercentagesByVendeur = orderCountsByVendeur
-                .Select(o => new
-                {
-                    VendeurId = o.VendeurId,
-                    OrderCount = o.OrderCount,
-                    VendeurName = _context.PPVendeurs.FirstOrDefault(v => v.NoVendeur == o.VendeurId)?.Prenom + " " + _context.PPVendeurs.FirstOrDefault(v => v.NoVendeur == o.VendeurId)?.Nom
-                })
-                .Select(o => new OrderPercentage
-                {
-                    VendeurId = o.VendeurId,
-                    VendeurName = o.VendeurName,
-                    Percentage = Math.Round((decimal)o.OrderCount / totalOrders * 100, 2)
-
-                })
-                .ToList();
-
-            var viewModel = new OrderPercentagesViewModel
-            {
-                OrderPercentages = orderPercentagesByVendeur
-            };
-
-            return View(viewModel);
-        }
 
 
     }
