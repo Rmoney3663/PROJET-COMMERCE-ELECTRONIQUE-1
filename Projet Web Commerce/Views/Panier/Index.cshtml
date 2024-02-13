@@ -28,10 +28,9 @@
         }
         totalPoids += item.Poids * article.NbItems;
     }
-
     decimal? tps = totalPrice * 0.05m;
     decimal? tvq = totalPrice * 0.09975m;
-
+    
     decimal? prixFinal = totalPrice;
     }
     @if (!SignInManager.IsSignedIn(User) || User.IsInRole("Vendeur") || User.IsInRole("Gestionnaire"))
