@@ -52,7 +52,7 @@ else
                 <div class="form-group">
                     <label asp-for="Photo" class="control-label">Photo de l’article :</label>
                     <img src="~/Logo/@(Model.Photo)" alt="@(Model.Photo)" width="140" height="200" />
-                    <input type="file" id="file" name="file" accept="image/jpg" class="form-control" />
+                    <input type="file" id="file" name="file" accept="image/*" class="form-control" />
                     <span asp-validation-for="Photo" class="text-danger"></span>
                 </div>
                 <br>
