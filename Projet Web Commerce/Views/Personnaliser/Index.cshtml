@@ -69,11 +69,11 @@ else
                     <div class="form-floating mb-3">
                         <h5>Police de la page</h5>
                         <select name="font" id="fontSelector">
-                            <!option value="Arial">Arial</!option>
-                            <!option value="Helvetica">Helvetica</!option>
-                            <!option value="Times New Roman">Times New Roman</!option>
-                            <!option value="Courier New">Courier New</!option>
-                            <!option value="Verdana">Verdana</!option>
+                            <option selected="@(font=="Arial"?"selected":null)" value="Arial">Arial</option>
+                            <option selected="@(font=="Helvetica"?"selected":null)" value="Helvetica">Helvetica</option>
+                            <option selected="@(font=="Times New Roman"?"selected":null)" value="Times New Roman">Times New Roman</option>
+                            <option selected="@(font=="Courier New"?"selected":null)" value="Courier New">Courier New</option>
+                            <option selected="@(font=="Verdana"?"selected":null)" value="Verdana">Verdana</option>
                         </select>
                     </div>
                     <div class="form-floating mb-3">
