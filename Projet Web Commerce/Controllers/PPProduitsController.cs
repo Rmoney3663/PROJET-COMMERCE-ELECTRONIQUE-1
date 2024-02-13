@@ -22,11 +22,13 @@ namespace Projet_Web_Commerce.Controllers
     {
         private readonly AuthDbContext _context;
         private readonly UserManager<Utilisateur> _userManager;
+        private readonly SignInManager<Utilisateur> SignInManager;
 
-        public PPProduitsController(AuthDbContext context, UserManager<Utilisateur> userManager)
+        public PPProduitsController(AuthDbContext context, UserManager<Utilisateur> userManager, SignInManager<Utilisateur> signInManager)
         {
             _context = context;
             _userManager = userManager;
+            SignInManager = signInManager;
         }
 
         // GET: PPProduits
@@ -182,6 +184,11 @@ namespace Projet_Web_Commerce.Controllers
                     Console.WriteLine(er.ErrorMessage);
                 }
             }
+            if (pPProduits.PrixVente > pPProduits.PrixDemande)
+            {
+                ModelState.AddModelError("PrixVente", "Le prix de vente ne peut pas être supérieur au prix demandé.");
+            }
+
             if (ModelState.IsValid)
             {
                 try

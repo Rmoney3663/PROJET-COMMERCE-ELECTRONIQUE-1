@@ -1,10 +1,8 @@
-﻿
-
-namespace Projet_Web_Commerce.Models
+﻿namespace Projet_Web_Commerce.Models
 {
-    public class ModelListeVendeurs
+    public class ModelListeClients
     {
-        //public Dictionary<List<int>, PPVendeurs> VendeursList { get; set; }
+        public List<PPClients> ClientsList { get; set; }
         public List<PPVendeurs> VendeursList { get; set; }
 
         public List<PPProduits> ProduitsList { get; set; }
@@ -12,5 +10,7 @@ namespace Projet_Web_Commerce.Models
         public List<ModelMoisAnnees> MoisAnneesDistinctsList { get; set; }
 
         public List<PPCommandes> CommandesList { get; set; }
+
+        public List<PPVendeursClients> VendeursClientsList { get; set; }
     }
 }
