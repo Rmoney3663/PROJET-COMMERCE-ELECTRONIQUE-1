@@ -86,7 +86,7 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account.Manage
             var ville = _context.PPClients.FirstOrDefault(x => x.AdresseEmail == email).Ville;
             var province = _context.PPClients.FirstOrDefault(x => x.AdresseEmail == email).NoProvince;
             var codePostal = _context.PPClients.FirstOrDefault(x => x.AdresseEmail == email).CodePostal;
-            var pays = _context.PPClients.FirstOrDefault(x => x.AdresseEmail == email).Pays;
+            var pays = "Canada"; //_context.PPClients.FirstOrDefault(x => x.AdresseEmail == email).Pays;
             var telephone = _context.PPClients.FirstOrDefault(x => x.AdresseEmail == email).Tel1;
             var cellulaire = _context.PPClients.FirstOrDefault(x => x.AdresseEmail == email).Tel2;
 
@@ -127,7 +127,7 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account.Manage
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
 
-            //ModelState.Remove("Pays");
+            //ModelState.Remove("");
             if (!ModelState.IsValid)
             {
                 await LoadAsync(user);

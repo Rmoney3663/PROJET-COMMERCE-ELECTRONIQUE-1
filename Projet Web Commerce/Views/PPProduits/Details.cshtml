@@ -1,6 +1,8 @@
 ﻿@using Microsoft.AspNetCore.Identity
+@using Projet_Web_Commerce.Data
 @inject UserManager<Projet_Web_Commerce.Areas.Identity.Data.Utilisateur> _userManager
 @inject SignInManager<Projet_Web_Commerce.Areas.Identity.Data.Utilisateur> SignInManager
+@inject AuthDbContext _context
 @model Projet_Web_Commerce.Models.PPProduits
 @using System.IO
 @inject IWebHostEnvironment env
@@ -135,6 +137,24 @@ else
                 <dd class="col-sm-10">
                     La date de vente n'est pas précisée
                 </dd>
+            }
+
+            @if (User.IsInRole("Client"))
+            {
+                var client = _context.PPClients.Where(c => c.AdresseEmail == user.Email).FirstOrDefault();
+
+                <form asp-controller="MainMenu" id="formAjoutPanier" asp-action="AjoutPanier" method="post">
+                    <input type="hidden" name="NoProduit" value="@Model.NoProduit" />
+                    <input type="hidden" name="NoClient" value="@client.NoClient" />
+                    <input type="hidden" name="NoVendeur" value="@Model.NoVendeur" />
+                    <button class="btn btn-secondary" type="submit">Ajouter au panier</button>
+                    <select name="quantite">
+                        @for (int i = 1; i <= Model.NombreItems && i < 21; i++)
+                        {
+                            <option value="@i">@i</option>
+                        }
+                    </select>
+                </form>
             }
 
         </dl>
