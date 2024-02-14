@@ -87,7 +87,6 @@ namespace Projet_Web_Commerce.Controllers
                 })
                 .ToList();
 
-            // Retrieve sales data for the last 12 months
             var currentDate = DateTime.Now;
             var startDate = currentDate.AddMonths(-12);
             var monthlySales = _context.PPCommandes
@@ -98,9 +97,36 @@ namespace Projet_Web_Commerce.Controllers
                 .ThenBy(g => g.Month)
                 .ToList();
 
-            // Format Data
             var labels = monthlySales.Select(s => $"{CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(s.Month)} {s.Year}").ToList();
             var data = monthlySales.Select(s => s.TotalMoney).ToList();
+
+            var ordersWithDetails = _context.PPCommandes
+            .Include(o => o.PPDetailsCommandes)
+            .Include(o => o.PPClients)
+            .Include(o => o.PPVendeurs)
+            .OrderByDescending(o => o.DateCommande)
+            .ToList();
+
+            var ordersByClientAndVendeur = ordersWithDetails
+                .GroupBy(o => new { o.NoClient, o.NoVendeur })
+                .Select(g => new ModelordersByClientAndVendeur
+                {
+                    NoClient = g.Key.NoClient,
+                    NomPrenomClient = (string.IsNullOrEmpty(g.FirstOrDefault().PPClients.Nom) && string.IsNullOrEmpty(g.FirstOrDefault().PPClients.Prenom))
+                        ? g.FirstOrDefault().PPClients.AdresseEmail
+                        : (g.FirstOrDefault().PPClients.Nom + " " + g.FirstOrDefault().PPClients.Prenom).Trim(),
+                    TotalCommandeAT = g.Sum(o => o.MontantTotAvantTaxes ),
+                    CoutLivraison = g.Sum(o => o.CoutLivraison),
+                    DateDerniereCommande = g.Max(o => o.DateCommande),
+                    NoVendeur = g.Key.NoVendeur,
+                    NomPrenomVendeur = (g.FirstOrDefault().PPVendeurs.Nom + " " + g.FirstOrDefault().PPVendeurs.Prenom).Trim(),
+                    ProvinceVendeur = g.FirstOrDefault().PPVendeurs.NoProvince,
+                    PourcentageTaxeVendeur = g.FirstOrDefault().PPVendeurs.PourcentageTaxe,
+                    TaxesVendeur = g.FirstOrDefault().PPVendeurs.Taxes
+                })
+                .OrderByDescending(o => o.DateDerniereCommande)
+                .ToList();
+
 
             var modelListeStat = new ModelListeStat()
             {
@@ -112,7 +138,8 @@ namespace Projet_Web_Commerce.Controllers
                 OrderPercentages = orderPercentagesByVendeur,
                 VisitesCountData = visitesCountData,
                 Labels = labels,
-                Data = data
+                Data = data,
+                OrdersByClientAndVendeurList = ordersByClientAndVendeur
             };
 
             return View(modelListeStat);
@@ -171,14 +198,9 @@ namespace Projet_Web_Commerce.Controllers
                 .OrderByDescending(v => v.NomAffaires)
                 .ToList();
 
-            //var flattenedList = groupedVendeurs
-            //    .SelectMany(group => group.OrderBy(v => v.NomAffaires))
-            //    .ToList();
-
             var lstMoisAnneesDistincts = _context.PPVendeurs
                 .Where(v => v.Statut == 1)
                 .Select(v => new ModelMoisAnnees { Mois = v.DateCreation.Month, Annee = v.DateCreation.Year })
-                //.Select(v => new { Mois = v.DateCreation.Month, Annee = v.DateCreation.Year })
                 .Distinct()
                 .OrderByDescending(item => item.Annee)
                 .ThenByDescending(item => item.Mois)
