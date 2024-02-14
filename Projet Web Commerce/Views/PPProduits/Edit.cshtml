@@ -157,9 +157,38 @@ else
         @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 
         <script>
-            var now = new Date();
-            var isoDate = now.toISOString().slice(0, 10);
-            document.getElementById("datevente2").min = isoDate;
+
+
+            function showConfirmationDialog(message) {
+                return new Promise((resolve, reject) => {
+                    if (confirm(message)) {
+                        resolve(true); 
+                    } else {
+                        resolve(false); 
+                    }
+                });
+            }
+
+            async function checkProductInCart() {
+                var disponibilite = document.getElementById("Disponibilite").value;
+
+                if (disponibilite === "false") {
+                    console.log("FALSE : ", '@Model.NoProduit');
+
+                    var result = await fetch('/PPProduits/IsProductInCart?noProduit=@Model.NoProduit');
+                    var data = await result.json();
+
+                    if (data.productInCart) {
+                        var confirmed = await showConfirmationDialog("Ce produit est présent dans le panier d'un utilisateur. Êtes-vous sûr de vouloir le marquer comme indisponible ?");
+
+                        if (!confirmed) {
+                            document.getElementById("Disponibilite").value = "true";
+                        }
+                    }
+                }
+            }
+
+            document.getElementById("Disponibilite").addEventListener("change", checkProductInCart);
         </script>
     }
 }
