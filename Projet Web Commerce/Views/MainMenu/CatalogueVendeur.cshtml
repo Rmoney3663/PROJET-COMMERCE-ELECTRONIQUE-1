@@ -223,6 +223,8 @@
                                     <p class="card-text">Prix : @Html.DisplayFor(modelItem => item.PrixDemande) $ </p>
                                 }
 
+                                
+
                                 @if (SignInManager.IsSignedIn(User) && User.IsInRole("Client") && item.NombreItems > 0)
                                 {
                                     <a asp-controller="PPProduits"
