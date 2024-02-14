@@ -4,7 +4,7 @@
 @inject AuthDbContext _context
 
 @{
-    ViewData["Title"] = "Boîte de réception";
+    ViewData["Title"] = "Brouillons";
 }
 
 <style>
@@ -12,7 +12,7 @@
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        max-width: 300px;
+        max-width: 500px;
     }
 
     .msg {
@@ -29,32 +29,31 @@
     <div class="col">
         <section>
             <div>
-                @Html.Partial("MenuMessagerie", "BoiteDeReception")
+                @Html.Partial("MenuMessagerie", "Brouillons")
             </div>
             <div class="card">
                 <div class="card-body">
-                    <h2 class="card-title">Boîte de réception</h2>
+                    <h2 class="card-title">Brouillons</h2>
                     <hr />
                     <table class="table">
                         <thead>
                             <tr>
-                                <th scope="col">#</th>
-                                <th scope="col">Expéditeur</th>
+                                <th scope="col" style="padding-right: 0px">#</th>
+                                <th scope="col" style="max-width: 50px;">Destinataire(s)</th>
                                 <th scope="col">Objet - <span class="msg">Message</span></th>
-                                <th scope="col">Date de l'envoi</th>
                             </tr>
                         </thead>
+
                         <tbody>
                             @{
                                 var no = 0;
                             }
                             @foreach (var msg in Model)
                             {
-                                <tr class="flotter" onclick="window.location.href = '@Url.Action("Details", new { idMessage = msg.NoMessage })'">
+                                <tr class="flotter" onclick="window.location.href = '@Url.Action("EnvoyerMessage", new { idMessage = msg.NoMessage })'">
                                     <td>@(++no)</td>
-                                    <td>@_context.Users.Where(u => u.Id == msg.Auteur).FirstOrDefault().Email</td>
+                                    <td>@msg.Destinataires?.FirstOrDefault()?.DestinataireUser?.Email</td>
                                     <td class="truncate">@Html.DisplayFor(modelItem => msg.Sujet) - <span class="msg">@Html.DisplayFor(modelItem => msg.Message)</span></td>
-                                    <td>@DateTime.Now.Date</td> @* <td>@Html.DisplayFor(modelItem => msg.Message.DateMessage)</td> *@
                                 </tr>
                             }
                         </tbody>

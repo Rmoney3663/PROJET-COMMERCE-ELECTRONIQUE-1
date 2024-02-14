@@ -1,4 +1,5 @@
 ﻿using DocumentFormat.OpenXml.InkML;
+using DocumentFormat.OpenXml.Presentation;
 using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -44,53 +45,90 @@ namespace Projet_Web_Commerce.Controllers
         }
 
         [HttpGet]
-        public ActionResult EnvoyerMessage()
+        public async Task<ActionResult> EnvoyerMessage(int? idMessage)
         {
+            if (idMessage == null)
+            {
+                return View();
+            }
 
-            return View();
+            var brouillonMsg = await _context.PPMessages
+                .FirstOrDefaultAsync(m => m.NoMessage == idMessage);
+
+            return View(brouillonMsg);
         }
 
         [HttpPost]
-        public async Task<ActionResult> EnvoyerMessage(string sujet, string message, string selectedDestinataire, string auteur)
+        public async Task<IActionResult> EnvoyerMessage(string sujet, string message, string selectedDestinataire
+            , string auteur, int typeMessage, int? idMessage)
         {
-            PPMessages nouveauMessage = new PPMessages();
+            int noMsg = 0;
+            
+            if (idMessage != null)
             {
-                nouveauMessage.Sujet = sujet;
-                nouveauMessage.Message = message;
-                nouveauMessage.Auteur = auteur;
-                nouveauMessage.AuteurUser = await _userManager.FindByEmailAsync(auteur);
-                nouveauMessage.TypeMessage = 0;
-                nouveauMessage.PieceJointe = "";
-                nouveauMessage.Transfemetteur = "";
+                var msg = await _context.PPMessages
+                    .FirstOrDefaultAsync(m => m.NoMessage == idMessage);
+                msg.Sujet = sujet == null ? "" : sujet;
+                msg.Message = message == null ? "" : message;
+                msg.TypeMessage = typeMessage;
+                noMsg = Convert.ToInt32(idMessage);
+
+                foreach (var dest in _context.PPDestinatairesMessage.ToList())
+                {
+                    if (dest.NoMessage == noMsg)
+                        _context.PPDestinatairesMessage.Remove(dest);
+                }
+                await _context.SaveChangesAsync();
             }
-            _context.PPMessages.Add(nouveauMessage);
-            await _context.SaveChangesAsync();
+            else
+            {
+                PPMessages nouveauMessage = new PPMessages();
+                {
+                    nouveauMessage.Sujet = sujet == null ? "" : sujet;
+                    nouveauMessage.Message = message == null ? "" : message;
+                    nouveauMessage.Auteur = auteur;
+                    nouveauMessage.AuteurUser = await _userManager.FindByEmailAsync(auteur);
+                    nouveauMessage.TypeMessage = typeMessage;
+                    nouveauMessage.PieceJointe = "";
+                    nouveauMessage.Transfemetteur = "";
+                }
+                _context.PPMessages.Add(nouveauMessage);
+                await _context.SaveChangesAsync();
+                noMsg = nouveauMessage.NoMessage;
+            }
+            
 
             var listClients = _context.PPClients.ToList();
             var destinatairesList = new List<PPDestinatairesMessage>();
 
-            string[] selectedDestinataireArray = selectedDestinataire.Split(',');
-
-            foreach (string email in selectedDestinataireArray)
+            if (selectedDestinataire != null)
             {
-                var user = _context.Users.Where(v => v.Email == email).FirstOrDefault();
+                string[] selectedDestinataireArray = selectedDestinataire.Split(',');
 
-                if (user != null)
+                foreach (string email in selectedDestinataireArray)
                 {
-                    PPDestinatairesMessage destinatairesMessage = new PPDestinatairesMessage
+                    var user = _context.Users.Where(v => v.Email == email).FirstOrDefault();
+
+                    if (user != null)
                     {
-                        NoMessage = nouveauMessage.NoMessage,
-                        Destinataire = user.Email,
-                        DestinataireUser = await _userManager.FindByEmailAsync(user.Email)
-                    };
+                        PPDestinatairesMessage destinatairesMessage = new PPDestinatairesMessage
+                        {
+                            NoMessage = noMsg,
+                            Destinataire = user.Email,
+                            DestinataireUser = await _userManager.FindByEmailAsync(user.Email)
+                        };
 
-                    destinatairesList.Add(destinatairesMessage);
+                        destinatairesList.Add(destinatairesMessage);
+                    }
                 }
+                _context.PPDestinatairesMessage.AddRange(destinatairesList);
             }
-
-            _context.PPDestinatairesMessage.AddRange(destinatairesList);
+            
             await _context.SaveChangesAsync();
-
+            if (typeMessage == 2)
+                TempData["MsgStatut"] = "Votre brouillon a été sauvegardé!";
+            else if (typeMessage == 0)
+                TempData["MsgStatut"] = "Votre message a été envoyé!";
             return View();
         }
 
@@ -101,7 +139,9 @@ namespace Projet_Web_Commerce.Controllers
             var msgEnvoyes = _context.PPMessages
                 .Where(message => message.Auteur == currentUserEmail 
                 && message.TypeMessage == 0)
+                .Include(m => m.Destinataires)
                 .ToList();
+
             return View(msgEnvoyes);
         }
 
@@ -113,10 +153,15 @@ namespace Projet_Web_Commerce.Controllers
             return View(messageCourant);
         }
 
-        // GET: EmailSenderController/Create
-        public ActionResult Create()
+        // GET: EmailSenderController/Brouillons
+        public ActionResult Brouillons()
         {
-            return View();
+            var currentUserEmail = _userManager.Users.Where(u => u.Email == User.Identity.Name).FirstOrDefault().Id;
+            var brouillons = _context.PPMessages
+                .Where(message => message.Auteur == currentUserEmail
+                && message.TypeMessage == 2)
+                .ToList();
+            return View(brouillons);
         }
 
         // POST: EmailSenderController/Create

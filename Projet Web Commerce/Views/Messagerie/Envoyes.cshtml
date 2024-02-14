@@ -15,11 +15,21 @@
         max-width: 350px;
     }
 
+    .truncateDest {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100px;
+    }
+
     .msg {
         color: gray;
     }
 
-    
+    .flotter:hover {
+        background-color: rgb(236, 235, 243);
+        cursor: pointer;
+    }
 </style>
 
 <div class="row">
@@ -48,9 +58,14 @@
                             }
                             @foreach (var msg in Model)
                             {
-                                <tr class="flotter" onclick="window.location.href = '@Url.Action("Details")'">
+                                <tr class="flotter" onclick="window.location.href = '@Url.Action("Details", new { idMessage = msg.NoMessage })'">
                                     <td>@(++no)</td>
-                                    <td>@msg.Destinataires?.FirstOrDefault()?.DestinataireUser?.Email</td>
+                                    <td class="truncateDest">
+                                        @if (msg.Destinataires != null && msg.Destinataires.Any())
+                                        {
+                                            @string.Join(", ", msg.Destinataires.Select(d => d.Destinataire))
+                                        }
+                                    </td>
                                     <td class="truncate">@Html.DisplayFor(modelItem => msg.Sujet) - <span class="msg">@Html.DisplayFor(modelItem => msg.Message)</span></td>
                                     <td class="ms-auto">@DateTime.Now.Date</td>
                                     @* <td>@msg.DateMessage.ToShortDateString()</td> *@
