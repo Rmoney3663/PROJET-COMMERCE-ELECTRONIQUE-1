@@ -68,6 +68,12 @@
                             <li class="nav-item">
                                 <a class="nav-link" style="color: rgb(249, 229, 71); font-size: 23px" asp-area="" asp-controller="MainMenu" asp-action="Catalogue">Catalogue</a>
                             </li>
+                            <div class="d-flex justify-content-center flex-grow-1">
+                            <form method="post" class="d-flex mx-auto" asp-controller="MainMenu" asp-action="CatalogueTous" class="mx-3">
+                                    <input class="form-control me-2" name="searchString" id="searchString"  type="search" placeholder="Search" aria-label="Search">
+                                <button class="btn btn-secondary" type="submit">Rechercher</button>
+                            </form>
+                            </div>
                         }                        
 
                         @if (SignInManager.IsSignedIn(User) && User.IsInRole("Vendeur"))
@@ -83,6 +89,7 @@
 
                             </li>
                         }
+
 
                         @if (SignInManager.IsSignedIn(User) && User.IsInRole("Gestionnaire"))
                         {
