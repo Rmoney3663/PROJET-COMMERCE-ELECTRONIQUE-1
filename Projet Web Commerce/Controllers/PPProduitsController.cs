@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows;
+using DocumentFormat.OpenXml.Office2010.Excel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -92,6 +94,10 @@ namespace Projet_Web_Commerce.Controllers
             {
                 ModelState.AddModelError("PrixVente", "Le prix de vente ne peut pas être supérieur au prix demandé.");
             }
+            if (pPProduits.PrixVente != null && pPProduits.DateVente == null)
+            {
+                ModelState.AddModelError("DateVente", "La date de vente est obligatoire, si vous mettez un prix de vente.");
+            }
 
             foreach (var m in ModelState)
             {
@@ -170,8 +176,8 @@ namespace Projet_Web_Commerce.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit( [Bind("NoProduit,NoVendeur,NoCategorie,DateCreation,DateMAJ,Nom,Description,Photo,PrixDemande,Disponibilite,Poids,DateVente,PrixVente, NombreItems")] PPProduits pPProduits,
-            IFormFile? file)
+        public async Task<IActionResult> Edit([Bind("NoProduit,NoVendeur,NoCategorie,DateCreation,DateMAJ,Nom,Description,Photo,PrixDemande,Disponibilite,Poids,DateVente,PrixVente,NombreItems")] PPProduits pPProduits,
+        IFormFile? file)
         {
             ModelState.Remove("file");
             ModelState.Remove("Photo");
@@ -184,9 +190,14 @@ namespace Projet_Web_Commerce.Controllers
                     Console.WriteLine(er.ErrorMessage);
                 }
             }
+
             if (pPProduits.PrixVente > pPProduits.PrixDemande)
             {
                 ModelState.AddModelError("PrixVente", "Le prix de vente ne peut pas être supérieur au prix demandé.");
+            }
+            if (pPProduits.PrixVente != null && pPProduits.DateVente == null)
+            {
+                ModelState.AddModelError("DateVente", "La date de vente est obligatoire, si vous mettez un prix de vente.");
             }
 
             if (ModelState.IsValid)
@@ -195,11 +206,22 @@ namespace Projet_Web_Commerce.Controllers
                 {
                     var user = await _userManager.GetUserAsync(User);
                     pPProduits.DateMAJ = DateTime.Now;
-                    
+
+                    if (!pPProduits.Disponibilite)
+                    {
+                        var productInCart = _context.PPArticlesEnPanier.Any(p => p.NoProduit == pPProduits.NoProduit);
+
+                        if (productInCart)
+                        {
+                            
+                        }
+                    }
+
                     if (file != null && file.Length > 0)
-                    {                        
+                    {
                         System.IO.File.Delete("wwwroot/Logo/" + pPProduits.Photo);
 
+                        // Save new photo
                         string extension = Path.GetExtension(file.FileName);
                         pPProduits.Photo = pPProduits.NoProduit.ToString() + extension;
                         string tempFilePath = Path.Combine("wwwroot/Logo", pPProduits.NoProduit + extension);
@@ -207,19 +229,19 @@ namespace Projet_Web_Commerce.Controllers
                         {
                             await file.CopyToAsync(fileStream);
                         }
-                    } 
-                    
+                    }
+
                     _context.Update(pPProduits);
+                    await _context.SaveChangesAsync();
 
                     Console.WriteLine(" pPProduits : " + pPProduits.DateMAJ);
                     Console.WriteLine(" pPProduits : " + pPProduits.NombreItems);
-                    await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
                     if (!PPProduitsExists(pPProduits.NoProduit))
                     {
-                        return NotFound();
+                        return RedirectToAction("ErrorNoFound", "PPProduits");
                     }
                     else
                     {
@@ -228,9 +250,18 @@ namespace Projet_Web_Commerce.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+
             ViewData["NoCategorie"] = new SelectList(_context.PPCategories, "NoCategorie", "Description", pPProduits.NoCategorie);
             ViewData["NoVendeur"] = new SelectList(_context.PPVendeurs, "NoVendeur", "Nom", pPProduits.NoVendeur);
             return View(pPProduits);
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> IsProductInCart(int noProduit)
+        {
+            var productInCart = await _context.PPArticlesEnPanier.AnyAsync(p => p.NoProduit == noProduit);
+            return Json(new { productInCart });
         }
 
         // GET: PPProduits/Delete/5
