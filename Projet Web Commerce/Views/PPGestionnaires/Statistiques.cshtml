@@ -7,6 +7,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
 
 <div class="row">
     <div class="col">
@@ -27,6 +29,10 @@
             Date de fin :  <input type="month" id="endDateV" onchange="validateAndGenerateV()"><br>
           
             <div id="reportV"></div>
+            <br />
+
+            <button class="btn btn-success" onclick="generatePDFV()">Creer PDF avec ce rapport</button>
+            <br />
             <br />            
             
             <p id="visitesCount">
@@ -41,6 +47,87 @@
             <div id="reportC"></div>
             <br />
 
+            <button class="btn btn-success" onclick="generatePDFC()">Creer PDF avec ce rapport</button>
+            <br />
+            <br />
+
+            <b>Information des commandes de client avec vendeur : </b><br>            
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>
+                            NoClient
+                        </th>
+                        <th>
+                            Nom/Prénom client
+                        </th>
+                        <th>
+                            Montant total
+                        </th>
+                        <th>
+                            Montant brut
+                        </th>
+                        <th>
+                            Montant livraison
+                        </th>
+                        <th>
+                            Date de dernière commande
+                        </th>
+                        <th>
+                            NoVendeur
+                        </th>
+                        <th>
+                            Nom vendeur
+                        </th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.OrdersByClientAndVendeurList)
+                    {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.NoClient)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.NomPrenomClient)
+                            </td>
+                            @{
+                                decimal? prixtot = item.TotalCommandeAT + item.CoutLivraison;
+                                if (item.TaxesVendeur != null && item.TaxesVendeur == true && item.PourcentageTaxeVendeur != null)
+                                {
+                                    prixtot = prixtot * (item.PourcentageTaxeVendeur / 100) + item.CoutLivraison;
+                                }
+                            }
+                            <td>
+                                @Html.DisplayFor(modelItem => prixtot)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.TotalCommandeAT)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.CoutLivraison)
+                            </td>
+                             <td>
+                                @Html.DisplayFor(modelItem => item.DateDerniereCommande)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.NoVendeur)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.NomPrenomVendeur)
+                            </td>
+                        </tr>
+
+                    }
+                </tbody>
+            </table>            
+            <br />
+
+            <button class="btn btn-success" onclick="generatePDFCV()">Creer PDF avec ce rapport</button>
+            <br />
+            <br />
+
             <canvas id="orderChart" style="width:100%;max-width:700px"></canvas>
             <br />
 
@@ -53,16 +140,82 @@
 
 @section Scripts {
     @{
-        // NEED TO DO WARNING FOR DATES IF DATE DEBUT IS BIGGER THEN DATE FIN
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
         var vendeursListJson = Json.Serialize(Model.VendeursList.Select(p => new { DateCreation = p.DateCreation.ToString("yyyy-MM-dd") }));
         var clientsListJson = Json.Serialize(Model.ClientsList.Select(p => new { DateCreation = p.DateCreation.ToString("yyyy-MM-dd") }));
 
         var visitesCountDataJson = Json.Serialize(Model.VisitesCountData);
+        var ordersByClientAndVendeurDataJson = Json.Serialize(Model.OrdersByClientAndVendeurList);
+        
         
     }
 
     <script>
+        window.jsPDF = window.jspdf.jsPDF;
+        function generatePDFV() {
+            const doc = new jsPDF();
+            const startDate = document.getElementById("startDateV").value;
+            const endDate = document.getElementById("endDateV").value;
+            let reportContent = document.getElementById("reportV").innerHTML;
+            reportContent = reportContent.replace(/<br\s*\/?>/mg, '\n');
+            const lines = doc.splitTextToSize(reportContent, doc.internal.pageSize.width - 20);
+            const currentDate = new Date();
+            const formattedDate = currentDate.getDate() + '/' + (currentDate.getMonth() + 1) + '/' + currentDate.getFullYear();
+            const rapportText = "Rapport créé: " + formattedDate;
+            doc.text(rapportText, 10, 10);
+            doc.text("Rapport sur le nombre de vendeurs par mois entre les dates sélectionnées", 10, 20);
+            doc.text("Date de début: " + startDate, 10, 30);
+            doc.text("Date de fin: " + endDate, 80, 30);
+            doc.text(lines, 10, 40);
+            doc.save("vendeurs_info.pdf");
+        }
+
+        function generatePDFC() {
+            const doc = new jsPDF();
+            const startDate = document.getElementById("startDateC").value;
+            const endDate = document.getElementById("endDateC").value;
+            let reportContent = document.getElementById("reportC").innerHTML;
+            reportContent = reportContent.replace(/<br\s*\/?>/mg, '\n');
+            const lines = doc.splitTextToSize(reportContent, doc.internal.pageSize.width - 20);
+            const currentDate = new Date();
+            const formattedDate = currentDate.getDate() + '/' + (currentDate.getMonth() + 1) + '/' + currentDate.getFullYear();
+            const rapportText = "Rapport créé: " + formattedDate;
+            doc.text(rapportText, 10, 10);
+            doc.text("Rapport sur le nombre de connexions des clients entre les dates sélectionnées", 10, 20);
+            doc.text("Date de début: " + startDate, 10, 30);
+            doc.text("Date de fin: " + endDate, 80, 30);
+            doc.text(lines, 10, 40);
+            doc.save("client_info.pdf");
+        }
+
+        function generatePDFCV() {
+            const doc = new jsPDF();
+            const currentDate = new Date();
+            const formattedDate = currentDate.getDate() + '/' + (currentDate.getMonth() + 1) + '/' + currentDate.getFullYear();
+            const rapportText = "Rapport créé: " + formattedDate;
+            doc.text(rapportText, 10, 10);
+            doc.text("Information des commandes de client avec vendeur :", 10, 30);
+            const tableData = [];
+            const tableRows = document.querySelectorAll('.table tbody tr');
+            tableRows.forEach(row => {
+                const rowData = [];
+                row.querySelectorAll('td').forEach(cell => {
+                    rowData.push(cell.textContent.trim());
+                });
+                tableData.push(rowData);
+            });
+            const headers = ["NoClient", "Nom/Prénom client", "Montant total", "Montant brut", "Montant livraison", "Date de dernière commande", "NoVendeur", "Nom vendeur"];
+
+            doc.autoTable({
+                head: [headers],
+                body: tableData,
+                startY: 40
+            });
+            doc.save("commandes_client_vendeur_info.pdf");
+        }
+
+
+
         function validateAndGenerateC() {
             validateDatesC();
             generateReportC();
@@ -71,7 +224,6 @@
             validateDatesV();
             generateReportV();
         }
-
         function validateDatesC() {
             var startDate = new Date(document.getElementById("startDateC").value);
             var endDate = new Date(document.getElementById("endDateC").value);
@@ -80,7 +232,6 @@
                 document.getElementById("endDateC").value = document.getElementById("startDateC").value;
             }
         }
-
         function validateDatesV() {
             var startDate = new Date(document.getElementById("startDateV").value);
             var endDate = new Date(document.getElementById("endDateV").value);
@@ -89,10 +240,14 @@
                 document.getElementById("endDateV").value = document.getElementById("startDateV").value;
             }
         }
+
         var vendeursList = @Html.Raw(vendeursListJson);
         console.log("Vendeurs List:", vendeursList);
         var clientsList = @Html.Raw(clientsListJson);
         console.log("Clients List:", clientsList);
+     
+        var ordersByClientAndVendeurData = @Html.Raw(ordersByClientAndVendeurDataJson);
+        console.log("Order By Client Vendeur List:", ordersByClientAndVendeurData);
 
         var currentDate = new Date();
         var currentYearMonth = currentDate.toISOString().slice(0, 7);

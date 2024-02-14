@@ -79,7 +79,6 @@ namespace Projet_Web_Commerce.Controllers
         [HttpPost]
         public async Task<ActionResult> ConfirmerCommandeAsync(ModelConfirmerCommande model, bool? payer, int? NoAutorisation, string? DateAutorisation, string? FraisMarchand, string? InfoSuppl)
         {
-
             if (TempData.ContainsKey("NoVendeur"))
             {
                 // Retrieve the value from TempData and convert it to a string
@@ -209,108 +208,146 @@ namespace Projet_Web_Commerce.Controllers
             if (NoAutorisation != null)
             {
 
-
+                var messageErreur = "";
                 switch (NoAutorisation)
                 {
-
+                    
                     case 0:
-                        TempData["ErrorMessage"] = "Transaction annulée par l'utilisateur ";
+                        messageErreur = "Transaction annulée par l'utilisateur \n";
                         break;
                     case 1:
-                        TempData["ErrorMessage"] = "Transaction refusée: Date expiration dépassée ";
+                        messageErreur = "Transaction refusée: Date expiration dépassée \n";
                         break;
                     case 2:
-                        TempData["ErrorMessage"] = "Transaction refusée: Limite de crédit atteinte";
+                        messageErreur = "Transaction refusée: Limite de crédit atteinte\n";
                         break;
                     case 3:
-                        TempData["ErrorMessage"] = "Contactez notre bureau (514-626-2666) ";
+                        messageErreur = "Contactez notre bureau (514-626-2666) \n";
                         break;
                     case 1234:
-                        TempData["ErrorMessage"] = "ERREUR";
+                        messageErreur = "ERREUR\n";
                         break;
                     case 9999:
-                        TempData["ErrorMessage"] = "ERREUR DE VALIDATION ";
+                        messageErreur = "ERREUR DE VALIDATION \n";
                         break;
                     default:
-                        bool dispo = true;
 
-                        foreach (PPArticlesEnPanier article in listPaniers)
+                        using (var transaction = _context.Database.BeginTransaction())
                         {
-                            var produit = _context.PPProduits.Where(p => p.NoProduit == article.NoProduit).FirstOrDefault();
-                            if (article.NbItems > produit.NombreItems)
+                            try
                             {
-                                dispo = false;
-                            }   
-                        }
-                        if (!dispo) {
-                            TempData["ErrorMessage"] = "Items pas en stock ";
-                            break; }
+                                var client = _context.PPClients.FirstOrDefault(c => c.NoClient == model.NoClient);
+                                if (client != null)
+                                {
+                                    client.Nom = nomClient;
+                                    client.Prenom = prenomClient;
+                                    client.AdresseEmail = adresseClient;
+                                    client.Tel1 = telClient;
+                                    client.Rue = rueClient;
+                                    client.Ville = villeClient;
+                                    client.CodePostal = postalClient;
+                                    client.NoProvince = provClient;
 
+                                    _context.SaveChanges();
+                                }
 
-                            var client = _context.PPClients.FirstOrDefault(c => c.NoClient == model.NoClient);
-                        if (client != null)
-                        {
-                            client.Nom = nomClient;
-                            client.Prenom = prenomClient;
-                            client.AdresseEmail = adresseClient;
-                            client.Tel1 = telClient;
-                            client.Rue = rueClient;
-                            client.Ville = villeClient;
-                            client.CodePostal = postalClient;
-                            client.NoProvince = provClient;
+                                decimal fraisLivraisonDecimal = Convert.ToDecimal(fraisLivraison);
+                                decimal roundedFraisLivraison = Math.Round(fraisLivraisonDecimal, 2);
 
-                            _context.SaveChanges();
-                        }
-                        decimal fraisLivraisonDecimal = Convert.ToDecimal(fraisLivraison);
-                        decimal roundedFraisLivraison = Math.Round(fraisLivraisonDecimal, 2);
+                                var ppCommande = new PPCommandes
+                                {
+                                    NoClient = model.NoClient,
+                                    NoVendeur = model.NoVendeur,
+                                    DateCommande = DateTime.Now,
+                                    PoidsTotal = poidsTotal,
+                                    Statut = "s",
+                                    MontantTotAvantTaxes = Math.Round(sousTotal.Value, 2),
+                                    TPS = Math.Round(sousTotal.Value * (tps / 100), 2),
+                                    TVQ = Math.Round(sousTotal.Value * (tvq / 100), 2),
+                                    CoutLivraison = roundedFraisLivraison,
+                                    TypeLivraison = model.TypeLivraison,
+                                    NoAutorisation = NoAutorisation.ToString()
+                                };
 
-                        var ppCommande = new PPCommandes
-                        {
-                            NoClient = model.NoClient, // Assuming model.NoClient contains the NoClient value
-                            NoVendeur = model.NoVendeur, // Assuming model.NoVendeur contains the NoVendeur value
-                            DateCommande = DateTime.Now, // Set the current date and time for DateCommande
-                            PoidsTotal = poidsTotal, // Assuming model.PoidsTotal contains the PoidsTotal value
-                            Statut = "s", // Set the initial status, e.g., "N" for New
-                            MontantTotAvantTaxes = Math.Round(sousTotal.Value,2), // Assuming model.total contains the total amount before taxes
-                            TPS = Math.Round(sousTotal.Value * (tps / 100),2), // Assuming TPS is 5% of the total amount
-                            TVQ = Math.Round(sousTotal.Value * (tvq / 100),2), // Assuming TVQ is 9.975% of the total amount
-                            CoutLivraison = roundedFraisLivraison, // Assuming model.FraisLivraison contains the delivery cost, handle null case
-                            TypeLivraison = model.TypeLivraison,
-                            NoAutorisation = NoAutorisation.ToString()
-                        };
+                                _context.PPCommandes.Add(ppCommande);
+                                _context.SaveChanges();
 
-                        //// Add the newly created PPCommandes object to the context and save changes
-                        _context.PPCommandes.Add(ppCommande);
-                        _context.SaveChanges();
+                                foreach (PPArticlesEnPanier article in listPaniers)
+                                {
+                                    var produit = _context.PPProduits.FirstOrDefault(p => p.NoProduit == article.NoProduit);
 
-                        foreach (PPArticlesEnPanier article in listPaniers)
-                        {
-                            var produit = _context.PPProduits.Where(p => p.NoProduit == article.NoProduit).FirstOrDefault();
+                                    if (produit == null)
+                                    {
+                                        // Handle case where product is not found
+                                        continue;
+                                    }
 
-                            decimal prix = 0;
-                            if (produit.PrixVente != null && produit.DateVente > DateTime.Now)
-                            {
-                                prix = produit.PrixVente.Value;
+                                    decimal prix = produit.PrixVente ?? produit.PrixDemande;
+
+                                    var ppDetailsCommande = new PPDetailsCommandes
+                                    {
+                                        NoCommande = ppCommande.NoCommande,
+                                        NoProduit = article.NoProduit,
+                                        Quantité = article.NbItems,
+                                        PrixVente = prix
+                                    };
+
+                                    _context.Add(ppDetailsCommande);
+                                }
+
+                                bool dispo = true;
+
+                                foreach (PPArticlesEnPanier article in listPaniers)
+                                {
+                                    var produit = _context.PPProduits.FirstOrDefault(p => p.NoProduit == article.NoProduit);
+
+                                    if (produit == null)
+                                    {
+                                        // Handle case where product is not found
+                                        continue;
+                                    }
+
+                                    int newQuantity = produit.NombreItems - article.NbItems;
+
+                                    if (newQuantity < 0)
+                                    {
+                                        messageErreur += $"Le produit {produit.Nom} excède le nombre d'items en stock.\n";
+                                        dispo = false; // Set dispo flag to false if any item is out of stock
+                                    }
+
+                                    produit.NombreItems = newQuantity;
+                                }
+
+                                if (dispo)
+                                {
+                                    var paniers = _context.PPArticlesEnPanier.Where(p => p.NoVendeur == model.NoVendeur && p.NoClient == model.NoClient).ToList();
+
+                                    foreach(PPArticlesEnPanier panier in paniers)
+                                    {
+                                        _context.Remove(panier);
+                                    }
+
+                                    _context.SaveChanges();
+                                    transaction.Commit(); // Commit the transaction if all operations succeed
+                                    TempData.Clear();
+                                    return RedirectToAction("CommandeCompleter", new { NoAutorisation = NoAutorisation, DateAutorisation = DateAutorisation, FraisMarchand = FraisMarchand, InfoSuppl = InfoSuppl });
+                                }
+                                else
+                                {
+
+                                    throw new Exception();
+                                }
                             }
-                            else
-                                prix = produit.PrixDemande;
-
-                            var ppDetailsCommande = new PPDetailsCommandes
+                            catch (Exception ex)
                             {
-                                NoCommande = ppCommande.NoCommande,
-                                NoProduit = article.NoProduit,
-                                Quantité = article.NbItems,
-                                PrixVente = prix
-                            };
-
-                            _context.Add(ppDetailsCommande);
+                                transaction.Rollback(); // Rollback the transaction if an exception occurs
+                                TempData.Clear();
+                                TempData["ErrorMessage"] = messageErreur;
+                            }
                         }
 
-                        _context.SaveChanges();
+                        break;
 
-                        TempData.Clear();
-
-                        return RedirectToAction("CommandeCompleter", new { NoAutorisation = NoAutorisation, DateAutorisation = DateAutorisation, FraisMarchand = FraisMarchand, InfoSuppl = InfoSuppl });
                 }
 
             }

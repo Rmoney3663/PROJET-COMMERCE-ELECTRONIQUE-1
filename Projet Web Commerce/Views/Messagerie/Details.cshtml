@@ -1,0 +1,33 @@
+﻿﻿﻿@using Microsoft.AspNetCore.Identity
+@using Projet_Web_Commerce.Data
+@model PPMessages
+@{
+    ViewData["Title"] = "Message";
+}
+
+<div class="row">
+    <div class="col">
+        <section>
+            <div>
+                @Html.Partial("MenuMessagerie", "")
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h2 class="card-title">@Model.Sujet</h2>
+                        <h6>@DateTime.Now.Date</h6>
+                    </div>
+                    <hr />
+                    <p>
+                        @Model.Message
+                    </p>
+                    @if (Model.PieceJointe != null)
+                    {
+                        @* <embed id="pieceJointe" name="pieceJointe" src="@Model.PieceJointe"/> *@
+                    }
+                </div>
+            </div>
+
+        </section>
+    </div>
+</div>

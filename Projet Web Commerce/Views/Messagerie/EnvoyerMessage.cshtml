@@ -1,6 +1,7 @@
 ﻿﻿﻿@using Microsoft.AspNetCore.Identity
 @using Newtonsoft.Json
 @using Projet_Web_Commerce.Data
+@model PPMessages
 @inject AuthDbContext _context
 @inject UserManager<Projet_Web_Commerce.Areas.Identity.Data.Utilisateur> UserManager
 @inject SignInManager<Projet_Web_Commerce.Areas.Identity.Data.Utilisateur> SignInManager
@@ -56,16 +57,88 @@
     }
 }
 
+<style>
+    .container {
+        width: 300px;
+        margin: 50px auto;
+    }
+
+    .ddl-container {
+        position: relative;
+    }
+
+        .ddl-container select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+    .selected-names {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+        .selected-names span {
+            background-color: #ddd;
+            padding: 5px;
+            margin-right: 5px;
+            display: flex;
+            align-items: center;
+        }
+
+    .delete-icon {
+        cursor: pointer;
+        margin-left: 5px;
+    }
+
+    textarea {
+        resize: vertical;
+        /* height: 120px;
+        width: 100%; */
+    }
+
+    .mesBtns {
+        color: rgb(249, 229, 71);
+        background-color: rgb(124, 105, 146);
+    }
+        
+        .mesBtns:hover {
+            color: rgb(124, 105, 146);
+            background-color: rgb(249, 229, 71);
+        }
+</style>
+
+@if (TempData["MsgStatut"] != null)
+{
+    <div class="alert alert-success" role="alert">
+        @TempData["MsgStatut"]
+    </div>
+}
+
+@{
+    var sujet = "";
+    var message = "";
+
+    if (Model != null)
+    {
+        sujet = Model.Sujet;
+        message = Model.Message;
+    }
+}
+
 <div class="row">
-    <div class="col-md-8">
+    <div class="col">
         <section>
             <div>
                 @Html.Partial("MenuMessagerie", "EnvoyerMessage")
             </div>
             <div class="card">
-                <form id="frmCourriel" method="post" asp-route-envoyeur="@user.Email" onsubmit="return soumettreForm()">
+                <form id="frmCourriel" method="post" asp-route-envoyeur="@user.Email"> <!-- onsubmit="return soumettreForm()" -->
                     <div class="card-body">
-                        <h2 class="card-title">Envoyer un message</h2>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h2 class="card-title">Envoyer un message</h2>
+                            <a id="btnEnregistrer" class="btn btn-lg btn-primary mesBtns">Enregister le brouillon</a>
+                        </div>
                         <hr />
                         <div class="form-floating mb-3">
                             <div class="card">
@@ -73,174 +146,142 @@
                                     Envoyer à
                                 </div>
                                 <div class="card-body">
-                                    @* @foreach (var utilisateur in listeUtilisateurs)
+                                    
+                                    <select name="ddlClients" id="ddlClients" onchange="ajouterDestinataire()">
+                                        <option value=""></option>
+                                    @foreach (var utilisateur in listeUtilisateurs)
                                     {
-                                        <div class="card" style="width:fit-content">
-                                            <div class="card-body">
-                                                <select class="form-select" multiple name="ddlClients" id="ddlClients" style="display:none">
-                                                    <option value="@utilisateur.Email">@utilisateur.Email</option>
-                                                </select>
-                                               <button>X</button>
-                                            </div>
-                                        </div>
-                                    } *@
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="destinataires" id="sendToAll" onclick="cacherDDL()">
-                                        <label class="form-check-label" for="sendToAll">
-                                            Tout le monde
-                                        </label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="destinataires" id="sendToGestionnaire" onclick="cacherDDL()">
-                                        <label class="form-check-label" for="sendToGestionnaire">
-                                            Au gestionnaire
-                                        </label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="destinataires" id="sendToClients">
-                                        <label class="form-check-label" for="sendToClients">
-                                            À un ou plusieurs de vos clients
-                                        </label>
-                                        <select class="form-select" multiple name="ddlClients" id="ddlClients" style="display:none">
-                                            @foreach (var utilisateur in listeUtilisateurs)
-                                            {
-                                                <option value="@utilisateur.Email">@utilisateur.Email</option>
-                                            }
-                                        </select>
-                                    </div>
+                                        @if (await UserManager.IsInRoleAsync(utilisateur, "Vendeur"))
+                                        {
+                                            <option value="@utilisateur.Email">@utilisateur.Email - Vendeur</option>
+                                        }
+                                        else if (await UserManager.IsInRoleAsync(utilisateur, "Client"))
+                                        {
+                                            <option value="@utilisateur.Email">@utilisateur.Email - Client</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@utilisateur.Email">@utilisateur.Email - Gestionnaire</option>
+                                        }
+                                    }
+                                    </select>
+                                    <br />
+                                    <div class="selected-names" id="selectedNamesContainer"></div>
                                 </div>
                             </div>
-                            <input type="hidden" name="selectedDestinataire" id="selectedDestinataire" value="">
-                            <input type="hidden" name="auteur" id="auteur" value="">
                         </div>
                         <div class="form-floating mb-3">
-                            <input name="sujet" class="form-control" aria-required="true" required
+                            <input name="sujet" id="sujet" class="form-control" aria-required="true" required
                                    oninvalid="setCustomValidity('Veuillez remplir ce champ.')"
-                                   oninput="setCustomValidity('')" />
+                                   oninput="setCustomValidity('')" value="@sujet" />
                             <label class="form-label">Le sujet</label>
                         </div>
                         <div class="form-floating mb-3">
-                            <input name="message" class="form-control" aria-required="true" required
-                                   oninvalid="setCustomValidity('Veuillez remplir ce champ.')"
-                                   oninput="setCustomValidity('')" />
+                            <textarea name="message" id="message" class="form-control" required
+                                oninvalid="setCustomValidity('Veuillez remplir ce champ.')"
+                                oninput="setCustomValidity('')">@message</textarea>
                             <label class="form-label">Votre message</label>
                         </div>
-                        <div>
-                            <button id="btnEnvoyer" type="submit" class="w-100 btn btn-lg btn-primary" style="color: rgb(249, 229, 71); background-color: rgb(124, 105, 146)">Envoyer</button>
+                        <br />
+                        <div class="form-floating">
+                            <a id="btnEnvoyer" class="w-100 btn btn-lg btn-primary mesBtns">Envoyer</a>
                         </div>
+                        <input type="hidden" name="selectedDestinataire" id="selectedDestinataire" value="" />
+                        <input type="hidden" name="auteur" id="auteur" value="" />
+                        <input type="hidden" name="typeMessage" id="typeMessage" value="" />
+                        <input type="hidden" name="idMessage" id="idMessage" value="" />
                     </div>
-                    
                 </form>
             </div>
         </section>
     </div>
 </div>
 
-
-@* <div class="row">
-    <div class="col-md-4">
-        <section>
-            <div class="row">
-                <div class="col-md-6">
-                    @Html.Partial("MenuMessagerie")
-                </div>
-                <div class="col-md-6">
-                    <form id="frmCourriel" method="post" asp-route-envoyeur="@user.Email" onsubmit="return soumettreForm()">
-                        <h2>Envoyer un message</h2>
-                        <hr />
-                        <div class="form-floating mb-3">
-                            <input name="sujet" class="form-control" aria-required="true" required
-                                   oninvalid="setCustomValidity('Veuillez remplir ce champ.')"
-                                   oninput="setCustomValidity('')" />
-                            <label class="form-label">Le sujet</label>
-                        </div>
-                        <div class="form-floating mb-3">
-                            <input name="message" class="form-control" aria-required="true" required
-                                   oninvalid="setCustomValidity('Veuillez remplir ce champ.')"
-                                   oninput="setCustomValidity('')" />
-                            <label class="form-label">Votre message</label>
-                        </div>
-                        <div class="form-floating mb-3">
-                            <div class="card">
-                                <div class="card-header">
-                                    Envoyer à
-                                </div>
-                                <div class="card-body">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="destinataires" id="sendToAll" onclick="cacherDDL()">
-                                        <label class="form-check-label" for="sendToAll">
-                                            Tout le monde
-                                        </label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="destinataires" id="sendToGestionnaire" onclick="cacherDDL()">
-                                        <label class="form-check-label" for="sendToGestionnaire">
-                                            Au gestionnaire
-                                        </label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="destinataires" id="sendToClients">
-                                        <label class="form-check-label" for="sendToClients">
-                                            À un ou plusieurs de vos clients
-                                        </label>
-                                        <select class="form-select" multiple name="ddlClients" id="ddlClients" style="display:none">
-                                            @foreach (var utilisateur in listeUtilisateurs)
-                                            {
-                                                <option value="@utilisateur.Email">@utilisateur.Email</option>
-                                            }
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                            <input type="hidden" name="selectedDestinataire" id="selectedDestinataire" value="">
-                            <input type="hidden" name="auteur" id="auteur" value="">
-                        </div>
-                        <div>
-                            <button id="btnEnvoyer" type="submit" class="w-100 btn btn-lg btn-primary" style="color: rgb(249, 229, 71); background-color: rgb(124, 105, 146)">Envoyer</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </section>
-    </div>
-</div> *@
-
 <script>
-    $(document).ready(function () {
-        $('#sendToClients').change(function () {
-            $('#ddlClients').toggle($(this).is(':checked'));
-        });
-    });
+    function ajouterDestinataire() {
+        var dropdown = document.getElementById("ddlClients");
+        var selectedValue = dropdown.options[dropdown.selectedIndex].value;
 
-    function cacherDDL() {
-        document.getElementById('ddlClients').style.display = 'none';
+        if (selectedValue) {
+            var selectedNamesContainer = document.getElementById("selectedNamesContainer");
+
+            var nameElement = document.createElement("span");
+            nameElement.innerHTML = selectedValue;
+
+            var deleteIcon = document.createElement("span");
+            deleteIcon.innerHTML = " &#10006;";
+            deleteIcon.className = "delete-icon";
+            deleteIcon.onclick = function () {
+                let option = document.createElement("option");
+                option.text = nameElement.firstChild.textContent
+                option.value = option.text
+                dropdown.add(option);
+                selectedNamesContainer.removeChild(nameElement);
+                selectedDestinataire.value = selectedDestinataire.value.replace(nameElement.firstChild.textContent + ';', '');
+            };
+
+            selectedDestinataire.value += nameElement.innerHTML + ';';
+            nameElement.appendChild(deleteIcon);
+            selectedNamesContainer.appendChild(nameElement);
+            dropdown.remove(dropdown.selectedIndex);
+
+            dropdown.selectedIndex = 0;
+        }
     }
 
-    function soumettreForm() {
-        var selectedDestinataire = document.getElementById('selectedDestinataire');
-        selectedDestinataire.value = "null";
+    document.getElementById("btnEnregistrer").addEventListener("click", function() {
+        var destinataires = document.getElementById('selectedDestinataire').value;
+        var sujet = document.getElementById('sujet').value;
+        var msg = document.getElementById('message').value
+        if (destinataires == '' && sujet == '' && msg == '') {
+            Swal.fire({
+                title: "Erreur!",
+                text: "Vous devez entrer au moins une donnée pour sauvegarder un brouillon",
+                icon: "error"
+            });
+        }
+        else {
+            var params = new URLSearchParams(document.location.search);
+            var idMessage = params.get('idMessage');
+            var destinatairesSelectionnes = destinataires.split(';');
+            for (var i = 0; i < destinatairesSelectionnes.length; i++) {
+                if (destinatairesSelectionnes[i] == '')
+                    destinatairesSelectionnes.splice(i, 1);
+            }
+
+            document.getElementById('selectedDestinataire').value = destinatairesSelectionnes;
+
+            document.getElementById('auteur').value = '@user.Email';
+            document.getElementById('typeMessage').value = 2;
+            document.getElementById('idMessage').value = idMessage;
+
+            document.getElementById('frmCourriel').submit();
+        }
+    });
+
+    document.getElementById("btnEnvoyer").addEventListener("click", function () {
+        var params = new URLSearchParams(document.location.search);
+        var idMessage = params.get('idMessage');
+        var destinatairesSelectionnes = document.getElementById('selectedDestinataire').value.split(';');
+        for (var i = 0; i < destinatairesSelectionnes.length; i++) {
+            if (destinatairesSelectionnes[i] == '')
+                destinatairesSelectionnes.splice(i, 1);
+        }
+        document.getElementById('selectedDestinataire').value = destinatairesSelectionnes;
         document.getElementById('auteur').value = '@user.Email';
+        document.getElementById('typeMessage').value = 0;
+        document.getElementById('idMessage').value = idMessage;
+
         var valide = true;
         var msgErreur = "";
 
-        if (document.getElementById('sendToAll').checked) {
-            selectedDestinataire.value = 'Tous';
-        } else if (document.getElementById('sendToGestionnaire').checked) {
-            selectedDestinataire.value = 'william.anthony.burgess@gmail.com';
-        } else if (document.getElementById('sendToClients').checked) {
-            selectedDestinataire.value = Array.from(ddlClients.selectedOptions).map(option => option.value).join(',');
-        } else {
-            msgErreur = "Veuillez sélectionner une des options de destinataires"
-            valide = false;
-        }
-
-        if (selectedDestinataire.value == "") {
-            msgErreur = "Veuillez sélectionner le(s) destinataire(s) de votre courriel."
+        if (selectedDestinataire.value == '') {
+            msgErreur = "Veuillez sélectionner le(s) destinataire(s) de votre courriel.";
             valide = false;
         }
 
         if (valide) {
-            return true;
+            document.getElementById('frmCourriel').submit();
         }
         else {
             console.log("pas valide");
@@ -249,10 +290,59 @@
                 text: msgErreur,
                 icon: "error"
             }).then(() => {
-                return false;
+                // return false;
             });
         }
+    });
 
-        return false;
+    // function soumettreForm() {
+    //     var destinatairesSelectionnes = document.getElementById('selectedDestinataire').value.split(';');
+    //     for (var i = 0; i < destinatairesSelectionnes.length; i++) {
+    //         if (destinatairesSelectionnes[i] == '')
+    //             destinatairesSelectionnes.splice(i, 1);
+    //     }
+    //     document.getElementById('selectedDestinataire').value = destinatairesSelectionnes;
+    //     document.getElementById('auteur').value = '@user.Email';
+    //     var valide = true;
+    //     var msgErreur = "";
+
+    //     // var selectedDestinataires = getCourrielsFromContainer();
+
+    //     if (selectedDestinataire.value == '') {
+    //         msgErreur = "Veuillez sélectionner le(s) destinataire(s) de votre courriel.";
+    //         valide = false;
+    //     }
+
+    //     if (valide) {
+    //         return true;
+    //     }
+    //     else {
+    //         console.log("pas valide");
+    //         Swal.fire({
+    //             title: "Erreur!",
+    //             text: msgErreur,
+    //             icon: "error"
+    //         }).then(() => {
+    //             return false;
+    //         });
+    //     }
+
+    //     return false;
+    // }
+
+    function getCourrielsFromContainer() {
+        var selectedNamesContainer = document.getElementById("selectedNamesContainer");
+        var emails = [];
+
+        for (var i = 0; i < selectedNamesContainer.children.length; i++) {
+            var childElement = selectedNamesContainer.children[i];
+
+            var email = childElement.textContent.trim();
+
+            emails.push(email);
+        }
+
+        return emails;
     }
+
 </script>
