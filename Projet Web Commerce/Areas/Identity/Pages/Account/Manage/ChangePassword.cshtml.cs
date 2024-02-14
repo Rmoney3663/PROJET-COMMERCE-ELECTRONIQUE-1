@@ -4,6 +4,7 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -114,29 +115,37 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account.Manage
             }
 
             var changePasswordResult = await _userManager.ChangePasswordAsync(user, Input.OldPassword, Input.NewPassword);
-            bool estDansRole = await _userManager.IsInRoleAsync(user, "Vendeur");
-            if (estDansRole) // Si user est vendeur
-            {
-                var lstVendeurs = _context.PPVendeurs.ToList();
-                lstVendeurs.FirstOrDefault(v => v.AdresseEmail == user.Email).MotDePasse = Input.NewPassword;
-                await _context.SaveChangesAsync();
-            }
-            else // User est client
-            {
-                estDansRole = await _userManager.IsInRoleAsync(user, "Client");
-                var lstClients = _context.PPClients.ToList();
-                lstClients.FirstOrDefault(c => c.AdresseEmail == user.Email).MotDePasse = Input.NewPassword;
-                await _context.SaveChangesAsync();
-            }
 
             if (!changePasswordResult.Succeeded)
             {
-                foreach (var error in changePasswordResult.Errors)
+                string verifySpecialChar = @"^.*[^a-zA-Z0-9]+.*";
+                System.Text.RegularExpressions.Match m = Regex.Match(Input.NewPassword, verifySpecialChar);
+                if (!m.Success)
+                {
+                    ModelState.AddModelError(string.Empty, "Le nouveau mot de passe doit contenir un charactère qui n'est pas alphanuméric.");
+                }
+                else
                 {
                     ModelState.AddModelError(string.Empty, "Mot de passe invalide");
-                    //ModelState.AddModelError(string.Empty, error.Description);
                 }
                 return Page();
+            }
+            else
+            {
+                bool estDansRole = await _userManager.IsInRoleAsync(user, "Vendeur");
+                if (estDansRole) // Si user est vendeur
+                {
+                    var lstVendeurs = _context.PPVendeurs.ToList();
+                    lstVendeurs.FirstOrDefault(v => v.AdresseEmail == user.Email).MotDePasse = Input.NewPassword;
+                    await _context.SaveChangesAsync();
+                }
+                else // User est client
+                {
+                    estDansRole = await _userManager.IsInRoleAsync(user, "Client");
+                    var lstClients = _context.PPClients.ToList();
+                    lstClients.FirstOrDefault(c => c.AdresseEmail == user.Email).MotDePasse = Input.NewPassword;
+                    await _context.SaveChangesAsync();
+                }
             }
 
             await _signInManager.RefreshSignInAsync(user);
