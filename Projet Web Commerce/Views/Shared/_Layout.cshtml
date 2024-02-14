@@ -1,9 +1,30 @@
 ﻿@using Microsoft.AspNetCore.Identity
 @using System.Security.Claims
+@using System.IO;
+@using Projet_Web_Commerce.Data
 
+@inject AuthDbContext _context
 @inject SignInManager<Projet_Web_Commerce.Areas.Identity.Data.Utilisateur> SignInManager
 @inject UserManager<Projet_Web_Commerce.Areas.Identity.Data.Utilisateur> UserManager
+@{
+    var background = "#ECEBF3";
+}
+@if (ViewBag.Current != null)
+{
+    @if (SignInManager.IsSignedIn(User))
+    {
+        string nom = ViewBag.Current;
+        var vendeur = _context.PPVendeurs.Where(v => v.NomAffaires == nom).FirstOrDefault();
+        var config = vendeur.Configuration;
 
+        if (config != null)
+        {
+            var listParams = config.Split(';');
+
+            background = listParams[1];
+        }
+    }
+}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -20,7 +41,6 @@
         }
 
         .container-custom{
-            background-color: rgb(236, 235, 243);
             width: 100%;
             height: 100%;
             min-width: 75%; 
@@ -32,7 +52,7 @@
         }
     </style>
 </head>
-<body style="background-color: rgb(236, 235, 243)">
+<body style="background-color: @background">
     <header>
         <nav class="navbar navbar-custom navbar-expand-sm navbar-toggleable-sm navbar-light bg-customMauve border-bottom box-shadow mb-3">
             <div class="container-fluid">
@@ -48,6 +68,12 @@
                             <li class="nav-item">
                                 <a class="nav-link" style="color: rgb(249, 229, 71); font-size: 23px" asp-area="" asp-controller="MainMenu" asp-action="Catalogue">Catalogue</a>
                             </li>
+                            <div class="d-flex justify-content-center flex-grow-1">
+                            <form method="post" class="d-flex mx-auto" asp-controller="MainMenu" asp-action="CatalogueTous" class="mx-3">
+                                    <input class="form-control me-2" name="searchString" id="searchString"  type="search" placeholder="Search" aria-label="Search">
+                                <button class="btn btn-secondary" type="submit">Rechercher</button>
+                            </form>
+                            </div>
                         }                        
 
                         @if (SignInManager.IsSignedIn(User) && User.IsInRole("Vendeur"))
@@ -58,7 +84,12 @@
                             <li class="nav-item">
                                 <a class="nav-link" style="color: rgb(249, 229, 71); font-size: 23px" asp-area="" asp-controller="PPProduits" asp-action="ListePanier">Mes Paniers</a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link" style="color: rgb(249, 229, 71); font-size: 23px" asp-area="" asp-controller="Personnaliser" asp-action="Index">Presonnaliser votre page</a>
+
+                            </li>
                         }
+
 
                         @if (SignInManager.IsSignedIn(User) && User.IsInRole("Gestionnaire"))
                         {
@@ -77,13 +108,17 @@
         </nav>
     </header>
     <div class="container-custom H-100">
-        <main role="main" class="pb-3">
+        <main role="main" style="background-color:@background" class="pb-3">
             @RenderBody()
         </main>
     </div>
-    <footer class="container-custom H-100" style="background-color: rgb(236, 235, 243)">
-        &copy; 2024 - Projet_Web_Commerce - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-    </footer>
+    @if (!Context.Request.Path.Value.Contains("/PPProduits/DetailsPanier"))
+    {
+        <footer class="container-custom H-100" style="background-color: @background">
+            &copy; 2024 - Projet_Web_Commerce - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        </footer>
+    }
+
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>

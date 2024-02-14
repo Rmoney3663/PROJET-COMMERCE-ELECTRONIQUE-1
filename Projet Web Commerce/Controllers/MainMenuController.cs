@@ -238,6 +238,162 @@ namespace Projet_Web_Commerce.Controllers
 
         }
 
+        public async Task<IActionResult> CatalogueTousAsync(ModelCatalogueTous model)
+        {
+
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (userId != null)
+            {
+                var client = _context.PPClients.FirstOrDefault(c => c.IdUtilisateur == userId);
+                model.noClient = client.NoClient;
+            }
+
+
+            model.CategoriesList = _context.PPCategories.ToList();
+            model.NouveauxProduits = _context.PPProduits
+           .OrderBy(v => v.DateCreation)
+           .Take(15)
+           .ToList();
+
+
+            model.menuVis = model.menuVis ?? true;
+
+            model.sortOrderOptions = new List<SelectListItem>
+            {
+                new SelectListItem { Value = "dateAsc", Text = "Date de parution ↑" },
+                new SelectListItem { Value = "dateDesc", Text = "Date de parution ↓" },
+                new SelectListItem { Value = "numProdAsc", Text = "Numéro de produit ↑" },
+                new SelectListItem { Value = "numProdDesc", Text = "Numéro de produit ↓" },
+                new SelectListItem { Value = "catProdAsc", Text = "Catégorie particulière de produit ↑" },
+                new SelectListItem { Value = "catProdDesc", Text = "Catégorie particulière de produit ↓" },
+                new SelectListItem { Value = "descProdAsc", Text = "Description du produit ↑" },
+                new SelectListItem { Value = "descProdDesc", Text = "Description du produit ↓" }
+            };
+
+            model.parPageOptions = new List<SelectListItem>
+            {
+                new SelectListItem { Value = "6", Text = "6" },
+                new SelectListItem { Value = "9", Text = "9" },
+                new SelectListItem { Value = "12", Text = "12" },
+                new SelectListItem { Value = "15", Text = "15" },
+                new SelectListItem { Value = "21", Text = "21" },
+                new SelectListItem { Value = "30", Text = "30" },
+                new SelectListItem { Value = "60", Text = "60" },
+                new SelectListItem { Value = "Tous", Text = "Tous" }
+            };
+
+
+            IQueryable<PPProduits> ProduitsVendeur;
+            // Recherche string description et nom + verif dispo et vendeur selectionner
+            if (!String.IsNullOrEmpty(model.searchString))
+            {
+                int intValue;
+                ProduitsVendeur = from p in _context.PPProduits
+                    .Where(p => p.Disponibilite == true && (p.Nom.Contains(model.searchString) || p.Description.Contains(model.searchString) || (int.TryParse(model.searchString, out intValue) && p.NoProduit == intValue)))
+                                  select p;
+            }
+            else
+            {
+                ProduitsVendeur = from p in _context.PPProduits
+                    .Where(p => p.Disponibilite == true)
+                                  select p;
+            }
+
+            // Then, fetch the corresponding category descriptions
+            model.categorieOptions = _context.PPCategories
+                .Select(c => new SelectListItem
+                {
+                    Value = c.Description,
+                    Text = c.Description
+                })
+                .ToList();
+
+            // Recherche par date
+            if (model.dateApres != null)
+            {
+                ProduitsVendeur = ProduitsVendeur.Where(p => p.DateCreation > model.dateApres);
+            }
+
+            if (model.dateAvant != null)
+            {
+                ProduitsVendeur = ProduitsVendeur.Where(p => p.DateCreation < model.dateAvant);
+            }
+
+            // Filtrer par categorie
+            if (!String.IsNullOrEmpty(model.searchCat))
+            {
+                var categorySelect = _context.PPCategories
+                .Where(c => c.Description == model.searchCat)
+                .Select(c => c.NoCategorie)
+                .FirstOrDefault();
+
+                if (categorySelect != null)
+                {
+                    ProduitsVendeur = ProduitsVendeur
+                    .Where(p =>  p.NoCategorie == categorySelect);
+                }
+            }
+
+            switch (model.sortOrder)
+            {
+                case "dateAsc":
+                    ProduitsVendeur = ProduitsVendeur.OrderBy(p => p.DateCreation);
+                    break;
+                case "dateDesc":
+                    ProduitsVendeur = ProduitsVendeur.OrderByDescending(p => p.DateCreation);
+                    break;
+                case "numProdAsc":
+                    ProduitsVendeur = ProduitsVendeur.OrderBy(p => p.NoProduit);
+                    break;
+                case "numProdDesc":
+                    ProduitsVendeur = ProduitsVendeur.OrderByDescending(p => p.NoProduit);
+                    break;
+                case "catProdAsc":
+                    ProduitsVendeur = ProduitsVendeur.OrderBy(p => p.NoCategorie);
+                    break;
+                case "catProdDesc":
+                    ProduitsVendeur = ProduitsVendeur.OrderByDescending(p => p.NoCategorie);
+                    break;
+                case "descProdAsc":
+                    ProduitsVendeur = ProduitsVendeur.OrderBy(p => p.Description);
+                    break;
+                case "descProdDesc":
+                    ProduitsVendeur = ProduitsVendeur.OrderByDescending(p => p.Description);
+                    break;
+            }
+
+            int pageSize;
+
+            if (model.parPage == null)
+            {
+                model.parPage = "15";
+            }
+
+            if (model.parPage == "Tous")
+            {
+                pageSize = 999;
+            }
+            else
+            {
+                pageSize = Convert.ToInt32(model.parPage);
+            }
+
+            var produitsVendeurQueryable = ProduitsVendeur.AsQueryable();
+
+            var produitsVendeurPaginated = await PaginatedList<PPProduits>.CreateAsync(
+                produitsVendeurQueryable,
+                model.pageNumber ?? 1,
+                pageSize);
+
+            model.ProduitsList = produitsVendeurPaginated;
+
+            return View(model);
+
+
+        }
+
         [HttpPost]
         public ActionResult AjoutPanier(int quantite, int NoProduit, int NoClient, int NoVendeur, ModelCatalogueVendeur model)
         {
@@ -280,11 +436,10 @@ namespace Projet_Web_Commerce.Controllers
 
                     _context.SaveChanges();
 
-                    TempData["SuccessMessage"] = $"Le produit {produit.Nom} à été ajouté au panier.  ";
+                    TempData["SuccessMessage"] = $"Le produit {produit.Nom} à été ajouté au panier.";
 
-                    return RedirectToAction("CatalogueVendeur", new
+                    return RedirectToAction("CatalogueTous", new
                     {
-                        nomAffaire = vendeur.NomAffaires,
                         searchString = model.searchString,
                         parPage = model.parPage,
                         dateApres = model.dateApres,
@@ -299,7 +454,7 @@ namespace Projet_Web_Commerce.Controllers
             else
             {
                 TempData["ErrorMessage"] = $"Le produit {produit.Nom} n'a pas été ajout au panier. Assurez-vous que le panier n'excède pas le nombre d'items en stock. ";
-                return RedirectToAction("CatalogueVendeur", new { nomAffaire = vendeur.NomAffaires });
+                return RedirectToAction("CatalogueTous");
             }
 
 

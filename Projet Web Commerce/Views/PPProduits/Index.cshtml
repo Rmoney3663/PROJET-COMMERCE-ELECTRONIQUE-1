@@ -34,17 +34,50 @@
     }
     else
     {
+        ViewBag.Current = vendeur.NomAffaires;
+
+        var text = "#000000";
+        var background = "#ECEBF3";
+        var textCard = "#000000";
+        var backgroundCard = "#FFFFFF";
+        var font = "Arial";
+        var logo = "none";
+
+        var config = vendeur.Configuration;
+
+        if (config != null)
+        {
+            var listParams = config.Split(';');
+
+            if (listParams.Length == 16)
+            {
+                text = listParams[0];
+                background = listParams[1];
+                textCard = listParams[2];
+                backgroundCard = listParams[3];
+                font = listParams[14];
+                logo = listParams[15];
+            }
+        }
+
         var sortedModel = _context.PPProduits.Where(p => p.NoVendeur == vendeur.NoVendeur).ToList();
 
-        <h1>Liste de produits</h1>
+        <div class="col-md-4 d-flex align-items-start" style="gap:10px">
+            <h1 style="color:@text;font-family:@font">Liste de produits</h1>
+
+            @if (logo != "none")
+            {
+                <img src="~/Logo/@logo" alt="@logo" width="40" height="40" />
+            }
+            </div>
 
         <p>
             <a asp-action="Create">Ajouter Nouveau</a>
         </p>
-        <div class="d-flex flex-wrap align-content-start bg-light" style="margin-bottom:50px">
+        <div class="d-flex flex-wrap align-content-start" style="margin-bottom:50px;background-color:@background;font-family:@font">
             @foreach (var item in sortedModel)
             {
-                <div class="card" style="width:320px; margin: 10px;">
+                <div class="card" style="width:320px; margin: 10px;background-color:@backgroundCard">
                     @{
                         var path = System.IO.Path.Combine(env.WebRootPath, "Logo", item.Photo);
                         string imagePath = item.Photo != null && File.Exists(path) ? $"~/Logo/{item.Photo}" : "~/Logo/DefaultImage.png";
@@ -54,23 +87,23 @@
 
                     <img src="@Url.Content(imagePath)" alt="@item.Photo" width="320" height="400" />
                     <div class="card-body">
-                        <p class="card-text">
+                        <p class="card-text" style="color:@textCard">
                             <b>Nom :</b>
                             @Html.DisplayFor(modelItem => item.Nom)
                         </p>
-                        <p class="card-text">
+                        <p class="card-text" style="color:@textCard">
                             <b>Prix :</b>
                             @Html.DisplayFor(modelItem => item.PrixDemande)
                         </p>
-                        <p class="card-text">
+                        <p class="card-text" style="color:@textCard">
                             <b>Categorie :</b>
                             @Html.DisplayFor(modelItem => item.PPCategories.Description)
                         </p>
-                        <p class="card-text">
+                        <p class="card-text" style="color:@textCard">
                             <b>Nombre d'Items :</b>
                             @Html.DisplayFor(modelItem => item.NombreItems)
                         </p>
-                        <p class="card-text">
+                        <p class="card-text" style="color:@textCard">
                             <b>Disponible :</b>
                             @{
                                 if (item.Disponibilite)

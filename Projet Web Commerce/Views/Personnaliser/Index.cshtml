@@ -1,0 +1,158 @@
+﻿@using Projet_Web_Commerce.Data
+﻿﻿@using Microsoft.AspNetCore.Identity
+@inject UserManager<Projet_Web_Commerce.Areas.Identity.Data.Utilisateur> UserManager
+@inject SignInManager<Projet_Web_Commerce.Areas.Identity.Data.Utilisateur> SignInManager
+@using System.IO
+@inject AuthDbContext _context
+
+@if (!SignInManager.IsSignedIn(User) || !User.IsInRole("Vendeur"))
+{
+    Console.WriteLine("yes");
+    <text>
+        <script>
+            debugger;
+            window.location.href = '/MainMenu/Catalogue';
+        </script>
+    </text>
+}
+else
+{
+    var user = await UserManager.GetUserAsync(User);
+    var vendeur = _context.PPVendeurs.FirstOrDefault(v => v.IdUtilisateur == user.Id);
+    var config = vendeur.Configuration;
+
+    var text = "#000000";
+    var background = "#ECEBF3";
+    var textCard = "#000000";
+    var backgroundCard = "#FFFFFF";
+    var recherche = "#7C6992";
+    var textRecherche = "#FFFFFF";
+    var backgroundButtonDetail = "#7C6992";
+    var textButtonDetail = "#F9E547";
+    var backgroundButtonAjouter = "#808080";
+    var textButtonAjouter = "#FFFFFF";
+    var backgroundBarre = "#FFFFFF";
+    var textBarre = "#000000";
+    var backgroundQuantite = "#FFFFFF";
+    var textQuantite = "#000000";
+    var font = "Arial";
+    var logo = "none";
+
+    if (config != null)
+    {
+        var listParams = config.Split(';');
+
+        if (listParams.Length == 16)
+        {
+            text = listParams[0];
+            background = listParams[1];
+            textCard = listParams[2];
+            backgroundCard = listParams[3];
+            recherche = listParams[4];
+            textRecherche = listParams[5];
+            backgroundButtonDetail = listParams[6];
+            textButtonDetail = listParams[7];
+            backgroundButtonAjouter = listParams[8];
+            textButtonAjouter = listParams[9];
+            backgroundBarre = listParams[10];
+            textBarre = listParams[11];
+            backgroundQuantite = listParams[12];
+            textQuantite = listParams[13];
+            font = listParams[14];
+            logo = listParams[15];
+        }
+    }
+
+    <div class="row">
+        <div class="col-md-4">
+            <section>
+                <form asp-route-id="@vendeur.NoVendeur" id="account" method="post" enctype="multipart/form-data">
+                    <h2>Personnalisation de votre page</h2>
+                    <div class="form-floating mb-3">
+                        <h5>Votre logo</h5>
+                        <div class="form-group">
+                            @if (logo != "none")
+                            {
+                                <img src="~/Logo/@logo" alt="@logo" width="140" height="140" />
+                            }
+                            else
+                            {
+                                <p>Aucun</p>
+                            }
+                            <input type="file" id="image" name="image" accept="image/*" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <h5>Police de la page</h5>
+                        <select name="font" id="fontSelector">
+                            <option selected="@(font=="Arial"?"selected":null)" value="Arial">Arial</option>
+                            <option selected="@(font=="Helvetica"?"selected":null)" value="Helvetica">Helvetica</option>
+                            <option selected="@(font=="Times New Roman"?"selected":null)" value="Times New Roman">Times New Roman</option>
+                            <option selected="@(font=="Courier New"?"selected":null)" value="Courier New">Courier New</option>
+                            <option selected="@(font=="Verdana"?"selected":null)" value="Verdana">Verdana</option>
+                        </select>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <h5>Couleur des textes en arrière plan</h5>
+                        <input type="color" value="@text" name="text" />
+                    </div>
+                    <div class="form-floating mb-3">
+                        <h5>Couleur de l'arrière plan</h5>
+                        <input type="color" value="@background" name="background" />
+                    </div>
+                    <div class="form-floating mb-3">
+                        <h5>Couleur des textes des cartes de produit</h5>
+                        <input type="color" value="@textCard" name="textCard" />
+                    </div>
+                    <div class="form-floating mb-3">
+                        <h5>Couleur de l'arrière plan des cartes de produit</h5>
+                        <input type="color" value="@backgroundCard" name="backgroundCard" />
+                    </div>
+                    <div class="form-floating mb-3">
+                        <h5>Couleur d'arrière plan des éléments de recherche</h5>
+                        <input type="color" value="@recherche" name="recherche" />
+                    </div>
+                    <div class="form-floating mb-3">
+                        <h5>Couleur de text des éléments de recherche</h5>
+                        <input type="color" value="@textRecherche" name="textRecherche" />
+                    </div>
+                    <div class="form-floating mb-3">
+                        <h5>Couleur du bouton de détails</h5>
+                        <input type="color" value="@backgroundButtonDetail" name="backgroundButtonDetail" />
+                    </div>
+                    <div class="form-floating mb-3">
+                        <h5>Couleur de text du bouton de détails</h5>
+                        <input type="color" value="@textButtonDetail" name="textButtonDetail" />
+                    </div>
+                    <div class="form-floating mb-3">
+                        <h5>Couleur du bouton d'ajout au panier</h5>
+                        <input type="color" value="@backgroundButtonAjouter" name="backgroundButtonAjouter" />
+                    </div>
+                    <div class="form-floating mb-3">
+                        <h5>Couleur de text du bouton d'ajout au panier</h5>
+                        <input type="color" value="@textButtonAjouter" name="textButtonAjouter" />
+                    </div>
+                    <div class="form-floating mb-3">
+                        <h5>Couleur de la barre de recherche</h5>
+                        <input type="color" value="@backgroundBarre" name="backgroundBarre" />
+                    </div>
+                    <div class="form-floating mb-3">
+                        <h5>Couleur de text de la barre de recherche</h5>
+                        <input type="color" value="@textBarre" name="textBarre" />
+                    </div>
+                    <div class="form-floating mb-3">
+                        <h5>Couleur du sélecteur de quantité</h5>
+                        <input type="color" value="@backgroundQuantite" name="backgroundQuantite" />
+                    </div>
+                    <div class="form-floating mb-3">
+                        <h5>Couleur de text du sélecteur de quantité</h5>
+                        <input type="color" value="@textQuantite" name="textQuantite" />
+                    </div>
+                    <div>
+                        <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary" style="color: rgb(249, 229, 71); background-color: rgb(124, 105, 146)">Confirmer</button>
+                    </div>
+                </form>
+            </section>
+        </div>
+    </div>
+}

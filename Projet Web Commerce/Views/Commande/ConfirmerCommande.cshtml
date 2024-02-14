@@ -7,11 +7,14 @@
 @model Projet_Web_Commerce.Models.ModelConfirmerCommande
 @using Projet_Web_Commerce.Data
 ﻿﻿@using Microsoft.AspNetCore.Identity
-@inject UserManager<Projet_Web_Commerce.Areas.Identity.Data.Utilisateur> UserManager
-@inject SignInManager<Projet_Web_Commerce.Areas.Identity.Data.Utilisateur> SignInManager
-@using System.IO
-@inject AuthDbContext _context
-@inject IWebHostEnvironment env
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger" role="alert">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
 
 @using (Html.BeginForm("ConfirmerCommande", "Commande", FormMethod.Post))
 {
@@ -36,15 +39,17 @@
                                         <div class="row mb-4 d-flex align-items-center justify-content-center">
                                             <div class="col-md-3 col-lg-2 col-xl-6">
                                                 <div class="form-floating mb-1">
-                                                    <input asp-for="@Model.client.Nom" class="form-control" placeholder="Veuillez entrer votre nom." />
-                                                    <label asp-for="@Model.client.Nom" class="form-label"></label>
+                                                    <input asp-for="@Model.NomClient" class="form-control" placeholder="Veuillez entrer votre nom." />
+                                                    <label asp-for="@Model." class="form-label"></label>
+                                                    <span asp-validation-for="@Model.NomClient" class="text-danger"></span>
                                                 </div>
                                             </div>
 
                                             <div class="col-md-3 col-lg-2 col-xl-6">
                                                 <div class="form-floating mb-1">
-                                                    <input asp-for="@Model.client.Prenom" class="form-control" placeholder="Veuillez entrer votre nom." />
-                                                    <label asp-for="@Model.client.Prenom" class="form-label">Prénom</label>
+                                                    <input asp-for="@Model.PrenomClient" class="form-control" placeholder="Veuillez entrer votre nom." />
+                                                    <label  class="form-label">Prénom</label>
+                                                    <span asp-validation-for="@Model.PrenomClient" class="text-danger"></span>
                                                 </div>
                                             </div>
                                         </div>
@@ -52,15 +57,17 @@
                                         <div class="row mb-4 d-flex justify-content-between align-items-center">
                                             <div class="col-md-3 col-lg-2 col-xl-9">
                                                 <div class="form-floating mb-3">
-                                                    <input asp-for="@Model.client.AdresseEmail" class="form-control" placeholder="Veuillez entrer votre adresse courriel." />
-                                                <label asp-for="@Model.client.AdresseEmail" class="form-label">Adresse Courriel</label>
+                                                    <input asp-for="@Model.AdresseClient" class="form-control" placeholder="Veuillez entrer votre adresse courriel." />
+                                                    <label asp-for="@Model.AdresseClient" class="form-label">Adresse Courriel</label>
+                                                    <span asp-validation-for="@Model.AdresseClient" class="text-danger"></span>
                                                 </div>
                                             </div>
 
                                             <div class="col-md-3 col-lg-2 col-xl-3">
                                                 <div class="form-floating mb-3">
-                                                    <input asp-for="@Model.client.Tel1" class="form-control" placeholder="Veuillez entrer votre numéro de téléphone." />
-                                                    <label asp-for="@Model.client.Tel1" class="form-label">Téléphone</label>
+                                                    <input asp-for="@Model.TelClient" class="form-control" placeholder="Veuillez entrer votre numéro de téléphone." />
+                                                    <label class="form-label">Téléphone</label>
+                                                    <span asp-validation-for="@Model.TelClient" class="text-danger"></span>
                                                 </div>
                                             </div>
                                         </div>
@@ -68,15 +75,17 @@
                                         <div class="row mb-4 d-flex justify-content-between align-items-center">
                                             <div class="col-md-3 col-lg-2 col-xl-8">
                                                 <div class="form-floating mb-3">
-                                                    <input asp-for="@Model.client.Rue" class="form-control" placeholder="Veuillez entrer votre rue." />
-                                                    <label asp-for="@Model.client.Rue" class="form-label"></label>
+                                                    <input asp-for="@Model.RueClient" class="form-control" placeholder="Veuillez entrer votre rue." />
+                                                    <label asp-for="@Model.RueClient" class="form-label">Rue</label>
+                                                    <span asp-validation-for="@Model.RueClient" class="text-danger"></span>
                                                 </div>
                                             </div>
 
                                             <div class="col-md-3 col-lg-2 col-xl-4">
                                                 <div class="form-floating mb-3">
-                                                    <input asp-for="@Model.client.Ville" class="form-control" placeholder="Veuillez entrer votre ville." />
-                                                    <label asp-for="@Model.client.Ville" class="form-label"></label>
+                                                    <input asp-for="@Model.VilleClient" class="form-control" placeholder="Veuillez entrer votre ville." />
+                                                    <label class="form-label">Ville</label>
+                                                    <span asp-validation-for="@Model.VilleClient" class="text-danger"></span>
                                                 </div>
                                             </div>
                                         </div>
@@ -84,14 +93,15 @@
                                     <div class="row mb-4 d-flex justify-content-between align-items-center">
                                         <div class="col-md-3 col-lg-2 col-xl-4">
                                             <div class="form-floating mb-3">
-                                                <input asp-for="@Model.client.Pays" class="form-control" placeholder="Veuillez entrer votre pays." />
+                                                    <input asp-for="@Model.client.Pays" readonly class="form-control" placeholder="Veuillez entrer votre pays." />
                                                 <label asp-for="@Model.client.Pays" class="form-label"></label>
+                                                <span asp-validation-for="@Model.client.Pays" class="text-danger"></span>
                                             </div>
                                         </div>
 
                                         <div class="col-md-3 col-lg-2 col-xl-4">
                                             <div class="form-floating mb-3">
-                                                <select asp-for="@Model.client.NoProvince" class="form-select" placeholder="Veuillez entrer votre province.">
+                                                <select asp-for="@Model.ProvinceCLient" class="form-select" placeholder="Veuillez entrer votre province.">
                                                     <option value="">Select Province</option>
                                                     @foreach (var province in ViewBag.Provinces)
                                                     {
@@ -99,13 +109,15 @@
                                                     }
                                                 </select>
                                                 <label asp-for="@Model.client.NoProvince" class="form-label">Province</label>
+                                                    <span asp-validation-for="@Model.ProvinceCLient" class="text-danger"></span>
                                             </div>
                                         </div>
 
                                         <div class="col-md-3 col-lg-2 col-xl-4">
                                             <div class="form-floating mb-3">
-                                                <input asp-for="@Model.client.CodePostal" class="form-control" placeholder="Veuillez entrer votre code postal." />
-                                                <label asp-for="@Model.client.CodePostal" class="form-label">Code Postal</label>
+                                                <input asp-for="@Model.PostalClient" class="form-control" placeholder="Veuillez entrer votre code postal." />
+                                                    <label asp-for="@Model.PostalClient" class="form-label">Code Postal</label>
+                                                    <span asp-validation-for="@Model.PostalClient" class="text-danger"></span>
                                             </div>
                                         </div>
                                     </div>
@@ -117,8 +129,9 @@
 
                                         <div class="col-md-3 col-lg-2 col-xl-6">
                                             <div class="form-floating mb-3">
-                                                <input asp-for="@Model.NoCarte" value="" class="form-control" placeholder="Veuillez entrer votre numéro de carte de crédit." />
+                                                <input asp-for="@Model.NoCarte" class="form-control" placeholder="Veuillez entrer votre numéro de carte de crédit." />
                                                 <label asp-for="@Model.NoCarte" class="form-label">Numéro de carte de crédit</label>
+                                                <span asp-validation-for="@Model.NoCarte" class="text-danger"></span>
                                             </div>
                                         </div>
 
@@ -126,13 +139,15 @@
                                             <div class="form-floating mb-3">
                                                 <input asp-for="@Model.dateExpiration" class="form-control" placeholder="Veuillez entrer la date d'expiration de la carte." />
                                                 <label asp-for="@Model.dateExpiration" class="form-label">Expir. (MM-AAAA)</label>
+                                                <span asp-validation-for="@Model.dateExpiration" class="text-danger"></span>
                                             </div>
                                         </div>
 
                                         <div class="col-md-3 col-lg-2 col-xl-3">
                                             <div class="form-floating mb-3">
-                                                <input value="" asp-for="@Model.CVV" class="form-control" placeholder="Veuillez entrer le numéro CVC ou CVV de la carte." pattern="[0-9]*" />
+                                                <input asp-for="@Model.CVV" class="form-control" placeholder="Veuillez entrer le numéro CVC ou CVV de la carte." pattern="[0-9]*" />
                                                 <label asp-for="@Model.CVV" class="form-label">CVC ou CVV</label>
+                                                <span asp-validation-for="@Model.CVV" class="text-danger"></span>
                                             </div>
                                         </div>
                                     </div>
@@ -212,16 +227,17 @@
                                     }
                                     else
                                     {
-                                                <form asp-controller="Commande" asp-action="Commander" method="post">
+                                                <form asp-route-payer="true" asp-controller="Commande" asp-action="ConfirmerCommande" method="post">
                                                     <!-- Your input fields for ModelConfirmerCommande -->
                                                     <input type="hidden" name="NoVendeur" value="@Model.NoVendeur" />
                                                     <input type="hidden" name="NomVendeur" value="@Model.vendeur.NomAffaires" />
                                                     <input type="hidden" name="NoCarteCredit" value="@Model.NoCarte" />
+                                                    
 
                                                     <input type="hidden" name="total" value="@Model.total" />
                                                     <!-- Add other hidden input fields for other properties of ModelConfirmerCommande -->
                                                     <!-- Your submit button -->
-                                                    <button type="submit" asp-action="Commander" asp-controller="Commande" class="btn btn-dark btn-lg" data-mdb-ripple-color="dark">Commander</button>
+                                                    <button type="submit" asp-route-payer="true" asp-action="ConfirmerCommande" asp-controller="Commande" class="btn btn-dark btn-lg" data-mdb-ripple-color="dark">Commander</button>
                                                 </form>
                                     }
                                     </div>

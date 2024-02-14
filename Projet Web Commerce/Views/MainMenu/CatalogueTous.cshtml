@@ -5,12 +5,11 @@
 @using System.IO
 @inject IWebHostEnvironment env
 
-@model Projet_Web_Commerce.Models.ModelCatalogueVendeur
+@model Projet_Web_Commerce.Models.ModelCatalogueTous
 @inject SignInManager<Projet_Web_Commerce.Areas.Identity.Data.Utilisateur> SignInManager
 @inject AuthDbContext _context
 
 @{
-    ViewBag.Current = Model.nomAffaire;
     var productList = SignInManager.IsSignedIn(User) ? Model.ProduitsList : Model.NouveauxProduits;
     var text = "#000000";
     var textCard = "#000000";
@@ -60,36 +59,19 @@
 <div class="row-fluid">
             @if (SignInManager.IsSignedIn(User))
             {
-        var vendeur = _context.PPVendeurs.Where(v => v.NomAffaires == Model.nomAffaire).FirstOrDefault();
-        var config = vendeur.Configuration;
-
-        if (config != null)
-        {
-            var listParams = config.Split(';');
-
-            if (listParams.Length == 16)
-            {
-                text = listParams[0];
-                textCard = listParams[2];
-                backgroundCard = listParams[3];
-                recherche = listParams[4];
-                textRecherche = listParams[5];
-                backgroundButtonDetail = listParams[6];
-                textButtonDetail = listParams[7];
-                backgroundButtonAjouter = listParams[8];
-                textButtonAjouter = listParams[9];
-                backgroundBarre = listParams[10];
-                textBarre = listParams[11];
-                backgroundQuantite = listParams[12];
-                textQuantite = listParams[13];
-                font = listParams[14];
-                logo = listParams[15];
-            }
-        }
 
 
         <div class="col-md-4 d-flex align-items-start" style="gap:10px">
-            <h3 style="color:@text; font-family:@font">Liste de tout les produits @Model.nomAffaire </h3>
+            @if (Model.searchString != null)
+            {
+                <h3 style="color:@text; font-family:@font">Résultats de recherche pour @Model.searchString </h3>
+            }
+            else
+            {
+                <h3 style="color:@text; font-family:@font">Catalogue de tout les vendeurs </h3>
+
+            }
+            
 
             @if (logo != "none")
             {
@@ -97,9 +79,8 @@
             }
                 </div>
 
-        @using (Html.BeginForm("CatalogueVendeur", "MainMenu", FormMethod.Post, new { id = "mainForm" }))
+        @using (Html.BeginForm("CatalogueTous", "MainMenu", FormMethod.Post, new { id = "mainForm" }))
                 {
-                @Html.HiddenFor(model => model.nomAffaire)
                     <div class="row" style="font-family:@font">
                         <div class="col-md-4 d-flex align-items-start">
 
@@ -279,12 +260,11 @@
                         @if (Model.ProduitsList.HasPreviousPage)
                         {
                             <li class="page-item">
-                                <a class="page-link" href="@Url.Action("CatalogueVendeur", new {
+                                <a class="page-link" href="@Url.Action("CatalogueTous", new {
     sortOrder = Model.sortOrder,
     pageNumber = Model.pageNumber - 1,
     parPage = Model.parPage,
-    searchString = Model.searchString,
-    nomAffaire = Model.nomAffaire
+    searchString = Model.searchString
 })">Précédent</a>
                             </li>
                         }
@@ -292,12 +272,11 @@
                         @for (int i = 1; i <= Model.ProduitsList.TotalPages; i++)
                         {
                             <li class="page-item @(i == Model.ProduitsList.PageIndex ? "active" : "")">
-                                <a class="page-link" href="@Url.Action("CatalogueVendeur", new {
+                                <a class="page-link" href="@Url.Action("CatalogueTous", new {
     sortOrder = Model.sortOrder,
     pageNumber = i,
     parPage = Model.parPage,
-    searchString = Model.searchString,
-    nomAffaire = Model.nomAffaire
+    searchString = Model.searchString
 })">@i</a>
                             </li>
                         }
@@ -305,12 +284,11 @@
                         @if (Model.ProduitsList.HasNextPage)
                         {
                             <li class="page-item">
-                                <a class="page-link" href="@Url.Action("CatalogueVendeur", new {
+                                <a class="page-link" href="@Url.Action("CatalogueTous", new {
     sortOrder = Model.sortOrder,
     pageNumber = Model.ProduitsList.PageIndex + 1,
     parPage = Model.parPage,
-    searchString = Model.searchString,
-    nomAffaire = Model.nomAffaire
+    searchString = Model.searchString
 })">Suivant</a>
                             </li>
                         }

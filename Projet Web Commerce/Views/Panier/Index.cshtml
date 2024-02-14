@@ -18,7 +18,7 @@
     {
         nbTotal += article.NbItems;
         var item = _context.PPProduits.FirstOrDefault(p => p.NoProduit == article.NoProduit);
-        if (item != null)
+        if (item.PrixVente != null && item.DateVente > DateTime.Now)
         {
             totalPrice += item.PrixVente * article.NbItems;
         }
@@ -28,10 +28,9 @@
         }
         totalPoids += item.Poids * article.NbItems;
     }
-
     decimal? tps = totalPrice * 0.05m;
     decimal? tvq = totalPrice * 0.09975m;
-
+    
     decimal? prixFinal = totalPrice;
     }
     @if (!SignInManager.IsSignedIn(User) || User.IsInRole("Vendeur") || User.IsInRole("Gestionnaire"))
@@ -61,7 +60,9 @@
                                         <div class="d-flex justify-content-between align-items-center mb-5">
                                             @if (vendeur != null)
                                             {
-                                            <h1 class="fw-bold mb-0 text-black">Panier associé à @vendeur.NomAffaires</h1>
+                                                <h1 class="fw-bold mb-0 text-black">
+                                                    Panier associé à <a asp-controller="MainMenu" asp-route-nomAffaire="@vendeur.NomAffaires" asp-action="CatalogueVendeur">@vendeur.NomAffaires</a>
+                                                </h1>
                                             }
                                             <h6 class="mb-0 text-muted">@Html.DisplayFor(modelItem => nbTotal) Items</h6>
                                         </div>
@@ -84,7 +85,9 @@
 
                                             <div class="row mb-4 d-flex justify-content-between align-items-center">
                                                 <div class="col-md-2 col-lg-2 col-xl-2">
-                                                    <img class="img-fluid rounded-3"src="@Url.Content(imagePath)" alt="@item.Photo" width="100" height="120" />
+                                                    <a asp-controller="PPProduits" asp-route-id="@item.NoProduit" asp-action="Details">
+                                                               <img class="img-fluid rounded-3"src="@Url.Content(imagePath)" alt="@item.Photo" width="100" height="120" />
+                                                    </a>
                                                 </div>
                                                 <div class="col-md-3 col-lg-3 col-xl-3">
                                                     <h6 class="text-muted">@_context.PPCategories.Where(c => c.NoCategorie == item.NoCategorie).FirstOrDefault().Description</h6>
@@ -106,7 +109,7 @@
                                                 </div>
                                                 <div class="col-md-3 col-lg-2 col-xl-2 offset-lg-1">
                                                     
-                                                        @if (item.PrixVente != null)
+                                                        @if (item.PrixVente != null && item.DateVente > DateTime.Now)
                                                         {
                                                             var prix = item.PrixVente * articles.NbItems;
                                                             <h6 class="mb-0">
