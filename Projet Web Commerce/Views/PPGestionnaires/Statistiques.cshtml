@@ -22,9 +22,9 @@
             </p>
 
             <b>Nombre de vendeurs par mois entre les dates sélectionnées  : </b><br>
-            Date de début : <input type="month" id="startDateV" onchange="generateReportV()">
+            Date de début : <input type="month" id="startDateV" onchange="validateAndGenerateV()">
 
-            Date de fin :  <input type="month" id="endDateV" onchange="generateReportV()"><br>
+            Date de fin :  <input type="month" id="endDateV" onchange="validateAndGenerateV()"><br>
           
             <div id="reportV"></div>
             <br />            
@@ -34,9 +34,9 @@
             <br />
 
             <b>Nombre de connexions des clients regrouper par mois  entre les dates sélectionnées : </b><br>
-            Date de début : <input type="month" id="startDateC" onchange="generateReportC()">
+            Date de début : <input type="month" id="startDateC" onchange="validateAndGenerateC()">
+            Date de fin :  <input type="month" id="endDateC" onchange="validateAndGenerateC()"><br>
 
-            Date de fin :  <input type="month" id="endDateC" onchange="generateReportC()"><br>
 
             <div id="reportC"></div>
             <br />
@@ -63,6 +63,32 @@
     }
 
     <script>
+        function validateAndGenerateC() {
+            validateDatesC();
+            generateReportC();
+        }
+        function validateAndGenerateV() {
+            validateDatesV();
+            generateReportV();
+        }
+
+        function validateDatesC() {
+            var startDate = new Date(document.getElementById("startDateC").value);
+            var endDate = new Date(document.getElementById("endDateC").value);
+            if (endDate < startDate) {
+                alert("La date de fin ne peut pas être antérieure à la date de début.");
+                document.getElementById("endDateC").value = document.getElementById("startDateC").value;
+            }
+        }
+
+        function validateDatesV() {
+            var startDate = new Date(document.getElementById("startDateV").value);
+            var endDate = new Date(document.getElementById("endDateV").value);
+            if (endDate < startDate) {
+                alert("La date de fin ne peut pas être antérieure à la date de début.");
+                document.getElementById("endDateV").value = document.getElementById("startDateV").value;
+            }
+        }
         var vendeursList = @Html.Raw(vendeursListJson);
         console.log("Vendeurs List:", vendeursList);
         var clientsList = @Html.Raw(clientsListJson);
@@ -318,17 +344,12 @@
         console.log("Labels : ", labels);
 
         var datasets = [{
+            label: "Argent Total (CAD)",
             data: data,
             backgroundColor: backgroundColors,
             borderColor: 'rgba(54, 162, 235, 1)',
             borderWidth: 1
         }];
-
-        if (labels.length > 0) {
-            datasets[0].label = labels[0];
-        }
-
-
 
         var ctx = document.getElementById('salesChart').getContext('2d');
         var chart = new Chart(ctx, {
