@@ -40,26 +40,26 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account.Manage
 
         public class InputModel
         {
-            [Required(ErrorMessage = "Le nom est requis.")]
+            //[Required(ErrorMessage = "Le nom est requis.")]
             [Display(Name = "Nom")]
             public string Nom { get; set; }
 
-            [Required(ErrorMessage = "Le prénom est requis.")]
+            //[Required(ErrorMessage = "Le prénom est requis.")]
             [Display(Name = "Prénom")]
             public string Prenom { get; set; }
 
-            [Required(ErrorMessage = "La rue est requise.")]
+            //[Required(ErrorMessage = "La rue est requise.")]
             [Display(Name = "Rue")]
             public string Rue { get; set; }
 
-            [Required(ErrorMessage = "La ville est requise.")]
+            //[Required(ErrorMessage = "La ville est requise.")]
             [Display(Name = "Ville")]
             public string Ville { get; set; }
 
             [Display(Name = "Province")]
             public string Province { get; set; }
 
-            [Required(ErrorMessage = "Le code postal est requis.")]
+            //[Required(ErrorMessage = "Le code postal est requis.")]
             [RegularExpression(@"^([A-Za-z]\d[A-Za-z] \d[A-Za-z]\d)|([A-Za-z]\d[A-Za-z]\d[A-Za-z]\d)$", ErrorMessage = "Le code postal doit respecter le format A1A 1A1 ou A1A1A1.")]
             [Display(Name = "Code postal")]
             public string CodePostal { get; set; }
@@ -67,7 +67,7 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account.Manage
             [Display(Name = "Pays")]
             public string Pays { get; set; }
 
-            [Required(ErrorMessage = "Le numéro de téléphone est requis")]
+            //[Required(ErrorMessage = "Le numéro de téléphone est requis")]
             [RegularExpression(@"^\d{3}-\d{3}-\d{4}$", ErrorMessage = "Le numéro de téléphone doit respêcter le format 999-999-9999.")]
             [Display(Name = "Numéro de téléphone")]
             public string Telephone { get; set; }

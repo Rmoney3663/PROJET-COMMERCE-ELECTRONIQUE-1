@@ -33,13 +33,13 @@
                 }
             }
 
-            @if (nom != "none" && prenom != "none" && nom != null && prenom != null)
+            @if (nom != "none" && prenom != "none" && nom != null && prenom != null && nom != "" && prenom != "" && !(estDansRole = await UserManager.IsInRoleAsync(user, "Gestionnaire")))
             {
                 <li class="nav-item">
                     <p id="nom" class="nav-link" style="color: rgb(249, 229, 71)">Bonjour @prenom @nom!</p>
                 </li>
             }
-            else if ((estDansRole = await UserManager.IsInRoleAsync(user, "Gestionnaire")))
+            else
             {
                 <li class="nav-item">
                     <p id="nom" class="nav-link" style="color: rgb(249, 229, 71)">Bonjour!</p>
