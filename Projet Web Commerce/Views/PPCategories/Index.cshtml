@@ -1,19 +1,18 @@
 ﻿@model IEnumerable<Projet_Web_Commerce.Models.PPCategories>
 
-@{
-    Layout = null;
-}
 
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 <!DOCTYPE html>
 
 <html>
 <head>
     <meta name="viewport" content="width=device-width" />
-    <title>Index</title>
+    <title>Liste de Categories</title>
 </head>
 <body>
+    <h2>Liste de Categories</h2>
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create">Ajouter un Nouveau Categorie</a>
 </p>
 <table class="table">
     <thead>
@@ -37,9 +36,8 @@
                 @Html.DisplayFor(modelItem => item.Details)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.NoCategorie">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.NoCategorie">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.NoCategorie">Delete</a>
+                <a asp-action="Edit" asp-route-id="@item.NoCategorie" class="btn btn-primary">Modifier</a> |
+                <a asp-action="Delete" asp-route-id="@item.NoCategorie" class="btn btn-danger">Supprimer</a>
             </td>
         </tr>
 }

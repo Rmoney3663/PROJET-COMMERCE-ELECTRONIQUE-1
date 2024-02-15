@@ -1,22 +1,20 @@
 ﻿@model Projet_Web_Commerce.Models.PPCategories
 
-@{
-    Layout = null;
-}
+
 
 <!DOCTYPE html>
 
 <html>
 <head>
     <meta name="viewport" content="width=device-width" />
-    <title>Create</title>
+    <title>Ajouter un Nouveau Categorie</title>
 </head>
 <body>
 
-<h4>PPCategories</h4>
+    <h2>Ajouter un Nouveau Categorie</h2>
 <hr />
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-6">
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
@@ -24,11 +22,13 @@
                 <input asp-for="Description" class="form-control" />
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
+            <br />  
             <div class="form-group">
                 <label asp-for="Details" class="control-label"></label>
-                <input asp-for="Details" class="form-control" />
+                <textarea asp-for="Details" class="form-control"></textarea>
                 <span asp-validation-for="Details" class="text-danger"></span>
             </div>
+            <br />
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>
@@ -37,7 +37,7 @@
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+        <a asp-action="Index">Retour à la liste</a>
 </div>
 
 </body>
