@@ -2,12 +2,17 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text;
+using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Logging;
 using Projet_Web_Commerce.Areas.Identity.Data;
 using Projet_Web_Commerce.Data;
 using Projet_Web_Commerce.Models;
@@ -175,6 +180,7 @@ namespace Projet_Web_Commerce.Controllers
              .Select(group => group.OrderByDescending(c => c.DateCommande).FirstOrDefault())
              .ToList();
 
+            var utilisateurList = _context.Users.ToList();
 
             ModelListeVendeurs modelListeVendeurs = new ModelListeVendeurs()
             {
@@ -182,7 +188,8 @@ namespace Projet_Web_Commerce.Controllers
                 ProduitsList = ProduitsList,
                 MoisAnneesDistinctsList = lstMoisAnneesDistincts,
                 CommandesList = CommandesList,
-               
+                UtilisateurList = utilisateurList
+
             };
 
             return View(modelListeVendeurs);
@@ -411,38 +418,109 @@ namespace Projet_Web_Commerce.Controllers
             return View(pPGestionnaire);
         }
 
-        // GET: PPGestionnaires/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+      
+        public async Task<IActionResult> FraudeC(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var pPGestionnaire = await _context.PPGestionnaire
+            var item = await _context.PPClients
                 .Include(p => p.Utilisateur)
-                .FirstOrDefaultAsync(m => m.NoGestionnaire == id);
-            if (pPGestionnaire == null)
+                .FirstOrDefaultAsync(m => m.NoClient == id);
+            if (item == null)
             {
                 return NotFound();
             }
 
-            return View(pPGestionnaire);
+            return View(item);
         }
 
-        // POST: PPGestionnaires/Delete/5
-        [HttpPost, ActionName("Delete")]
+        [HttpPost, ActionName("FraudeC")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> FraudeC(int id)
         {
-            var pPGestionnaire = await _context.PPGestionnaire.FindAsync(id);
-            if (pPGestionnaire != null)
+            var item = await _context.PPClients.FindAsync(id);
+            if (item != null)
             {
-                _context.PPGestionnaire.Remove(pPGestionnaire);
+                item.Statut = 0;
+                var email = item.AdresseEmail;
+                var idUSER = item.IdUtilisateur;
+                var use = await _context.Users.FindAsync(idUSER);
+                use.EmailConfirmed = false;
+                Console.WriteLine("USER : ================================================== " + use.Email);
+                _context.Update(item);
+                _context.Update(use);
+
+                string returnUrl = Url.Content("~/");
+                var code = await _userManager.GenerateEmailConfirmationTokenAsync(use);
+                code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+                var callbackUrl = Url.Page(
+                       "/Account/ConfirmEmail",
+                        pageHandler: null,
+                       values: new { area = "Identity", userId = use.Id, code = code, returnUrl = returnUrl },
+                       protocol: Request.Scheme);
+                await Methodes.envoyerCourriel(
+                       "Vous devez reconfirmer votre adresse courriel",
+                       $"Veuillez reconfirmer votre compte en <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>cliquant ici</a>. Votre numéro de client est {item.NoClient}",
+                       email);
             }
 
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction("ListeClients");
+        }
+
+        public async Task<IActionResult> FraudeV(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var item = await _context.PPVendeurs
+                .Include(p => p.Utilisateur)
+                .FirstOrDefaultAsync(m => m.NoVendeur == id);
+            if (item == null)
+            {
+                return NotFound();
+            }
+
+            return View(item);
+        }
+
+        [HttpPost, ActionName("FraudeV")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> FraudeV(int id)
+        {
+            var item = await _context.PPVendeurs.FindAsync(id);
+            if (item != null)
+            {
+               // item.Statut = 0;
+                var email = item.AdresseEmail;
+                var idUSER = item.IdUtilisateur;
+                var use = await _context.Users.FindAsync(idUSER);
+                use.EmailConfirmed = false;
+                Console.WriteLine("USER : ================================================== " + use.Email);
+               // _context.Update(item);
+                _context.Update(use);
+
+                string returnUrl = Url.Content("~/");
+                var code = await _userManager.GenerateEmailConfirmationTokenAsync(use);
+                code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+                var callbackUrl = Url.Page(
+                       "/Account/ConfirmEmail",
+                        pageHandler: null,
+                       values: new { area = "Identity", userId = use.Id, code = code, returnUrl = returnUrl },
+                       protocol: Request.Scheme);
+                await Methodes.envoyerCourriel(
+                       "Vous devez reconfirmer votre adresse courriel",
+                       $"Veuillez reconfirmer votre compte en <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>cliquant ici</a>. Votre numéro de vendeur est {item.NoVendeur}",
+                       email);
+            }
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction("ListeVendeurs");
         }
 
         private bool PPGestionnaireExists(int id)

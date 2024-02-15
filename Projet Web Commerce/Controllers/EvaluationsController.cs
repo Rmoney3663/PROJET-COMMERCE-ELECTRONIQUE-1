@@ -6,8 +6,9 @@ namespace Projet_Web_Commerce.Controllers
     public class EvaluationsController : Controller
     {
         // GET: EvaluationController
-        public ActionResult Index()
+        public ActionResult Index(int id)
         {
+
 
             return View();
         }

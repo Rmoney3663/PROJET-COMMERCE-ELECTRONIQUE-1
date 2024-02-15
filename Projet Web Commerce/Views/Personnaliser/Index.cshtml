@@ -37,12 +37,14 @@ else
     var textQuantite = "#000000";
     var font = "Arial";
     var logo = "none";
+    var backgroundButtonEvaluation = "#808080";
+    var textButtonEvaluation = "#FFFFFF";
 
     if (config != null)
     {
         var listParams = config.Split(';');
 
-        if (listParams.Length == 16)
+        if (listParams.Length == 18)
         {
             text = listParams[0];
             background = listParams[1];
@@ -60,6 +62,8 @@ else
             textQuantite = listParams[13];
             font = listParams[14];
             logo = listParams[15];
+            backgroundButtonEvaluation = listParams[16];
+            textButtonEvaluation = listParams[17];
         }
     }
 
@@ -147,6 +151,14 @@ else
                     <div class="form-floating mb-3">
                         <h5>Couleur de text du sélecteur de quantité</h5>
                         <input type="color" value="@textQuantite" name="textQuantite" />
+                    </div>
+                    <div class="form-floating mb-3">
+                        <h5>Couleur du bouton d'évaluations</h5>
+                        <input type="color" value="@backgroundButtonEvaluation" name="backgroundButtonEvaluation" />
+                    </div>
+                    <div class="form-floating mb-3">
+                        <h5>Couleur de text du bouton d'évaluations</h5>
+                        <input type="color" value="@textButtonEvaluation" name="textButtonEvaluation" />
                     </div>
                     <div>
                         <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary" style="color: rgb(249, 229, 71); background-color: rgb(124, 105, 146)">Confirmer</button>
