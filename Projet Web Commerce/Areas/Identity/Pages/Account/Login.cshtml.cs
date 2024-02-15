@@ -130,6 +130,7 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
                     var user = await _userManager.FindByEmailAsync(Input.Email);                   
                     bool estVendeur = await _userManager.IsInRoleAsync(user, "Vendeur");
                     bool estClient = await _userManager.IsInRoleAsync(user, "Client");
+                    bool estGestionnaire = await _userManager.IsInRoleAsync(user, "Gestionnaire");
                     var lstVendeurs = _context.PPVendeurs.ToList();
 
                     if (foundVendeur != null)
@@ -160,6 +161,11 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
                                 return Page();
                             }
                         }
+                    }
+
+                    if (estGestionnaire)
+                    {
+                        return RedirectToAction("ListeVendeurs", "PPGestionnaires", new { area = "" });
                     }
                     return LocalRedirect(returnUrl);
                 }

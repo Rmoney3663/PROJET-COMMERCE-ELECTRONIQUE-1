@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using DocumentFormat.OpenXml.Office.CustomUI;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Projet_Web_Commerce.API;
 using Projet_Web_Commerce.Areas.Identity.Data;
@@ -12,6 +14,7 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Projet_Web_Commerce.Controllers
 {
+    [Authorize(Roles = "Client")]
     public class CommandeController : Controller
     {
 
@@ -138,16 +141,21 @@ namespace Projet_Web_Commerce.Controllers
 
             foreach (PPArticlesEnPanier article in listPaniers)
             {
-                nbTotal += article.NbItems;
                 var item = _context.PPProduits.FirstOrDefault(p => p.NoProduit == article.NoProduit);
-                if (item.PrixVente != null && item.DateVente > DateTime.Now)
+                if (item.Disponibilite == true)
                 {
-                    totalPrice += item.PrixVente * article.NbItems;
+                    nbTotal += article.NbItems;
+
+                    if (item.PrixVente != null && item.DateVente > DateTime.Now)
+                    {
+                        totalPrice += item.PrixVente * article.NbItems;
+                    }
+                    else
+                    {
+                        totalPrice += item.PrixDemande * article.NbItems;
+                    }
                 }
-                else
-                {
-                    totalPrice += item.PrixDemande * article.NbItems;
-                }
+
             }
             var sousTotal = totalPrice;
 
@@ -276,7 +284,7 @@ namespace Projet_Web_Commerce.Controllers
                                 {
                                     var produit = _context.PPProduits.FirstOrDefault(p => p.NoProduit == article.NoProduit);
 
-                                    if (produit == null)
+                                    if (produit == null || produit.Disponibilite == false)
                                     {
                                         // Handle case where product is not found
                                         continue;
@@ -301,7 +309,7 @@ namespace Projet_Web_Commerce.Controllers
                                 {
                                     var produit = _context.PPProduits.FirstOrDefault(p => p.NoProduit == article.NoProduit);
 
-                                    if (produit == null)
+                                    if (produit == null || produit.Disponibilite == false)
                                     {
                                         // Handle case where product is not found
                                         continue;

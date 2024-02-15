@@ -227,22 +227,22 @@
                                     <p class="card-text">Prix : @Html.DisplayFor(modelItem => item.PrixDemande) $ </p>
                                 }
 
-                                
+                                <a asp-controller="PPProduits"
+                                   asp-route-id="@item.NoProduit"
+                                   asp-action="Details"
+                                   class="btn btn-secondary mt-auto" style="background-color:@backgroundButtonDetail; color: @textButtonDetail">
+                                    Details
+                                </a>
 
                                 @if (SignInManager.IsSignedIn(User) && User.IsInRole("Client") && item.NombreItems > 0)
                                 {
-                                    <a asp-controller="Evaluations"
-                                       asp-route-id="@item.NoProduit"
-                                       asp-action="Index"
-                                       class="btn btn-secondary mt-auto" style="background-color:@backgroundButtonEvaluation; color: @textButtonEvaluation">
-                                        Évaluations
-                                    </a>
-                                    <a asp-controller="PPProduits"
-                                       asp-route-id="@item.NoProduit"
-                                       asp-action="Details"
-                                       class="btn btn-secondary mt-auto" style="background-color:@backgroundButtonDetail; color: @textButtonDetail">
-                                        Details
-                                    </a>
+@*                                       <a asp-controller="Evaluations"
+                                         asp-route-id="@item.NoProduit"
+                                         asp-action="Index"
+                                         class="btn btn-secondary mt-auto" style="background-color:@backgroundButtonEvaluation; color: @textButtonEvaluation">
+                                          Évaluations
+                                      </a> *@
+                                    
                                     <form asp-controller="MainMenu" id="formAjoutPanier" asp-action="AjoutPanier" method="post">
                                         <input type="hidden" name="NoProduit" value="@item.NoProduit" />
                                         <input type="hidden" name="NoClient" value="@Model.noClient" />

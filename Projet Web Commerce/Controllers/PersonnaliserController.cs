@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Projet_Web_Commerce.Areas.Identity.Data;
 using Projet_Web_Commerce.Data;
@@ -6,6 +7,7 @@ using Projet_Web_Commerce.Models;
 
 namespace Projet_Web_Commerce.Controllers
 {
+    [Authorize(Roles = "Vendeur")]
     public class PersonnaliserController : Controller
     {
         private readonly AuthDbContext _context;
