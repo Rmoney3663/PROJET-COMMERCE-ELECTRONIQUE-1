@@ -34,6 +34,7 @@ namespace Projet_Web_Commerce.Controllers
         }
 
         // GET: PPProduits
+        [Authorize(Roles = "Vendeur")]
         public async Task<IActionResult> Index()
         {
            
@@ -42,6 +43,7 @@ namespace Projet_Web_Commerce.Controllers
         }
 
         // GET: PPProduits/Details/5
+
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -62,6 +64,7 @@ namespace Projet_Web_Commerce.Controllers
         }
 
         // GET: PPProduits/Create
+        [Authorize(Roles = "Vendeur")]
         public IActionResult Create()
         {
             ViewData["NoCategorie"] = new SelectList(_context.PPCategories, "NoCategorie", "Description");
@@ -74,6 +77,7 @@ namespace Projet_Web_Commerce.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Vendeur")]
         public async Task<IActionResult> Create([Bind("NoVendeur,NoCategorie,Nom,Description,PrixDemande,Disponibilite,Poids,PrixVente, NombreItems, DateVente")] PPProduits pPProduits,
             IFormFile? file)
         {
@@ -154,6 +158,7 @@ namespace Projet_Web_Commerce.Controllers
         }
 
         // GET: PPProduits/Edit/5
+        [Authorize(Roles = "Vendeur")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -176,6 +181,7 @@ namespace Projet_Web_Commerce.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Vendeur")]
         public async Task<IActionResult> Edit([Bind("NoProduit,NoVendeur,NoCategorie,DateCreation,DateMAJ,Nom,Description,Photo,PrixDemande,Disponibilite,Poids,DateVente,PrixVente,NombreItems")] PPProduits pPProduits,
         IFormFile? file)
         {
@@ -258,6 +264,7 @@ namespace Projet_Web_Commerce.Controllers
 
 
         [HttpGet]
+        [Authorize(Roles = "Vendeur")]
         public async Task<IActionResult> IsProductInCart(int noProduit)
         {
             var productInCart = await _context.PPArticlesEnPanier.AnyAsync(p => p.NoProduit == noProduit);
@@ -265,6 +272,7 @@ namespace Projet_Web_Commerce.Controllers
         }
 
         // GET: PPProduits/Delete/5
+        [Authorize(Roles = "Vendeur")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -287,6 +295,7 @@ namespace Projet_Web_Commerce.Controllers
         // POST: PPProduits/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Vendeur")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             try
@@ -346,6 +355,7 @@ namespace Projet_Web_Commerce.Controllers
 
         [HttpPost, ActionName("DeleteConfirmed")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Vendeur")]
         public async Task<IActionResult> DeleteConfirmed2(int id)
         {
             try
@@ -416,6 +426,7 @@ namespace Projet_Web_Commerce.Controllers
             return View();
         }
 
+        [Authorize(Roles = "Vendeur")]
         public async Task<IActionResult> ListePanier()
         {
 
@@ -423,6 +434,7 @@ namespace Projet_Web_Commerce.Controllers
             return View(await authDbContext.ToListAsync());
         }
 
+        [Authorize(Roles = "Vendeur")]
         public async Task<IActionResult> DetailsPanier(int? id)
         {
             if (id == null)
@@ -439,7 +451,7 @@ namespace Projet_Web_Commerce.Controllers
 
             return View(pPClients);
         }
-
+        [Authorize(Roles = "Vendeur")]
         public async Task<IActionResult> SupprimerPanier(int? id)
         {
             if (id == null)
@@ -459,6 +471,7 @@ namespace Projet_Web_Commerce.Controllers
 
         [HttpPost, ActionName("SupprimerPanier")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Vendeur")]
         public async Task<IActionResult> SupprimerPanier(int noVendeur, int noClient)
         {
             try

@@ -1,4 +1,5 @@
 ﻿using DocumentFormat.OpenXml.InkML;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -8,6 +9,7 @@ using Projet_Web_Commerce.Models;
 
 namespace Projet_Web_Commerce.Controllers
 {
+    [Authorize(Roles = "Client")]
     public class PanierController : Controller
     {
         private readonly AuthDbContext _context;

@@ -1,4 +1,5 @@
 ﻿using DocumentFormat.OpenXml.Office.CustomUI;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Projet_Web_Commerce.API;
@@ -13,6 +14,7 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Projet_Web_Commerce.Controllers
 {
+    [Authorize(Roles = "Client")]
     public class CommandeController : Controller
     {
 

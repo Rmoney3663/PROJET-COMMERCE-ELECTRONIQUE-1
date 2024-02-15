@@ -17,6 +17,7 @@ using System;
 
 namespace Projet_Web_Commerce.Controllers
 {
+    [Authorize(Roles = "Client")]
     public class MainMenuController : Controller
     {
 
@@ -32,8 +33,8 @@ namespace Projet_Web_Commerce.Controllers
         // GET: MainMenuController
 
         
+        [Authorize(Roles = "Client")]
         [AllowAnonymous]
-        //[Authorize(Roles = "Client,Gestionnaire")]
         public ActionResult Catalogue()
         {
             if (User.IsInRole("Vendeur"))
@@ -61,17 +62,8 @@ namespace Projet_Web_Commerce.Controllers
             return View(modelCatalogue);
         }
 
-        //[HttpGet]
-        //public async Task<IActionResult> CatalogueVendeurAsync(string id)
-        //{
-
-        //    var model = new ModelCatalogueVendeur();
-
-        //    model.sortOrder = 
-
-        //    return View(model);
-        //}
-
+        [Authorize(Roles = "Client")]
+        [AllowAnonymous]
         public async Task<IActionResult> CatalogueVendeurAsync(ModelCatalogueVendeur model)
         {
 
@@ -238,6 +230,8 @@ namespace Projet_Web_Commerce.Controllers
 
         }
 
+        [Authorize(Roles = "Client")]
+        [AllowAnonymous]
         public async Task<IActionResult> CatalogueTousAsync(ModelCatalogueTous model)
         {
 
@@ -395,6 +389,7 @@ namespace Projet_Web_Commerce.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Client")]
         public ActionResult AjoutPanier(string source, int quantite, int NoProduit, int NoClient, int NoVendeur, ModelCatalogueVendeur model)
         {
             var vendeur = _context.PPVendeurs.Where(v => v.NoVendeur == NoVendeur).FirstOrDefault();
@@ -503,84 +498,6 @@ namespace Projet_Web_Commerce.Controllers
 
             return RedirectToAction("Catalogue");
 
-        }
-
-        //[Route("/MainMenuController/ValiderAsync")]
-        //[Authorize(Roles = "Gestionnaire")]
-        //public async Task<IActionResult> ValiderAsync(int id, string sujet, string message, bool vendeurAccepte, int pourcentage)
-        //{
-        //    var vendeurAUpdate = _context.PPVendeurs.FirstOrDefault(v => v.NoVendeur == id);
-
-        //    var result = new
-        //    {
-        //        Success = false,
-        //        Message = $"Erreur%"
-        //    };
-
-        //    if (vendeurAUpdate != null)
-        //    {
-        //        var user = await _userManager.FindByEmailAsync(vendeurAUpdate.AdresseEmail);
-        //        if (user != null)
-        //        {
-        //            await Methodes.envoyerCourriel(vendeurAUpdate.AdresseEmail, sujet, message);
-        //            if (vendeurAccepte)
-        //            {
-        //                vendeurAUpdate.Statut = 1;
-        //                vendeurAUpdate.Pourcentage = Convert.ToDecimal(pourcentage, CultureInfo.InvariantCulture);
-        //            }
-        //            else
-        //            {
-        //                _context.PPVendeurs.Remove(vendeurAUpdate);
-        //                _userManager.DeleteAsync(user);
-        //            }
-        //            _context.SaveChanges();
-
-        //            var vendeursStatutZero = _context.PPVendeurs
-        //                    .Where(v => v.Statut == 0)
-        //                    .OrderBy(v => v.DateCreation)
-        //                    .ToList();
-
-        //            View(vendeursStatutZero);
-
-        //            result = new
-        //            {
-        //                Success = true,
-        //                Message = $"Courriel envoyé%."
-        //            };
-        //        }
-        //    }
-
-        //    return Json(result);
-        //}
-
-        [HttpPost]
-        public ActionResult GestionVendeurs(int NoVendeur, string Pourcentage, bool vendeurAccepte)
-        {
-            if (User.IsInRole("Gestionnaire"))
-            {
-                var vendeurAUpdate = _context.PPVendeurs.FirstOrDefault(v => v.NoVendeur == NoVendeur);
-
-                if (vendeurAUpdate != null)
-                {
-                    if (vendeurAccepte)
-                    {
-                        vendeurAUpdate.Statut = 1;
-                        vendeurAUpdate.Pourcentage = Convert.ToDecimal(Pourcentage, CultureInfo.InvariantCulture);
-                    }
-                    else
-                        _context.PPVendeurs.Remove(vendeurAUpdate);
-
-                    _context.SaveChanges();
-
-                    var vendeursStatutZero = _context.PPVendeurs
-                            .Where(v => v.Statut == 0)
-                            .OrderBy(v => v.DateCreation)
-                            .ToList();
-
-                    return View(vendeursStatutZero);
-                }
-            }
-            return Redirect("AccessDenied");
         }
 
         // GET: MainMenuController/Details/5
