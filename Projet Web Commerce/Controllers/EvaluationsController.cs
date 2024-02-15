@@ -8,8 +8,16 @@ namespace Projet_Web_Commerce.Controllers
         // GET: EvaluationController
         public ActionResult Index(int id)
         {
+            ViewData["idProduit"] = id;
 
+            return View();
+        }
 
+        [HttpPost]
+        public ActionResult Index(int id, int rating)
+        {
+            ViewData["idProduit"] = id;
+            ViewData["rating"] = rating + 1;
             return View();
         }
 
