@@ -260,38 +260,56 @@
     });
 
     document.getElementById("btnEnvoyer").addEventListener("click", function () {
-        var params = new URLSearchParams(document.location.search);
-        var idMessage = params.get('idMessage');
-        var destinatairesSelectionnes = document.getElementById('selectedDestinataire').value.split(';');
-        for (var i = 0; i < destinatairesSelectionnes.length; i++) {
-            if (destinatairesSelectionnes[i] == '')
-                destinatairesSelectionnes.splice(i, 1);
-        }
-        document.getElementById('selectedDestinataire').value = destinatairesSelectionnes;
-        document.getElementById('auteur').value = '@user.Email';
-        document.getElementById('typeMessage').value = 0;
-        document.getElementById('idMessage').value = idMessage;
-
-        var valide = true;
-        var msgErreur = "";
-
-        if (selectedDestinataire.value == '') {
-            msgErreur = "Veuillez sélectionner le(s) destinataire(s) de votre courriel.";
-            valide = false;
-        }
-
-        if (valide) {
-            document.getElementById('frmCourriel').submit();
-        }
-        else {
-            console.log("pas valide");
+        var sujet = document.getElementById('sujet').value;
+        var msg = document.getElementById('message').value
+        if (sujet == '') {
             Swal.fire({
                 title: "Erreur!",
-                text: msgErreur,
+                text: "Vous devez entrer un objet pour le message!",
                 icon: "error"
-            }).then(() => {
-                // return false;
             });
+        }
+        else if (msg == '') {
+            Swal.fire({
+                title: "Erreur!",
+                text: "Vous devez entrer un message à envoyer!",
+                icon: "error"
+            });
+        }
+        else {
+            var params = new URLSearchParams(document.location.search);
+            var idMessage = params.get('idMessage');
+            var destinatairesSelectionnes = document.getElementById('selectedDestinataire').value.split(';');
+            for (var i = 0; i < destinatairesSelectionnes.length; i++) {
+                if (destinatairesSelectionnes[i] == '')
+                    destinatairesSelectionnes.splice(i, 1);
+            }
+            document.getElementById('selectedDestinataire').value = destinatairesSelectionnes;
+            document.getElementById('auteur').value = '@user.Email';
+            document.getElementById('typeMessage').value = 0;
+            document.getElementById('idMessage').value = idMessage;
+
+            var valide = true;
+            var msgErreur = "";
+
+            if (selectedDestinataire.value == '') {
+                msgErreur = "Veuillez sélectionner le(s) destinataire(s) de votre courriel.";
+                valide = false;
+            }
+
+            if (valide) {
+                document.getElementById('frmCourriel').submit();
+            }
+            else {
+                console.log("pas valide");
+                Swal.fire({
+                    title: "Erreur!",
+                    text: msgErreur,
+                    icon: "error"
+                }).then(() => {
+                    // return false;
+                });
+            }
         }
     });
 
