@@ -395,7 +395,7 @@ namespace Projet_Web_Commerce.Controllers
         }
 
         [HttpPost]
-        public ActionResult AjoutPanier(int quantite, int NoProduit, int NoClient, int NoVendeur, ModelCatalogueVendeur model)
+        public ActionResult AjoutPanier(string source, int quantite, int NoProduit, int NoClient, int NoVendeur, ModelCatalogueVendeur model)
         {
             var vendeur = _context.PPVendeurs.Where(v => v.NoVendeur == NoVendeur).FirstOrDefault();
             var produit = _context.PPProduits.Where(v => v.NoProduit == NoProduit).FirstOrDefault();
@@ -438,6 +438,42 @@ namespace Projet_Web_Commerce.Controllers
 
                     TempData["SuccessMessage"] = $"Le produit {produit.Nom} à été ajouté au panier.";
 
+                    if (source == "tous")
+                    {
+                        return RedirectToAction("CatalogueTous", new
+                        {
+                            searchString = model.searchString,
+                            parPage = model.parPage,
+                            dateApres = model.dateApres,
+                            dateAvant = model.dateAvant,
+                            searchCat = model.searchCat,
+                            pageNumber = model.pageNumber
+                        });
+                    }
+                    else
+                    {
+                        return RedirectToAction("CatalogueVendeur", new
+                        {
+                            nomAffaire = model.nomAffaire,
+                            searchString = model.searchString,
+                            parPage = model.parPage,
+                            dateApres = model.dateApres,
+                            dateAvant = model.dateAvant,
+                            searchCat = model.searchCat,
+                            pageNumber = model.pageNumber,
+                        });
+                    }
+
+
+                }
+
+            }
+            else
+            {
+                TempData["ErrorMessage"] = $"Le produit {produit.Nom} n'a pas été ajout au panier. Assurez-vous que le panier n'excède pas le nombre d'items en stock. ";
+                
+                if (source == "tous")
+                {
                     return RedirectToAction("CatalogueTous", new
                     {
                         searchString = model.searchString,
@@ -447,14 +483,21 @@ namespace Projet_Web_Commerce.Controllers
                         searchCat = model.searchCat,
                         pageNumber = model.pageNumber
                     });
-
                 }
-
-            }
-            else
-            {
-                TempData["ErrorMessage"] = $"Le produit {produit.Nom} n'a pas été ajout au panier. Assurez-vous que le panier n'excède pas le nombre d'items en stock. ";
-                return RedirectToAction("CatalogueTous");
+                else
+                {
+                    return RedirectToAction("CatalogueVendeur", new
+                    {
+                        nomAffaire = model.nomAffaire,
+                        searchString = model.searchString,
+                        parPage = model.parPage,
+                        dateApres = model.dateApres,
+                        dateAvant = model.dateAvant,
+                        searchCat = model.searchCat,
+                        pageNumber = model.pageNumber
+                        
+                    });
+                }
             }
 
 
