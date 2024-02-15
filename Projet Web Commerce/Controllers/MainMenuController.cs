@@ -66,7 +66,7 @@ namespace Projet_Web_Commerce.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> CatalogueVendeurAsync(ModelCatalogueVendeur model)
         {
-
+            
             // Action logic
             var vendeur = _context.PPVendeurs.Where(v => v.NomAffaires == model.nomAffaire).FirstOrDefault();
 
