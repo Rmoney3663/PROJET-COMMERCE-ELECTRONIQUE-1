@@ -64,6 +64,7 @@
                                         <th scope="col">Date de dernière connexion</th>
                                         <th scope="col">Date de dernière visite</th>
                                         <th scope="col">Nom d'affaire</th>
+                                        <th scope="col"></th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -88,6 +89,9 @@
                                             <td>@Html.DisplayFor(modelItem => item.Client.DateDerniereConnexion)</td>
                                             <td>@Html.DisplayFor(modelItem => item.VendeurClient.DateVisite)</td>
                                             <td>@Html.DisplayFor(modelItem => item.Vendeur.NomAffaires)</td>
+                                            <td>
+                                                <a asp-action="FraudeC" asp-route-id="@item.Client.NoClient">Fraude</a> 
+                                            </td>
                                         </tr>
                                     }
                                 </tbody>

@@ -1,5 +1,7 @@
 ﻿
 
+using Projet_Web_Commerce.Areas.Identity.Data;
+
 namespace Projet_Web_Commerce.Models
 {
     public class ModelListeVendeurs
@@ -12,5 +14,7 @@ namespace Projet_Web_Commerce.Models
         public List<ModelMoisAnnees> MoisAnneesDistinctsList { get; set; }
 
         public List<PPCommandes> CommandesList { get; set; }
+
+        public List<Utilisateur> UtilisateurList { get; set; }
     }
 }
