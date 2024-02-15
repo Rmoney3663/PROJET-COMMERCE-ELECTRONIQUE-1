@@ -27,6 +27,8 @@
     var textQuantite = "#000000";
     var font = "Arial";
     var logo = "none";
+    var backgroundButtonEvaluation = "#808080";
+    var textButtonEvaluation = "#FFFFFF";
 }
 
 
@@ -67,7 +69,7 @@
         {
             var listParams = config.Split(';');
 
-            if (listParams.Length == 16)
+            if (listParams.Length == 18)
             {
                 text = listParams[0];
                 textCard = listParams[2];
@@ -84,6 +86,8 @@
                 textQuantite = listParams[13];
                 font = listParams[14];
                 logo = listParams[15];
+                backgroundButtonEvaluation = listParams[16];
+                textButtonEvaluation = listParams[17];
             }
         }
 
@@ -222,6 +226,13 @@
                                 {
                                     <p class="card-text">Prix : @Html.DisplayFor(modelItem => item.PrixDemande) $ </p>
                                 }
+
+                                <a asp-controller="Evaluations"
+                                   asp-route-id="@item.NoProduit"
+                                   asp-action="Index"
+                                   class="btn btn-secondary mt-auto" style="background-color:@backgroundButtonEvaluation; color: @textButtonEvaluation">
+                                    Évaluations
+                                </a>
 
                                 
 

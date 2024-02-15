@@ -26,7 +26,8 @@ namespace Projet_Web_Commerce.Controllers
         [HttpPost]
         public ActionResult Index(int id, string text, string background, string textCard, string backgroundCard, string recherche, 
             string textRecherche, string backgroundButtonDetail, string textButtonDetail, string backgroundButtonAjouter, string textButtonAjouter,
-            string backgroundBarre, string textBarre, string backgroundQuantite, string textQuantite, string font, IFormFile image)
+            string backgroundBarre, string textBarre, string backgroundQuantite, string textQuantite, string font, IFormFile image, 
+            string backgroundButtonEvaluation, string textButtonEvaluation)
         {
             var vendeur = _context.PPVendeurs.Where(v => v.NoVendeur == id).FirstOrDefault();
             string nomFileImage = vendeur.NoVendeur.ToString();
@@ -52,7 +53,8 @@ namespace Projet_Web_Commerce.Controllers
             string configuration = "";
             configuration += text + ";" + background + ";" + textCard + ";" + backgroundCard + ";" + recherche + ";" + textRecherche + ";" 
                 + backgroundButtonDetail + ";" + textButtonDetail + ";" + backgroundButtonAjouter + ";" + textButtonAjouter + ";" + 
-                backgroundBarre + ";" + textBarre + ";" + backgroundQuantite + ";" + textQuantite + ";" + font + ";" + nomFileImage;
+                backgroundBarre + ";" + textBarre + ";" + backgroundQuantite + ";" + textQuantite + ";" + font + ";" + nomFileImage + ";" +
+                backgroundButtonEvaluation + ";" + textButtonEvaluation;
 
             vendeur.Configuration = configuration;
 
