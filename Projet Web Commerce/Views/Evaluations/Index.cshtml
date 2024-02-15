@@ -1,1 +1,60 @@
-﻿<p>yo</p>
+﻿@using Microsoft.AspNetCore.Identity
+@using Projet_Web_Commerce.Areas.Identity.Data
+@using Projet_Web_Commerce.Data
+
+@inject AuthDbContext _context
+
+@inject SignInManager<Utilisateur> SignInManager
+@inject UserManager<Utilisateur> UserManager
+
+@if (!SignInManager.IsSignedIn(User) || !User.IsInRole("Client"))
+{
+    Console.WriteLine("yes");
+    <text>
+        <script>
+            debugger;
+            window.location.href = '/MainMenu/Catalogue';
+        </script>
+    </text>
+}
+else
+{
+    var user = await UserManager.GetUserAsync(User);
+    var client = _context.PPClients.Where(c => c.AdresseEmail == user.Email).FirstOrDefault();
+
+    int id = ViewBag.idProduit;
+    var rating = ViewBag.rating;
+    int numRating = 0;
+
+    if (rating != null)
+    {
+        numRating = rating;
+    }
+    
+    <div class="row">
+        <div class="col-md-4">
+            <p>Ajouter une évaluation</p>
+            <div class="col">
+                <form asp-route-id="@id" id="eval" method="post">
+                    @for (int i = 0; i < numRating; i++)
+                    {
+                        <button type="submit" name="rating" value="@i" style="border: none">
+                            <img src="~/Logo/iconeEtoileJaune.png" width="25" height="25" />
+                        </button>
+                    }
+                    @for (int i = numRating; i < 5; i++)
+                    {
+                        <button type="submit" name="rating" value="@i" style="border: none">
+                            <img src="~/Logo/iconeEtoile.png" width="25" height="25" />
+                        </button>
+                    }
+                </form>
+            </div>
+        </div>
+    </div>
+
+    foreach(var review in _context.PPEvaluations.Where(e=>e.NoProduit == id).ToList())
+    {
+        <p>@review.Commentaire</p>
+    }
+}

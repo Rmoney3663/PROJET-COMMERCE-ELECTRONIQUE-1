@@ -227,17 +227,16 @@
                                     <p class="card-text">Prix : @Html.DisplayFor(modelItem => item.PrixDemande) $ </p>
                                 }
 
-                                <a asp-controller="Evaluations"
-                                   asp-route-id="@item.NoProduit"
-                                   asp-action="Index"
-                                   class="btn btn-secondary mt-auto" style="background-color:@backgroundButtonEvaluation; color: @textButtonEvaluation">
-                                    Évaluations
-                                </a>
-
                                 
 
                                 @if (SignInManager.IsSignedIn(User) && User.IsInRole("Client") && item.NombreItems > 0)
                                 {
+                                    <a asp-controller="Evaluations"
+                                       asp-route-id="@item.NoProduit"
+                                       asp-action="Index"
+                                       class="btn btn-secondary mt-auto" style="background-color:@backgroundButtonEvaluation; color: @textButtonEvaluation">
+                                        Évaluations
+                                    </a>
                                     <a asp-controller="PPProduits"
                                        asp-route-id="@item.NoProduit"
                                        asp-action="Details"
