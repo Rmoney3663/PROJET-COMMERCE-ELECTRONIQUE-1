@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Projet_Web_Commerce.Data;
 using Projet_Web_Commerce.Models;
 
-namespace Projet_Web_Commerce
+namespace Projet_Web_Commerce.Controllers
 {
     public class PPCategoriesController : Controller
     {
@@ -30,14 +30,14 @@ namespace Projet_Web_Commerce
         {
             if (id == null)
             {
-                return NotFound();
+                return RedirectToAction("ErrorNoFound", "PPCategories");
             }
 
             var pPCategories = await _context.PPCategories
                 .FirstOrDefaultAsync(m => m.NoCategorie == id);
             if (pPCategories == null)
             {
-                return NotFound();
+                return RedirectToAction("ErrorNoFound", "PPCategories");
             }
 
             return View(pPCategories);
@@ -70,13 +70,13 @@ namespace Projet_Web_Commerce
         {
             if (id == null)
             {
-                return NotFound();
+                return RedirectToAction("ErrorNoFound", "PPCategories");
             }
 
             var pPCategories = await _context.PPCategories.FindAsync(id);
             if (pPCategories == null)
             {
-                return NotFound();
+                return RedirectToAction("ErrorNoFound", "PPCategories");
             }
             return View(pPCategories);
         }
@@ -86,13 +86,8 @@ namespace Projet_Web_Commerce
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("NoCategorie,Description,Details")] PPCategories pPCategories)
+        public async Task<IActionResult> Edit([Bind("NoCategorie,Description,Details")] PPCategories pPCategories)
         {
-            if (id != pPCategories.NoCategorie)
-            {
-                return NotFound();
-            }
-
             if (ModelState.IsValid)
             {
                 try
@@ -104,7 +99,7 @@ namespace Projet_Web_Commerce
                 {
                     if (!PPCategoriesExists(pPCategories.NoCategorie))
                     {
-                        return NotFound();
+                        return RedirectToAction("ErrorNoFound", "PPCategories");
                     }
                     else
                     {
@@ -121,14 +116,14 @@ namespace Projet_Web_Commerce
         {
             if (id == null)
             {
-                return NotFound();
+                return RedirectToAction("ErrorNoFound", "PPCategories");
             }
 
             var pPCategories = await _context.PPCategories
                 .FirstOrDefaultAsync(m => m.NoCategorie == id);
             if (pPCategories == null)
             {
-                return NotFound();
+                return RedirectToAction("ErrorNoFound", "PPCategories");
             }
 
             return View(pPCategories);
@@ -137,21 +132,45 @@ namespace Projet_Web_Commerce
         // POST: PPCategories/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(int? id)
         {
-            var pPCategories = await _context.PPCategories.FindAsync(id);
-            if (pPCategories != null)
+            try
             {
-                _context.PPCategories.Remove(pPCategories);
-            }
+                if (id == null)
+                {
+                    return RedirectToAction("ErrorNoFound", "PPCategories");
+                }
 
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+                var pPCategories = await _context.PPCategories.FindAsync(id);
+                if (pPCategories != null)
+                {
+                    _context.PPCategories.Remove(pPCategories);
+                }
+
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            catch
+            {
+                return RedirectToAction("Error", "PPCategories");
+                
+            }
         }
 
         private bool PPCategoriesExists(int id)
         {
             return _context.PPCategories.Any(e => e.NoCategorie == id);
         }
+
+        public IActionResult Error()
+        {
+            return View();
+        }
+
+        public IActionResult ErrorNoFound()
+        {
+            return View();
+        }
+
     }
 }
