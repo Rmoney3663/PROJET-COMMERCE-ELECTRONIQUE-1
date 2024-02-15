@@ -19,6 +19,7 @@ using Projet_Web_Commerce.Models;
 
 namespace Projet_Web_Commerce.Controllers
 {
+    [Authorize(Roles = "Gestionnaire")]
     public class PPGestionnairesController : Controller
     {
         public readonly AuthDbContext _context;
