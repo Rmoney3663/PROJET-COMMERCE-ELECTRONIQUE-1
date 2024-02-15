@@ -40,7 +40,9 @@
                                 */
 
                                 var groupeParAnnee = (from vendeur in Model.VendeursList
-                                                      where vendeur.DateCreation.Month == date.Mois && vendeur.DateCreation.Year == date.Annee
+                                                      join user in Model.UtilisateurList
+                                                      on vendeur.IdUtilisateur equals user.Id
+                                                      where user.EmailConfirmed && vendeur.DateCreation.Month == date.Mois && vendeur.DateCreation.Year == date.Annee
                                                       orderby vendeur.NomAffaires
                                                       join commande in Model.CommandesList
                                                       on vendeur.NoVendeur equals commande.NoVendeur into vendeurCommandes
@@ -52,6 +54,7 @@
                                                           Commande = vc
                                                       })
                                 .ToList();
+
 
 
 
@@ -67,6 +70,7 @@
                                         <th scope="col">Nb de produits inscrits</th>
                                         <th scope="col">Date de dernière commande</th>
                                         <th scope="col">Montant total avant taxes </th>
+                                        <th scope="col"></th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -92,6 +96,9 @@
                                             <td>@Model.ProduitsList.Count(modelItem => modelItem.NoVendeur == item.Vendeur.NoVendeur)</td>
                                             <td>@Html.DisplayFor(modelItem => item.Commande.DateCommande)</td>
                                             <td>@Html.DisplayFor(modelItem => item.Commande.MontantTotAvantTaxes)</td>
+                                            <td>
+                                                <a asp-action="FraudeV" asp-route-id="@item.Vendeur.NoVendeur">Fraude</a>
+                                            </td>
                                         </tr>
                                     }
                                 </tbody>
