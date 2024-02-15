@@ -4,7 +4,7 @@
 @inject AuthDbContext _context
 
 @{
-    ViewData["Title"] = "Boîte de réception";
+    ViewData["Title"] = "Supprimés";
 }
 
 <style>
@@ -12,7 +12,7 @@
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        max-width: 450px
+        max-width: 300px;
     }
 
     .msg {
@@ -23,19 +23,13 @@
         background-color: rgb(236, 235, 243);
         cursor: pointer;
     }
-
-    .email-non-lu {
-        font-weight: bold; /* Texte en gras */
-        color: #0000FF; /* Couleur du texte - par exemple, bleu */
-        background-color: #E6E6FA; /* Couleur de fond - par exemple, lavande */
-    }
 </style>
 
 <div class="row">
     <div class="col">
         <section>
             <div>
-                @Html.Partial("MenuMessagerie", "BoiteDeReception")
+                @Html.Partial("MenuMessagerie", "Supprimes")
             </div>
             <div class="card">
                 <div class="card-body">
@@ -47,26 +41,23 @@
                                 <th scope="col">#</th>
                                 <th scope="col">Expéditeur</th>
                                 <th scope="col">Objet - <span class="msg">Message</span></th>
-                                <th scope="col" class="text-end">Date de l'envoi</th>
+                                <th scope="col">Date de l'envoi</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        @* <tbody>
                             @{
                                 var no = 0;
                             }
                             @foreach (var msg in Model)
                             {
-                                string rowClass = (msg.TypeMessage == 0) ? "flotter email-non-lu" : "flotter";
-
-                                <tr class="@rowClass" onclick="window.location.href = '@Url.Action("Details", new { idMessage = msg.NoMessage })'">
+                                <tr class="flotter" onclick="window.location.href = '@Url.Action("Details", new { idMessage = msg.NoMessage })'">
                                     <td>@(++no)</td>
-                                    <td>@_context.Users.FirstOrDefault(u => u.Id == msg.Auteur)?.Email</td>
+                                    <td>@_context.Users.Where(u => u.Id == msg.Auteur).FirstOrDefault().Email</td>
                                     <td class="truncate">@Html.DisplayFor(modelItem => msg.Sujet) - <span class="msg">@Html.DisplayFor(modelItem => msg.Message)</span></td>
-                                    <td class="text-end">@DateTime.Now.Date</td> @* <td>@Html.DisplayFor(modelItem => msg.Message.DateMessage)</td> *@
+                                    <td>@DateTime.Now.Date</td> @* <td>@Html.DisplayFor(modelItem => msg.Message.DateMessage)</td>
                                 </tr>
-
                             }
-                        </tbody>
+                        </tbody> *@
                     </table>
                 </div>
             </div>

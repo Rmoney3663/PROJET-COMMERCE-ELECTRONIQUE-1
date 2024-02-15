@@ -248,12 +248,15 @@
                                         <input type="hidden" name="NoClient" value="@Model.noClient" />
                                         <input type="hidden" name="NoVendeur" value="@item.NoVendeur" />
 
+                                        <input type="hidden" name="source" value="vendeur" />
+
                                         @Html.HiddenFor(m => m.searchString)
                                         @Html.HiddenFor(m => m.parPage)
                                         @Html.HiddenFor(m => m.searchCat)
                                         @Html.HiddenFor(m => m.pageNumber)
                                         @Html.HiddenFor(m => m.dateApres)
                                         @Html.HiddenFor(m => m.dateAvant)
+                                        @Html.HiddenFor(m => m.nomAffaire)
 
                                         <br />
                                         <button class="btn btn-secondary" style="background-color:@backgroundButtonAjouter; color:@textButtonAjouter" type="submit">Ajouter au panier</button>

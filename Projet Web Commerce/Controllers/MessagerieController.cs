@@ -25,6 +25,7 @@ namespace Projet_Web_Commerce.Controllers
             _userManager = userManager;
         }
 
+        [HttpGet]
         // GET: MessagerieController
         public ActionResult BoiteDeReception()
         {
@@ -138,21 +139,37 @@ namespace Projet_Web_Commerce.Controllers
             var currentUserEmail = _userManager.Users.Where(u => u.Email == User.Identity.Name).FirstOrDefault().Id;
             var msgEnvoyes = _context.PPMessages
                 .Where(message => message.Auteur == currentUserEmail 
-                && message.TypeMessage == 0)
+                && (message.TypeMessage == 0 || message.TypeMessage == 1))
                 .Include(m => m.Destinataires)
                 .ToList();
 
             return View(msgEnvoyes);
         }
 
+        [HttpGet]
         // GET: EmailSenderController/Details/5
         public async Task<ActionResult> Details(int idMessage)
         {
+            var user = await _userManager.GetUserAsync(User);
+            var utilisateurCourantId = await _userManager.GetUserIdAsync(user);
+
             var messageCourant = await _context.PPMessages
+                .Include(m => m.Destinataires)
                 .FirstOrDefaultAsync(m => m.NoMessage == idMessage);
+
+            // Vérifier si l'utilisateur courant est le destinataire du message
+            var utilisateurEstDestinataire = messageCourant.Destinataires.Any(dest => dest.Destinataire == utilisateurCourantId);
+
+            if (utilisateurEstDestinataire)
+            {
+                messageCourant.TypeMessage = 1;
+                await _context.SaveChangesAsync();
+            }
+
             return View(messageCourant);
         }
 
+        [HttpGet]
         // GET: EmailSenderController/Brouillons
         public ActionResult Brouillons()
         {
@@ -163,6 +180,14 @@ namespace Projet_Web_Commerce.Controllers
                 .ToList();
             return View(brouillons);
         }
+
+        [HttpGet]
+        public ActionResult Supprimes()
+        {
+
+            return View();
+        }
+
 
         // POST: EmailSenderController/Create
         [HttpPost]
