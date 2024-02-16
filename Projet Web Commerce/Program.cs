@@ -18,6 +18,8 @@ builder.Services.AddDefaultIdentity<Utilisateur>(options => options.SignIn.Requi
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+builder.Services.AddSignalR();
+
 
 var app = builder.Build();
 

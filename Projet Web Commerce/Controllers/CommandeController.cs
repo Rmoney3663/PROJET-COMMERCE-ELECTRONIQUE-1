@@ -6,6 +6,7 @@ using Projet_Web_Commerce.API;
 using Projet_Web_Commerce.Areas.Identity.Data;
 using Projet_Web_Commerce.Data;
 using Projet_Web_Commerce.Models;
+using System.Globalization;
 using System.Net;
 using System.Text;
 using System.Text.Json;
@@ -335,6 +336,37 @@ namespace Projet_Web_Commerce.Controllers
                                         _context.Remove(panier);
                                     }
 
+                                    decimal fraisLesi;
+                                    if (decimal.TryParse(FraisMarchand,
+                     NumberStyles.Number,
+                     CultureInfo.InvariantCulture,
+                     out fraisLesi))
+                                    {
+
+                                        var Redevance = _context.PPVendeurs.Where(v => v.NoVendeur == model.NoVendeur).FirstOrDefault().Pourcentage;
+                                        var ppHistoriqueCommande = new PPHistoriquePaiements
+                                        {
+                                            MontantVenteAvantLivraison = Math.Round(sousTotal.Value, 2),
+                                            NoVendeur = model.NoVendeur,
+                                            NoClient = model.NoClient,
+                                            NoCommande = ppCommande.NoCommande,
+                                            DateVente = ppCommande.DateCommande,
+                                            NoAutorisation = NoAutorisation.ToString(),
+                                            FraisLesi = fraisLesi,
+                                            Redevance = Redevance.Value,
+                                            FraisLivraison = roundedFraisLivraison,
+                                            FraisTPS = ppCommande.TPS,
+                                            FraisTVQ = ppCommande.TVQ
+                                        };
+                                        _context.Add(ppHistoriqueCommande);
+                                    }
+                                    else
+                                    {
+                                        throw new Exception();
+                                    }
+
+                                   
+
                                     _context.SaveChanges();
                                     transaction.Commit(); // Commit the transaction if all operations succeed
                                     TempData.Clear();
@@ -350,6 +382,8 @@ namespace Projet_Web_Commerce.Controllers
                             {
                                 transaction.Rollback(); // Rollback the transaction if an exception occurs
                                 TempData.Clear();
+
+                                messageErreur = messageErreur == "" ? "Une erreur s'est produite !" : messageErreur;
                                 TempData["ErrorMessage"] = messageErreur;
                             }
                         }
