@@ -202,6 +202,13 @@
         var dropdown = document.getElementById("ddlClients");
         var selectedValue = dropdown.options[dropdown.selectedIndex].value;
 
+        // Vérifier si la personne est déjà sélectionnée
+        if (selectedDestinataire.value.includes(selectedValue)) {
+            alert("Cette personne est déjà sélectionnée.");
+            dropdown.selectedIndex = 0;
+            return;
+        }
+
         if (selectedValue) {
             var selectedNamesContainer = document.getElementById("selectedNamesContainer");
 
@@ -213,9 +220,9 @@
             deleteIcon.className = "delete-icon";
             deleteIcon.onclick = function () {
                 let option = document.createElement("option");
-                option.text = nameElement.firstChild.textContent
-                option.value = option.text
-                dropdown.add(option);
+                option.text = nameElement.firstChild.textContent;
+                option.value = option.text;
+                // dropdown.add(option);
                 selectedNamesContainer.removeChild(nameElement);
                 selectedDestinataire.value = selectedDestinataire.value.replace(nameElement.firstChild.textContent + ';', '');
             };
@@ -223,7 +230,6 @@
             selectedDestinataire.value += nameElement.innerHTML + ';';
             nameElement.appendChild(deleteIcon);
             selectedNamesContainer.appendChild(nameElement);
-            dropdown.remove(dropdown.selectedIndex);
 
             dropdown.selectedIndex = 0;
         }

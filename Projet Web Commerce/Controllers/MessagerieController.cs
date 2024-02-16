@@ -91,7 +91,7 @@ namespace Projet_Web_Commerce.Controllers
                     nouveauMessage.AuteurUser = await _userManager.FindByEmailAsync(auteur);
                     nouveauMessage.TypeMessage = typeMessage;
                     nouveauMessage.PieceJointe = "";
-                    nouveauMessage.Transfemetteur = "";
+                    nouveauMessage.Transmetteur = "";
                 }
                 _context.PPMessages.Add(nouveauMessage);
                 await _context.SaveChangesAsync();
