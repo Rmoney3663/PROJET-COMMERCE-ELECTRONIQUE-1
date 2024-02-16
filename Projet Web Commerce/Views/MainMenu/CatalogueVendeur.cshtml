@@ -236,12 +236,12 @@
 
                                 @if (SignInManager.IsSignedIn(User) && User.IsInRole("Client") && item.NombreItems > 0)
                                 {
-@*                                       <a asp-controller="Evaluations"
+                                      <a asp-controller="Evaluations"
                                          asp-route-id="@item.NoProduit"
                                          asp-action="Index"
                                          class="btn btn-secondary mt-auto" style="background-color:@backgroundButtonEvaluation; color: @textButtonEvaluation">
                                           Évaluations
-                                      </a> *@
+                                      </a> 
                                     
                                     <form asp-controller="MainMenu" id="formAjoutPanier" asp-action="AjoutPanier" method="post">
                                         <input type="hidden" name="NoProduit" value="@item.NoProduit" />

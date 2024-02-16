@@ -1,10 +1,23 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using DocumentFormat.OpenXml.Office2010.Excel;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Projet_Web_Commerce.Areas.Identity.Data;
+using Projet_Web_Commerce.Data;
+using Projet_Web_Commerce.Models;
 
 namespace Projet_Web_Commerce.Controllers
 {
     public class EvaluationsController : Controller
     {
+        private readonly AuthDbContext _context;
+        private readonly Microsoft.AspNetCore.Identity.UserManager<Utilisateur> _userManager;
+
+        public EvaluationsController(AuthDbContext context, Microsoft.AspNetCore.Identity.UserManager<Utilisateur> userManager)
+        {
+            _context = context;
+            _userManager = userManager;
+        }
+
         // GET: EvaluationController
         public ActionResult Index(int id)
         {
@@ -48,25 +61,39 @@ namespace Projet_Web_Commerce.Controllers
             }
         }
 
-        // GET: EvaluationController/Edit/5
-        public ActionResult Edit(int id)
-        {
-            return View();
-        }
-
         // POST: EvaluationController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public ActionResult Edit(int id, string msg, int noClient, int rating, bool eval)
         {
-            try
+            DateTime dateCreate = DateTime.Now;
+            DateTime dateMaj = DateTime.Now;
+            PPEvaluations newEvaluation = new PPEvaluations();
+
+            if (eval)
             {
-                return RedirectToAction(nameof(Index));
+                var evalActu = _context.PPEvaluations.Where(e => e.NoClient == noClient && e.NoProduit == id).FirstOrDefault();
+                evalActu.Commentaire = msg;
+                evalActu.Cote = rating;
+                evalActu.DateMAJ = dateMaj;
+                _context.SaveChanges();
             }
-            catch
+            else
             {
-                return View();
+                newEvaluation.NoProduit = id;
+                newEvaluation.NoClient = noClient;
+                newEvaluation.Commentaire = msg;
+                newEvaluation.Cote = rating;
+                newEvaluation.DateCreation = dateCreate;
+                newEvaluation.DateMAJ = dateMaj;
+
+                _context.Add(newEvaluation);
+                _context.SaveChanges();
             }
+
+            ViewData["idProduit"] = id;
+
+            return RedirectToAction(nameof(Index), new RouteValueDictionary(new { controller = "Evaluations", action = "Index", id = id }));
         }
 
         // GET: EvaluationController/Delete/5
