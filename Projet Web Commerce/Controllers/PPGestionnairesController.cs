@@ -257,7 +257,7 @@ namespace Projet_Web_Commerce.Controllers
 
         [Route("/PPGestionnairesController/ValiderAsync")]
         [Authorize(Roles = "Gestionnaire")]
-        public async Task<IActionResult> ValiderAsync(int id, string sujet, string message, bool vendeurAccepte, int pourcentage)
+        public async Task<IActionResult> ValiderAsync(int id, string sujet, string message, string infosSupp, bool vendeurAccepte, int pourcentage)
         {
             var vendeurAUpdate = _context.PPVendeurs.FirstOrDefault(v => v.NoVendeur == id);
 
@@ -272,6 +272,8 @@ namespace Projet_Web_Commerce.Controllers
                 var user = await _userManager.FindByEmailAsync(vendeurAUpdate.AdresseEmail);
                 if (user != null)
                 {
+                    if (infosSupp != null)
+                        message += "\n\n" + infosSupp;
                     await Methodes.envoyerCourriel(sujet, message, vendeurAUpdate.AdresseEmail);
                     if (vendeurAccepte)
                     {
