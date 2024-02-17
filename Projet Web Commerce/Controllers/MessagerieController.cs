@@ -29,9 +29,9 @@ namespace Projet_Web_Commerce.Controllers
         // GET: MessagerieController
         public ActionResult BoiteDeReception()
         {
-            var currentUserEmail = _userManager.Users.Where(u => u.Email == User.Identity.Name).FirstOrDefault().Id;
+            var currentUserId = _userManager.Users.Where(u => u.Email == User.Identity.Name).FirstOrDefault().Id;
             var msgRecus = _context.PPDestinatairesMessage
-                .Where(dest => dest.Destinataire == currentUserEmail)
+                .Where(dest => dest.Destinataire == currentUserId)
                 .Select(dest => dest.Message)
                 .ToList();
 
