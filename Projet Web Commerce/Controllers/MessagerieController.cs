@@ -29,9 +29,12 @@ namespace Projet_Web_Commerce.Controllers
         // GET: MessagerieController
         public ActionResult BoiteDeReception()
         {
-            var currentUserId = _userManager.Users.Where(u => u.Email == User.Identity.Name).FirstOrDefault().Id;
+            var utilisateurCourantId = _userManager.Users.Where(u => u.Email == User.Identity.Name).FirstOrDefault().Id;
+            ViewBag.UtilisateurCourantId = utilisateurCourantId;
+
             var msgRecus = _context.PPDestinatairesMessage
-                .Where(dest => dest.Destinataire == currentUserId)
+                .Include(dest => dest.Message.Destinataires)
+                .Where(dest => dest.Destinataire == utilisateurCourantId)
                 .Select(dest => dest.Message)
                 .ToList();
 
@@ -54,7 +57,10 @@ namespace Projet_Web_Commerce.Controllers
             }
 
             var brouillonMsg = await _context.PPMessages
+                .Include(m => m.Destinataires)
                 .FirstOrDefaultAsync(m => m.NoMessage == idMessage);
+
+            ViewBag.Dests = brouillonMsg.Destinataires;
 
             return View(brouillonMsg);
         }
@@ -65,7 +71,7 @@ namespace Projet_Web_Commerce.Controllers
         {
             int noMsg = 0;
             
-            if (idMessage != null)
+             if (idMessage != null)
             {
                 var msg = await _context.PPMessages
                     .FirstOrDefaultAsync(m => m.NoMessage == idMessage);
@@ -91,7 +97,8 @@ namespace Projet_Web_Commerce.Controllers
                     nouveauMessage.AuteurUser = await _userManager.FindByEmailAsync(auteur);
                     nouveauMessage.TypeMessage = typeMessage;
                     nouveauMessage.PieceJointe = "";
-                    nouveauMessage.Transmetteur = "";
+                    nouveauMessage.Transmetteur = null;
+                    nouveauMessage.DateEnvoi = DateTime.Now;
                 }
                 _context.PPMessages.Add(nouveauMessage);
                 await _context.SaveChangesAsync();
@@ -139,7 +146,7 @@ namespace Projet_Web_Commerce.Controllers
             var currentUserEmail = _userManager.Users.Where(u => u.Email == User.Identity.Name).FirstOrDefault().Id;
             var msgEnvoyes = _context.PPMessages
                 .Where(message => message.Auteur == currentUserEmail 
-                && (message.TypeMessage == 0 || message.TypeMessage == 1))
+                && message.TypeMessage == 0)
                 .Include(m => m.Destinataires)
                 .ToList();
 
@@ -158,11 +165,11 @@ namespace Projet_Web_Commerce.Controllers
                 .FirstOrDefaultAsync(m => m.NoMessage == idMessage);
 
             // Vérifier si l'utilisateur courant est le destinataire du message
-            var utilisateurEstDestinataire = messageCourant.Destinataires.Any(dest => dest.Destinataire == utilisateurCourantId);
+            var destinataire = messageCourant.Destinataires.FirstOrDefault(dest => dest.Destinataire == utilisateurCourantId);
 
-            if (utilisateurEstDestinataire)
+            if (destinataire != null && !destinataire.MessageLu)
             {
-                messageCourant.TypeMessage = 1;
+                destinataire.MessageLu = true;
                 await _context.SaveChangesAsync();
             }
 
@@ -176,7 +183,8 @@ namespace Projet_Web_Commerce.Controllers
             var currentUserEmail = _userManager.Users.Where(u => u.Email == User.Identity.Name).FirstOrDefault().Id;
             var brouillons = _context.PPMessages
                 .Where(message => message.Auteur == currentUserEmail
-                && message.TypeMessage == 2)
+                    && message.TypeMessage == 2)
+                .Include(m => m.Destinataires)
                 .ToList();
             return View(brouillons);
         }

@@ -12,8 +12,8 @@ using Projet_Web_Commerce.Data;
 namespace Projet_Web_Commerce.Migrations
 {
     [DbContext(typeof(AuthDbContext))]
-    [Migration("20240216172740_messagerie3")]
-    partial class messagerie3
+    [Migration("20240217204953_Messagerie")]
+    partial class Messagerie
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -585,6 +585,9 @@ namespace Projet_Web_Commerce.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<DateTime>("DateEnvoi")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Message")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -598,7 +601,6 @@ namespace Projet_Web_Commerce.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Transmetteur")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("TypeMessage")
@@ -1082,9 +1084,7 @@ namespace Projet_Web_Commerce.Migrations
 
                     b.HasOne("Projet_Web_Commerce.Areas.Identity.Data.Utilisateur", "TransmetteurUser")
                         .WithMany()
-                        .HasForeignKey("Transmetteur")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("Transmetteur");
 
                     b.Navigation("AuteurUser");
 

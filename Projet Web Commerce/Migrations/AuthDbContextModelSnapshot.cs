@@ -582,6 +582,9 @@ namespace Projet_Web_Commerce.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<DateTime>("DateEnvoi")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Message")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -595,7 +598,6 @@ namespace Projet_Web_Commerce.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Transmetteur")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("TypeMessage")
@@ -1079,9 +1081,7 @@ namespace Projet_Web_Commerce.Migrations
 
                     b.HasOne("Projet_Web_Commerce.Areas.Identity.Data.Utilisateur", "TransmetteurUser")
                         .WithMany()
-                        .HasForeignKey("Transmetteur")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("Transmetteur");
 
                     b.Navigation("AuteurUser");
 

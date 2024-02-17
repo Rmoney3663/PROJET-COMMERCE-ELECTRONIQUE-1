@@ -26,7 +26,9 @@ namespace Projet_Web_Commerce.Models
 
         public string PieceJointe { get; set; }
 
-        public string Transmetteur { get; set; }
+        public string? Transmetteur { get; set; }
+
+        public DateTime DateEnvoi { get; set; }
 
         // Navigation property for recipients
         public ICollection<PPDestinatairesMessage> Destinataires { get; set; }
@@ -35,6 +37,6 @@ namespace Projet_Web_Commerce.Models
         public virtual Utilisateur AuteurUser { get; set; }
 
         [ForeignKey("Transmetteur")]
-        public virtual Utilisateur TransmetteurUser { get; set; }
+        public virtual Utilisateur? TransmetteurUser { get; set; }
     }
 }

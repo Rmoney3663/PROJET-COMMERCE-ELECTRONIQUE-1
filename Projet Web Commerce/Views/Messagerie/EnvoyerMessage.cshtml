@@ -198,13 +198,45 @@
 </div>
 
 <script>
+    $(document).ready(function () {
+        // Check if Model.Destinataires is not null
+        if (@(Model != null ? "true" : "false") === true) {
+
+            // Serialize the email addresses
+            var idDestinataires = @Html.Raw(Json.Serialize(Model?.Destinataires.Select(d => d.DestinataireUser?.Email).Where(email => !string.IsNullOrWhiteSpace(email))));
+
+            // Add the pre-selected destinataires to selectedNamesContainer
+            for (var i = 0; i < idDestinataires.length; i++) {
+                var selectedNamesContainer = document.getElementById("selectedNamesContainer");
+
+                var nameElement = document.createElement("span");
+                nameElement.innerHTML = idDestinataires[i];
+
+                var deleteIcon = document.createElement("span");
+                deleteIcon.innerHTML = " &#10006;";
+                deleteIcon.className = "delete-icon";
+                deleteIcon.onclick = function () {
+                    let option = document.createElement("option");
+                    option.text = nameElement.firstChild.textContent;
+                    option.value = option.text;
+                    selectedNamesContainer.removeChild(nameElement);
+                    document.getElementById('selectedDestinataire').value = document.getElementById('selectedDestinataire').value.replace(nameElement.firstChild.textContent + ';', '');
+                };
+
+                selectedDestinataire.value += nameElement.innerHTML + ';';
+                nameElement.appendChild(deleteIcon);
+                selectedNamesContainer.appendChild(nameElement);
+            }
+        }
+    });
+
     function ajouterDestinataire() {
         var dropdown = document.getElementById("ddlClients");
         var selectedValue = dropdown.options[dropdown.selectedIndex].value;
 
         // Vérifier si la personne est déjà sélectionnée
         if (selectedDestinataire.value.includes(selectedValue)) {
-            alert("Cette personne est déjà sélectionnée.");
+            // alert("Cette personne est déjà sélectionnée.");
             dropdown.selectedIndex = 0;
             return;
         }
@@ -318,55 +350,5 @@
             }
         }
     });
-
-    // function soumettreForm() {
-    //     var destinatairesSelectionnes = document.getElementById('selectedDestinataire').value.split(';');
-    //     for (var i = 0; i < destinatairesSelectionnes.length; i++) {
-    //         if (destinatairesSelectionnes[i] == '')
-    //             destinatairesSelectionnes.splice(i, 1);
-    //     }
-    //     document.getElementById('selectedDestinataire').value = destinatairesSelectionnes;
-    //     document.getElementById('auteur').value = '@user.Email';
-    //     var valide = true;
-    //     var msgErreur = "";
-
-    //     // var selectedDestinataires = getCourrielsFromContainer();
-
-    //     if (selectedDestinataire.value == '') {
-    //         msgErreur = "Veuillez sélectionner le(s) destinataire(s) de votre courriel.";
-    //         valide = false;
-    //     }
-
-    //     if (valide) {
-    //         return true;
-    //     }
-    //     else {
-    //         console.log("pas valide");
-    //         Swal.fire({
-    //             title: "Erreur!",
-    //             text: msgErreur,
-    //             icon: "error"
-    //         }).then(() => {
-    //             return false;
-    //         });
-    //     }
-
-    //     return false;
-    // }
-
-    function getCourrielsFromContainer() {
-        var selectedNamesContainer = document.getElementById("selectedNamesContainer");
-        var emails = [];
-
-        for (var i = 0; i < selectedNamesContainer.children.length; i++) {
-            var childElement = selectedNamesContainer.children[i];
-
-            var email = childElement.textContent.trim();
-
-            emails.push(email);
-        }
-
-        return emails;
-    }
 
 </script>

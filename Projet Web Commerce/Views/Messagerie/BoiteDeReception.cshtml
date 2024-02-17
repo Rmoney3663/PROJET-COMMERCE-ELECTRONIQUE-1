@@ -56,7 +56,12 @@
                             }
                             @foreach (var msg in Model)
                             {
-                                string rowClass = (msg.TypeMessage == 0) ? "flotter email-non-lu" : "flotter";
+                                // Assuming msg.Destinataires is loaded in the controller action
+                                bool messageRead = msg.Destinataires?.Any(dest => dest.Destinataire == ViewBag.UtilisateurCourantId 
+                                    && dest.MessageLu) ?? false;
+
+                                // Adjust this line to check whether the user had read the message or not
+                                string rowClass = (!messageRead && msg.TypeMessage == 0) ? "flotter email-non-lu" : "flotter";
 
                                 <tr class="@rowClass" onclick="window.location.href = '@Url.Action("Details", new { idMessage = msg.NoMessage })'">
                                     <td>@(++no)</td>
