@@ -8,7 +8,7 @@
     ViewData["Title"] = "Message";
     CultureInfo cultureInfo = new CultureInfo("fr-FR");
 
-    string dateFormattee = DateTime.Now.Date.ToString("d MMMM yyyy", cultureInfo);
+    string dateFormattee = Model.DateEnvoi.Date.ToString("d MMMM yyyy hh:mm", cultureInfo);
     var auteur = _context.Users.FirstOrDefault(u => u.Id == Model.Auteur)?.Email;
     // var destinataires = _context.PPDestinatairesMessage
     //                              .Where(d => d.NoMessage == Model.NoMessage)

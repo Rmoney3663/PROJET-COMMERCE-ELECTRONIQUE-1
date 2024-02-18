@@ -1,6 +1,7 @@
 ﻿﻿﻿@using Microsoft.AspNetCore.Identity
 @using Newtonsoft.Json
 @using Projet_Web_Commerce.Data
+@using System.Text
 @model PPMessages
 @inject AuthDbContext _context
 @inject UserManager<Projet_Web_Commerce.Areas.Identity.Data.Utilisateur> UserManager
@@ -177,9 +178,7 @@
                             <label class="form-label">Le sujet</label>
                         </div>
                         <div class="form-floating mb-3">
-                            <textarea name="message" id="message" class="form-control" required
-                                oninvalid="setCustomValidity('Veuillez remplir ce champ.')"
-                                oninput="setCustomValidity('')">@message</textarea>
+                            <textarea title="Message" name="message" id="message" class="form-control" style="height: 200px">@message</textarea>
                             <label class="form-label">Votre message</label>
                         </div>
                         <br />
@@ -200,17 +199,19 @@
 <script>
     $(document).ready(function () {
         // Check if Model.Destinataires is not null
-        if (@(Model != null ? "true" : "false") === true) {
+        // if (@(Model != null ? "true" : "false") === true) {
+        if (@(ViewBag.Dests != null ? "true" : "false") === true) {
 
             // Serialize the email addresses
-            var idDestinataires = @Html.Raw(Json.Serialize(Model?.Destinataires.Select(d => d.DestinataireUser?.Email).Where(email => !string.IsNullOrWhiteSpace(email))));
+            // var idDestinataires = @Html.Raw(Json.Serialize(Model?.Destinataires.Select(d => d.DestinataireUser?.Email).Where(email => !string.IsNullOrWhiteSpace(email))));
+            var dests = @Html.Raw(Json.Serialize(ViewBag.Dests));
 
             // Add the pre-selected destinataires to selectedNamesContainer
-            for (var i = 0; i < idDestinataires.length; i++) {
+            for (var i = 0; i < dests.length; i++) {
                 var selectedNamesContainer = document.getElementById("selectedNamesContainer");
 
                 var nameElement = document.createElement("span");
-                nameElement.innerHTML = idDestinataires[i];
+                nameElement.innerHTML = dests[i];
 
                 var deleteIcon = document.createElement("span");
                 deleteIcon.innerHTML = " &#10006;";

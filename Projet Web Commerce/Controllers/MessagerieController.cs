@@ -56,13 +56,33 @@ namespace Projet_Web_Commerce.Controllers
                 return View();
             }
 
-            var brouillonMsg = await _context.PPMessages
+            var msg = await _context.PPMessages
                 .Include(m => m.Destinataires)
                 .FirstOrDefaultAsync(m => m.NoMessage == idMessage);
 
-            ViewBag.Dests = brouillonMsg.Destinataires;
+            var utilisateurCourantId = _userManager.Users.Where(u => u.Email == User.Identity.Name).FirstOrDefault().Id;
+            
+            if (utilisateurCourantId == msg.Auteur) // Si brouillon
+            {
+                List<string> lstCourrielsDests = new List<string>();
+                foreach (var dest in msg.Destinataires)
+                {
+                    var courrielDest = _userManager.Users.Where(u => u.Id == dest.Destinataire).FirstOrDefault().Email;
+                    lstCourrielsDests.Add(courrielDest);
+                }
+                ViewBag.Dests = lstCourrielsDests;
+            }
+            else // Si réponse à courriel
+            {
+                var courrielAuteur = _userManager.Users.Where(u => u.Id == msg.Auteur).FirstOrDefault().Email;
+                List<string> lstCourrielDest = new List<string>();
+                lstCourrielDest.Add(courrielAuteur);
+                ViewBag.Dests = lstCourrielDest;
+                msg.Sujet = "Re: " + msg.Sujet;
+                msg.Message = "\n\n\n\n---------------------------------------------------------------------------------\n" + courrielAuteur + ", " + msg.DateEnvoi + "\n\n" + msg.Message;
+            }
 
-            return View(brouillonMsg);
+            return View(msg);
         }
 
         [HttpPost]
@@ -70,8 +90,14 @@ namespace Projet_Web_Commerce.Controllers
             , string auteur, int typeMessage, int? idMessage)
         {
             int noMsg = 0;
+            var utilisateurCourantId = _userManager.Users.Where(u => u.Email == User.Identity.Name).FirstOrDefault().Id;
+
+            if (utilisateurCourantId != auteur) // Si réponse à courriel
+            {
+                idMessage = null;
+            }
             
-             if (idMessage != null)
+            if (idMessage != null)
             {
                 var msg = await _context.PPMessages
                     .FirstOrDefaultAsync(m => m.NoMessage == idMessage);
