@@ -86,6 +86,7 @@
                 <div class="card-body">
                     <h2 class="card-title">@ViewData["Title"]</h2>
                     <hr />
+                    <form id="frmCourriel" method="post" asp-action="Supprimer">
                     <table class="table">
                         <thead>
                             <tr>
@@ -97,9 +98,11 @@
                             </tr>
                         </thead>
                         <tbody>
-                                @{
-                                    var no = 0;
-                                }
+                            @{
+                                var no = 0;
+                            }
+                            @if(Model != null)
+                            {
                                 @foreach (var msg in Model)
                                 {
                                     bool messageLu = msg.Destinataires?.Any(dest => dest.Destinataire == ViewBag.UtilisateurCourantId
@@ -117,18 +120,18 @@
                                                 <a class="menu-btn" onclick="afficherMenu(event)">@* ☰ *@</a>
                                                 <ul class="menu-list">
                                                     <li><a href="#" onclick="repondre(event, '@msg.NoMessage')">Répondre</a></li>
-                                                    <li><a href="#" onclick="transferer(event)">Transférer</a></li>
+                                                    <li><a href="#" onclick="transferer(event, '@msg.NoMessage', '@ViewBag.UtilisateurCourantId')">Transférer</a></li>
                                                     <li><a href="#" onclick="supprimer(event, '@msg.NoMessage')">Supprimer</a></li>
                                                 </ul>
                                             </div>
                                         </td>
                                     </tr>
                                 }
+                            }
                         </tbody>
-                        <form id="frmCourriel" method="post" asp-route="Supprimer">
-                            <input type="hidden" id="idMessage" value="" />
-                        </form>
+                        <input type="hidden" name="idMessage" id="idMessage" value="" />
                     </table>
+                    </form>
                 </div>
             </div>
         </section>
@@ -156,12 +159,13 @@
 
     function repondre(event, noMessage) {
         event.stopPropagation();
-        window.location.href = '@Url.Action("EnvoyerMessage")' + '?idMessage=' + noMessage;
+        window.location.href = '@Url.Action("EnvoyerMessage")' + '?idMessage=' + noMessage + '&typeMessage=' + 'reponse';
     }
 
 
-    function transferer(event) {
+    function transferer(event, noMessage, transmetteur) {
         event.stopPropagation();
+        window.location.href = '@Url.Action("EnvoyerMessage")' + '?idMessage=' + noMessage + '&typeMessage=' + 'transmission' + '&transmetteur=' + transmetteur;
     }
 
     function supprimer(event, noMessage) {

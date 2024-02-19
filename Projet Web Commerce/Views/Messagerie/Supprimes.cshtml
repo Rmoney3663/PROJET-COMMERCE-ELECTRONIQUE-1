@@ -44,7 +44,7 @@
                                 <th scope="col">Date de l'envoi</th>
                             </tr>
                         </thead>
-                        @* <tbody>
+                        <tbody>
                             @{
                                 var no = 0;
                             }
@@ -54,10 +54,10 @@
                                     <td>@(++no)</td>
                                     <td>@_context.Users.Where(u => u.Id == msg.Auteur).FirstOrDefault().Email</td>
                                     <td class="truncate">@Html.DisplayFor(modelItem => msg.Sujet) - <span class="msg">@Html.DisplayFor(modelItem => msg.Message)</span></td>
-                                    <td>@DateTime.Now.Date</td> @* <td>@Html.DisplayFor(modelItem => msg.Message.DateMessage)</td>
+                                    <td>@Html.DisplayFor(modelItem => msg.DateEnvoi)</td>
                                 </tr>
                             }
-                        </tbody> *@
+                        </tbody>
                     </table>
                 </div>
             </div>
