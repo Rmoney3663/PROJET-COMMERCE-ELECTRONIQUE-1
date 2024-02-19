@@ -817,7 +817,30 @@ namespace Projet_Web_Commerce.Controllers
             }
         }
 
-        
+        [HttpPost]
+        public async Task<IActionResult> SupprimerPanier()
+        {
+            var panierToDelete = Request.Form["panierToDelete"].ToString().Split(',').Select(int.Parse).ToList();
+            if (panierToDelete == null || !panierToDelete.Any())
+            {
+                return BadRequest(new { error = "Aucun panier à supprimer." });
+            }
+
+            try
+            {
+                var articlesEnPanier = _context.PPArticlesEnPanier.Where(ap => panierToDelete.Contains(ap.NoClient));
+                _context.PPArticlesEnPanier.RemoveRange(articlesEnPanier);
+
+
+
+                await _context.SaveChangesAsync();
+                return Ok(new { message = "Les paniers ont été supprimés avec succès." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = $"Une erreur s'est produite lors des paniers : {ex.Message}" });
+            }
+        }
 
     }
 }
