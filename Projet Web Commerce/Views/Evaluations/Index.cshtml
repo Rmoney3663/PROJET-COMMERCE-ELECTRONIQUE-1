@@ -47,7 +47,14 @@ else
 
     <div class="row">
         <div class="col-md-4">
-            <h5>Ajouter une évaluation</h5>
+            @if (trouve)
+            {
+                <h5>Modifier votre évaluation</h5>
+            }
+            else
+            {
+                <h5>Ajouter une évaluation</h5>
+            }
             <div class="col">
                 @if (User.IsInRole("Client"))
                 {
@@ -89,7 +96,21 @@ else
                 @if (trouve)
                 {
                     int cote = (int)evalClientActu.Cote;
-                    <h6>@client.AdresseEmail (@cote étoiles) :</h6>
+                    <h6>
+                        @client.AdresseEmail 
+                        @for (int i = 0; i < cote; i++)
+                        {
+                            <button type="submit" name="rating" value="@i" style="border: none">
+                                <img src="~/Logo/iconeEtoileJaune.png" width="15" height="15" />
+                            </button>
+                        }
+                        @for (int i = cote; i < 5; i++)
+                        {
+                            <button type="submit" name="rating" value="@i" style="border: none">
+                                <img src="~/Logo/iconeEtoile.png" width="15" height="15" />
+                            </button>
+                        } :
+                    </h6>
                     if(evalClientActu.Commentaire != "" && evalClientActu.Commentaire != null)
                     {
                         <p>@evalClientActu.Commentaire</p>
