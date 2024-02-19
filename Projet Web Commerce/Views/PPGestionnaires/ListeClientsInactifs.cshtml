@@ -1,6 +1,6 @@
 ﻿@model Projet_Web_Commerce.Models.ModelListeClients
 @{
-    ViewData["Title"] = "Liste des clients";
+    ViewData["Title"] = "Liste des clients inactifs";
 }
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
@@ -11,7 +11,7 @@
     <div class="col">
         <section>
             <div>
-                @Html.Partial("GestionVendeursPages", "ListeClients")
+                @Html.Partial("GestionVendeursPages", "ListeClientsInactifs")
             </div>
 
             <div class="container mt-4">
@@ -91,7 +91,6 @@
                                             <td>@Html.DisplayFor(modelItem => item.Vendeur.NomAffaires)</td>
                                             <td>
                                                 <a asp-action="FraudeC" class="btn btn-danger" asp-route-id="@item.Client.NoClient">Fraude</a>
-                                                <a asp-action="InactifC" class="btn btn-warning" asp-route-id="@item.Client.NoClient">Inactif</a>
                                             </td>
                                         </tr>
                                     }
@@ -102,6 +101,10 @@
                     </div>
                 }
             </div>
+            @if (Model.MoisAnneesDistinctsList.Count() == 0)
+            {
+                <p>Aucun clients inactif.</p>
+            }
         </section>
     </div>
 </div>

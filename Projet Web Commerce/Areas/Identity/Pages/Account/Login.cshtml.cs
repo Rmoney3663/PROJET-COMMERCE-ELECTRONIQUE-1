@@ -117,7 +117,7 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
             if (ModelState.IsValid)
             {
                 var foundVendeur = _context.PPVendeurs.FirstOrDefault(v => v.AdresseEmail == Input.Email);
-                if (foundVendeur != null && foundVendeur.Statut != 1)
+                if (foundVendeur != null && foundVendeur.Statut != 1 && foundVendeur.Statut != 2)
                 {
                     ModelState.AddModelError(string.Empty, "Votre compte vendeur a besoin d'être validé par un gestionnaire");
                     return Page();
@@ -137,6 +137,22 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
                     {
                         if (estVendeur)
                         {
+                            if (foundVendeur.Statut == 2)
+                            {
+                                foundVendeur.Statut = 1;
+                                foundVendeur.DateMAJ = DateTime.Now;
+                            }
+                            try
+                            {
+                                await _context.SaveChangesAsync();
+                            }
+                            catch (Exception ex)
+                            {
+                                ModelState.AddModelError(string.Empty, "Une erreur s'est produite lors de la mise à jour des informations du vendeur.");
+                                _logger.LogError(ex, "An error occurred while updating vendeur information.");
+                                return Page();
+                            }
+
                             return RedirectToAction("Index", "PPProduits", new { area = "" });
                         }
                     }
@@ -148,7 +164,12 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
                         if (foundClient != null)
                         {
                             foundClient.DateDerniereConnexion = DateTime.Now;
-                            foundClient.NbConnexions++; 
+                            foundClient.NbConnexions++;
+                            if (foundClient.Statut == 2)
+                            {
+                                foundClient.Statut = 1;
+                                foundClient.DateMAJ = DateTime.Now;
+                            }
 
                             try
                             {

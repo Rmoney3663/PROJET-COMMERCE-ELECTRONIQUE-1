@@ -224,7 +224,7 @@ namespace Projet_Web_Commerce.Controllers
             .ToList();
 
 
-            var ClientsList = _context.PPClients.ToList();
+            var ClientsList = _context.PPClients.Where(v => v.Statut == 1).ToList();
 
             var nbProduits = _context.PPProduits
                 .GroupBy(p => p.NoVendeur)
@@ -309,14 +309,92 @@ namespace Projet_Web_Commerce.Controllers
 
         [HttpGet]
         [Authorize(Roles = "Gestionnaire")]
-        public ActionResult ListeVendeursInactifs()
+        public ActionResult ListeClientsInactifs()
         {
-            var vendeursStatutZero = _context.PPVendeurs
-                .Where(v => v.Statut == 0)
-                .OrderBy(v => v.DateCreation)
+            var vendeurs = _context.PPVendeurs
+              .Where(v => v.Statut == 1)
+              .OrderByDescending(v => v.NomAffaires)
+              .ToList();
+
+            var lstMoisAnneesDistincts = _context.PPVendeurs
+                .Where(v => v.Statut == 1)
+                .Select(v => new ModelMoisAnnees { Mois = v.DateCreation.Month, Annee = v.DateCreation.Year })
+                .Distinct()
+                .OrderByDescending(item => item.Annee)
+                .ThenByDescending(item => item.Mois)
                 .ToList();
 
-            return View();
+            var ProduitsList = _context.PPProduits.ToList();
+
+            var CommandesList = _context.PPCommandes.ToList();
+
+            var VendeursClientsList = _context.PPVendeursClients
+            .GroupBy(vc => vc.NoClient)
+            .Select(group => group.OrderByDescending(vc => vc.DateVisite).FirstOrDefault())
+            .ToList();
+
+
+            var ClientsList = _context.PPClients.Where(v => v.Statut == 2).ToList();
+
+            var nbProduits = _context.PPProduits
+                .GroupBy(p => p.NoVendeur)
+                .Count();
+
+            ModelListeClients modelListeClients = new ModelListeClients()
+            {
+                VendeursList = vendeurs,
+                ProduitsList = ProduitsList,
+                MoisAnneesDistinctsList = lstMoisAnneesDistincts,
+                ClientsList = ClientsList,
+                CommandesList = CommandesList,
+                VendeursClientsList = VendeursClientsList
+            };
+
+            return View(modelListeClients);
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "Gestionnaire")]
+        public ActionResult ListeVendeursInactifs()
+        {
+            var vendeurs = _context.PPVendeurs
+                .Where(v => v.Statut == 2)
+                .OrderByDescending(v => v.NomAffaires)
+                .ToList();
+
+            var lstMoisAnneesDistincts = _context.PPVendeurs
+                .Where(v => v.Statut == 2)
+                .Select(v => new ModelMoisAnnees { Mois = v.DateCreation.Month, Annee = v.DateCreation.Year })
+                //.Select(v => new { Mois = v.DateCreation.Month, Annee = v.DateCreation.Year })
+                .Distinct()
+                .OrderByDescending(item => item.Annee)
+                .ThenByDescending(item => item.Mois)
+                .ToList();
+
+            var ProduitsList = _context.PPProduits.ToList();
+
+            var nbProduits = _context.PPProduits
+                .GroupBy(p => p.NoVendeur)
+                .Count();
+
+            var CommandesList = _context.PPCommandes
+             .GroupBy(c => c.NoVendeur)
+             .Select(group => group.OrderByDescending(c => c.DateCommande).FirstOrDefault())
+             .ToList();
+
+            var utilisateurList = _context.Users.ToList();
+
+            ModelListeVendeurs modelListeVendeurs = new ModelListeVendeurs()
+            {
+                VendeursList = vendeurs,
+                ProduitsList = ProduitsList,
+                MoisAnneesDistinctsList = lstMoisAnneesDistincts,
+                CommandesList = CommandesList,
+                UtilisateurList = utilisateurList
+
+            };
+
+            return View(modelListeVendeurs);
         }
 
 
@@ -600,6 +678,71 @@ namespace Projet_Web_Commerce.Controllers
             return _context.PPVendeurs.Any(e => e.NoVendeur == id);
         }
 
+        public async Task<IActionResult> InactifV(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
 
+            var item = await _context.PPVendeurs
+                .Include(p => p.Utilisateur)
+                .FirstOrDefaultAsync(m => m.NoVendeur == id);
+            if (item == null)
+            {
+                return NotFound();
+            }
+
+            return View(item);
+        }
+
+        public async Task<IActionResult> InactifC(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var item = await _context.PPClients
+                .Include(p => p.Utilisateur)
+                .FirstOrDefaultAsync(m => m.NoClient == id);
+            if (item == null)
+            {
+                return NotFound();
+            }
+
+            return View(item);
+        }
+
+        [HttpPost, ActionName("InactifV")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> InactifV(int id)
+        {
+            var item = await _context.PPVendeurs.FindAsync(id);
+            if (item != null)
+            {
+                item.Statut = 2;               
+                _context.Update(item);
+               
+            }
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction("ListeVendeurs");
+        }
+        [HttpPost, ActionName("InactifC")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> InactifC(int id)
+        {
+            var item = await _context.PPClients.FindAsync(id);
+            if (item != null)
+            {
+                 item.Statut = 2;
+                _context.Update(item);
+
+            }
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction("ListeClients");
+        }
     }
 }

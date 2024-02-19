@@ -1,10 +1,11 @@
-﻿@model List<Projet_Web_Commerce.Models.PPVendeurs>
+﻿@model Projet_Web_Commerce.Models.ModelListeVendeurs
 @{
-    ViewData["Title"] = "Liste des vendeurs à confirmer";
+    ViewData["Title"] = "Liste des vendeurs inactifs";
 }
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+
 
 <div class="row">
     <div class="col">
@@ -12,160 +13,105 @@
             <div>
                 @Html.Partial("GestionVendeursPages", "ListeVendeursInactifs")
             </div>
-            <div class="container mt-4">
-                @if (Model != null && Model.Any())
-                {
-                    <div class="row">
-                        @foreach (var item in Model)
-                        {
-                            <div class="col-md-6 mb-4">
-                                <div class="card">
-                                    <div class="card-body">
-                                        <h5 class="card-title">@Html.DisplayFor(modelItem => item.AdresseEmail)</h5>
-                                        <p class="card-text">No Vendeur: @Html.DisplayFor(modelItem => item.NoVendeur)</p>
-                                        <p class="card-text">Date de demande : @Html.DisplayFor(modelItem => item.DateCreation)</p>
-                                        <form asp-controller="MainMenu" id="frmGestionVendeur" method="post">
-                                            <div class="form-floating mb-3">
-                                                <input type="number" name="Pourcentage" value="0" min="0" max="100" step="0.01" class="form-control" />
-                                                <label class="form-label">Pourcentage (taux de redevance)</label>
-                                            </div>
-                                            <input type="hidden" name="NoVendeur" value="@item.NoVendeur" />
-                                            <input type="hidden" id="vendeurAccepte" name="vendeurAccepte" />
-                                        </form>
-                                        <button href="#" onclick="courrielGestionVendeurs(
-                                            true,
-                                            '@item.NoVendeur',
-                                            '@item.NomAffaires',
-                                            '@item.PoidsMaxLivraison',
-                                            '@item.LivraisonGratuite',
-                                            '@item.Taxes',
-                                            '@item.Pourcentage',
-                                            '@item.DateCreation',
-                                            '@item.DateMAJ',
-                                            '@item.AdresseEmail',
-                                            '@item.Nom',
-                                            '@item.Prenom',
-                                            '@item.Rue',
-                                            '@item.Ville',
-                                            '@item.NoProvince',
-                                            '@item.CodePostal',
-                                            '@item.Pays',
-                                            '@item.Tel1',
-                                            '@item.Tel2')"
-                                            class="btn btn-primary">
-                                            Accepter
-                                        </button>
 
-                                        <button href="#" onclick="courrielGestionVendeurs(false, '@item.NoVendeur')" class="btn btn-secondary">Refuser</button>
-                                    </div>
-                                </div>
-                            </div>
-                        }
+            <div class="container mt-4">
+                @foreach (var date in Model.MoisAnneesDistinctsList)
+                {
+                    <div class="card">
+                        <div class="card-body">
+                            <script>
+                                function getMonthName(monthNumber) {
+                                    const months = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
+                                    return months[monthNumber - 1];
+                                }
+
+                                const monthNumber = @date.Mois;
+                                const year = @date.Annee;
+                                const monthName = getMonthName(monthNumber);
+
+                                document.write('<h4 class="card-title"><u>' + monthName + ' ' + year + '</u></h4>');
+                            </script>
+                            @{
+                                /*
+                                var groupeParAnnee = Model.VendeursList
+                                .Where(item => item.DateCreation.Month == date.Mois && item.DateCreation.Year == date.Annee)
+                                .OrderBy(item => item.NomAffaires)
+                                .ToList();
+                                */
+
+                                var groupeParAnnee = (from vendeur in Model.VendeursList
+                                                      join user in Model.UtilisateurList
+                                                      on vendeur.IdUtilisateur equals user.Id
+                                                      where user.EmailConfirmed && vendeur.DateCreation.Month == date.Mois && vendeur.DateCreation.Year == date.Annee
+                                                      orderby vendeur.NomAffaires
+                                                      join commande in Model.CommandesList
+                                                      on vendeur.NoVendeur equals commande.NoVendeur into vendeurCommandes
+                                                      from vc in vendeurCommandes.DefaultIfEmpty()
+                                                      orderby vc?.DateCommande
+                                                      select new
+                                                      {
+                                                          Vendeur = vendeur,
+                                                          Commande = vc
+                                                      })
+                                .ToList();
+
+
+
+
+                            }
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        <th scope="col">No de vendeur</th>
+                                        <th scope="col">Information personnelle</th>
+                                        <th scope="col">Nom d'affaires</th>
+                                        <th scope="col">Date de création</th>
+                                        <th scope="col">Nb de produits inscrits</th>
+                                        <th scope="col">Date de dernière commande</th>
+                                        <th scope="col">Montant total avant taxes </th>
+                                        <th scope="col"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @{
+                                        var no = 0;
+                                    }
+                                    @foreach (var item in groupeParAnnee)
+                                    {
+                                        <tr>
+                                            <td>@(++no)</td>
+                                            <td>@Html.DisplayFor(modelItem => item.Vendeur.NoVendeur)</td>
+                                            @if (item.Vendeur.Nom != null && item.Vendeur.Prenom != null)
+                                            {
+                                                <td>@Html.DisplayFor(modelItem => item.Vendeur.Nom), @Html.DisplayFor(modelItem => item.Vendeur.Prenom)</td>
+                                            }
+                                            else
+                                            {
+                                                <td>@Html.DisplayFor(modelItem => item.Vendeur.AdresseEmail)</td>
+                                            }
+
+                                            <td>@Html.DisplayFor(modelItem => item.Vendeur.NomAffaires)</td>
+                                            <td>@Html.DisplayFor(modelItem => item.Vendeur.DateCreation)</td>
+                                            <td>@Model.ProduitsList.Count(modelItem => modelItem.NoVendeur == item.Vendeur.NoVendeur)</td>
+                                            <td>@Html.DisplayFor(modelItem => item.Commande.DateCommande)</td>
+                                            <td>@Html.DisplayFor(modelItem => item.Commande.MontantTotAvantTaxes)</td>
+                                            <td>
+                                                <a asp-action="FraudeV" class="btn btn-danger" asp-route-id="@item.Vendeur.NoVendeur">Fraude</a>                                               
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+
+                            </table>
+                        </div>
                     </div>
                 }
-                else
+                @if (Model.MoisAnneesDistinctsList.Count() == 0)
                 {
-                    <p>Aucun vendeur à confirmer.</p>
+                    <p>Aucun vendeur inactif.</p>
                 }
             </div>
         </section>
     </div>
 </div>
-
-<script type="text/javascript">
-    // function submitForm(value) {
-    //     document.getElementById('vendeurAccepte').value = value;
-
-    //     document.getElementById('frmGestionVendeur').submit();
-    // }
-    function lstVendeurs() {
-        window.location = "https://localhost:44376/PPGestionnaires/ListeVendeurs"
-    }
-
-    function courrielGestionVendeurs(
-        accepte,
-        noVendeur,
-        nomAffaires,
-        poidsMaxLivraison,
-        livraisonGratuite,
-        taxes,
-        pourcentageRedevence,
-        dateCreation,
-        dateMAJ,
-        courriel, 
-        nom,
-        prenom, 
-        rue,
-        ville,
-        noProvince,
-        codePostal,
-        pays,
-        tel,
-        cell)
-    {
-        var sujet = "Demande acceptée"
-        var message = `Votre demande a été acceptée. Merci de vous joindre à notre plateforme.
-            Détails du vendeur :
-            - No Vendeur: ${noVendeur}
-            - Nom d'affaires: ${nomAffaires}
-            - Poids maximum de livraison: ${poidsMaxLivraison}
-            - Livraison gratuite: ${livraisonGratuite}
-            - Taxes: ${taxes}
-            - Pourcentage de redevance: ${pourcentageRedevence}
-            - Date de création: ${dateCreation}
-            - Date de mise à jour: ${dateMAJ}
-            - Courriel: ${courriel}
-            - Nom: ${nom}
-            - Prénom: ${prenom}
-            - Rue: ${rue}
-            - Ville: ${ville}
-            - Province: ${noProvince}
-            - Code postal: ${codePostal}
-            - Pays: ${pays}
-            - Téléphone: ${tel}
-            - Cellulaire: ${cell}`;
-        if (accepte == false) {
-            sujet = "Demande refusée";
-            message = "Votre demande a été refusée. Pour plus d'informations, veuillez nous contacter.";
-        }
-
-        Swal.fire({
-            title: 'Courriel a envoyer au vendeur',
-            html: `<input id="sujet" style="width:550;" class="swal2-input" value="${sujet}"/> <textarea id="message" style="resize:none;width:550;height:300;" class="swal2-input">${message}</textarea>`,
-            showCancelButton: true,
-            confirmButtonText: 'Envoyer',
-            cancelButtonText: 'Annuler',
-            showLoaderOnConfirm: true,
-            width: '800px',
-            preConfirm: (redevance) => {
-                var url = "/PPGestionnairesController/ValiderAsync?" + $.param({ id: noVendeur, sujet: sujet, message: message, vendeurAccepte: accepte, pourcentageRedevence: pourcentageRedevence })
-                return fetch(url)
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error(response.statusText);
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        console.log('Response from ValiderWithNumber:', data);
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        Swal.showValidationMessage('Validation failed');
-                    });
-            },
-            allowOutsideClick: () => !Swal.isLoading()
-        }).then((result) => {
-            if (result.isConfirmed) {
-                Swal.fire({
-                    title: "Envoyé!",
-                    text: "Le courriel a été envoyé avec succès",
-                    icon: "success"
-                }).then(() => {
-                    location.reload();
-                });
-            }
-        });
-    }
-</script>
-
