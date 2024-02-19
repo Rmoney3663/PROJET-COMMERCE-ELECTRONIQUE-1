@@ -257,7 +257,7 @@ namespace Projet_Web_Commerce.Controllers
 
         [Route("/PPGestionnairesController/ValiderAsync")]
         [Authorize(Roles = "Gestionnaire")]
-        public async Task<IActionResult> ValiderAsync(int id, string sujet, string message, string infosSupp, bool vendeurAccepte, int pourcentage)
+        public async Task<IActionResult> ValiderAsync(int id, string sujet, string message, string infosSupp, bool vendeurAccepte, decimal pourcentageRedevence)
         {
             var vendeurAUpdate = _context.PPVendeurs.FirstOrDefault(v => v.NoVendeur == id);
 
@@ -278,7 +278,9 @@ namespace Projet_Web_Commerce.Controllers
                     if (vendeurAccepte)
                     {
                         vendeurAUpdate.Statut = 1;
-                        vendeurAUpdate.Pourcentage = Convert.ToDecimal(pourcentage, CultureInfo.InvariantCulture);
+                        vendeurAUpdate.Pourcentage = pourcentageRedevence;
+                        _context.Update(vendeurAUpdate);
+                        await _context.SaveChangesAsync();
                     }
                     else
                     {
