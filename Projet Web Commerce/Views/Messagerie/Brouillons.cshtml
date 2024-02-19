@@ -12,7 +12,14 @@
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        max-width: 500px;
+        max-width: 350px;
+    }
+
+    .truncateDest {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100px;
     }
 
     .msg {
@@ -50,9 +57,19 @@
                             }
                             @foreach (var msg in Model)
                             {
+                                var idDestinataires = msg.Destinataires.Select(d => d.Destinataire);
                                 <tr class="flotter" onclick="window.location.href = '@Url.Action("EnvoyerMessage", new { idMessage = msg.NoMessage })'">
                                     <td>@(++no)</td>
-                                    <td>@msg.Destinataires?.FirstOrDefault()?.DestinataireUser?.Email</td>
+                                    <td class="truncateDest">
+                                        @{
+                                            var destinataires = idDestinataires
+                                            .Select(dest => _context.Users.FirstOrDefault(u => u.Id == dest)?.Email)
+                                            .Where(email => !string.IsNullOrWhiteSpace(email));
+
+                                            var dests = string.Join(", ", destinataires);
+                                        }
+                                        @dests
+                                    </td>
                                     <td class="truncate">@Html.DisplayFor(modelItem => msg.Sujet) - <span class="msg">@Html.DisplayFor(modelItem => msg.Message)</span></td>
                                 </tr>
                             }

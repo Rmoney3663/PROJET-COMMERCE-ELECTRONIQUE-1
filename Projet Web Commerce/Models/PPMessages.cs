@@ -17,15 +17,26 @@ namespace Projet_Web_Commerce.Models
         // 0  = Envoyé
         // 1  = Lu
         // 2  = Brouillon
+
+        // Nouveau!!
+        // -1 = Supprimé
+        // 0  = Envoyé
+        // 1  = Brouillon
         public int TypeMessage { get; set; }
 
         public string PieceJointe { get; set; }
-        public string Transfemetteur { get; set; }
+
+        public string? Transmetteur { get; set; }
+
+        public DateTime DateEnvoi { get; set; }
 
         // Navigation property for recipients
         public ICollection<PPDestinatairesMessage> Destinataires { get; set; }
 
         [ForeignKey("Auteur")]
         public virtual Utilisateur AuteurUser { get; set; }
+
+        [ForeignKey("Transmetteur")]
+        public virtual Utilisateur? TransmetteurUser { get; set; }
     }
 }

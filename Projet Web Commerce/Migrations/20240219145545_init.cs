@@ -294,7 +294,8 @@ namespace Projet_Web_Commerce.Migrations
                     Auteur = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     TypeMessage = table.Column<int>(type: "int", nullable: false),
                     PieceJointe = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Transfemetteur = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Transmetteur = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    DateEnvoi = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -305,6 +306,11 @@ namespace Projet_Web_Commerce.Migrations
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_PPMessages_AspNetUsers_Transmetteur",
+                        column: x => x.Transmetteur,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -424,7 +430,8 @@ namespace Projet_Web_Commerce.Migrations
                     DestinataireId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     NoMessage = table.Column<int>(type: "int", nullable: false),
-                    Destinataire = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    Destinataire = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    MessageLu = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -755,6 +762,11 @@ namespace Projet_Web_Commerce.Migrations
                 name: "IX_PPMessages_Auteur",
                 table: "PPMessages",
                 column: "Auteur");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PPMessages_Transmetteur",
+                table: "PPMessages",
+                column: "Transmetteur");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PPPoidsLivraisons_CodePoids",
