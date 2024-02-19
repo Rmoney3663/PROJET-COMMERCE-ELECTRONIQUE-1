@@ -1,10 +1,10 @@
 ﻿@model Projet_Web_Commerce.Models.PPClients
 
-<h2>Confirmez vous voulez que l'utilisateur confirme à nouveau son compte</h2>
+<h2>Confirmation que vous voulez rendre ce compte inactif</h2>
 
 <p>Compte de @Model.AdresseEmail </p>
 
-<form asp-action="FraudeC" method="post">
+<form asp-action="InactifC" method="post">
     <input type="hidden" name="id" value="@Model.NoClient" />
     <button type="submit" class="btn btn-danger">Confirmer le chagment</button>
     <a href="@Url.Action("ListeClients")" class="btn btn-secondary">Annuler</a>

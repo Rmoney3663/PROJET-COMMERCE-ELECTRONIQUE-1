@@ -206,7 +206,7 @@ namespace Projet_Web_Commerce.Controllers
                 .OrderByDescending(v => v.NomAffaires)
                 .ToList();
 
-            var lstMoisAnneesDistincts = _context.PPVendeurs
+            var lstMoisAnneesDistincts = _context.PPClients
                 .Where(v => v.Statut == 1)
                 .Select(v => new ModelMoisAnnees { Mois = v.DateCreation.Month, Annee = v.DateCreation.Year })
                 .Distinct()
@@ -215,16 +215,18 @@ namespace Projet_Web_Commerce.Controllers
                 .ToList();
 
             var ProduitsList = _context.PPProduits.ToList();
-
-            var CommandesList = _context.PPCommandes.ToList();
+            var CommandesList = _context.PPCommandes.Where(v => v.Statut != "E").ToList();
 
             var VendeursClientsList = _context.PPVendeursClients
             .GroupBy(vc => vc.NoClient)
             .Select(group => group.OrderByDescending(vc => vc.DateVisite).FirstOrDefault())
             .ToList();
 
+            var ClientsList = _context.PPClients.Where(v => v.Statut == 1).ToList();
 
-            var ClientsList = _context.PPClients.ToList();
+            var ClientsList2 = _context.PPClients.Where(v => v.Statut == 1).Select(c => c.NoClient).ToList();
+
+            var clientPanierList = _context.PPArticlesEnPanier.Where(v => ClientsList2.Contains(v.NoClient)).ToList();
 
             var nbProduits = _context.PPProduits
                 .GroupBy(p => p.NoVendeur)
@@ -237,7 +239,8 @@ namespace Projet_Web_Commerce.Controllers
                 MoisAnneesDistinctsList = lstMoisAnneesDistincts,
                 ClientsList = ClientsList,
                 CommandesList = CommandesList,
-                VendeursClientsList = VendeursClientsList
+                VendeursClientsList = VendeursClientsList,
+                ClientPanierList = clientPanierList
             };
 
             return View(modelListeClients);
@@ -257,7 +260,7 @@ namespace Projet_Web_Commerce.Controllers
 
         [Route("/PPGestionnairesController/ValiderAsync")]
         [Authorize(Roles = "Gestionnaire")]
-        public async Task<IActionResult> ValiderAsync(int id, string sujet, string message, string infosSupp, bool vendeurAccepte, int pourcentage)
+        public async Task<IActionResult> ValiderAsync(int id, string sujet, string message, string infosSupp, bool vendeurAccepte, decimal pourcentageRedevence)
         {
             var vendeurAUpdate = _context.PPVendeurs.FirstOrDefault(v => v.NoVendeur == id);
 
@@ -278,7 +281,9 @@ namespace Projet_Web_Commerce.Controllers
                     if (vendeurAccepte)
                     {
                         vendeurAUpdate.Statut = 1;
-                        vendeurAUpdate.Pourcentage = Convert.ToDecimal(pourcentage, CultureInfo.InvariantCulture);
+                        vendeurAUpdate.Pourcentage = pourcentageRedevence;
+                        _context.Update(vendeurAUpdate);
+                        await _context.SaveChangesAsync();
                     }
                     else
                     {
@@ -307,14 +312,92 @@ namespace Projet_Web_Commerce.Controllers
 
         [HttpGet]
         [Authorize(Roles = "Gestionnaire")]
-        public ActionResult ListeVendeursInactifs()
+        public ActionResult ListeClientsInactifs()
         {
-            var vendeursStatutZero = _context.PPVendeurs
-                .Where(v => v.Statut == 0)
-                .OrderBy(v => v.DateCreation)
+            var vendeurs = _context.PPVendeurs
+              .Where(v => v.Statut == 1)
+              .OrderByDescending(v => v.NomAffaires)
+              .ToList();
+
+            var lstMoisAnneesDistincts = _context.PPVendeurs
+                .Where(v => v.Statut == 1)
+                .Select(v => new ModelMoisAnnees { Mois = v.DateCreation.Month, Annee = v.DateCreation.Year })
+                .Distinct()
+                .OrderByDescending(item => item.Annee)
+                .ThenByDescending(item => item.Mois)
                 .ToList();
 
-            return View();
+            var ProduitsList = _context.PPProduits.ToList();
+
+            var CommandesList = _context.PPCommandes.ToList();
+
+            var VendeursClientsList = _context.PPVendeursClients
+            .GroupBy(vc => vc.NoClient)
+            .Select(group => group.OrderByDescending(vc => vc.DateVisite).FirstOrDefault())
+            .ToList();
+
+
+            var ClientsList = _context.PPClients.Where(v => v.Statut == 2).ToList();
+
+            var nbProduits = _context.PPProduits
+                .GroupBy(p => p.NoVendeur)
+                .Count();
+
+            ModelListeClients modelListeClients = new ModelListeClients()
+            {
+                VendeursList = vendeurs,
+                ProduitsList = ProduitsList,
+                MoisAnneesDistinctsList = lstMoisAnneesDistincts,
+                ClientsList = ClientsList,
+                CommandesList = CommandesList,
+                VendeursClientsList = VendeursClientsList
+            };
+
+            return View(modelListeClients);
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "Gestionnaire")]
+        public ActionResult ListeVendeursInactifs()
+        {
+            var vendeurs = _context.PPVendeurs
+                .Where(v => v.Statut == 2)
+                .OrderByDescending(v => v.NomAffaires)
+                .ToList();
+
+            var lstMoisAnneesDistincts = _context.PPVendeurs
+                .Where(v => v.Statut == 2)
+                .Select(v => new ModelMoisAnnees { Mois = v.DateCreation.Month, Annee = v.DateCreation.Year })
+                //.Select(v => new { Mois = v.DateCreation.Month, Annee = v.DateCreation.Year })
+                .Distinct()
+                .OrderByDescending(item => item.Annee)
+                .ThenByDescending(item => item.Mois)
+                .ToList();
+
+            var ProduitsList = _context.PPProduits.ToList();
+
+            var nbProduits = _context.PPProduits
+                .GroupBy(p => p.NoVendeur)
+                .Count();
+
+            var CommandesList = _context.PPCommandes
+             .GroupBy(c => c.NoVendeur)
+             .Select(group => group.OrderByDescending(c => c.DateCommande).FirstOrDefault())
+             .ToList();
+
+            var utilisateurList = _context.Users.ToList();
+
+            ModelListeVendeurs modelListeVendeurs = new ModelListeVendeurs()
+            {
+                VendeursList = vendeurs,
+                ProduitsList = ProduitsList,
+                MoisAnneesDistinctsList = lstMoisAnneesDistincts,
+                CommandesList = CommandesList,
+                UtilisateurList = utilisateurList
+
+            };
+
+            return View(modelListeVendeurs);
         }
 
 
@@ -551,7 +634,7 @@ namespace Projet_Web_Commerce.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Taux([Bind("Pourcentage")] PPVendeurs pPVendeurs, int id) 
+        public async Task<IActionResult> Taux([Bind("Pourcentage")] PPVendeurs pPVendeurs, int id)
         {
             var keysToRemove = ModelState.Keys.Where(k => k != "Pourcentage").ToList();
             foreach (var key in keysToRemove)
@@ -598,6 +681,255 @@ namespace Projet_Web_Commerce.Controllers
             return _context.PPVendeurs.Any(e => e.NoVendeur == id);
         }
 
+        public async Task<IActionResult> InactifV(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var item = await _context.PPVendeurs
+                .Include(p => p.Utilisateur)
+                .FirstOrDefaultAsync(m => m.NoVendeur == id);
+            if (item == null)
+            {
+                return NotFound();
+            }
+
+            return View(item);
+        }
+
+        public async Task<IActionResult> InactifC(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var item = await _context.PPClients
+                .Include(p => p.Utilisateur)
+                .FirstOrDefaultAsync(m => m.NoClient == id);
+            if (item == null)
+            {
+                return NotFound();
+            }
+
+            return View(item);
+        }
+
+        [HttpPost, ActionName("InactifV")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> InactifV(int id)
+        {
+            var item = await _context.PPVendeurs.FindAsync(id);
+            if (item != null)
+            {
+                item.Statut = 2;
+                _context.Update(item);
+
+            }
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction("ListeVendeurs");
+        }
+
+        [HttpPost, ActionName("InactifC")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> InactifC(int id)
+        {
+            var item = await _context.PPClients.FindAsync(id);
+            if (item != null)
+            {
+                item.Statut = 2;
+                _context.Update(item);
+
+            }
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction("ListeClients");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SupprimerClient()
+        {
+            var clientsToDelete = Request.Form["clientsToDelete"].ToString().Split(',').Select(int.Parse).ToList();
+            if (clientsToDelete == null || !clientsToDelete.Any())
+            {
+                return BadRequest(new { error = "Aucun client à supprimer." });
+            }
+
+            try
+            {
+                var vendeursClients = _context.PPVendeursClients.Where(vc => clientsToDelete.Contains(vc.NoClient));
+                _context.PPVendeursClients.RemoveRange(vendeursClients);
+
+                var articlesEnPanier = _context.PPArticlesEnPanier.Where(ap => clientsToDelete.Contains(ap.NoClient));
+                _context.PPArticlesEnPanier.RemoveRange(articlesEnPanier);
+
+                var evaluation = _context.PPEvaluations.Where(ap => clientsToDelete.Contains(ap.NoClient));
+                _context.PPEvaluations.RemoveRange(evaluation);
+
+                var commandes = _context.PPCommandes.Where(cmd => clientsToDelete.Contains(cmd.NoClient));
+                foreach (var commande in commandes)
+                {
+                    var detailsCommandes = _context.PPDetailsCommandes.Where(dc => dc.NoCommande == commande.NoCommande);
+                    _context.PPDetailsCommandes.RemoveRange(detailsCommandes);
+                }
+                _context.PPCommandes.RemoveRange(commandes);
+
+                var emailDelete = _context.PPClients
+                    .Where(c => clientsToDelete.Contains(c.NoClient))
+                    .Select(c => c.IdUtilisateur);
+
+                var email = _context.PPDestinatairesMessage
+                    .Where(u => emailDelete.Contains(u.Destinataire));
+
+                var messageIds = _context.PPMessages
+                    .Where(u => emailDelete.Contains(u.Auteur))
+                    .Select(u => u.NoMessage)
+                    .ToList();
+
+                var messagesToDelete = _context.PPMessages
+                    .Where(m => messageIds.Contains(m.NoMessage));
+
+                var destinatairesToDelete = _context.PPDestinatairesMessage
+                    .Where(u => messageIds.Contains(u.NoMessage));
+
+                _context.PPDestinatairesMessage.RemoveRange(destinatairesToDelete);
+                _context.PPMessages.RemoveRange(messagesToDelete);
+                _context.PPDestinatairesMessage.RemoveRange(email);
+
+
+
+                var usersToDelete = _context.PPClients.Where(c => clientsToDelete.Contains(c.NoClient)).Select(c => c.AdresseEmail);
+                var users = _context.Users.Where(u => usersToDelete.Contains(u.Email));
+                _context.Users.RemoveRange(users);
+
+                var clients = _context.PPClients.Where(c => clientsToDelete.Contains(c.NoClient));
+                _context.PPClients.RemoveRange(clients);
+
+                await _context.SaveChangesAsync();
+                return Ok(new { message = "Les clients et les informations associées ont été supprimés avec succès." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = $"Une erreur s'est produite lors de la suppression de clients et des informations associées : {ex.Message}" });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SupprimerPanier()
+        {
+            var panierToDelete = Request.Form["panierToDelete"].ToString().Split(',').Select(int.Parse).ToList();
+            if (panierToDelete == null || !panierToDelete.Any())
+            {
+                return BadRequest(new { error = "Aucun panier à supprimer." });
+            }
+
+            try
+            {
+                var articlesEnPanier = _context.PPArticlesEnPanier.Where(ap => panierToDelete.Contains(ap.NoClient));
+                _context.PPArticlesEnPanier.RemoveRange(articlesEnPanier);
+
+                await _context.SaveChangesAsync();
+                return Ok(new { message = "Les paniers ont été supprimés avec succès." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = $"Une erreur s'est produite lors des paniers : {ex.Message}" });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SupprimerVPanier()
+        {
+            var panierToDelete = Request.Form["panierToDelete"].ToString().Split(',').Select(int.Parse).ToList();
+            if (panierToDelete == null || !panierToDelete.Any())
+            {
+                return BadRequest(new { error = "Aucun panier à supprimer." });
+            }
+
+            try
+            {
+                var articlesEnPanier = _context.PPArticlesEnPanier.Where(ap => panierToDelete.Contains(ap.NoVendeur));
+                _context.PPArticlesEnPanier.RemoveRange(articlesEnPanier);
+
+
+
+                await _context.SaveChangesAsync();
+                return Ok(new { message = "Les paniers ont été supprimés avec succès." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = $"Une erreur s'est produite lors des paniers : {ex.Message}" });
+            }
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> SupprimerVendeur()
+        {
+            var vendeursToDelete = Request.Form["vendeursToDelete"].ToString().Split(',').Select(int.Parse).ToList();
+            if (vendeursToDelete == null || !vendeursToDelete.Any())
+            {
+                return BadRequest(new { error = "Aucun vendeur à supprimer." });
+            }
+
+            try
+            {
+                var vendeursClients = _context.PPVendeursClients.Where(vc => vendeursToDelete.Contains(vc.NoVendeur));
+                _context.PPVendeursClients.RemoveRange(vendeursClients);
+
+                var articlesEnPanier = _context.PPArticlesEnPanier.Where(ap => vendeursToDelete.Contains(ap.NoVendeur));
+                _context.PPArticlesEnPanier.RemoveRange(articlesEnPanier);
+
+                var commandes = _context.PPCommandes.Where(cmd => vendeursToDelete.Contains(cmd.NoVendeur));
+                foreach (var commande in commandes)
+                {
+                    var detailsCommandes = _context.PPDetailsCommandes.Where(dc => dc.NoCommande == commande.NoCommande);
+                    _context.PPDetailsCommandes.RemoveRange(detailsCommandes);
+                }
+                _context.PPCommandes.RemoveRange(commandes);
+
+                var emailDelete = _context.PPVendeurs
+                    .Where(c => vendeursToDelete.Contains(c.NoVendeur))
+                    .Select(c => c.IdUtilisateur);
+
+                var email = _context.PPDestinatairesMessage
+                    .Where(u => emailDelete.Contains(u.Destinataire));
+
+                var messageIds = _context.PPMessages
+                    .Where(u => emailDelete.Contains(u.Auteur))
+                    .Select(u => u.NoMessage)
+                    .ToList();
+
+                var messagesToDelete = _context.PPMessages
+                    .Where(m => messageIds.Contains(m.NoMessage));
+
+                var destinatairesToDelete = _context.PPDestinatairesMessage
+                    .Where(u => messageIds.Contains(u.NoMessage));
+
+                _context.PPDestinatairesMessage.RemoveRange(destinatairesToDelete);
+                _context.PPMessages.RemoveRange(messagesToDelete);
+                _context.PPDestinatairesMessage.RemoveRange(email);
+
+
+
+                var usersToDelete = _context.PPVendeurs.Where(c => vendeursToDelete.Contains(c.NoVendeur)).Select(c => c.AdresseEmail);
+                var users = _context.Users.Where(u => usersToDelete.Contains(u.Email));
+                _context.Users.RemoveRange(users);
+
+                var vendeur = _context.PPVendeurs.Where(c => vendeursToDelete.Contains(c.NoVendeur));
+                _context.PPVendeurs.RemoveRange(vendeur);
+
+                await _context.SaveChangesAsync();
+                return Ok(new { message = "Les vendeur ont été supprimés avec succès." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = $"Une erreur s'est produite lors des vendeurs : {ex.Message}" });
+            }
+        }
 
     }
 }
