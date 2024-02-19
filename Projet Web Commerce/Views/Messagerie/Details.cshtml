@@ -1,4 +1,5 @@
 ﻿﻿﻿@using Microsoft.AspNetCore.Identity
+@using Microsoft.EntityFrameworkCore
 @using Projet_Web_Commerce.Data
 @using System.Globalization;
 @inject AuthDbContext _context
@@ -7,8 +8,24 @@
     ViewData["Title"] = "Message";
     CultureInfo cultureInfo = new CultureInfo("fr-FR");
 
-    string dateFormattee = DateTime.Now.Date.ToString("d MMMM yyyy", cultureInfo);
+    string dateFormattee = Model.DateEnvoi.Date.ToString("d MMMM yyyy hh:mm", cultureInfo);
     var auteur = _context.Users.FirstOrDefault(u => u.Id == Model.Auteur)?.Email;
+    // var destinataires = _context.PPDestinatairesMessage
+    //                              .Where(d => d.NoMessage == Model.NoMessage)
+    //                              .Join(
+    //                                  _context.Users, // La table des utilisateurs
+    //                                  dest => dest.Destinataire, // La clé étrangère dans PPDestinatairesMessage
+    //                                  user => user.Id, // La clé primaire dans Utilisateur
+    //                                  (dest, user) => new
+    //                                  {
+    //                                      DestinataireEmail = user.Email,
+    //                                  }
+    //                              )
+    //                              .ToList();
+    var destinataires = _context.PPDestinatairesMessage
+        .Where(d => d.NoMessage == Model.NoMessage)
+        .Include(d => d.DestinataireUser)
+        .ToList();
 }
 
 <div class="row">
@@ -26,6 +43,10 @@
                     <div class="d-flex justify-content-between align-items-center" style="font-size: 20px;">
                         <span>De: <b>@auteur</b></span> <!-- @Model.Auteur-->
                         <span class="ml-auto"><b>@dateFormattee</b></span>
+                    </div>
+                    <div style="font-size: 20px;">
+                        À: @Html.Raw(string.Join(", ", destinataires.Select(destinataire => destinataire.DestinataireUser != null 
+                            ? $"<strong>{destinataire.DestinataireUser.Email}</strong>" : "")))
                     </div>
                     <br />
                     <div>

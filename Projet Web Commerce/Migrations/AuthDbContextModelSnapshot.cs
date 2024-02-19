@@ -410,6 +410,9 @@ namespace Projet_Web_Commerce.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<bool>("MessageLu")
+                        .HasColumnType("bit");
+
                     b.Property<int>("NoMessage")
                         .HasColumnType("int");
 
@@ -578,6 +581,9 @@ namespace Projet_Web_Commerce.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<DateTime>("DateEnvoi")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Message")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -590,9 +596,8 @@ namespace Projet_Web_Commerce.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Transfemetteur")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("Transmetteur")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("TypeMessage")
                         .HasColumnType("int");
@@ -600,6 +605,8 @@ namespace Projet_Web_Commerce.Migrations
                     b.HasKey("NoMessage");
 
                     b.HasIndex("Auteur");
+
+                    b.HasIndex("Transmetteur");
 
                     b.ToTable("PPMessages");
                 });
@@ -1071,7 +1078,13 @@ namespace Projet_Web_Commerce.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Projet_Web_Commerce.Areas.Identity.Data.Utilisateur", "TransmetteurUser")
+                        .WithMany()
+                        .HasForeignKey("Transmetteur");
+
                     b.Navigation("AuteurUser");
+
+                    b.Navigation("TransmetteurUser");
                 });
 
             modelBuilder.Entity("Projet_Web_Commerce.Models.PPPoidsLivraisons", b =>

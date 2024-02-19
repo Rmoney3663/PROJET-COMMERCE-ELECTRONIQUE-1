@@ -140,12 +140,12 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account.Manage
             var rue = Input.Rue;
             var ville = Input.Ville;
             var province = Input.Province;
-            var codePostal = Input.CodePostal.ToUpper();
+            var codePostal = Input.CodePostal == null ? null : Input.CodePostal.ToUpper();
             var pays = "Canada";
             var telephone = Input.Telephone;
-            var cellulaire = (Input.Cellulaire == "" ? null : Input.Cellulaire);
+            var cellulaire = Input.Cellulaire;
 
-            if (codePostal.Length == 6)
+            if (codePostal != null && codePostal.Length == 6)
             {
                 codePostal = codePostal.Insert(3, " ");
             }

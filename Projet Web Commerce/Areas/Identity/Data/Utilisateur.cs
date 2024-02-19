@@ -16,6 +16,7 @@ public class Utilisateur : IdentityUser
 
     [InverseProperty("Utilisateur")]
     public virtual ICollection<PPVendeurs>? PPVendeurs { get; set; }
+
     [InverseProperty("Utilisateur")]
     public virtual ICollection<PPGestionnaire>? PPGestionnaire { get; set; }
 }

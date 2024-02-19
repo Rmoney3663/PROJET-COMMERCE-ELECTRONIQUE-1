@@ -13,6 +13,10 @@ namespace Projet_Web_Commerce.Models
 
         public string Destinataire { get; set; }
 
+        // True: lu
+        // False: Pas lu
+        public bool MessageLu { get; set; }
+
         [ForeignKey("NoMessage")]
         [InverseProperty("Destinataires")]
         public virtual PPMessages? Message { get; set; }
