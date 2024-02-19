@@ -206,7 +206,7 @@ namespace Projet_Web_Commerce.Controllers
                 .OrderByDescending(v => v.NomAffaires)
                 .ToList();
 
-            var lstMoisAnneesDistincts = _context.PPVendeurs
+            var lstMoisAnneesDistincts = _context.PPClients
                 .Where(v => v.Statut == 1)
                 .Select(v => new ModelMoisAnnees { Mois = v.DateCreation.Month, Annee = v.DateCreation.Year })
                 .Distinct()
@@ -215,8 +215,7 @@ namespace Projet_Web_Commerce.Controllers
                 .ToList();
 
             var ProduitsList = _context.PPProduits.ToList();
-
-            var CommandesList = _context.PPCommandes.ToList();
+            var CommandesList = _context.PPCommandes.Where(v => v.Statut != "E").ToList();
 
             var VendeursClientsList = _context.PPVendeursClients
             .GroupBy(vc => vc.NoClient)
@@ -733,6 +732,7 @@ namespace Projet_Web_Commerce.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction("ListeVendeurs");
         }
+
         [HttpPost, ActionName("InactifC")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> InactifC(int id)
@@ -748,5 +748,76 @@ namespace Projet_Web_Commerce.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction("ListeClients");
         }
+
+        [HttpPost]
+        public async Task<IActionResult> SupprimerClient()
+        {
+            var clientsToDelete = Request.Form["clientsToDelete"].ToString().Split(',').Select(int.Parse).ToList();
+            if (clientsToDelete == null || !clientsToDelete.Any())
+            {
+                return BadRequest(new { error = "Aucun client à supprimer." });
+            }
+
+            try
+            {
+                var vendeursClients = _context.PPVendeursClients.Where(vc => clientsToDelete.Contains(vc.NoClient));
+                _context.PPVendeursClients.RemoveRange(vendeursClients);
+
+                var articlesEnPanier = _context.PPArticlesEnPanier.Where(ap => clientsToDelete.Contains(ap.NoClient));
+                _context.PPArticlesEnPanier.RemoveRange(articlesEnPanier);
+
+                var evaluation = _context.PPEvaluations.Where(ap => clientsToDelete.Contains(ap.NoClient));
+                _context.PPEvaluations.RemoveRange(evaluation);
+
+                var commandes = _context.PPCommandes.Where(cmd => clientsToDelete.Contains(cmd.NoClient));
+                foreach (var commande in commandes)
+                {
+                    var detailsCommandes = _context.PPDetailsCommandes.Where(dc => dc.NoCommande == commande.NoCommande);
+                    _context.PPDetailsCommandes.RemoveRange(detailsCommandes);
+                }
+                _context.PPCommandes.RemoveRange(commandes);
+
+                var emailDelete = _context.PPClients
+                    .Where(c => clientsToDelete.Contains(c.NoClient))
+                    .Select(c => c.IdUtilisateur);
+
+                var email = _context.PPDestinatairesMessage
+                    .Where(u => emailDelete.Contains(u.Destinataire));
+
+                var messageIds = _context.PPMessages
+                    .Where(u => emailDelete.Contains(u.Auteur))
+                    .Select(u => u.NoMessage)
+                    .ToList();
+
+                var messagesToDelete = _context.PPMessages
+                    .Where(m => messageIds.Contains(m.NoMessage));
+
+                var destinatairesToDelete = _context.PPDestinatairesMessage
+                    .Where(u => messageIds.Contains(u.NoMessage));
+
+                _context.PPDestinatairesMessage.RemoveRange(destinatairesToDelete);
+                _context.PPMessages.RemoveRange(messagesToDelete);
+                _context.PPDestinatairesMessage.RemoveRange(email);
+
+
+
+                var usersToDelete = _context.PPClients.Where(c => clientsToDelete.Contains(c.NoClient)).Select(c => c.AdresseEmail);
+                var users = _context.Users.Where(u => usersToDelete.Contains(u.Email));
+                _context.Users.RemoveRange(users);
+
+                var clients = _context.PPClients.Where(c => clientsToDelete.Contains(c.NoClient));
+                _context.PPClients.RemoveRange(clients);
+
+                await _context.SaveChangesAsync();
+                return Ok(new { message = "Les clients et les informations associées ont été supprimés avec succès." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = $"Une erreur s'est produite lors de la suppression de clients et des informations associées : {ex.Message}" });
+            }
+        }
+
+        
+
     }
 }

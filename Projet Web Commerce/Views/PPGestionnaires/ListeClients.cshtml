@@ -48,6 +48,7 @@
                                                           Client = client,
                                                           VendeurClient = vc,
                                                           Vendeur = v,
+                                                          CommandesList = Model.CommandesList.Where(cp => cp.NoClient == client.NoClient).ToList(),
                                                           ClientPanierList = Model.ClientPanierList.Where(cp => cp.NoClient == client.NoClient).ToList()
                                                       })
                                 .ToList();
@@ -64,7 +65,8 @@
                                         <th scope="col">Date de dernière connexion</th>
                                         <th scope="col">Date de dernière visite</th>
                                         <th scope="col">Nom d'affaire</th>
-                                        <th scope="col">Panier Info</th>
+                                        <th scope="col">Supprimer Panier</th>
+                                        <th scope="col">Supprimer Client</th>
                                         <th scope="col"></th>
                                     </tr>
                                 </thead>
@@ -89,7 +91,20 @@
                                             <td>@Html.DisplayFor(modelItem => item.Client.DateCreation)</td>
                                             <td>@Html.DisplayFor(modelItem => item.Client.DateDerniereConnexion)</td>
                                             <td>@Html.DisplayFor(modelItem => item.VendeurClient.DateVisite)</td>
-                                            <td>@Html.DisplayFor(modelItem => item.Vendeur.NomAffaires)</td>                                          
+                                            <td>@Html.DisplayFor(modelItem => item.Vendeur.NomAffaires)</td>
+                                            <td>
+                                                @if (item.CommandesList.Count() > 0)
+                                                {
+                                                    <input type="checkbox" id="SPanier" name="SPanier" value="@item.Client.NoClient">
+                                                }                                                
+                                            </td>
+                                            <td>
+                                                @if (item.CommandesList.Count() == 0)
+                                                {
+                                                    <input type="checkbox" id="SClient" name="SClient" value="@item.Client.NoClient">
+                                                }
+                                                
+                                            </td>
                                             <td>
                                                 <a asp-action="FraudeC" class="btn btn-danger" asp-route-id="@item.Client.NoClient">Fraude</a>
                                                 <a asp-action="InactifC" class="btn btn-warning" asp-route-id="@item.Client.NoClient">Inactif</a>
@@ -121,12 +136,16 @@
 
                             </table>
                         </div>
-                    </div>
+                    </div>                   
                 }
                 @if (Model.MoisAnneesDistinctsList.Count() == 0)
                 {
                     <p>Il n'y a aucun Client</p>
+                }else{
+                    <br />
+                    <a id="enregistrementButton" class="btn btn-danger">Enregistrement des modifications</a>
                 }
+                
             </div>
         </section>
     </div>
@@ -143,4 +162,118 @@
             });
         });
     });
+
+    document.getElementById('enregistrementButton').addEventListener('click', function () {
+        var panierCheckboxes = document.getElementsByName('SPanier');
+        var clientCheckboxes = document.getElementsByName('SClient');
+        var panierCount = 0;
+        var clientCount = 0;
+        var formData = new FormData();
+
+        for (var i = 0; i < panierCheckboxes.length; i++) {
+            if (panierCheckboxes[i].checked) {
+                panierCount++;
+                formData.append('panierToDelete', panierCheckboxes[i].value);
+            }
+        }
+
+        for (var i = 0; i < clientCheckboxes.length; i++) {
+            if (clientCheckboxes[i].checked) {
+                clientCount++;
+                formData.append('clientsToDelete', clientCheckboxes[i].value);
+            }
+        }
+
+        console.log("Panier to delete: ", formData.getAll('panierToDelete'));
+        console.log("Clients to delete: ", formData.getAll('clientsToDelete'));
+
+        if (panierCount > 0 || clientCount > 0) {
+            Swal.fire({
+                title: 'Enregistrement des modifications',
+                html: 'Number of Panier Supprimer: ' + panierCount + '<br>' +
+                    'Number of Client Supprimer: ' + clientCount,
+                icon: 'warning',
+                showDenyButton: true,
+                confirmButtonText: "Confirmer",
+                denyButtonText: `Annuler`,
+                showLoaderOnConfirm: true,
+                preConfirm: () => {
+                    if (clientCount > 0 && panierCount > 0) {
+                        return Promise.all([
+                            fetch('/PPGestionnaires/SupprimerClient', {
+                                method: 'POST',
+                                body: formData
+                            }),
+                            fetch('/PPGestionnaires/SupprimerPanier', {
+                                method: 'POST',
+                                body: formData
+                            })
+                        ])
+                            .then(([response1, response2]) => {
+                                if (!response1.ok || !response2.ok) {
+                                    throw new Error('One or more requests failed');
+                                }
+                                return Promise.all([response1.json(), response2.json()]);
+                            })
+                            .catch(error => {
+                                Swal.showValidationMessage(`Request failed: ${error}`);
+                            });
+                    } else if (clientCount > 0) {
+                        return fetch('/PPGestionnaires/SupprimerClient', {
+                            method: 'POST',
+                            body: formData
+                        })
+                            .then(response => {
+                                if (!response.ok) {
+                                    throw new Error(response.statusText);
+                                }
+                                return response.json();
+                            })
+                            .catch(error => {
+                                Swal.showValidationMessage(`Request failed: ${error}`);
+                            });
+                    } else if (panierCount > 0) {
+                        return fetch('/PPGestionnaires/SupprimerPanier', {
+                            method: 'POST',
+                            body: formData
+                        })
+                            .then(response => {
+                                if (!response.ok) {
+                                    throw new Error(response.statusText);
+                                }
+                                return response.json();
+                            })
+                            .catch(error => {
+                                Swal.showValidationMessage(`Request failed: ${error}`);
+                            });
+                    } else {
+                        // Neither clients nor paniers are selected
+                        Swal.showValidationMessage('No clients or paniers selected.');
+                        return;
+                    }
+                }
+
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire("Sauvegarder!", "", "success").then(() => {
+                        location.reload();
+                    });
+                } else if (result.isDenied) {
+                    Swal.fire("Les modifications ne sont pas enregistrées", "", "info");
+                }
+            });
+        } else {
+            Swal.fire({
+                title: 'Aucun élément sélectionné',
+                text: 'Veuillez sélectionner au moins un élément à supprimer.',
+                icon: 'warning'
+            });
+        }
+    });
+
+
+
+
+
+
 </script>
