@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Projet_Web_Commerce.Migrations
 {
     /// <inheritdoc />
-    public partial class pparticlepanier : Migration
+    public partial class init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -284,6 +284,30 @@ namespace Projet_Web_Commerce.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "PPMessages",
+                columns: table => new
+                {
+                    NoMessage = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Sujet = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Message = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Auteur = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    TypeMessage = table.Column<int>(type: "int", nullable: false),
+                    PieceJointe = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Transfemetteur = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PPMessages", x => x.NoMessage);
+                    table.ForeignKey(
+                        name: "FK_PPMessages_AspNetUsers_Auteur",
+                        column: x => x.Auteur,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "PPPoidsLivraisons",
                 columns: table => new
                 {
@@ -390,6 +414,32 @@ namespace Projet_Web_Commerce.Migrations
                         column: x => x.NoProvince,
                         principalTable: "Province",
                         principalColumn: "ProvinceID",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PPDestinatairesMessage",
+                columns: table => new
+                {
+                    DestinataireId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    NoMessage = table.Column<int>(type: "int", nullable: false),
+                    Destinataire = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PPDestinatairesMessage", x => x.DestinataireId);
+                    table.ForeignKey(
+                        name: "FK_PPDestinatairesMessage_AspNetUsers_Destinataire",
+                        column: x => x.Destinataire,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_PPDestinatairesMessage_PPMessages_NoMessage",
+                        column: x => x.NoMessage,
+                        principalTable: "PPMessages",
+                        principalColumn: "NoMessage",
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -566,7 +616,7 @@ namespace Projet_Web_Commerce.Migrations
                     NoClient = table.Column<int>(type: "int", nullable: false),
                     NoProduit = table.Column<int>(type: "int", nullable: false),
                     Cote = table.Column<decimal>(type: "numeric(8,2)", nullable: false),
-                    Commentaire = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Commentaire = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     DateMAJ = table.Column<DateTime>(type: "datetime2", nullable: false),
                     DateCreation = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
@@ -667,6 +717,16 @@ namespace Projet_Web_Commerce.Migrations
                 column: "TypeLivraison");
 
             migrationBuilder.CreateIndex(
+                name: "IX_PPDestinatairesMessage_Destinataire",
+                table: "PPDestinatairesMessage",
+                column: "Destinataire");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PPDestinatairesMessage_NoMessage",
+                table: "PPDestinatairesMessage",
+                column: "NoMessage");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_PPDetailsCommandes_NoCommande",
                 table: "PPDetailsCommandes",
                 column: "NoCommande");
@@ -690,6 +750,11 @@ namespace Projet_Web_Commerce.Migrations
                 name: "IX_PPGestionnaire_IdUtilisateur",
                 table: "PPGestionnaire",
                 column: "IdUtilisateur");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PPMessages_Auteur",
+                table: "PPMessages",
+                column: "Auteur");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PPPoidsLivraisons_CodePoids",
@@ -751,6 +816,9 @@ namespace Projet_Web_Commerce.Migrations
                 name: "PPArticlesEnPanier");
 
             migrationBuilder.DropTable(
+                name: "PPDestinatairesMessage");
+
+            migrationBuilder.DropTable(
                 name: "PPDetailsCommandes");
 
             migrationBuilder.DropTable(
@@ -776,6 +844,9 @@ namespace Projet_Web_Commerce.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
+
+            migrationBuilder.DropTable(
+                name: "PPMessages");
 
             migrationBuilder.DropTable(
                 name: "PPCommandes");
