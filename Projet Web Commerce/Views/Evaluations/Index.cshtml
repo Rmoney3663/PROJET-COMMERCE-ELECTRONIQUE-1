@@ -61,7 +61,11 @@ if (evalClientActu != null)
 
     <div class="row">
         <div class="col-md-4">
-            <h2>Évaluations pour <h2 style="font-style:italic">@_context.PPProduits.Where(p => p.NoProduit == id).FirstOrDefault().Nom</h2></h2>
+            <h2>Évaluations pour 
+                <a asp-controller="PPProduits" asp-route-id="@id" asp-action="Details">
+                    <h2 style="font-style:italic">@_context.PPProduits.Where(p => p.NoProduit == id).FirstOrDefault().Nom</h2>
+                </a>
+            </h2>
             @if (trouve && User.IsInRole("Client"))
             {
                 <h5>Modifier votre évaluation</h5>
@@ -100,14 +104,9 @@ if (evalClientActu != null)
                             <button class="btn btn-secondary" style="background-color:#7C6992; color:#F9E547" type="submit">Ajouter une évaluation</button>
                         }
                     </form>
-                    <hr style="border-top: 3px solid gray" />
-                    <h3>Évaluations:</h3>
                 }
-                else
-                {
-                    <hr style="border-top: 3px solid gray" />
-                    <h3>Vos évaluations:</h3>
-                }
+                <hr style="border-top: 3px solid gray" />
+                <h3>Évaluations:</h3>
                 @if (trouve)
                 {
                     int cote = (int)evalClientActu.Cote;

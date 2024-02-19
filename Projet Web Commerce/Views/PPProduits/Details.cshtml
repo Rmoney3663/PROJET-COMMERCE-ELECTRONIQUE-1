@@ -13,6 +13,15 @@
     var vendeur = Model.PPVendeurs.NomAffaires;
 }
 
+<style>
+    .evaluation {
+        background-color: white;
+        padding: 5px;
+        margin-bottom: 10px;
+        border-radius: 5px
+    }
+</style>
+
 @if (!SignInManager.IsSignedIn(User) )
 {
     Console.WriteLine("yes");
@@ -155,6 +164,13 @@ else
                         }
                     </select>
                 </form>
+
+                <a asp-controller="Evaluations"
+                   asp-route-id="@Model.NoProduit"
+                   asp-action="Index"
+                   class="btn btn-secondary" style="background-color:#808080; color: #FFFFFF; width:auto; margin-top:10px; margin-left:12px">
+                    Ajouter une évaluation
+                </a>
             }
 
         </dl>
@@ -171,5 +187,53 @@ else
             <text> | </text>
             <a asp-action="Index">Retour à la liste</a>
         }
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="col">
+                @{
+                    var lstReview = _context.PPEvaluations.Where(e => e.NoProduit == Model.NoProduit).ToList();
+                }
+                <hr style="border-top: 3px solid gray" />
+                <div style="display: flex; align-items: center; margin-bottom: 10px"><h3 style="margin-right: 10px;">Évaluations: </h3> <h4>@lstReview.Average(a => a.Cote) étoiles (@lstReview.Count)</h4></div>
+
+                @if (lstReview.Count > 0)
+                {
+                    @foreach (var review in lstReview)
+                    {
+                        var unClient = _context.PPClients.Where(c => c.NoClient == review.NoClient).FirstOrDefault();
+
+                        int cote = (int)review.Cote;
+
+                        <div class="evaluation">
+                            <h6>
+                                @unClient.AdresseEmail
+                                @for (int i = 0; i < cote; i++)
+                                {
+                                    <img src="~/Logo/iconeEtoileJaune.png" width="15" height="15" />
+                                }
+                                @for (int i = cote; i < 5; i++)
+                                {
+                                    <img src="~/Logo/iconeEtoile.png" width="15" height="15" />
+                                } :
+                            </h6>
+                            @if (review.Commentaire != "" && review.Commentaire != null)
+                            {
+                                <p>@review.Commentaire</p>
+                            }
+                            else
+                            {
+                                <p>Aucun commentaire</p>
+                            }
+                        </div>
+                    }
+                }
+                else
+                {
+                    <h4>Aucune évaluations</h4>
+                }
+            </div>
+        </div>
     </div>
 }
