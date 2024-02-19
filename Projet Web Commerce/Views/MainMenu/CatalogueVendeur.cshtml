@@ -200,7 +200,11 @@
                                     string imagePath = item.Photo != null && File.Exists(path) ? $"~/Logo/{item.Photo}" : "~/Logo/DefaultImage.png";
                                     Console.WriteLine("FILE Name : " + item.Photo);
                                     Console.WriteLine("FILE : " + File.Exists(path));
+
+                                    decimal average = _context.PPEvaluations.Where(e => e.NoProduit == item.NoProduit).Average(a=>a.Cote);
+                                    float rating = (float)System.Math.Round(average, 2);
                                 }
+                                <b>@rating étoiles!</b>
                                 <div>
                                     <img src="@Url.Content(imagePath)" alt="@item.Photo" class="card-img-top" width="200" height="200" />
                                 </div>
@@ -233,16 +237,16 @@
                                     Details
                                 </a>
 
-                                <a asp-controller="Evaluations"
-                                   asp-route-id="@item.NoProduit"
-                                   asp-action="Index"
-                                   class="btn btn-secondary mt-auto" style="background-color:@backgroundButtonEvaluation; color: @textButtonEvaluation">
-                                    Évaluations
-                                </a>
+                                
 
                                 @if (SignInManager.IsSignedIn(User) && User.IsInRole("Client") && item.NombreItems > 0)
                                 {
-                                      
+                                    <a asp-controller="Evaluations"
+                                       asp-route-id="@item.NoProduit"
+                                       asp-action="Index"
+                                       class="btn btn-secondary mt-auto" style="background-color:@backgroundButtonEvaluation; color: @textButtonEvaluation">
+                                        Évaluations
+                                    </a>
                                     
                                     <form asp-controller="MainMenu" id="formAjoutPanier" asp-action="AjoutPanier" method="post">
                                         <input type="hidden" name="NoProduit" value="@item.NoProduit" />

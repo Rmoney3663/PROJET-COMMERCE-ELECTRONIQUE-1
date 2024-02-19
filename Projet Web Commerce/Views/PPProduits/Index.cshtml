@@ -116,6 +116,13 @@
                                 }
                             }
                         </p>
+                        <a asp-controller="Evaluations"
+                           asp-route-id="@item.NoProduit"
+                           asp-action="Index"
+                           class="btn btn-secondary mt-auto" style="background-color:#808080; color: #FFFFFF; margin-bottom:10px; margin-right:10px">
+                            Évaluations
+                        </a>
+                        <b>@System.Math.Round(_context.PPEvaluations.Where(e => e.NoProduit == item.NoProduit).Average(a => a.Cote), 2) étoiles!</b>
                         <div>
                             <a class="btn btn-primary" asp-action="Edit" asp-route-id="@item.NoProduit">Modifier</a>
                             <a> | </a>

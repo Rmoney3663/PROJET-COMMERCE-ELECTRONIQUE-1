@@ -73,7 +73,7 @@ namespace Projet_Web_Commerce.Controllers
             if (eval)
             {
                 var evalActu = _context.PPEvaluations.Where(e => e.NoClient == noClient && e.NoProduit == id).FirstOrDefault();
-                evalActu.Commentaire = msg;
+                evalActu.Commentaire = msg.Trim();
                 evalActu.Cote = rating;
                 evalActu.DateMAJ = dateMaj;
                 _context.SaveChanges();
@@ -82,7 +82,7 @@ namespace Projet_Web_Commerce.Controllers
             {
                 newEvaluation.NoProduit = id;
                 newEvaluation.NoClient = noClient;
-                newEvaluation.Commentaire = msg;
+                newEvaluation.Commentaire = msg.Trim();
                 newEvaluation.Cote = rating;
                 newEvaluation.DateCreation = dateCreate;
                 newEvaluation.DateMAJ = dateMaj;
