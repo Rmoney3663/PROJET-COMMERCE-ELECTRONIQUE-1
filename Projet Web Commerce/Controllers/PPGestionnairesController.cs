@@ -223,8 +223,11 @@ namespace Projet_Web_Commerce.Controllers
             .Select(group => group.OrderByDescending(vc => vc.DateVisite).FirstOrDefault())
             .ToList();
 
-
             var ClientsList = _context.PPClients.Where(v => v.Statut == 1).ToList();
+
+            var ClientsList2 = _context.PPClients.Where(v => v.Statut == 1).Select(c => c.NoClient).ToList();
+
+            var clientPanierList = _context.PPArticlesEnPanier.Where(v => ClientsList2.Contains(v.NoClient)).ToList();
 
             var nbProduits = _context.PPProduits
                 .GroupBy(p => p.NoVendeur)
@@ -237,7 +240,8 @@ namespace Projet_Web_Commerce.Controllers
                 MoisAnneesDistinctsList = lstMoisAnneesDistincts,
                 ClientsList = ClientsList,
                 CommandesList = CommandesList,
-                VendeursClientsList = VendeursClientsList
+                VendeursClientsList = VendeursClientsList,
+                ClientPanierList = clientPanierList
             };
 
             return View(modelListeClients);

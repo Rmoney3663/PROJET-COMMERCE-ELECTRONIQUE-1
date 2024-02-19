@@ -12,5 +12,7 @@
         public List<PPCommandes> CommandesList { get; set; }
 
         public List<PPVendeursClients> VendeursClientsList { get; set; }
+
+        public List<PPArticlesEnPanier> ClientPanierList { get; set; }
     }
 }

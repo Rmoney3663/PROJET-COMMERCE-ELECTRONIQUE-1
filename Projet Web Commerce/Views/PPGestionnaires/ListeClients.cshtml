@@ -47,13 +47,13 @@
                                                       {
                                                           Client = client,
                                                           VendeurClient = vc,
-                                                          Vendeur = v
+                                                          Vendeur = v,
+                                                          ClientPanierList = Model.ClientPanierList.Where(cp => cp.NoClient == client.NoClient).ToList()
                                                       })
                                 .ToList();
 
-
-
                             }
+
                             <table class="table">
                                 <thead>
                                     <tr>
@@ -64,6 +64,7 @@
                                         <th scope="col">Date de dernière connexion</th>
                                         <th scope="col">Date de dernière visite</th>
                                         <th scope="col">Nom d'affaire</th>
+                                        <th scope="col">Panier Info</th>
                                         <th scope="col"></th>
                                     </tr>
                                 </thead>
@@ -73,7 +74,7 @@
                                     }
                                     @foreach (var item in groupeParAnnee)
                                     {
-                                        <tr>
+                                        <tr class="client-row" data-client-id="@item.Client.NoClient">
                                             <td>@(++no)</td>
                                             <td>@Html.DisplayFor(modelItem => item.Client.NoClient)</td>
                                             @if (item.Client.Nom != null && item.Client.Prenom != null)
@@ -88,10 +89,31 @@
                                             <td>@Html.DisplayFor(modelItem => item.Client.DateCreation)</td>
                                             <td>@Html.DisplayFor(modelItem => item.Client.DateDerniereConnexion)</td>
                                             <td>@Html.DisplayFor(modelItem => item.VendeurClient.DateVisite)</td>
-                                            <td>@Html.DisplayFor(modelItem => item.Vendeur.NomAffaires)</td>
+                                            <td>@Html.DisplayFor(modelItem => item.Vendeur.NomAffaires)</td>                                          
                                             <td>
                                                 <a asp-action="FraudeC" class="btn btn-danger" asp-route-id="@item.Client.NoClient">Fraude</a>
                                                 <a asp-action="InactifC" class="btn btn-warning" asp-route-id="@item.Client.NoClient">Inactif</a>
+                                            </td>
+                                        </tr>
+                                        <tr class="panier-info" data-client-id="@item.Client.NoClient" style="display: none;">
+                                            <td colspan="8">
+                                                @foreach (var panier in item.ClientPanierList)
+                                                {
+                                                    var produit = Model.ProduitsList.FirstOrDefault(p => p.NoProduit == panier.NoProduit);
+                                                    var vendeur = Model.VendeursList.FirstOrDefault(p => p.NoVendeur == panier.NoVendeur);
+                                                    if (vendeur.Nom != null && vendeur.Prenom != null)
+                                                    {
+                                                        <p>@produit.Nom par @vendeur.Prenom @vendeur.Nom crée le @panier.DateCreation</p>
+                                                    }
+                                                    else
+                                                    {
+                                                        <p>@produit.Nom par @vendeur.AdresseEmail crée le @panier.DateCreation</p>
+                                                    }
+                                                }
+                                                @if (item.ClientPanierList.Count() == 0)
+                                                {
+                                                    <p>Aucun panier.</p>
+                                                }
                                             </td>
                                         </tr>
                                     }
@@ -101,7 +123,24 @@
                         </div>
                     </div>
                 }
+                @if (Model.MoisAnneesDistinctsList.Count() == 0)
+                {
+                    <p>Il n'y a aucun Client</p>
+                }
             </div>
         </section>
     </div>
 </div>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const clientRows = document.querySelectorAll('.client-row');
+
+        clientRows.forEach(function (row) {
+            row.addEventListener('click', function () {
+                const clientId = row.dataset.clientId;
+                const panierInfoRow = document.querySelector(`.panier-info[data-client-id="${clientId}"]`);
+                panierInfoRow.style.display = panierInfoRow.style.display === 'none' ? 'table-row' : 'none';
+            });
+        });
+    });
+</script>
