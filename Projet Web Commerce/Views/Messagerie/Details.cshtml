@@ -28,6 +28,20 @@
         .ToList();
 }
 
+<style>
+    .btns {
+        width: 8%;
+        height: 100%;
+        color: rgb(124, 105, 146);
+        background-color: rgb(236, 235, 243);
+    }
+
+        .btns:hover {
+            color: rgb(249, 229, 71);
+            background-color: rgb(124, 105, 146);
+        }
+</style>
+
 <div class="row">
     <div class="col">
         <section>
@@ -52,9 +66,14 @@
                     <div>
                         @Model.Message
                     </div>
+                    <br />
+                    <div class="card-footer" style="height: 55px;">
+                        <button class="btns" onclick="repondre('@Model.NoMessage')">Répondre</button>
+                        <button class="btns" onclick="transferer('@Model.NoMessage', '@ViewBag.UtilisateurCourantId')">Transférer</button>
+                    </div>
                     @if (Model.PieceJointe != null)
                     {
-                        @* <embed id="pieceJointe" name="pieceJointe" src="@Model.PieceJointe"/> *@
+                        <embed id="pieceJointe" name="pieceJointe" src="@Model.PieceJointe"/>
                     }
                 </div>
             </div>
@@ -62,3 +81,13 @@
         </section>
     </div>
 </div>
+
+<script>
+    function repondre(noMessage) {
+        window.location.href = '@Url.Action("EnvoyerMessage")' + '?idMessage=' + noMessage + '&typeMessage=' + 'reponse';
+    }
+
+    function transferer(noMessage, transmetteur) {
+        window.location.href = '@Url.Action("EnvoyerMessage")' + '?idMessage=' + noMessage + '&typeMessage=' + 'transmission' + '&transmetteur=' + transmetteur;
+    }
+</script>
