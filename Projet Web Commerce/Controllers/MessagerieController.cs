@@ -222,6 +222,12 @@ namespace Projet_Web_Commerce.Controllers
             return View();
         }
 
+        [HttpPost]
+        public ActionResult Supprimer()
+        {
+            return View();
+        }
+
 
         // POST: EmailSenderController/Create
         [HttpPost]

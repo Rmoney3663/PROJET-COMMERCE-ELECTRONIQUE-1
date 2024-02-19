@@ -97,34 +97,37 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @{
-                                var no = 0;
-                            }
-                            @foreach (var msg in Model)
-                            {
-                                bool messageLu = msg.Destinataires?.Any(dest => dest.Destinataire == ViewBag.UtilisateurCourantId 
+                                @{
+                                    var no = 0;
+                                }
+                                @foreach (var msg in Model)
+                                {
+                                    bool messageLu = msg.Destinataires?.Any(dest => dest.Destinataire == ViewBag.UtilisateurCourantId
                                     && dest.MessageLu) ?? false;
 
-                                string rowClass = (!messageLu && msg.TypeMessage == 0) ? "flotter email-non-lu" : "flotter";
+                                    string rowClass = (!messageLu && msg.TypeMessage == 0) ? "flotter email-non-lu" : "flotter";
 
-                                <tr class="@rowClass" onclick="window.location.href = '@Url.Action("Details", new { idMessage = msg.NoMessage })'">
-                                    <td>@(++no)</td>
-                                    <td>@_context.Users.FirstOrDefault(u => u.Id == msg.Auteur)?.Email</td>
-                                    <td class="truncate">@Html.DisplayFor(modelItem => msg.Sujet) - <span class="msg">@Html.DisplayFor(modelItem => msg.Message)</span></td>
-                                    <td class="text-end">@Html.DisplayFor(modelItem => msg.DateEnvoi)</td>
-                                    <td>
-                                        <div class="menu-container">
-                                            <a class="menu-btn" onclick="afficherMenu(event)">@* ☰ *@</a>
-                                            <ul class="menu-list">
-                                                <li><a href="#" onclick="repondre(event, '@msg.NoMessage')">Répondre</a></li>
-                                                <li><a href="#" onclick="transferer(event)">Transférer</a></li>
-                                                <li><a href="#" onclick="supprimer(event)">Supprimer</a></li>
-                                            </ul>
-                                        </div>
-                                    </td>
-                                </tr>
-                            }
+                                    <tr class="@rowClass" onclick="window.location.href = '@Url.Action("Details", new { idMessage = msg.NoMessage })'">
+                                        <td>@(++no)</td>
+                                        <td>@_context.Users.FirstOrDefault(u => u.Id == msg.Auteur)?.Email</td>
+                                        <td class="truncate">@Html.DisplayFor(modelItem => msg.Sujet) - <span class="msg">@Html.DisplayFor(modelItem => msg.Message)</span></td>
+                                        <td class="text-end">@Html.DisplayFor(modelItem => msg.DateEnvoi)</td>
+                                        <td>
+                                            <div class="menu-container">
+                                                <a class="menu-btn" onclick="afficherMenu(event)">@* ☰ *@</a>
+                                                <ul class="menu-list">
+                                                    <li><a href="#" onclick="repondre(event, '@msg.NoMessage')">Répondre</a></li>
+                                                    <li><a href="#" onclick="transferer(event)">Transférer</a></li>
+                                                    <li><a href="#" onclick="supprimer(event, '@msg.NoMessage')">Supprimer</a></li>
+                                                </ul>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
                         </tbody>
+                        <form id="frmCourriel" method="post" asp-route="Supprimer">
+                            <input type="hidden" id="idMessage" value="" />
+                        </form>
                     </table>
                 </div>
             </div>
@@ -161,8 +164,11 @@
         event.stopPropagation();
     }
 
-    function supprimer(event) {
+    function supprimer(event, noMessage) {
         event.stopPropagation();
+
+        document.getElementById('idMessage').value = noMessage;
+        document.getElementById('frmCourriel').submit();
     }
 
 </script>
