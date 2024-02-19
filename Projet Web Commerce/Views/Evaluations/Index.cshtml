@@ -21,19 +21,33 @@ else
 {
     var user = await UserManager.GetUserAsync(User);
     var client = _context.PPClients.Where(c => c.AdresseEmail == user.Email).FirstOrDefault();
+    var lstReview = _context.PPEvaluations.ToList();
 
     int id = ViewBag.idProduit;
     var rating = ViewBag.rating;
     int numRating = 0;
+    bool trouve = false;
+    PPEvaluations evalClientActu = _context.PPEvaluations.Where(e=>e.NoClient==client.NoClient && e.NoProduit == id).FirstOrDefault();
+
+
+    if (evalClientActu != null)
+    {
+        trouve = true;
+    }
+
+    if (trouve)
+    {
+        numRating = (int)evalClientActu.Cote;
+    }
 
     if (rating != null)
     {
         numRating = rating;
     }
-    
+
     <div class="row">
         <div class="col-md-4">
-            <p>Ajouter une évaluation</p>
+            <h5>Ajouter une évaluation</h5>
             <div class="col">
                 <form asp-route-id="@id" id="eval" method="post">
                     @for (int i = 0; i < numRating; i++)
@@ -49,12 +63,52 @@ else
                         </button>
                     }
                 </form>
+                <br />
+                <form asp-route-id="@id" asp-route-noClient="@client.NoClient" asp-route-eval="@trouve" asp-route-rating="@numRating" asp-action="Edit">
+                    @if (evalClientActu != null)
+                    {
+                        <textarea rows="4" cols="50" name="msg" placeholder="Modifier votre commentaire">@evalClientActu.Commentaire</textarea>
+                        <button class="btn btn-secondary" style="background-color:#7C6992; color:#F9E547" type="submit">Modifier votre évaluation</button>
+                    }
+                    else
+                    {
+                        <textarea rows="4" cols="50" name="msg" placeholder="Ajouter un commentaire"></textarea>
+                        <button class="btn btn-secondary" style="background-color:#7C6992; color:#F9E547" type="submit">Ajouter une évaluation</button>
+                    }
+                </form>
+                <br style="border-top: 3px solid #bbb" />
+
+                @if (trouve)
+                {
+                    int cote = (int)evalClientActu.Cote;
+                    <h6>@client.AdresseEmail (@cote étoiles) :</h6>
+                    if(evalClientActu.Commentaire != "" && evalClientActu.Commentaire != null)
+                    {
+                        <p>@evalClientActu.Commentaire</p>
+                    }
+                    else
+                    {
+                        <p>Aucun commentaire</p>
+                    }
+                }
+                
+                @foreach (var review in lstReview.Where(r => r.NoClient != client.NoClient && r.NoProduit == id))
+                {
+                    var unClient = _context.PPClients.Where(c => c.NoClient == review.NoClient).FirstOrDefault();
+
+                    int cote = (int)review.Cote;
+
+                    <h6>(Vous) @unClient.AdresseEmail (@cote étoiles) :</h6>
+                    if (review.Commentaire != "" && review.Commentaire != null)
+                    {
+                        <p>@review.Commentaire</p>
+                    }
+                    else
+                    {
+                        <p>Aucun commentaire</p>
+                    }
+                }
             </div>
         </div>
     </div>
-
-    foreach(var review in _context.PPEvaluations.Where(e=>e.NoProduit == id).ToList())
-    {
-        <p>@review.Commentaire</p>
-    }
 }

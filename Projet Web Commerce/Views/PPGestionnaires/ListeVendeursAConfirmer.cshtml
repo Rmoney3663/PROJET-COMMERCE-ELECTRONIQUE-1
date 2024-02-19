@@ -146,14 +146,16 @@
 
         Swal.fire({
             title: 'Courriel à envoyer au vendeur',
-            html: `<input id="sujet" style="width:550;" class="swal2-input" value="${sujet}"/> <textarea id="message" style="resize:none;width:550;height:300;" class="swal2-input">${message}</textarea>`,
+            html: `<input id="sujet" style="width:550;" class="swal2-input" value="${sujet}" readonly/>
+                <textarea id="message" style="resize:none;width:550;height:200;" class="swal2-input" readonly>${message}</textarea>
+                <textarea id="infosSupp" style="resize:none;width:550;height:150;" class="swal2-input" placeholder="Informations supplémentaires... (Optionnel)"></textarea>`,
             showCancelButton: true,
             confirmButtonText: 'Envoyer',
             cancelButtonText: 'Annuler',
             showLoaderOnConfirm: true,
             width: '800px',
             preConfirm: (redevance) => {
-                var url = "/PPGestionnairesController/ValiderAsync?" + $.param({ id: noVendeur, sujet: sujet, message: message, vendeurAccepte: accepte, pourcentageRedevence: pourcentageRedevence })
+                var url = "/PPGestionnairesController/ValiderAsync?" + $.param({ id: noVendeur, sujet: sujet, message: message, infosSupp: infosSupp.value, vendeurAccepte: accepte, pourcentageRedevence: pourcentageRedevence })
                 return fetch(url)
                     .then(response => {
                         if (!response.ok) {

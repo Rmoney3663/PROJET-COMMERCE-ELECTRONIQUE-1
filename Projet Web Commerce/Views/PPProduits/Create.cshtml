@@ -106,13 +106,13 @@ else
 
                 <div class="form-group">
                     <label asp-for="NombreItems" class="control-label">Nombre d’items :</label>
-                    <input asp-for="NombreItems" class="form-control" type="number" min="1" data-val="true" required />
+                    <input asp-for="NombreItems" class="form-control" type="number" min="0" data-val="true" required />
                     <span asp-validation-for="NombreItems" class="text-danger"></span>
                 </div>
                 <br>
 
                 <div class="form-group">
-                    <label asp-for="PrixVente" class="control-label">Prix de vente (Optionel) :</label>
+                    <label asp-for="PrixVente" class="control-label">Prix de vente (Optionnel) :</label>
                     <div class="input-group">
                         <input asp-for="PrixVente" class="form-control" type="number" min="0" step="any" data-val="true"  />
                         <span class="input-group-text">(CAD)</span>
@@ -122,7 +122,7 @@ else
                 <br>
 
                 <div class="form-group">
-                    <label asp-for="DateVente" class="control-label">Date de vente (Optionel) :</label>
+                    <label asp-for="DateVente" class="control-label">Date de vente (Optionnel) :</label>
                     <input asp-for="DateVente" class="form-control" type="date" data-val="true" id="DateVente" />
                     <span asp-validation-for="DateVente" class="text-danger"></span>
                 </div>

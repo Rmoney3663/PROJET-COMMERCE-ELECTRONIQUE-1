@@ -13,7 +13,7 @@ namespace Projet_Web_Commerce.Models
         [Column(TypeName = "numeric(8,2)")]
         public decimal Cote { get; set; }
 
-        public string Commentaire { get; set; }
+        public string? Commentaire { get; set; }
         public DateTime DateMAJ { get; set; }
         public DateTime DateCreation { get; set; }
 

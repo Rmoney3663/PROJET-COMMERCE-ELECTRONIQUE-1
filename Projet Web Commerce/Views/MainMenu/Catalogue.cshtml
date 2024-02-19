@@ -84,19 +84,28 @@ else
         </section>
     }
 </div>
-<h3>Nos Catégories</h3>
+@if (Model.CategoriesList.Count > 0)
+{
+    <h3>Nos Catégories</h3>
+}
+else
+{
+    <h3>Aucune Catégories</h3>
+}
 <div class="d-flex flex-wrap align-content-start bg-light" style="margin-bottom:50px;">
     @foreach (var category in Model.CategoriesList)
     {
-        @if (category.PPProduits != null)
-        {
-            <div class="card" style="width:50%; margin-bottom:10px;">
-                <div class="card-body">
-                    <h2 class="card-title">@Html.DisplayFor(modelItem => category.Description)</h2>
-                    <h5 class="card-details">@Html.DisplayFor(modelItem => category.Details)</h5>
-
+        <div class="card" style="width:50%; margin-bottom:10px;">
+            <div class="card-body">
+                <h2 class="card-title">@Html.DisplayFor(modelItem => category.Description)</h2>
+                <h5 class="card-details">@Html.DisplayFor(modelItem => category.Details)</h5>
+                @if (category.PPProduits != null)
+                {
                     <p>Vendeurs:</p>
-                    <div style="height: 40%; width:50%; overflow:auto">
+                }
+                <div style="height: 40%; width:50%; overflow:auto">
+                    @if (category.PPProduits != null)
+                    {
                         @foreach (var group in category.PPProduits
                        .Where(p => p.PPVendeurs != null && p.PPVendeurs.NomAffaires != null)
                        .GroupBy(p => p.PPVendeurs.NomAffaires))
@@ -116,11 +125,15 @@ else
                                 <p>Vendeur sans nom</p>
                             }
                         }
-                    </div>
-
+                    }
+                    else
+                    {
+                        <p>Aucun vendeur dans la catégorie</p>
+                    }
                 </div>
+
             </div>
-        }
+        </div>
         
     }
 </div>
