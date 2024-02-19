@@ -1,0 +1,48 @@
+﻿@model IEnumerable<Projet_Web_Commerce.Models.PPHistoriquePaiements>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+    <!-- Include Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Optional custom styles */
+        .card {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            @foreach (var item in Model)
+            {
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Order Details</h5>
+                            <p class="card-text">Montant Avant Livraison: @Html.DisplayFor(modelItem => item.MontantVenteAvantLivraison)</p>
+                            <p class="card-text">NoVendeur: @Html.DisplayFor(modelItem => item.NoVendeur)</p>
+                            <p class="card-text">NoClient: @Html.DisplayFor(modelItem => item.NoClient)</p>
+                            <p class="card-text">NoCommande: @Html.DisplayFor(modelItem => item.NoCommande)</p>
+                            <p class="card-text">DateVente: @Html.DisplayFor(modelItem => item.DateVente)</p>
+                            <p class="card-text">NoAutorisation: @Html.DisplayFor(modelItem => item.NoAutorisation)</p>
+                            <p class="card-text">FraisLesi: @Html.DisplayFor(modelItem => item.FraisLesi)</p>
+                            <p class="card-text">Redevance: @Html.DisplayFor(modelItem => item.Redevance)</p>
+                            <p class="card-text">FraisLivraison: @Html.DisplayFor(modelItem => item.FraisLivraison)</p>
+                            <p class="card-text">FraisTPS: @Html.DisplayFor(modelItem => item.FraisTPS)</p>
+                            <p class="card-text">FraisTVQ: @Html.DisplayFor(modelItem => item.FraisTVQ)</p>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Include Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

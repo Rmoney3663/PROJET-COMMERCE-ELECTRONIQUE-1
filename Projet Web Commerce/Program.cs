@@ -18,6 +18,8 @@ builder.Services.AddDefaultIdentity<Utilisateur>(options => options.SignIn.Requi
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+builder.Services.AddSignalR();
+
 
 var app = builder.Build();
 
@@ -66,6 +68,7 @@ using (var scope = app.Services.CreateScope())
     var emailToCheck = "william.anthony.burgess@gmail.com";
     var optionsBuilder = new DbContextOptionsBuilder<AuthDbContext>();
     optionsBuilder.UseSqlServer("Data Source=tcp:sql.informatique.cgodin.qc.ca,5433;Initial Catalog=BDB68_424Q24;User ID=B68equipe424q24;Password=Password24;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True;Integrated Security=False");
+    //optionsBuilder.UseSqlServer("Data Source=tcp:424sql.cgodin.qc.ca,5433;Initial Catalog=BDB68_424Q24;User ID=B68equipe424q24;Password=Password24;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True;Integrated Security=False");
 
     var context = new AuthDbContext(optionsBuilder.Options);
     // Check if a user with the specified email already exists

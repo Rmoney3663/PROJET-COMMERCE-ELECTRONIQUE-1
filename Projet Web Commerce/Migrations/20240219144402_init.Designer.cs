@@ -12,7 +12,7 @@ using Projet_Web_Commerce.Data;
 namespace Projet_Web_Commerce.Migrations
 {
     [DbContext(typeof(AuthDbContext))]
-    [Migration("20240219142606_init")]
+    [Migration("20240219144402_init")]
     partial class init
     {
         /// <inheritdoc />

@@ -34,6 +34,11 @@ namespace Projet_Web_Commerce.Controllers
                               where unPanier.NoVendeur == id
                               select unPanier;
 
+            if (listPaniers.ToList<PPArticlesEnPanier>().Count <= 0)
+            {
+                return RedirectToAction("Index", "Paniers");
+            }
+
             ViewData["Panier"] = listPaniers.ToList<PPArticlesEnPanier>();
             ViewData["VendeurId"] = id;
 

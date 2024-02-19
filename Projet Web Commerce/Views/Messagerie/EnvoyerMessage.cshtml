@@ -1,6 +1,7 @@
 ﻿﻿﻿@using Microsoft.AspNetCore.Identity
 @using Newtonsoft.Json
 @using Projet_Web_Commerce.Data
+@using System.Text
 @model PPMessages
 @inject AuthDbContext _context
 @inject UserManager<Projet_Web_Commerce.Areas.Identity.Data.Utilisateur> UserManager
@@ -177,9 +178,7 @@
                             <label class="form-label">Le sujet</label>
                         </div>
                         <div class="form-floating mb-3">
-                            <textarea name="message" id="message" class="form-control" required
-                                oninvalid="setCustomValidity('Veuillez remplir ce champ.')"
-                                oninput="setCustomValidity('')">@message</textarea>
+                            <textarea title="Message" name="message" id="message" class="form-control" style="height: 200px">@message</textarea>
                             <label class="form-label">Votre message</label>
                         </div>
                         <br />
@@ -198,9 +197,50 @@
 </div>
 
 <script>
+    $(document).ready(function () {
+        // Check if Model.Destinataires is not null
+        // if (@(Model != null ? "true" : "false") === true) {
+        if (@(ViewBag.Dests != null ? "true" : "false") === true) {
+
+            // Serialize the email addresses
+            // var idDestinataires = @Html.Raw(Json.Serialize(Model?.Destinataires.Select(d => d.DestinataireUser?.Email).Where(email => !string.IsNullOrWhiteSpace(email))));
+            var dests = @Html.Raw(Json.Serialize(ViewBag.Dests));
+
+            // Add the pre-selected destinataires to selectedNamesContainer
+            for (var i = 0; i < dests.length; i++) {
+                var selectedNamesContainer = document.getElementById("selectedNamesContainer");
+
+                var nameElement = document.createElement("span");
+                nameElement.innerHTML = dests[i];
+
+                var deleteIcon = document.createElement("span");
+                deleteIcon.innerHTML = " &#10006;";
+                deleteIcon.className = "delete-icon";
+                deleteIcon.onclick = function () {
+                    let option = document.createElement("option");
+                    option.text = nameElement.firstChild.textContent;
+                    option.value = option.text;
+                    selectedNamesContainer.removeChild(nameElement);
+                    document.getElementById('selectedDestinataire').value = document.getElementById('selectedDestinataire').value.replace(nameElement.firstChild.textContent + ';', '');
+                };
+
+                selectedDestinataire.value += nameElement.innerHTML + ';';
+                nameElement.appendChild(deleteIcon);
+                selectedNamesContainer.appendChild(nameElement);
+            }
+        }
+    });
+
     function ajouterDestinataire() {
         var dropdown = document.getElementById("ddlClients");
         var selectedValue = dropdown.options[dropdown.selectedIndex].value;
+
+        // Vérifier si la personne est déjà sélectionnée
+        if (selectedDestinataire.value.includes(selectedValue)) {
+            // alert("Cette personne est déjà sélectionnée.");
+            dropdown.selectedIndex = 0;
+            return;
+        }
 
         if (selectedValue) {
             var selectedNamesContainer = document.getElementById("selectedNamesContainer");
@@ -213,9 +253,9 @@
             deleteIcon.className = "delete-icon";
             deleteIcon.onclick = function () {
                 let option = document.createElement("option");
-                option.text = nameElement.firstChild.textContent
-                option.value = option.text
-                dropdown.add(option);
+                option.text = nameElement.firstChild.textContent;
+                option.value = option.text;
+                // dropdown.add(option);
                 selectedNamesContainer.removeChild(nameElement);
                 selectedDestinataire.value = selectedDestinataire.value.replace(nameElement.firstChild.textContent + ';', '');
             };
@@ -223,7 +263,6 @@
             selectedDestinataire.value += nameElement.innerHTML + ';';
             nameElement.appendChild(deleteIcon);
             selectedNamesContainer.appendChild(nameElement);
-            dropdown.remove(dropdown.selectedIndex);
 
             dropdown.selectedIndex = 0;
         }
@@ -312,55 +351,5 @@
             }
         }
     });
-
-    // function soumettreForm() {
-    //     var destinatairesSelectionnes = document.getElementById('selectedDestinataire').value.split(';');
-    //     for (var i = 0; i < destinatairesSelectionnes.length; i++) {
-    //         if (destinatairesSelectionnes[i] == '')
-    //             destinatairesSelectionnes.splice(i, 1);
-    //     }
-    //     document.getElementById('selectedDestinataire').value = destinatairesSelectionnes;
-    //     document.getElementById('auteur').value = '@user.Email';
-    //     var valide = true;
-    //     var msgErreur = "";
-
-    //     // var selectedDestinataires = getCourrielsFromContainer();
-
-    //     if (selectedDestinataire.value == '') {
-    //         msgErreur = "Veuillez sélectionner le(s) destinataire(s) de votre courriel.";
-    //         valide = false;
-    //     }
-
-    //     if (valide) {
-    //         return true;
-    //     }
-    //     else {
-    //         console.log("pas valide");
-    //         Swal.fire({
-    //             title: "Erreur!",
-    //             text: msgErreur,
-    //             icon: "error"
-    //         }).then(() => {
-    //             return false;
-    //         });
-    //     }
-
-    //     return false;
-    // }
-
-    function getCourrielsFromContainer() {
-        var selectedNamesContainer = document.getElementById("selectedNamesContainer");
-        var emails = [];
-
-        for (var i = 0; i < selectedNamesContainer.children.length; i++) {
-            var childElement = selectedNamesContainer.children[i];
-
-            var email = childElement.textContent.trim();
-
-            emails.push(email);
-        }
-
-        return emails;
-    }
 
 </script>

@@ -26,9 +26,54 @@
 
     .email-non-lu {
         font-weight: bold; /* Texte en gras */
-        color: #0000FF; /* Couleur du texte - par exemple, bleu */
-        background-color: #E6E6FA; /* Couleur de fond - par exemple, lavande */
+        color: #0000FF;
+        background-color: #E6E6FA; 
     }
+
+    .menu-container {
+        display: block;
+        justify-content: space-between;
+        align-items: center;
+        padding-left: 30%;
+    }
+
+    .menu-btn {
+        border: none;
+        cursor: pointer;
+        text-decoration: none;
+        color: black;
+    }
+
+        .menu-btn:after {
+            content: '\2807';
+            font-size: 110%;
+        }
+
+    .menu-list {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+        display: none;
+        position: absolute;
+        background-color: #444;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    }
+
+        .menu-list li {
+            padding: 10px;
+        }
+
+            .menu-list li a {
+                text-decoration: none;
+                color: white;
+                display: block;
+            }
+
+                .menu-list li a:hover {
+                    text-decoration: underline;
+                    font-weight: bold;
+                }
 </style>
 
 <div class="row">
@@ -48,28 +93,82 @@
                                 <th scope="col">Expéditeur</th>
                                 <th scope="col">Objet - <span class="msg">Message</span></th>
                                 <th scope="col" class="text-end">Date de l'envoi</th>
+                                <th scope="col"></th>
                             </tr>
                         </thead>
                         <tbody>
-                            @{
-                                var no = 0;
-                            }
-                            @foreach (var msg in Model)
-                            {
-                                string rowClass = (msg.TypeMessage == 0) ? "flotter email-non-lu" : "flotter";
+                                @{
+                                    var no = 0;
+                                }
+                                @foreach (var msg in Model)
+                                {
+                                    bool messageLu = msg.Destinataires?.Any(dest => dest.Destinataire == ViewBag.UtilisateurCourantId
+                                    && dest.MessageLu) ?? false;
 
-                                <tr class="@rowClass" onclick="window.location.href = '@Url.Action("Details", new { idMessage = msg.NoMessage })'">
-                                    <td>@(++no)</td>
-                                    <td>@_context.Users.FirstOrDefault(u => u.Id == msg.Auteur)?.Email</td>
-                                    <td class="truncate">@Html.DisplayFor(modelItem => msg.Sujet) - <span class="msg">@Html.DisplayFor(modelItem => msg.Message)</span></td>
-                                    <td class="text-end">@DateTime.Now.Date</td> @* <td>@Html.DisplayFor(modelItem => msg.Message.DateMessage)</td> *@
-                                </tr>
+                                    string rowClass = (!messageLu && msg.TypeMessage == 0) ? "flotter email-non-lu" : "flotter";
 
-                            }
+                                    <tr class="@rowClass" onclick="window.location.href = '@Url.Action("Details", new { idMessage = msg.NoMessage })'">
+                                        <td>@(++no)</td>
+                                        <td>@_context.Users.FirstOrDefault(u => u.Id == msg.Auteur)?.Email</td>
+                                        <td class="truncate">@Html.DisplayFor(modelItem => msg.Sujet) - <span class="msg">@Html.DisplayFor(modelItem => msg.Message)</span></td>
+                                        <td class="text-end">@Html.DisplayFor(modelItem => msg.DateEnvoi)</td>
+                                        <td>
+                                            <div class="menu-container">
+                                                <a class="menu-btn" onclick="afficherMenu(event)">@* ☰ *@</a>
+                                                <ul class="menu-list">
+                                                    <li><a href="#" onclick="repondre(event, '@msg.NoMessage')">Répondre</a></li>
+                                                    <li><a href="#" onclick="transferer(event)">Transférer</a></li>
+                                                    <li><a href="#" onclick="supprimer(event, '@msg.NoMessage')">Supprimer</a></li>
+                                                </ul>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
                         </tbody>
+                        <form id="frmCourriel" method="post" asp-route="Supprimer">
+                            <input type="hidden" id="idMessage" value="" />
+                        </form>
                     </table>
                 </div>
             </div>
         </section>
     </div>
 </div>
+
+<script>
+    document.addEventListener('click', function (event) {
+        var menuList = document.querySelectorAll('.menu-list');
+
+        // Vérifier si l'élément cliqué n'est pas à l'intérieur du menu
+        if (!event.target.closest('.menu-container')) {
+            // Masquer tous les menus
+            menuList.forEach(function (menu) {
+                menu.style.display = 'none';
+            });
+        }
+    });
+
+    function afficherMenu(event) {
+        event.stopPropagation();
+        var menuList = event.target.nextElementSibling;
+        menuList.style.display = (menuList.style.display === 'none' || menuList.style.display === '') ? 'block' : 'none';
+    }
+
+    function repondre(event, noMessage) {
+        event.stopPropagation();
+        window.location.href = '@Url.Action("EnvoyerMessage")' + '?idMessage=' + noMessage;
+    }
+
+
+    function transferer(event) {
+        event.stopPropagation();
+    }
+
+    function supprimer(event, noMessage) {
+        event.stopPropagation();
+
+        document.getElementById('idMessage').value = noMessage;
+        document.getElementById('frmCourriel').submit();
+    }
+
+</script>
