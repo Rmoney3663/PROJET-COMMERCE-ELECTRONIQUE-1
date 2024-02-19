@@ -49,34 +49,42 @@ else
         <div class="col-md-4">
             <h5>Ajouter une évaluation</h5>
             <div class="col">
-                <form asp-route-id="@id" id="eval" method="post">
-                    @for (int i = 0; i < numRating; i++)
-                    {
-                        <button type="submit" name="rating" value="@i" style="border: none">
-                            <img src="~/Logo/iconeEtoileJaune.png" width="25" height="25" />
-                        </button>
-                    }
-                    @for (int i = numRating; i < 5; i++)
-                    {
-                        <button type="submit" name="rating" value="@i" style="border: none">
-                            <img src="~/Logo/iconeEtoile.png" width="25" height="25" />
-                        </button>
-                    }
-                </form>
-                <br />
-                <form asp-route-id="@id" asp-route-noClient="@client.NoClient" asp-route-eval="@trouve" asp-route-rating="@numRating" asp-action="Edit">
-                    @if (evalClientActu != null)
-                    {
-                        <textarea rows="4" cols="50" name="msg" placeholder="Modifier votre commentaire">@evalClientActu.Commentaire</textarea>
-                        <button class="btn btn-secondary" style="background-color:#7C6992; color:#F9E547" type="submit">Modifier votre évaluation</button>
-                    }
-                    else
-                    {
-                        <textarea rows="4" cols="50" name="msg" placeholder="Ajouter un commentaire"></textarea>
-                        <button class="btn btn-secondary" style="background-color:#7C6992; color:#F9E547" type="submit">Ajouter une évaluation</button>
-                    }
-                </form>
-                <br style="border-top: 3px solid #bbb" />
+                @if (User.IsInRole("Client"))
+                {
+                    <form asp-route-id="@id" id="eval" method="post">
+                        @for (int i = 0; i < numRating; i++)
+                        {
+                            <button type="submit" name="rating" value="@i" style="border: none">
+                                <img src="~/Logo/iconeEtoileJaune.png" width="25" height="25" />
+                            </button>
+                        }
+                        @for (int i = numRating; i < 5; i++)
+                        {
+                            <button type="submit" name="rating" value="@i" style="border: none">
+                                <img src="~/Logo/iconeEtoile.png" width="25" height="25" />
+                            </button>
+                        }
+                    </form>
+                    <br />
+                    <form asp-route-id="@id" asp-route-noClient="@client.NoClient" asp-route-eval="@trouve" asp-route-rating="@numRating" asp-action="Edit">
+                        @if (evalClientActu != null)
+                        {
+                            <textarea rows="4" cols="50" name="msg" placeholder="Modifier votre commentaire">@evalClientActu.Commentaire</textarea>
+                            <button class="btn btn-secondary" style="background-color:#7C6992; color:#F9E547" type="submit">Modifier votre évaluation</button>
+                        }
+                        else
+                        {
+                            <textarea rows="4" cols="50" name="msg" placeholder="Ajouter un commentaire"></textarea>
+                            <button class="btn btn-secondary" style="background-color:#7C6992; color:#F9E547" type="submit">Ajouter une évaluation</button>
+                        }
+                    </form>
+                    <br style="border-top: 3px solid #bbb" />
+                    <h3>Évaluations:</h3>
+                }
+                else
+                {
+                    <h3>Vos évaluations:</h3>
+                }
 
                 @if (trouve)
                 {
@@ -88,25 +96,32 @@ else
                     }
                     else
                     {
-                        <p>Aucun commentaire</p>
+                        <p style="color:gray">Aucune commentaire</p>
                     }
                 }
                 
-                @foreach (var review in lstReview.Where(r => r.NoClient != client.NoClient && r.NoProduit == id))
+                @if (lstReview.Count > 0)
                 {
-                    var unClient = _context.PPClients.Where(c => c.NoClient == review.NoClient).FirstOrDefault();
-
-                    int cote = (int)review.Cote;
-
-                    <h6>(Vous) @unClient.AdresseEmail (@cote étoiles) :</h6>
-                    if (review.Commentaire != "" && review.Commentaire != null)
+                    @foreach (var review in lstReview.Where(r => r.NoClient != client.NoClient && r.NoProduit == id))
                     {
-                        <p>@review.Commentaire</p>
+                        var unClient = _context.PPClients.Where(c => c.NoClient == review.NoClient).FirstOrDefault();
+
+                        int cote = (int)review.Cote;
+
+                        <h6>(Vous) @unClient.AdresseEmail (@cote étoiles) :</h6>
+                        if (review.Commentaire != "" && review.Commentaire != null)
+                        {
+                            <p>@review.Commentaire</p>
+                        }
+                        else
+                        {
+                            <p>Aucun commentaire</p>
+                        }
                     }
-                    else
-                    {
-                        <p>Aucun commentaire</p>
-                    }
+                }
+                else
+                {
+                    <h4>Aucune évaluations</h4>
                 }
             </div>
         </div>
