@@ -549,13 +549,29 @@ namespace Projet_Web_Commerce.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Taux([Bind("NoVendeur, Pourcentage")] PPVendeurs pPVendeurs)
+        public async Task<IActionResult> Taux([Bind("Pourcentage")] PPVendeurs pPVendeurs, int id) 
         {
-            if (ModelState.IsValid)
+            var keysToRemove = ModelState.Keys.Where(k => k != "Pourcentage").ToList();
+            foreach (var key in keysToRemove)
+            {
+                ModelState.Remove(key);
+            }
+            foreach (var m in ModelState)
+            {
+                foreach (var er in m.Value.Errors)
+                {
+                    Console.WriteLine(m.Key);
+                    Console.WriteLine(er.ErrorMessage);
+                }
+            }
+            Console.WriteLine(pPVendeurs.Pourcentage);
+            var item = await _context.PPVendeurs.FindAsync(id);
+            if (ModelState.IsValid && item != null)
             {
                 try
                 {
-                    _context.Update(pPVendeurs);
+                    item.Pourcentage = pPVendeurs.Pourcentage;
+                    _context.Update(item);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
@@ -569,7 +585,7 @@ namespace Projet_Web_Commerce.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("ListeVendeurs");
             }
 
             return View(pPVendeurs);

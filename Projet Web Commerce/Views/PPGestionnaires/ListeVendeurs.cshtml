@@ -98,7 +98,7 @@
                                             <td>@Html.DisplayFor(modelItem => item.Commande.MontantTotAvantTaxes)</td>
                                             <td>
                                                 <a asp-action="FraudeV" class="btn btn-danger" asp-route-id="@item.Vendeur.NoVendeur">Fraude</a>
-                                                @if (item.Commande != null && item.Commande.NoCommande != null)
+                                                @if (item.Commande == null )
                                                 {
                                                     <a asp-action="Taux" class="btn btn-success"  asp-route-id="@item.Vendeur.NoVendeur">Taux Redevance</a>                                                   
                                                 }

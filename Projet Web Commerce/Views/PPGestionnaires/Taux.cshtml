@@ -5,10 +5,10 @@
 <p>Compte de @Model.AdresseEmail</p>
 
 <form asp-action="Taux" method="post">
-    <input type="hidden" asp-for="NoVendeur" />
     <div class="form-group">
+        <input type="hidden" name="id" value="@Model.NoVendeur" />
         <label asp-for="Pourcentage" class="control-label"></label>
-        <input type="number" asp-for="Pourcentage" class="form-control" min="0" max="100" step="0.01" />
+        <input type="number" asp-for="Pourcentage" class="form-control" min="0" max="100" step="any" />
         <span asp-validation-for="Pourcentage" class="text-danger"></span>
     </div>
     <br />
