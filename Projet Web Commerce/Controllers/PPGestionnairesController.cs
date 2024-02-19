@@ -634,7 +634,7 @@ namespace Projet_Web_Commerce.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Taux([Bind("Pourcentage")] PPVendeurs pPVendeurs, int id) 
+        public async Task<IActionResult> Taux([Bind("Pourcentage")] PPVendeurs pPVendeurs, int id)
         {
             var keysToRemove = ModelState.Keys.Where(k => k != "Pourcentage").ToList();
             foreach (var key in keysToRemove)
@@ -724,9 +724,9 @@ namespace Projet_Web_Commerce.Controllers
             var item = await _context.PPVendeurs.FindAsync(id);
             if (item != null)
             {
-                item.Statut = 2;               
+                item.Statut = 2;
                 _context.Update(item);
-               
+
             }
 
             await _context.SaveChangesAsync();
@@ -740,7 +740,7 @@ namespace Projet_Web_Commerce.Controllers
             var item = await _context.PPClients.FindAsync(id);
             if (item != null)
             {
-                 item.Statut = 2;
+                item.Statut = 2;
                 _context.Update(item);
 
             }
@@ -831,6 +831,29 @@ namespace Projet_Web_Commerce.Controllers
                 var articlesEnPanier = _context.PPArticlesEnPanier.Where(ap => panierToDelete.Contains(ap.NoClient));
                 _context.PPArticlesEnPanier.RemoveRange(articlesEnPanier);
 
+                await _context.SaveChangesAsync();
+                return Ok(new { message = "Les paniers ont été supprimés avec succès." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = $"Une erreur s'est produite lors des paniers : {ex.Message}" });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SupprimerVPanier()
+        {
+            var panierToDelete = Request.Form["panierToDelete"].ToString().Split(',').Select(int.Parse).ToList();
+            if (panierToDelete == null || !panierToDelete.Any())
+            {
+                return BadRequest(new { error = "Aucun panier à supprimer." });
+            }
+
+            try
+            {
+                var articlesEnPanier = _context.PPArticlesEnPanier.Where(ap => panierToDelete.Contains(ap.NoVendeur));
+                _context.PPArticlesEnPanier.RemoveRange(articlesEnPanier);
+
 
 
                 await _context.SaveChangesAsync();
@@ -839,6 +862,72 @@ namespace Projet_Web_Commerce.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, new { error = $"Une erreur s'est produite lors des paniers : {ex.Message}" });
+            }
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> SupprimerVendeur()
+        {
+            var vendeursToDelete = Request.Form["vendeursToDelete"].ToString().Split(',').Select(int.Parse).ToList();
+            if (vendeursToDelete == null || !vendeursToDelete.Any())
+            {
+                return BadRequest(new { error = "Aucun vendeur à supprimer." });
+            }
+
+            try
+            {
+                var vendeursClients = _context.PPVendeursClients.Where(vc => vendeursToDelete.Contains(vc.NoVendeur));
+                _context.PPVendeursClients.RemoveRange(vendeursClients);
+
+                var articlesEnPanier = _context.PPArticlesEnPanier.Where(ap => vendeursToDelete.Contains(ap.NoVendeur));
+                _context.PPArticlesEnPanier.RemoveRange(articlesEnPanier);
+
+                var commandes = _context.PPCommandes.Where(cmd => vendeursToDelete.Contains(cmd.NoVendeur));
+                foreach (var commande in commandes)
+                {
+                    var detailsCommandes = _context.PPDetailsCommandes.Where(dc => dc.NoCommande == commande.NoCommande);
+                    _context.PPDetailsCommandes.RemoveRange(detailsCommandes);
+                }
+                _context.PPCommandes.RemoveRange(commandes);
+
+                var emailDelete = _context.PPVendeurs
+                    .Where(c => vendeursToDelete.Contains(c.NoVendeur))
+                    .Select(c => c.IdUtilisateur);
+
+                var email = _context.PPDestinatairesMessage
+                    .Where(u => emailDelete.Contains(u.Destinataire));
+
+                var messageIds = _context.PPMessages
+                    .Where(u => emailDelete.Contains(u.Auteur))
+                    .Select(u => u.NoMessage)
+                    .ToList();
+
+                var messagesToDelete = _context.PPMessages
+                    .Where(m => messageIds.Contains(m.NoMessage));
+
+                var destinatairesToDelete = _context.PPDestinatairesMessage
+                    .Where(u => messageIds.Contains(u.NoMessage));
+
+                _context.PPDestinatairesMessage.RemoveRange(destinatairesToDelete);
+                _context.PPMessages.RemoveRange(messagesToDelete);
+                _context.PPDestinatairesMessage.RemoveRange(email);
+
+
+
+                var usersToDelete = _context.PPVendeurs.Where(c => vendeursToDelete.Contains(c.NoVendeur)).Select(c => c.AdresseEmail);
+                var users = _context.Users.Where(u => usersToDelete.Contains(u.Email));
+                _context.Users.RemoveRange(users);
+
+                var vendeur = _context.PPVendeurs.Where(c => vendeursToDelete.Contains(c.NoVendeur));
+                _context.PPVendeurs.RemoveRange(vendeur);
+
+                await _context.SaveChangesAsync();
+                return Ok(new { message = "Les vendeur ont été supprimés avec succès." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = $"Une erreur s'est produite lors des vendeurs : {ex.Message}" });
             }
         }
 

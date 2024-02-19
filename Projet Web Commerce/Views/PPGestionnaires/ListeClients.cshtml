@@ -190,8 +190,8 @@
         if (panierCount > 0 || clientCount > 0) {
             Swal.fire({
                 title: 'Enregistrement des modifications',
-                html: 'Number of Panier Supprimer: ' + panierCount + '<br>' +
-                    'Number of Client Supprimer: ' + clientCount,
+                html: 'Nombre de Panier Supprimer : ' + panierCount + '<br>' +
+                    'Nombre de suppressions de clients : ' + clientCount,
                 icon: 'warning',
                 showDenyButton: true,
                 confirmButtonText: "Confirmer",
@@ -247,8 +247,7 @@
                                 Swal.showValidationMessage(`Request failed: ${error}`);
                             });
                     } else {
-                        // Neither clients nor paniers are selected
-                        Swal.showValidationMessage('No clients or paniers selected.');
+                        Swal.showValidationMessage("Aucun client ou paniers n'a été sélectionné.");
                         return;
                     }
                 }
