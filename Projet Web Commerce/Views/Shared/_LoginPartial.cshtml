@@ -7,6 +7,7 @@
 @inject SignInManager<Utilisateur> SignInManager
 @inject UserManager<Utilisateur> UserManager
 
+<div id="snackbar">Nouvelle notification de la messagerie</div>
 <ul class="navbar-nav">
     @if (SignInManager.IsSignedIn(User))
     {
@@ -50,6 +51,7 @@
                 <a class="nav-link" asp-area="" asp-controller="Messagerie" asp-action="BoiteDeReception" title="Messagerie">
                     <img style="width: 30px; height: 30px; filter: invert(87%) sepia(71%) saturate(1210%) hue-rotate(322deg) brightness(113%) contrast(95%)" src="/Logo/MessageIcon.png" />
                 </a>
+                <b id="notificationCount" style="color:red; position:absolute; top:10px; left:30px "></b>
             </li>
 
             if ((estDansRole = await UserManager.IsInRoleAsync(user, "Client")))
@@ -104,3 +106,75 @@
         </li>
     }
 </ul>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/5.0.7/signalr.min.js"></script>
+<script>
+    const connection = new signalR.HubConnectionBuilder()
+        .withUrl("/notifications")
+        .build();
+
+    connection.start().then(function () {
+        console.log("SignalR Connected.");
+    }).catch(function (err) {
+        return console.error(err.toString());
+    });
+
+    connection.on("NotificationMessage", function () {
+        // Handle the received notification here
+        console.log("New notification received!");
+        // You can update the UI, display a notification, etc.
+        nouveauMessage();
+    });
+
+    function nouveauMessage() {
+        var x = document.getElementById("snackbar");
+        x.className = "show";
+        setTimeout(function () { x.className = x.className.replace("show", ""); }, 3000);
+    }
+</script>
+
+
+
+<style>
+#snackbar {
+  visibility: hidden;
+  min-width: 250px;
+  margin-left: -125px;
+  background-color: #333;
+  color: #fff;
+  text-align: center;
+  border-radius: 2px;
+  padding: 16px;
+  position: fixed;
+  z-index: 1;
+  left: 50%;
+  bottom: 30px;
+  font-size: 17px;
+}
+
+#snackbar.show {
+  visibility: visible;
+  -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
+  animation: fadein 0.5s, fadeout 0.5s 2.5s;
+}
+
+@@-webkit-keyframes fadein {
+  from {bottom: 0; opacity: 0;} 
+  to {bottom: 30px; opacity: 1;}
+}
+
+@@keyframes fadein {
+  from {bottom: 0; opacity: 0;}
+  to {bottom: 30px; opacity: 1;}
+}
+
+@@-webkit-keyframes fadeout {
+  from {bottom: 30px; opacity: 1;} 
+  to {bottom: 0; opacity: 0;}
+}
+
+@@keyframes fadeout {
+  from {bottom: 30px; opacity: 1;}
+  to {bottom: 0; opacity: 0;}
+}
+</style>
