@@ -15,102 +15,106 @@
             </div>
             
             <div class="container mt-4">
-                @foreach (var date in Model.MoisAnneesDistinctsList)
+                @if (Model.MoisAnneesDistinctsList.Count == 0)
                 {
-                    <div class="card">
-                        <div class="card-body">
-                            <script>
-                                function getMonthName(monthNumber) {
-                                    const months = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
-                                    return months[monthNumber - 1];
-                                }
-
-                                const monthNumber = @date.Mois;
-                                const year = @date.Annee;
-                                const monthName = getMonthName(monthNumber);
-
-                                document.write('<h4 class="card-title"><u>' + monthName + ' ' + year + '</u></h4>');
-                            </script>
-                            @{
-                                /*
-                                var groupeParAnnee = Model.VendeursList
-                                .Where(item => item.DateCreation.Month == date.Mois && item.DateCreation.Year == date.Annee)
-                                .OrderBy(item => item.NomAffaires)
-                                .ToList();
-                                */
-
-                                var groupeParAnnee = (from vendeur in Model.VendeursList
-                                                      join user in Model.UtilisateurList
-                                                      on vendeur.IdUtilisateur equals user.Id
-                                                      where user.EmailConfirmed && vendeur.DateCreation.Month == date.Mois && vendeur.DateCreation.Year == date.Annee
-                                                      orderby vendeur.NomAffaires
-                                                      join commande in Model.CommandesList
-                                                      on vendeur.NoVendeur equals commande.NoVendeur into vendeurCommandes
-                                                      from vc in vendeurCommandes.DefaultIfEmpty()
-                                                      orderby vc?.DateCommande
-                                                      select new
-                                                      {
-                                                          Vendeur = vendeur,
-                                                          Commande = vc
-                                                      })
-                                .ToList();
-
-
-
-
-                            }
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th scope="col">#</th>
-                                        <th scope="col">No de vendeur</th>                                        
-                                        <th scope="col">Information personnelle</th>
-                                        <th scope="col">Nom d'affaires</th>
-                                        <th scope="col">Date de création</th>
-                                        <th scope="col">Nb de produits inscrits</th>
-                                        <th scope="col">Date de dernière commande</th>
-                                        <th scope="col">Montant total avant taxes </th>
-                                        <th scope="col"></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @{
-                                        var no = 0;
-                                    }
-                                    @foreach (var item in groupeParAnnee)
-                                    {
-                                        <tr>
-                                            <td>@(++no)</td>
-                                            <td>@Html.DisplayFor(modelItem => item.Vendeur.NoVendeur)</td>
-                                            @if (item.Vendeur.Nom != null && item.Vendeur.Prenom != null)
-                                            {
-                                                <td>@Html.DisplayFor(modelItem => item.Vendeur.Nom), @Html.DisplayFor(modelItem => item.Vendeur.Prenom)</td>
-                                            }
-                                            else
-                                            {
-                                                <td>@Html.DisplayFor(modelItem => item.Vendeur.AdresseEmail)</td>
-                                            }
-
-                                            <td>@Html.DisplayFor(modelItem => item.Vendeur.NomAffaires)</td>
-                                            <td>@Html.DisplayFor(modelItem => item.Vendeur.DateCreation)</td>
-                                            <td>@Model.ProduitsList.Count(modelItem => modelItem.NoVendeur == item.Vendeur.NoVendeur)</td>
-                                            <td>@Html.DisplayFor(modelItem => item.Commande.DateCommande)</td>
-                                            <td>@Html.DisplayFor(modelItem => item.Commande.MontantTotAvantTaxes)</td>
-                                            <td>
-                                                <a asp-action="FraudeV" class="btn btn-danger" asp-route-id="@item.Vendeur.NoVendeur">Fraude</a>
-                                                @if (item.Commande == null )
-                                                {
-                                                    <a asp-action="Taux" class="btn btn-success"  asp-route-id="@item.Vendeur.NoVendeur">Taux Redevance</a>                                                   
-                                                }
-                                            </td>
-                                        </tr>
-                                    }
-                                </tbody>
-
-                            </table>
-                        </div>
+                    <div>
+                        Il n'y a aucun vendeur sur l'application.
                     </div>
-                }               
+                }
+                else {
+                    @foreach (var date in Model.MoisAnneesDistinctsList)
+                    {
+                        <div class="card">
+                            <div class="card-body">
+                                <script>
+                                    function getMonthName(monthNumber) {
+                                        const months = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
+                                        return months[monthNumber - 1];
+                                    }
+
+                                    const monthNumber = @date.Mois;
+                                    const year = @date.Annee;
+                                    const monthName = getMonthName(monthNumber);
+
+                                    document.write('<h4 class="card-title"><u>' + monthName + ' ' + year + '</u></h4>');
+                                </script>
+                                @{
+                                    /*
+                                    var groupeParAnnee = Model.VendeursList
+                                    .Where(item => item.DateCreation.Month == date.Mois && item.DateCreation.Year == date.Annee)
+                                    .OrderBy(item => item.NomAffaires)
+                                    .ToList();
+                                    */
+
+                                    var groupeParAnnee = (from vendeur in Model.VendeursList
+                                                          join user in Model.UtilisateurList
+                                                          on vendeur.IdUtilisateur equals user.Id
+                                                          where user.EmailConfirmed && vendeur.DateCreation.Month == date.Mois && vendeur.DateCreation.Year == date.Annee
+                                                          orderby vendeur.NomAffaires
+                                                          join commande in Model.CommandesList
+                                                          on vendeur.NoVendeur equals commande.NoVendeur into vendeurCommandes
+                                                          from vc in vendeurCommandes.DefaultIfEmpty()
+                                                          orderby vc?.DateCommande
+                                                          select new
+                                                          {
+                                                              Vendeur = vendeur,
+                                                              Commande = vc
+                                                          })
+                                    .ToList();
+                                }
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">#</th>
+                                            <th scope="col">No de vendeur</th>
+                                            <th scope="col">Information personnelle</th>
+                                            <th scope="col">Nom d'affaires</th>
+                                            <th scope="col">Date de création</th>
+                                            <th scope="col">Nb de produits inscrits</th>
+                                            <th scope="col">Date de dernière commande</th>
+                                            <th scope="col">Montant total avant taxes </th>
+                                            <th scope="col"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{
+                                            var no = 0;
+                                        }
+                                        @foreach (var item in groupeParAnnee)
+                                        {
+                                            <tr>
+                                                <td>@(++no)</td>
+                                                <td>@Html.DisplayFor(modelItem => item.Vendeur.NoVendeur)</td>
+                                                @if (item.Vendeur.Nom != null && item.Vendeur.Prenom != null)
+                                                {
+                                                    <td>@Html.DisplayFor(modelItem => item.Vendeur.Nom), @Html.DisplayFor(modelItem => item.Vendeur.Prenom)</td>
+                                                }
+                                                else
+                                                {
+                                                    <td>@Html.DisplayFor(modelItem => item.Vendeur.AdresseEmail)</td>
+                                                }
+
+                                                <td>@Html.DisplayFor(modelItem => item.Vendeur.NomAffaires)</td>
+                                                <td>@Html.DisplayFor(modelItem => item.Vendeur.DateCreation)</td>
+                                                <td>@Model.ProduitsList.Count(modelItem => modelItem.NoVendeur == item.Vendeur.NoVendeur)</td>
+                                                <td>@Html.DisplayFor(modelItem => item.Commande.DateCommande)</td>
+                                                <td>@Html.DisplayFor(modelItem => item.Commande.MontantTotAvantTaxes)</td>
+                                                <td>
+                                                    <a asp-action="FraudeV" class="btn btn-danger" asp-route-id="@item.Vendeur.NoVendeur">Fraude</a>
+                                                    @if (item.Commande == null)
+                                                    {
+                                                        <a asp-action="Taux" class="btn btn-success" asp-route-id="@item.Vendeur.NoVendeur">Taux Redevance</a>
+                                                    }
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+
+                                </table>
+                            </div>
+                        </div>
+                    }
+                }     
             </div>
         </section>
     </div>
