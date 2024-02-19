@@ -21,7 +21,14 @@ namespace Projet_Web_Commerce.Controllers
         // GET: EvaluationController
         public ActionResult Index(int id)
         {
-            ViewData["idProduit"] = id;
+            if (_context.PPProduits.Where(p=>p.NoProduit == id).FirstOrDefault() != null)
+            {
+                ViewData["idProduit"] = id;
+            }
+            else
+            {
+                ViewData["idProduit"] = -1;
+            }
 
             return View();
         }

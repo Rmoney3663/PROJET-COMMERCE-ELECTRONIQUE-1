@@ -202,7 +202,12 @@
                                     Console.WriteLine("FILE : " + File.Exists(path));
 
                                     decimal average = _context.PPEvaluations.Where(e => e.NoProduit == item.NoProduit).Average(a=>a.Cote);
-                                    float rating = (float)System.Math.Round(average, 2);
+                                    float rating = (float)Math.Round(average, 2);
+
+                                    if (int.TryParse(rating.ToString(), out int test))
+                                    {
+                                        rating = (float)Math.Round(rating, 0);
+                                    }
                                 }
                                 <b>@rating étoiles!</b>
                                 <div>

@@ -194,9 +194,17 @@ else
             <div class="col">
                 @{
                     var lstReview = _context.PPEvaluations.Where(e => e.NoProduit == Model.NoProduit).ToList();
+
+                    decimal average = lstReview.Average(a => a.Cote);
+                    float rating = (float)Math.Round(average, 2);
+
+                    if (int.TryParse(rating.ToString(), out int test))
+                    {
+                        rating = (float)Math.Round(rating, 0);
+                    }
                 }
                 <hr style="border-top: 3px solid gray" />
-                <div style="display: flex; align-items: center; margin-bottom: 10px"><h3 style="margin-right: 10px;">Évaluations: </h3> <h4>@lstReview.Average(a => a.Cote) étoiles (@lstReview.Count)</h4></div>
+                <div style="display: flex; align-items: center; margin-bottom: 10px"><h3 style="margin-right: 10px;">Évaluations: </h3> <h4>@rating étoiles (@lstReview.Count)</h4></div>
 
                 @if (lstReview.Count > 0)
                 {
