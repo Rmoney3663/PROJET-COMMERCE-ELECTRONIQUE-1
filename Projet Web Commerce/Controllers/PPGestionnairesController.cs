@@ -121,7 +121,7 @@ namespace Projet_Web_Commerce.Controllers
                     NomPrenomClient = (string.IsNullOrEmpty(g.FirstOrDefault().PPClients.Nom) && string.IsNullOrEmpty(g.FirstOrDefault().PPClients.Prenom))
                         ? g.FirstOrDefault().PPClients.AdresseEmail
                         : (g.FirstOrDefault().PPClients.Nom + " " + g.FirstOrDefault().PPClients.Prenom).Trim(),
-                    TotalCommandeAT = g.Sum(o => o.MontantTotAvantTaxes ),
+                    TotalCommandeAT = g.Sum(o => o.MontantTotAvantTaxes),
                     CoutLivraison = g.Sum(o => o.CoutLivraison),
                     DateDerniereCommande = g.Max(o => o.DateCommande),
                     NoVendeur = g.Key.NoVendeur,
@@ -199,7 +199,7 @@ namespace Projet_Web_Commerce.Controllers
         [HttpGet]
         [Authorize(Roles = "Gestionnaire")]
         public ActionResult ListeClients()
-        {           
+        {
 
             var vendeurs = _context.PPVendeurs
                 .Where(v => v.Statut == 1)
@@ -215,7 +215,7 @@ namespace Projet_Web_Commerce.Controllers
                 .ToList();
 
             var ProduitsList = _context.PPProduits.ToList();
-            
+
             var CommandesList = _context.PPCommandes.ToList();
 
             var VendeursClientsList = _context.PPVendeursClients
@@ -421,7 +421,7 @@ namespace Projet_Web_Commerce.Controllers
             return View(pPGestionnaire);
         }
 
-      
+
         public async Task<IActionResult> FraudeC(int? id)
         {
             if (id == null)
@@ -499,13 +499,13 @@ namespace Projet_Web_Commerce.Controllers
             var item = await _context.PPVendeurs.FindAsync(id);
             if (item != null)
             {
-               // item.Statut = 0;
+                // item.Statut = 0;
                 var email = item.AdresseEmail;
                 var idUSER = item.IdUtilisateur;
                 var use = await _context.Users.FindAsync(idUSER);
                 use.EmailConfirmed = false;
                 Console.WriteLine("USER : ================================================== " + use.Email);
-               // _context.Update(item);
+                // _context.Update(item);
                 _context.Update(use);
 
                 string returnUrl = Url.Content("~/");
@@ -531,8 +531,72 @@ namespace Projet_Web_Commerce.Controllers
             return _context.PPGestionnaire.Any(e => e.NoGestionnaire == id);
         }
 
-       
+        public async Task<IActionResult> Taux(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
 
+            var item = await _context.PPVendeurs
+                .Include(p => p.Utilisateur)
+                .FirstOrDefaultAsync(m => m.NoVendeur == id);
+            if (item == null)
+            {
+                return NotFound();
+            }
+
+            return View(item);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Taux([Bind("Pourcentage")] PPVendeurs pPVendeurs, int id) 
+        {
+            var keysToRemove = ModelState.Keys.Where(k => k != "Pourcentage").ToList();
+            foreach (var key in keysToRemove)
+            {
+                ModelState.Remove(key);
+            }
+            foreach (var m in ModelState)
+            {
+                foreach (var er in m.Value.Errors)
+                {
+                    Console.WriteLine(m.Key);
+                    Console.WriteLine(er.ErrorMessage);
+                }
+            }
+            Console.WriteLine(pPVendeurs.Pourcentage);
+            var item = await _context.PPVendeurs.FindAsync(id);
+            if (ModelState.IsValid && item != null)
+            {
+                try
+                {
+                    item.Pourcentage = pPVendeurs.Pourcentage;
+                    _context.Update(item);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!PPVendeurExists(pPVendeurs.NoVendeur))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction("ListeVendeurs");
+            }
+
+            return View(pPVendeurs);
+        }
+
+        private bool PPVendeurExists(int id)
+        {
+            return _context.PPVendeurs.Any(e => e.NoVendeur == id);
+        }
 
 
     }

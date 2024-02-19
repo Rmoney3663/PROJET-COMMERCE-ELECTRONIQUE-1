@@ -12,15 +12,15 @@ using Projet_Web_Commerce.Data;
 namespace Projet_Web_Commerce.Migrations
 {
     [DbContext(typeof(AuthDbContext))]
-    [Migration("20240211171917_messagerie")]
-    partial class messagerie
+    [Migration("20240219142606_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.1")
+                .HasAnnotation("ProductVersion", "8.0.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -411,12 +411,14 @@ namespace Projet_Web_Commerce.Migrations
 
                     b.Property<string>("Destinataire")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("NoMessage")
                         .HasColumnType("int");
 
                     b.HasKey("DestinataireId");
+
+                    b.HasIndex("Destinataire");
 
                     b.HasIndex("NoMessage");
 
@@ -461,7 +463,6 @@ namespace Projet_Web_Commerce.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Commentaire")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Cote")
@@ -578,7 +579,7 @@ namespace Projet_Web_Commerce.Migrations
 
                     b.Property<string>("Auteur")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Message")
                         .IsRequired()
@@ -600,6 +601,8 @@ namespace Projet_Web_Commerce.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("NoMessage");
+
+                    b.HasIndex("Auteur");
 
                     b.ToTable("PPMessages");
                 });
@@ -997,11 +1000,19 @@ namespace Projet_Web_Commerce.Migrations
 
             modelBuilder.Entity("Projet_Web_Commerce.Models.PPDestinatairesMessage", b =>
                 {
+                    b.HasOne("Projet_Web_Commerce.Areas.Identity.Data.Utilisateur", "DestinataireUser")
+                        .WithMany()
+                        .HasForeignKey("Destinataire")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Projet_Web_Commerce.Models.PPMessages", "Message")
                         .WithMany("Destinataires")
                         .HasForeignKey("NoMessage")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("DestinataireUser");
 
                     b.Navigation("Message");
                 });
@@ -1053,6 +1064,17 @@ namespace Projet_Web_Commerce.Migrations
                         .IsRequired();
 
                     b.Navigation("Utilisateur");
+                });
+
+            modelBuilder.Entity("Projet_Web_Commerce.Models.PPMessages", b =>
+                {
+                    b.HasOne("Projet_Web_Commerce.Areas.Identity.Data.Utilisateur", "AuteurUser")
+                        .WithMany()
+                        .HasForeignKey("Auteur")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AuteurUser");
                 });
 
             modelBuilder.Entity("Projet_Web_Commerce.Models.PPPoidsLivraisons", b =>
