@@ -183,13 +183,16 @@ namespace Projet_Web_Commerce.Controllers
 
             var utilisateurList = _context.Users.ToList();
 
+            var evaluationList = _context.PPEvaluations.ToList();
+
             ModelListeVendeurs modelListeVendeurs = new ModelListeVendeurs()
             {
                 VendeursList = vendeurs,
                 ProduitsList = ProduitsList,
                 MoisAnneesDistinctsList = lstMoisAnneesDistincts,
                 CommandesList = CommandesList,
-                UtilisateurList = utilisateurList
+                UtilisateurList = utilisateurList,
+                EvaluationList = evaluationList
 
             };
 
