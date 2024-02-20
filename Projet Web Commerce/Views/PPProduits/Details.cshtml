@@ -293,7 +293,7 @@ else
                     </div>
                 }
 
-                @if (lstReview.Count > 0)
+                @if (lstReview.Where(r=>r.NoProduit == Model.NoProduit).ToList().Count > 0)
                 {
                     @foreach (var review in User.IsInRole("Client") ? lstReview.Where(r => r.NoClient != client.NoClient && r.NoProduit == Model.NoProduit) : lstReview)
                     {
