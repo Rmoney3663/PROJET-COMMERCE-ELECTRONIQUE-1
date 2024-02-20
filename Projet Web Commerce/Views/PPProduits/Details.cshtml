@@ -11,6 +11,23 @@
     var user = await _userManager.GetUserAsync(User);
 
     var vendeur = Model.PPVendeurs.NomAffaires;
+    int numRating = 0;
+}
+
+@section scripts{
+    <script type="text/javascript">
+        function Etoiles(valeur) {
+            document.getElementById("newRating").value=valeur + 1
+            for (var i = 0; i < 5; i++){
+                if (i <= valeur) {
+                    document.getElementById(i.toString()).src = "/Logo/iconeEtoileJaune.png"
+                }
+                else {
+                    document.getElementById(i.toString()).src = "/Logo/iconeEtoile.png"
+                }
+            }
+        }
+    </script>
 }
 
 <style>
@@ -51,6 +68,7 @@ else
                 string imagePath = Model.Photo != null && File.Exists(path) ? $"~/Logo/{Model.Photo}" : "~/Logo/DefaultImage.png";
                 Console.WriteLine("FILE Name : " + Model.Photo);
                 Console.WriteLine("FILE : " + File.Exists(path));
+                PPClients client = null;
             }
 
             
@@ -150,7 +168,7 @@ else
 
             @if (User.IsInRole("Client"))
             {
-                var client = _context.PPClients.Where(c => c.AdresseEmail == user.Email).FirstOrDefault();
+                client = _context.PPClients.Where(c => c.AdresseEmail == user.Email).FirstOrDefault();
 
                 <form asp-controller="MainMenu" id="formAjoutPanier" asp-action="AjoutPanier" method="post">
                     <input type="hidden" name="NoProduit" value="@Model.NoProduit" />
@@ -164,13 +182,6 @@ else
                         }
                     </select>
                 </form>
-
-                <a asp-controller="Evaluations"
-                   asp-route-id="@Model.NoProduit"
-                   asp-action="Index"
-                   class="btn btn-secondary" style="background-color:#808080; color: #FFFFFF; width:auto; margin-top:10px; margin-left:12px">
-                    Ajouter une évaluation
-                </a>
             }
 
         </dl>
@@ -189,26 +200,102 @@ else
         }
     </div>
 
+    client = _context.PPClients.Where(c => c.AdresseEmail == user.Email).FirstOrDefault();
+    var lstReview = _context.PPEvaluations.ToList();
+    bool trouve = false;
+    PPEvaluations evalClientActu = null;
+
+    @if (User.IsInRole("Client"))
+    {
+        evalClientActu = _context.PPEvaluations.Where(e => e.NoClient == client.NoClient && e.NoProduit == Model.NoProduit).FirstOrDefault();
+    }
+
+
+    if (evalClientActu != null)
+    {
+        trouve = true;
+    }
+
+    if (trouve)
+    {
+        numRating = (int)evalClientActu.Cote;
+    }
+
     <div class="row">
         <div class="col-md-4">
+            <h2>
+                Évaluations pour @vendeur
+            </h2>
+            @if (trouve && User.IsInRole("Client"))
+            {
+                <h5>Modifier votre évaluation</h5>
+            }
+            else if (User.IsInRole("Client"))
+            {
+                <h5>Ajouter une évaluation</h5>
+            }
             <div class="col">
-                @{
-                    var lstReview = _context.PPEvaluations.Where(e => e.NoProduit == Model.NoProduit).ToList();
+                @if (User.IsInRole("Client"))
+                {
 
-                    decimal average = lstReview.Average(a => a.Cote);
-                    float rating = (float)Math.Round(average, 2);
-
-                    if (int.TryParse(rating.ToString(), out int test))
+                    @for (int i = 0; i < numRating; i++)
                     {
-                        rating = (float)Math.Round(rating, 0);
+                        <button onclick="Etoiles(@i)" style="border: 0; background-color:transparent">
+                            <img id="@i" src="~/Logo/iconeEtoileJaune.png" width="25" height="25" />
+                        </button>
                     }
+                    @for (int i = numRating; i < 5; i++)
+                    {
+                        <button onclick="Etoiles(@i)" style="border: 0; background-color:transparent">
+                            <img id="@i" src="~/Logo/iconeEtoile.png" width="25" height="25" />
+                        </button>
+                    }
+                    <br />
+                    <form asp-route-id="@Model.NoProduit" asp-route-noClient="@client.NoClient" asp-route-eval="@trouve">
+                        <input type="hidden" name="rating" id="newRating" />
+                        @if (evalClientActu != null)
+                        {
+                            <textarea rows="4" cols="50" name="msg" placeholder="Modifier votre commentaire">@evalClientActu.Commentaire</textarea>
+                            <button class="btn btn-secondary" style="background-color:#7C6992; color:#F9E547" type="submit">Modifier votre évaluation</button>
+                        }
+                        else
+                        {
+                            <textarea rows="4" cols="50" name="msg" placeholder="Ajouter un commentaire"></textarea>
+                            <button class="btn btn-secondary" style="background-color:#7C6992; color:#F9E547" type="submit">Ajouter une évaluation</button>
+                        }
+                    </form>
                 }
                 <hr style="border-top: 3px solid gray" />
-                <div style="display: flex; align-items: center; margin-bottom: 10px"><h3 style="margin-right: 10px;">Évaluations: </h3> <h4>@rating étoiles (@lstReview.Count)</h4></div>
+                <h3>Évaluations:</h3>
+                @if (trouve)
+                {
+                    int cote = (int)evalClientActu.Cote;
+                    <div class="evaluation">
+                        <h6>
+                            (Vous) @client.AdresseEmail
+                            @for (int i = 0; i < cote; i++)
+                            {
+                                <img src="~/Logo/iconeEtoileJaune.png" width="15" height="15" />
+                            }
+                            @for (int i = cote; i < 5; i++)
+                            {
+                                <img src="~/Logo/iconeEtoile.png" width="15" height="15" />
+                            } :
+                        </h6>
+                        @if (evalClientActu.Commentaire != "" && evalClientActu.Commentaire != null)
+                        {
+                            <p>@evalClientActu.Commentaire</p>
+                        }
+                        else
+                        {
+                            <p style="color:gray">Aucune commentaire</p>
+                        }
+                    </div>
+                }
 
                 @if (lstReview.Count > 0)
                 {
-                    @foreach (var review in lstReview)
+                    @foreach (var review in User.IsInRole("Client") ? lstReview.Where(r => r.NoClient != client.NoClient && r.NoProduit == Model.NoProduit) : lstReview)
                     {
                         var unClient = _context.PPClients.Where(c => c.NoClient == review.NoClient).FirstOrDefault();
 
