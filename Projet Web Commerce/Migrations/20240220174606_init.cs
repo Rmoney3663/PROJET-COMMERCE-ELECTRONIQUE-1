@@ -293,7 +293,7 @@ namespace Projet_Web_Commerce.Migrations
                     Message = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Auteur = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     TypeMessage = table.Column<int>(type: "int", nullable: false),
-                    PieceJointe = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PieceJointe = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Transmetteur = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     DateEnvoi = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
@@ -431,7 +431,8 @@ namespace Projet_Web_Commerce.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     NoMessage = table.Column<int>(type: "int", nullable: false),
                     Destinataire = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    MessageLu = table.Column<bool>(type: "bit", nullable: false)
+                    MessageLu = table.Column<bool>(type: "bit", nullable: false),
+                    Statut = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -556,7 +557,7 @@ namespace Projet_Web_Commerce.Migrations
                 name: "PPArticlesEnPanier",
                 columns: table => new
                 {
-                    NoPanier = table.Column<int>(type: "int", nullable: false),
+                    NoPanier = table.Column<long>(type: "bigint", nullable: false),
                     NoClient = table.Column<int>(type: "int", nullable: false),
                     NoVendeur = table.Column<int>(type: "int", nullable: false),
                     NoProduit = table.Column<int>(type: "int", nullable: false),

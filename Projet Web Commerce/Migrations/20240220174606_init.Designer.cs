@@ -12,7 +12,7 @@ using Projet_Web_Commerce.Data;
 namespace Projet_Web_Commerce.Migrations
 {
     [DbContext(typeof(AuthDbContext))]
-    [Migration("20240219145545_init")]
+    [Migration("20240220174606_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -229,8 +229,8 @@ namespace Projet_Web_Commerce.Migrations
 
             modelBuilder.Entity("Projet_Web_Commerce.Models.PPArticlesEnPanier", b =>
                 {
-                    b.Property<int>("NoPanier")
-                        .HasColumnType("int");
+                    b.Property<long>("NoPanier")
+                        .HasColumnType("bigint");
 
                     b.Property<DateTime>("DateCreation")
                         .HasColumnType("datetime2");
@@ -419,6 +419,9 @@ namespace Projet_Web_Commerce.Migrations
                     b.Property<int>("NoMessage")
                         .HasColumnType("int");
 
+                    b.Property<int>("Statut")
+                        .HasColumnType("int");
+
                     b.HasKey("DestinataireId");
 
                     b.HasIndex("Destinataire");
@@ -592,7 +595,6 @@ namespace Projet_Web_Commerce.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PieceJointe")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Sujet")
