@@ -97,7 +97,7 @@
 
             @if (logo != "none")
             {
-                <img src="~/Logo/@logo" alt="@logo" width="40" height="40" />
+                <img src="~/data/images/@logo" alt="@logo" width="40" height="40" />
             }
                 </div>
 
@@ -196,20 +196,33 @@
                                     <h5 class="card-text float-end" style="color: orangered; font-size:15px">Nouveau !</h5>
                                 }
                                 @{
-                                    var path = System.IO.Path.Combine(env.WebRootPath, "Logo", item.Photo);
-                                    string imagePath = item.Photo != null && File.Exists(path) ? $"~/Logo/{item.Photo}" : "~/Logo/DefaultImage.png";
+                                    var path = System.IO.Path.Combine(env.WebRootPath, "data/images", item.Photo);
+                                    string imagePath = item.Photo != null && File.Exists(path) ? $"~/data/images/{item.Photo}" : "~/data/images/DefaultImage.png";
                                     Console.WriteLine("FILE Name : " + item.Photo);
                                     Console.WriteLine("FILE : " + File.Exists(path));
 
-                                    decimal average = _context.PPEvaluations.Where(e => e.NoProduit == item.NoProduit).Average(a=>a.Cote);
-                                    float rating = (float)Math.Round(average, 2);
-
-                                    if (int.TryParse(rating.ToString(), out int test))
+                                    float rating = -1;
+                                    @if (_context.PPEvaluations.Where(e => e.NoProduit == item.NoProduit).ToList().Count > 0)
                                     {
-                                        rating = (float)Math.Round(rating, 0);
+                                        decimal average = _context.PPEvaluations.Where(e => e.NoProduit == item.NoProduit).Average(a => a.Cote);
+                                         rating = (float)Math.Round(average, 2);
+
+                                        if (int.TryParse(rating.ToString(), out int test))
+                                        {
+                                            rating = (float)Math.Round(rating, 0);
+                                        }
                                     }
+                                    
                                 }
-                                <b>@rating étoiles!</b>
+                                @if (rating != -1 )
+                                {
+                                    <b>@rating étoiles!</b>
+                                }
+                                else
+                                {
+                                    <b>Aucune évaluations!</b>
+                                }
+                               
                                 <div>
                                     <img src="@Url.Content(imagePath)" alt="@item.Photo" class="card-img-top" width="200" height="200" />
                                 </div>

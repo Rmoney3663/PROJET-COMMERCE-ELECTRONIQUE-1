@@ -49,7 +49,7 @@
 
             <li class="nav-item">
                 <a class="nav-link" asp-area="" asp-controller="Messagerie" asp-action="BoiteDeReception" title="Messagerie">
-                    <img style="width: 30px; height: 30px; filter: invert(87%) sepia(71%) saturate(1210%) hue-rotate(322deg) brightness(113%) contrast(95%)" src="/Logo/MessageIcon.png" />
+                    <img style="width: 30px; height: 30px; filter: invert(87%) sepia(71%) saturate(1210%) hue-rotate(322deg) brightness(113%) contrast(95%)" src="/data/images/MessageIcon.png" />
                 </a>
                 <b id="notificationCount" style="color:red; position:absolute; top:10px; left:30px "></b>
             </li>
@@ -60,7 +60,7 @@
                 <li class="nav-item">
                     <a class="nav-link" asp-area="" asp-controller="Paniers" asp-action="Index" title="Panier">
                         <div style="position: relative; top:0px; left:0px">
-                            <img style="position:relative; width: 30px; height: 30px; filter: invert(87%) sepia(71%) saturate(1210%) hue-rotate(322deg) brightness(113%) contrast(95%)" src="/Logo/PanierIcon.png" />
+                            <img style="position:relative; width: 30px; height: 30px; filter: invert(87%) sepia(71%) saturate(1210%) hue-rotate(322deg) brightness(113%) contrast(95%)" src="/data/images/PanierIcon.png" />
                             @if (_context.PPArticlesEnPanier.Where(v=>v.NoClient == userId).ToList().Count > 0){
                                 var listArticlesEnPanier = _context.PPArticlesEnPanier.Where(v => v.NoClient == userId).ToList();
                                 var tot = 0;
@@ -78,13 +78,13 @@
                 @if ((estDansRole = await UserManager.IsInRoleAsync(user, "Client")))
                 {
                     <a id="manage" class="nav-link" asp-area="Identity" asp-page="/Account/Manage/ProfilClient" title="Profil">
-                        <img style="width: 30px; height: 30px; filter: invert(87%) sepia(71%) saturate(1210%) hue-rotate(322deg) brightness(113%) contrast(95%)" src="/Logo/ProfileIcon.png" />
+                        <img style="width: 30px; height: 30px; filter: invert(87%) sepia(71%) saturate(1210%) hue-rotate(322deg) brightness(113%) contrast(95%)" src="/data/images/ProfileIcon.png" />
                     </a>
                 }
                 else if ((estDansRole = await UserManager.IsInRoleAsync(user, "Vendeur")) && statutVendeur == 1)
                 {
                     <a id="manage" class="nav-link" style="color: rgb(249, 229, 71)" asp-area="Identity" asp-page="/Account/Manage/ProfilVendeur" title="Profil">
-                        <img style="width: 30px; height: 30px; filter: invert(87%) sepia(71%) saturate(1210%) hue-rotate(322deg) brightness(113%) contrast(95%)" src="/Logo/ProfileIcon.png" />
+                        <img style="width: 30px; height: 30px; filter: invert(87%) sepia(71%) saturate(1210%) hue-rotate(322deg) brightness(113%) contrast(95%)" src="/data/images/ProfileIcon.png" />
                     </a>
                 }
 

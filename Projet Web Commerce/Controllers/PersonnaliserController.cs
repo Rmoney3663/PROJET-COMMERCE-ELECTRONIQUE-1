@@ -33,15 +33,15 @@ namespace Projet_Web_Commerce.Controllers
         {
             var vendeur = _context.PPVendeurs.Where(v => v.NoVendeur == id).FirstOrDefault();
             string nomFileImage = vendeur.NoVendeur.ToString();
-            var files = Directory.GetFiles("wwwroot/Logo", nomFileImage + ".*");
+            var files = Directory.GetFiles("wwwroot/data/images", nomFileImage + ".*");
             if (image != null && image.Length > 0)
             {
                 if (files.Length > 0)
-                    System.IO.File.Delete("wwwroot/Logo/" + files[0].Split("\\")[1]);
+                    System.IO.File.Delete("wwwroot/data/images/" + files[0].Split("\\")[1]);
 
                 string extension = Path.GetExtension(image.FileName);
                 nomFileImage += extension;
-                string tempFilePath = Path.Combine("wwwroot/Logo", nomFileImage);
+                string tempFilePath = Path.Combine("wwwroot/data/images", nomFileImage);
                 using (Stream fileStream = new FileStream(tempFilePath, FileMode.Create))
                 {
                     image.CopyTo(fileStream);
