@@ -4,6 +4,7 @@ using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Org.BouncyCastle.Asn1.Cmp;
 using Projet_Web_Commerce.Areas.Identity.Data;
@@ -19,11 +20,13 @@ namespace Projet_Web_Commerce.Controllers
     {
         public readonly AuthDbContext _context;
         private readonly Microsoft.AspNetCore.Identity.UserManager<Utilisateur> _userManager;
+        private readonly IHubContext<Notifications> _notificationsHubContext;
 
-        public MessagerieController(AuthDbContext context, Microsoft.AspNetCore.Identity.UserManager<Utilisateur> userManager)
+        public MessagerieController(AuthDbContext context, Microsoft.AspNetCore.Identity.UserManager<Utilisateur> userManager, IHubContext<Notifications> notificationsHubContext)
         {
             _context = context;
             _userManager = userManager;
+            _notificationsHubContext = notificationsHubContext;
         }
 
         [HttpGet]
@@ -175,7 +178,12 @@ namespace Projet_Web_Commerce.Controllers
             }
             
             await _context.SaveChangesAsync();
-            if (typeMessage == 2)
+
+            foreach (PPDestinatairesMessage email in destinatairesList)
+            {
+                await _notificationsHubContext.Clients.User(email.Destinataire).SendAsync("NotificationMessage", email.Destinataire);
+            }
+                if (typeMessage == 2)
                 TempData["MsgStatut"] = "Votre brouillon a été sauvegardé!";
             else if (typeMessage == 0)
                 TempData["MsgStatut"] = "Votre message a été envoyé!";

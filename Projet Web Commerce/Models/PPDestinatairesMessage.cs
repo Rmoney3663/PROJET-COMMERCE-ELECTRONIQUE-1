@@ -17,6 +17,8 @@ namespace Projet_Web_Commerce.Models
         // False: Pas lu
         public bool MessageLu { get; set; }
 
+        public int Statut { get; set; }
+
         [ForeignKey("NoMessage")]
         [InverseProperty("Destinataires")]
         public virtual PPMessages? Message { get; set; }
