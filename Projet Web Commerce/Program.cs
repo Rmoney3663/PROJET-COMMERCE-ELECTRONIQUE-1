@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.Blazor;
+using Projet_Web_Commerce;
 using Projet_Web_Commerce.Areas.Identity.Data;
 using Projet_Web_Commerce.Data;
 using Projet_Web_Commerce.Models;
@@ -38,9 +39,17 @@ app.UseRouting();
 
 app.UseAuthorization();
 
-app.MapControllerRoute(
+
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllerRoute(
     name: "default",
     pattern: "{controller=MainMenu}/{action=Catalogue}");
+
+    endpoints.MapHub<Notifications>("/notifications");
+});
+
+
 
 
 app.MapRazorPages();

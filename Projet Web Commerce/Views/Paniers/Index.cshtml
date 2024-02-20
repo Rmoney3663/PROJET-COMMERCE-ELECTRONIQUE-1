@@ -82,7 +82,12 @@
             }
             else
             {
-                <p>Vous n'avez pas de paniers</p>
+                <p style="margin-bottom:10px">Vous n'avez pas de paniers</p>
+                <a asp-controller="MainMenu"
+                   asp-action="Catalogue"
+                   class="btn btn-secondary" style="background-color:#808080; color: #FFFFFF; width:auto; margin-top:10px; margin-left:12px">
+                    Retour au catalogue
+                </a>
             }
         </div>
     </div>

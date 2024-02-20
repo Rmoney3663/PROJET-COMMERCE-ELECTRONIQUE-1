@@ -1,6 +1,8 @@
 ﻿using DocumentFormat.OpenXml.Office.CustomUI;
+using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.IdentityModel.Tokens;
 using Projet_Web_Commerce.API;
 using Projet_Web_Commerce.Areas.Identity.Data;
@@ -21,11 +23,13 @@ namespace Projet_Web_Commerce.Controllers
 
         private readonly AuthDbContext _context;
         private readonly Microsoft.AspNetCore.Identity.UserManager<Utilisateur> _userManager;
+        private readonly IHubContext<Notifications> _notificationsHubContext;
 
-        public CommandeController(AuthDbContext context, Microsoft.AspNetCore.Identity.UserManager<Utilisateur> userManager)
+        public CommandeController(AuthDbContext context, Microsoft.AspNetCore.Identity.UserManager<Utilisateur> userManager, IHubContext<Notifications> notificationsHubContext)
         {
             _context = context;
             _userManager = userManager;
+            _notificationsHubContext = notificationsHubContext;
         }
 
         public ActionResult Commander(ModelConfirmerCommande model)
@@ -365,7 +369,9 @@ namespace Projet_Web_Commerce.Controllers
                                         throw new Exception();
                                     }
 
-                                   
+
+                                    
+
 
                                     _context.SaveChanges();
                                     transaction.Commit(); // Commit the transaction if all operations succeed
