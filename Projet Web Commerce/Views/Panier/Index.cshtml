@@ -134,7 +134,7 @@
                                                     </button>
                                                     @if (produit.NombreItems > 0)
                                                     {
-                                                        <form asp-route-id="@articles.NoPanier" asp-route-delete="false" asp-route-vendeur="@articles.NoVendeur" asp-action="Index">
+                                                        <form asp-route-id="@articles.NoPanier" asp-route-delete="2" asp-route-vendeur="@articles.NoVendeur" asp-action="Index">
                                                             <input type="number" class="form-control form-control-sm" name="nb" value="@articles.NbItems" onchange="this.form.submit()" min="1" style="border-color: " max="@articles.PPProduits.NombreItems" />
                                                         </form>
                                                     }
@@ -170,7 +170,7 @@
                                                 </div>
                                                 <div class="col-md-1 col-lg-1 col-xl-1 text-end">
 
-                                                    <form asp-route-id="@articles.NoPanier" asp-route-delete="true" asp-route-vendeur="@articles.NoVendeur" asp-action="Index" method="post">
+                                                    <form asp-route-id="@articles.NoPanier" asp-route-delete="1" asp-route-vendeur="@articles.NoVendeur" asp-action="Index" method="post">
                                                         <button type="submit" class="submit-button">
                                                             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
                                                                 <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708" />
@@ -185,6 +185,16 @@
                                             <hr class="my-4">
                                         }
 
+                                        <div class="d-flex justify-content-between align-items-center mb-5">
+                                            @if (vendeur != null)
+                                            {
+                                                <form asp-action="Index" asp-route-id="@client.NoClient" asp-route-delete="3" asp-route-vendeur="@vendeur.NoVendeur">
+                                                    <button type="submit" class="btn btn-danger">Supprimer ce panier</button>
+                                                </form>
+                                                
+                                            }
+
+                                        </div>
 
                                         <div class="pt-5">
                                             <h6 class="mb-0">
@@ -193,6 +203,7 @@
                                                 </a>
                                             </h6>
                                         </div>
+
                                     </div>
                                 </div>
                                 <div class="col-lg-4 bg-grey">

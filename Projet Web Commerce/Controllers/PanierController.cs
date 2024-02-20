@@ -105,39 +105,50 @@ namespace Projet_Web_Commerce.Controllers
         }
 
         [HttpPost]
-        public ActionResult Index(int id, bool delete, int vendeur, int nb)
+        public ActionResult Index(int id, int delete, int vendeur, int nb)
         {
-            var article = _context.PPArticlesEnPanier.Where(v => v.NoPanier == id).FirstOrDefault();
-
-            
-            if (article != null)
+            Console.WriteLine("HELP");
+            if (delete == 3)
             {
-                if (delete)
+                foreach(var article in _context.PPArticlesEnPanier.Where(a=>a.NoVendeur == vendeur && a.NoClient == id).ToList())
                 {
                     _context.PPArticlesEnPanier.Remove(article);
-                }
-                else
-                {
-                    var produit = _context.PPProduits.Where(v => v.NoProduit == article.NoProduit).FirstOrDefault();
-                    if (nb <= produit.NombreItems)
-                    {
-                        article.NbItems = nb;
-                        
-                        if (article.NbItems <= 0)
-                        {
-                            article.NbItems = 1;
-                        }
-                    }
-                    else
-                    {
-                        article.NbItems = produit.NombreItems;
-                    }
-                    _context.PPArticlesEnPanier.Update(article);
                 }
             }
             else
             {
-                return RedirectToAction("Index", "Paniers");
+                var article = _context.PPArticlesEnPanier.Where(v => v.NoPanier == id).FirstOrDefault();
+
+
+                if (article != null)
+                {
+                    if (delete == 1)
+                    {
+                        _context.PPArticlesEnPanier.Remove(article);
+                    }
+                    else if (delete == 2)
+                    {
+                        var produit = _context.PPProduits.Where(v => v.NoProduit == article.NoProduit).FirstOrDefault();
+                        if (nb <= produit.NombreItems)
+                        {
+                            article.NbItems = nb;
+
+                            if (article.NbItems <= 0)
+                            {
+                                article.NbItems = 1;
+                            }
+                        }
+                        else
+                        {
+                            article.NbItems = produit.NombreItems;
+                        }
+                        _context.PPArticlesEnPanier.Update(article);
+                    }
+                }
+                else
+                {
+                    return RedirectToAction("Index", "Paniers");
+                }
             }
 
             _context.SaveChanges();
