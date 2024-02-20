@@ -9,6 +9,7 @@ using Org.BouncyCastle.Asn1.Cmp;
 using Projet_Web_Commerce.Areas.Identity.Data;
 using Projet_Web_Commerce.Data;
 using Projet_Web_Commerce.Models;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.ExceptionServices;
 using System.Text;
 
@@ -259,7 +260,15 @@ namespace Projet_Web_Commerce.Controllers
         [HttpPost]
         public ActionResult Supprimer(int? idMessage)
         {
-            var msg = _context.PPMessages.Where(m => m.NoMessage == idMessage).FirstOrDefault();
+            var destMsg = _context.PPDestinatairesMessage
+                .Where(m => m.NoMessage == idMessage)
+                .ToList();
+
+            var msg = _context.PPMessages
+                .Where(m => m.NoMessage == idMessage)
+                .Include(m => m.Destinataires)
+                .FirstOrDefault();
+
             if (msg != null)
             {
                 msg.TypeMessage = -1;
