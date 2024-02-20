@@ -295,7 +295,7 @@ else
 
                 @if (lstReview.Where(r=>r.NoProduit == Model.NoProduit).ToList().Count > 0)
                 {
-                    @foreach (var review in User.IsInRole("Client") ? lstReview.Where(r => r.NoClient != client.NoClient && r.NoProduit == Model.NoProduit) : lstReview)
+                    @foreach (var review in User.IsInRole("Client") ? lstReview.Where(r => r.NoClient != client.NoClient && r.NoProduit == Model.NoProduit) : lstReview.Where(r=>r.NoProduit == Model.NoProduit))
                     {
                         var unClient = _context.PPClients.Where(c => c.NoClient == review.NoClient).FirstOrDefault();
 

@@ -1,11 +1,40 @@
 ﻿@page
 @model ProfilVendeurModel
+@inject AuthDbContext _context
+@using Projet_Web_Commerce.Data
 @{
-    ViewData["Title"] = "Profil";
     ViewData["ActivePage"] = ManageNavPages.ProfilVendeur;
+
+    var vendeur = _context.PPVendeurs.Where(v => v.AdresseEmail == Model.Courriel).FirstOrDefault();
+    decimal moyenne = 0;
+    var nb = 0;
+    var nbEval = 0;
+
+    foreach (var produit in _context.PPProduits.Where(p=>p.NoVendeur == vendeur.NoVendeur))
+    {
+        var nbEvalActu = _context.PPEvaluations.Where(e => e.NoProduit == produit.NoProduit).ToList().Count;
+        nbEval += nbEvalActu;
+        if (nbEvalActu > 0)
+        {
+            decimal moyenneProduit = _context.PPEvaluations.Where(e => e.NoProduit == produit.NoProduit).Average(z => z.Cote);
+            moyenne += moyenneProduit;
+            nb++;
+        }
+    }
+    string moyAffiche = "";
+    if (nbEval > 0)
+    {
+        moyenne = moyenne / nb;
+        moyAffiche = Math.Round(moyenne, 2).ToString("F2").TrimEnd('0', ',');
+    }
+    else
+    {
+        moyAffiche = "Vous n'avez pas encore d'évaluations";
+    }
+
 }
 
-<h3>@ViewData["Title"]</h3>
+<h3>Votre cote moyenne est @moyAffiche étoiles!</h3>
 <partial name="_StatusMessage" for="StatusMessage" />
 @* <div class="container"> *@
     <form id="profile-form" method="post">
