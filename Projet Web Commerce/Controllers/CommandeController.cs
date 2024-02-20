@@ -494,14 +494,25 @@ namespace Projet_Web_Commerce.Controllers
                     errors.Add("Le code postal doit être dans le format A1A1A1.");
                     ModelState.AddModelError("CVV", "Le champ CVV doit contenir 3 ou 4 chiffres.");
                 }
-
-                if (string.IsNullOrEmpty(model.dateExpiration) || !Regex.IsMatch(model.dateExpiration, @"^\d{2}-\d{4}$"))
+                DateTime currentDateTime = DateTime.Now;
+                if (string.IsNullOrEmpty(model.dateExpiration) ||
+       !Regex.IsMatch(model.dateExpiration, @"^(0[1-9]|1[0-2])-\d{4}$"))
                 {
                     errors.Add("Le code postal doit être dans le format A1A1A1.");
                     ModelState.AddModelError("dateExpiration", "La date d'expiration doit être dans le format MM-AAAA.");
                 }
+                else if (currentDateTime.Year.ToString() != model.dateExpiration.Substring(model.dateExpiration.Length - 4))
+                {
+                    errors.Add("Le code postal doit être dans le format A1A1A1.");
+                    ModelState.AddModelError("dateExpiration", "La date d'expiration doit être avant l'an 2025");
+                }
+                else if ((int.Parse(model.dateExpiration.Substring(0, 2)) <= currentDateTime.Month))
+                {
+                    errors.Add("Le code postal doit être dans le format A1A1A1.");
+                    ModelState.AddModelError("dateExpiration", "La date d'expiration doit être après la date d'aujourd'hui");
+                }
 
-                if (string.IsNullOrEmpty(model.NoCarte) || !Regex.IsMatch(model.NoCarte, @"^\d{16}$"))
+                    if (string.IsNullOrEmpty(model.NoCarte) || !Regex.IsMatch(model.NoCarte, @"^\d{16}$"))
                 {
                     errors.Add("Le code postal doit être dans le format A1A1A1.");
                     ModelState.AddModelError("NoCarte", "Le numéro de carte doit être 16 chiffres.");
