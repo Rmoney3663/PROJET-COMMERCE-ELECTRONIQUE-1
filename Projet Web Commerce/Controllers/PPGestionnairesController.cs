@@ -319,8 +319,8 @@ namespace Projet_Web_Commerce.Controllers
               .OrderByDescending(v => v.NomAffaires)
               .ToList();
 
-            var lstMoisAnneesDistincts = _context.PPVendeurs
-                .Where(v => v.Statut == 1)
+            var lstMoisAnneesDistincts = _context.PPClients
+                .Where(v => v.Statut == 2)
                 .Select(v => new ModelMoisAnnees { Mois = v.DateCreation.Month, Annee = v.DateCreation.Year })
                 .Distinct()
                 .OrderByDescending(item => item.Annee)

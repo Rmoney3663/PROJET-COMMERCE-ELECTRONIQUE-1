@@ -24,7 +24,7 @@ namespace Projet_Web_Commerce.Models
         // 1  = Brouillon
         public int TypeMessage { get; set; }
 
-        public string PieceJointe { get; set; }
+        public string? PieceJointe { get; set; }
 
         public string? Transmetteur { get; set; }
 
