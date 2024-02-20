@@ -85,9 +85,9 @@
 
                                             var item = _context.PPProduits.FirstOrDefault(p => p.NoProduit == articles.NoProduit);
 
-                                            
-                                            var path = System.IO.Path.Combine(env.WebRootPath, "Logo", item.Photo);
-                                            string imagePath = item.Photo != null && File.Exists(path) ? $"~/Logo/{item.Photo}" : "~/Logo/DefaultImage.png";
+
+                                            var path = System.IO.Path.Combine(env.WebRootPath, "data/images", item.Photo);
+                                            string imagePath = item.Photo != null && File.Exists(path) ? $"~/data/images/{item.Photo}" : "~/data/images/DefaultImage.png";
                                             Console.WriteLine("FILE Name : " + item.Photo);
                                             Console.WriteLine("FILE : " + File.Exists(path));
 

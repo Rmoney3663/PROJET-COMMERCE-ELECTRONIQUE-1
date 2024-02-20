@@ -50,9 +50,9 @@ else
                     <input asp-for="DateCreation" class="form-control" />
                     <span asp-validation-for="DateCreation" class="text-danger"></span>
                 </div>
-                @{
-                    var path = System.IO.Path.Combine(env.WebRootPath, "Logo", Model.Photo);
-                    string imagePath = Model.Photo != null && File.Exists(path) ? $"~/Logo/{Model.Photo}" : "~/Logo/DefaultImage.png";
+                @{                    
+                    var path = System.IO.Path.Combine(env.WebRootPath, "data/images", Model.Photo);
+                    string imagePath = Model.Photo != null && File.Exists(path) ? $"~/data/images/{Model.Photo}" : "~/data/images/DefaultImage.png";
                     Console.WriteLine("FILE Name : " + Model.Photo);
                     Console.WriteLine("FILE : " + File.Exists(path));
                 }
