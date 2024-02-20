@@ -22,10 +22,10 @@
     //                                  }
     //                              )
     //                              .ToList();
-    var destinataires = _context.PPDestinatairesMessage
+    var destinataires = Model.Destinataires
         .Where(d => d.NoMessage == Model.NoMessage)
-        .Include(d => d.DestinataireUser)
         .ToList();
+
 }
 
 <style>
@@ -67,10 +67,19 @@
                         @Model.Message
                     </div>
                     <br />
-                    <div class="card-footer" style="height: 55px;">
-                        <button class="btns" onclick="repondre('@Model.NoMessage')">Répondre</button>
-                        <button class="btns" onclick="transferer('@Model.NoMessage', '@ViewBag.UtilisateurCourantId')">Transférer</button>
-                    </div>
+                    @if (ViewBag.destinataire != null && ViewBag.destinataire.Statut == -1)
+                    {
+                        <div class="card-footer" style="height: 55px;">
+                            <button class="btns" onclick="repondre('@Model.NoMessage')">Restaurer</button>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="card-footer" style="height: 55px;">
+                            <button class="btns" onclick="repondre('@Model.NoMessage')">Répondre</button>
+                            <button class="btns" onclick="transferer('@Model.NoMessage', '@ViewBag.UtilisateurCourantId')">Transférer</button>
+                        </div>
+                    }
                     @if (Model.PieceJointe != null)
                     {
                         <embed id="pieceJointe" name="pieceJointe" src="@Model.PieceJointe"/>

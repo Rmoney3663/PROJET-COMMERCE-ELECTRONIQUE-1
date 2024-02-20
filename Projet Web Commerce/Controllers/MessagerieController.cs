@@ -39,7 +39,7 @@ namespace Projet_Web_Commerce.Controllers
 
             var msgRecus = _context.PPDestinatairesMessage
                 .Include(dest => dest.Message.Destinataires)
-                .Where(dest => dest.Destinataire == utilisateurCourantId)
+                .Where(dest => dest.Destinataire == utilisateurCourantId && dest.Statut == 0)
                 .Select(dest => dest.Message)
                 .Where(m => m.TypeMessage == 0)
                 .ToList();
@@ -194,10 +194,11 @@ namespace Projet_Web_Commerce.Controllers
         [HttpGet]
         public ActionResult Envoyes()
         {
-            var currentUserEmail = _userManager.Users.Where(u => u.Email == User.Identity.Name).FirstOrDefault().Id;
+            var currentUserId = _userManager.Users.Where(u => u.Email == User.Identity.Name).FirstOrDefault().Id;
+
             var msgEnvoyes = _context.PPMessages
-                .Where(message => message.Auteur == currentUserEmail 
-                && message.TypeMessage == 0)
+                .Where(message => message.Auteur == currentUserId
+                    && message.TypeMessage == 0)
                 .Include(m => m.Destinataires)
                 .ToList();
 
@@ -214,12 +215,14 @@ namespace Projet_Web_Commerce.Controllers
             ViewBag.UtilisateurCourantId = utilisateurCourantId;
 
             var messageCourant = await _context.PPMessages
+                .Where(m => m.NoMessage == idMessage)
                 .Include(m => m.Destinataires)
-                .FirstOrDefaultAsync(m => m.NoMessage == idMessage);
+                    .ThenInclude(d => d.DestinataireUser)
+                .FirstOrDefaultAsync();
 
             // Vérifier si l'utilisateur courant est le destinataire du message
             var destinataire = messageCourant.Destinataires.FirstOrDefault(dest => dest.Destinataire == utilisateurCourantId);
-
+            ViewBag.destinataire = destinataire;
             if (destinataire != null && !destinataire.MessageLu)
             {
                 destinataire.MessageLu = true;
@@ -250,14 +253,19 @@ namespace Projet_Web_Commerce.Controllers
         [HttpGet]
         public ActionResult Supprimes()
         {
-            var currentUserEmail = _userManager.Users.Where(u => u.Email == User.Identity.Name).FirstOrDefault().Id;
-            if (currentUserEmail != null)
+            var currentUserId = _userManager.Users.Where(u => u.Email == User.Identity.Name).FirstOrDefault().Id;
+            if (currentUserId != null)
             {
-                var msgSupprimes = _context.PPMessages
-                .Where(message => message.Auteur == currentUserEmail
-                    && message.TypeMessage == -1)
-                .Include(m => m.Destinataires)
-                .ToList();
+                //var msgSupprimes = _context.PPMessages
+                //.Where(message => message.Auteur == currentUserId
+                //    && message.TypeMessage == -1)
+                //.Include(m => m.Destinataires)
+                //.ToList();
+
+                var msgSupprimes = _context.PPDestinatairesMessage
+                    .Where(m => m.Statut == -1 && m.Destinataire == currentUserId)
+                    .Include(m => m.Message)
+                    .ToList();
 
                 return View(msgSupprimes);
             }
@@ -266,22 +274,28 @@ namespace Projet_Web_Commerce.Controllers
         }
 
         [HttpPost]
-        public ActionResult Supprimer(int? idMessage)
+        public async Task<ActionResult> Supprimer(int? idMessage)
         {
             var destMsg = _context.PPDestinatairesMessage
                 .Where(m => m.NoMessage == idMessage)
-                .ToList();
-
-            var msg = _context.PPMessages
-                .Where(m => m.NoMessage == idMessage)
-                .Include(m => m.Destinataires)
                 .FirstOrDefault();
 
-            if (msg != null)
+            if (destMsg != null)
             {
-                msg.TypeMessage = -1;
-                _context.SaveChangesAsync();
+                destMsg.Statut = -1;
+                await _context.SaveChangesAsync();
             }
+
+            //var msg = _context.PPMessages
+            //    .Where(m => m.NoMessage == idMessage)
+            //    .Include(m => m.Destinataires)
+            //    .FirstOrDefault();
+
+            //if (msg != null)
+            //{
+            //    msg.TypeMessage = -1;
+            //    _context.SaveChangesAsync();
+            //}
 
             return RedirectToAction("Supprimes");
         }

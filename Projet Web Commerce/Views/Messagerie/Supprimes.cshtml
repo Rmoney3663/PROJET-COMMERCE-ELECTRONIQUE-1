@@ -1,6 +1,6 @@
 ﻿﻿﻿@using Microsoft.AspNetCore.Identity
 @using Projet_Web_Commerce.Data
-@model List<PPMessages>
+@model List<PPDestinatairesMessage>
 @inject AuthDbContext _context
 
 @{
@@ -52,9 +52,9 @@
                             {
                                 <tr class="flotter" onclick="window.location.href = '@Url.Action("Details", new { idMessage = msg.NoMessage })'">
                                     <td>@(++no)</td>
-                                    <td>@_context.Users.Where(u => u.Id == msg.Auteur).FirstOrDefault().Email</td>
-                                    <td class="truncate">@Html.DisplayFor(modelItem => msg.Sujet) - <span class="msg">@Html.DisplayFor(modelItem => msg.Message)</span></td>
-                                    <td>@Html.DisplayFor(modelItem => msg.DateEnvoi)</td>
+                                    <td>@_context.Users.Where(u => u.Id == msg.Message.Auteur).FirstOrDefault().Email</td>
+                                    <td class="truncate">@Html.DisplayFor(modelItem => msg.Message.Sujet) - <span class="msg">@Html.DisplayFor(modelItem => msg.Message.Message)</span></td>
+                                    <td>@Html.DisplayFor(modelItem => msg.Message.DateEnvoi)</td>
                                 </tr>
                             }
                         </tbody>

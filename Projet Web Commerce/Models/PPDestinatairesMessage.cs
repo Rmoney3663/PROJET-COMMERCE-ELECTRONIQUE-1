@@ -17,6 +17,9 @@ namespace Projet_Web_Commerce.Models
         // False: Pas lu
         public bool MessageLu { get; set; }
 
+
+        // -1: Supprimé
+        //  0: Normal (rien)
         public int Statut { get; set; }
 
         [ForeignKey("NoMessage")]
