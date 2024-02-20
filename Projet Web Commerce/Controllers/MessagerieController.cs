@@ -10,6 +10,7 @@ using Org.BouncyCastle.Asn1.Cmp;
 using Projet_Web_Commerce.Areas.Identity.Data;
 using Projet_Web_Commerce.Data;
 using Projet_Web_Commerce.Models;
+using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.ExceptionServices;
 using System.Text;
@@ -22,12 +23,15 @@ namespace Projet_Web_Commerce.Controllers
         public readonly AuthDbContext _context;
         private readonly Microsoft.AspNetCore.Identity.UserManager<Utilisateur> _userManager;
         private readonly IHubContext<Notifications> _notificationsHubContext;
+        private readonly IHostingEnvironment _hostingEnvironment;
 
-        public MessagerieController(AuthDbContext context, Microsoft.AspNetCore.Identity.UserManager<Utilisateur> userManager, IHubContext<Notifications> notificationsHubContext)
+        public MessagerieController(AuthDbContext context, Microsoft.AspNetCore.Identity.UserManager<Utilisateur> userManager, IHubContext<Notifications> notificationsHubContext,
+            IHostingEnvironment hostingEnvironment)
         {
             _context = context;
             _userManager = userManager;
             _notificationsHubContext = notificationsHubContext;
+            _hostingEnvironment = hostingEnvironment;
         }
 
         [HttpGet]
@@ -106,7 +110,7 @@ namespace Projet_Web_Commerce.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> EnvoyerMessage(string sujet, string message, string pieceJointe, string selectedDestinataire
+        public async Task<IActionResult> EnvoyerMessage(string sujet, string message, IFormFile pieceJointe, string selectedDestinataire
             , string auteur, int typeMessage, int? idMessage)
         {
             int noMsg = 0;
@@ -121,10 +125,25 @@ namespace Projet_Web_Commerce.Controllers
             {
                 var msg = await _context.PPMessages
                     .FirstOrDefaultAsync(m => m.NoMessage == idMessage);
+
+                if (pieceJointe != null)
+                {
+                    var fileExtension = Path.GetExtension(pieceJointe.FileName);
+                    var nouveauNomFichier = $"{idMessage}{fileExtension}";
+                    string uploadsFolder = Path.Combine(_hostingEnvironment.WebRootPath, "data", "images");
+                    var filePath = Path.Combine(uploadsFolder, nouveauNomFichier);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await pieceJointe.CopyToAsync(stream);
+                    }
+                    nouveauNomFichier = $"{noMsg}{fileExtension}";
+                    msg.PieceJointe = nouveauNomFichier;
+                }
+
                 msg.Sujet = sujet == null ? "" : sujet;
                 msg.Message = message == null ? "" : message;
                 msg.TypeMessage = typeMessage;
-                msg.PieceJointe = pieceJointe;
                 noMsg = Convert.ToInt32(idMessage);
 
                 foreach (var dest in _context.PPDestinatairesMessage.ToList())
@@ -143,13 +162,29 @@ namespace Projet_Web_Commerce.Controllers
                     nouveauMessage.Auteur = auteur;
                     nouveauMessage.AuteurUser = await _userManager.FindByEmailAsync(auteur);
                     nouveauMessage.TypeMessage = typeMessage;
-                    nouveauMessage.PieceJointe = pieceJointe;
+                    nouveauMessage.PieceJointe = null;
                     nouveauMessage.Transmetteur = null;
                     nouveauMessage.DateEnvoi = DateTime.Now;
                 }
                 _context.PPMessages.Add(nouveauMessage);
                 await _context.SaveChangesAsync();
                 noMsg = nouveauMessage.NoMessage;
+
+                if (pieceJointe != null)
+                {
+                    var fileExtension = Path.GetExtension(pieceJointe.FileName);
+                    var nouveauNomFichier = $"{noMsg}{fileExtension}";
+                    string uploadsFolder = Path.Combine(_hostingEnvironment.WebRootPath, "data", "images");
+                    var filePath = Path.Combine(uploadsFolder, nouveauNomFichier);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await pieceJointe.CopyToAsync(stream);
+                    }
+
+                    nouveauMessage.PieceJointe = nouveauNomFichier;
+                    await _context.SaveChangesAsync();
+                }
             }
 
             var listClients = _context.PPClients.ToList();
@@ -356,6 +391,25 @@ namespace Projet_Web_Commerce.Controllers
             {
                 return View();
             }
+        }
+
+        public IActionResult TelechargerPieceJointe(string cheminFichier)
+        {
+            if (string.IsNullOrEmpty(cheminFichier))
+            {
+                return NotFound();
+            }
+
+            var cheminComplet = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "data", "images", cheminFichier);
+            if (!System.IO.File.Exists(cheminComplet))
+            {
+                return NotFound();
+            }
+            var fileContents = System.IO.File.ReadAllBytes(cheminComplet);
+
+            var contentType = "application/octet-stream";
+
+            return File(fileContents, contentType, Path.GetFileName(cheminComplet));
         }
     }
 }
