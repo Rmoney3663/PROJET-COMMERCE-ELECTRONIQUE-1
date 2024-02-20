@@ -63,6 +63,53 @@ namespace Projet_Web_Commerce.Controllers
             return View(pPProduits);
         }
 
+        [HttpPost]
+        public async Task<IActionResult> Details(int? id, int noClient, bool eval, int rating, string msg)
+        {
+            if (id == null)
+            {
+                return RedirectToAction("ErrorNoFound", "PPProduits");
+            }
+
+            var pPProduits = await _context.PPProduits
+                .Include(p => p.PPCategories)
+                .Include(p => p.PPVendeurs)
+                .FirstOrDefaultAsync(m => m.NoProduit == id);
+            if (pPProduits == null)
+            {
+                return RedirectToAction("ErrorNoFound", "PPProduits");
+            }
+
+            DateTime dateCreate = DateTime.Now;
+            DateTime dateMaj = DateTime.Now;
+            PPEvaluations newEvaluation = new PPEvaluations();
+
+            if (eval)
+            {
+                var evalActu = _context.PPEvaluations.Where(e => e.NoClient == noClient && e.NoProduit == id).FirstOrDefault();
+                evalActu.Commentaire = msg.Trim();
+                evalActu.Cote = rating;
+                evalActu.DateMAJ = dateMaj;
+                _context.SaveChanges();
+            }
+            else
+            {
+                newEvaluation.NoProduit = (int)id;
+                newEvaluation.NoClient = noClient;
+                newEvaluation.Commentaire = msg.Trim();
+                newEvaluation.Cote = rating;
+                newEvaluation.DateCreation = dateCreate;
+                newEvaluation.DateMAJ = dateMaj;
+
+                _context.Add(newEvaluation);
+                _context.SaveChanges();
+            }
+
+            ViewData["idProduit"] = id;
+
+            return View(pPProduits);
+        }
+
         // GET: PPProduits/Create
         [Authorize(Roles = "Vendeur")]
         public IActionResult Create()
