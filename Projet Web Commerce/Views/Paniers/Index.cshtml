@@ -49,23 +49,23 @@
                                 }
                                 <p class="card-text">
                                     @{
-                                        int nbItems = panier.articles.Count;
-                                    }
-                                    <b>Nombre d'items :</b>
-                                    @Html.DisplayFor(modelItem => nbItems)
-                                </p>
-                                <p class="card-text">
-                                    @{
+                                        int nbItems = 0;
+
                                         var oldestProductDate = DateTime.Now;
-                                        foreach(int produit in panier.articles)
+                                        foreach (int produit in panier.articles)
                                         {
                                             PPArticlesEnPanier produitActu = _context.PPArticlesEnPanier.Where(v => v.NoPanier == produit).FirstOrDefault();
                                             if (produitActu.DateCreation < oldestProductDate)
                                             {
                                                 oldestProductDate = produitActu.DateCreation;
                                             }
+                                            nbItems += produitActu.NbItems;
                                         }
                                     }
+                                    <b>Nombre d'items :</b>
+                                    @Html.DisplayFor(modelItem => nbItems)
+                                </p>
+                                <p class="card-text">
                                     <b>Date de creation :</b>
                                     @Html.DisplayFor(modelItem => oldestProductDate)
                                 </p>
