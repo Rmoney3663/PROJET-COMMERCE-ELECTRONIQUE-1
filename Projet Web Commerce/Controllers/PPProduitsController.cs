@@ -96,7 +96,7 @@ namespace Projet_Web_Commerce.Controllers
             {
                 newEvaluation.NoProduit = (int)id;
                 newEvaluation.NoClient = noClient;
-                newEvaluation.Commentaire = msg.Trim();
+                newEvaluation.Commentaire = msg != null? msg.Trim():msg;
                 newEvaluation.Cote = rating;
                 newEvaluation.DateCreation = dateCreate;
                 newEvaluation.DateMAJ = dateMaj;
