@@ -139,8 +139,8 @@ else
 
                                                 var produit = _context.PPProduits.FirstOrDefault(p => p.NoProduit == item.NoProduit);
 
-                                                var path = System.IO.Path.Combine(env.WebRootPath, "Logo", item.Photo);
-                                                string imagePath = item.Photo != null && File.Exists(path) ? $"~/Logo/{item.Photo}" : "~/Logo/DefaultImage.png";
+                                                var path = System.IO.Path.Combine(env.WebRootPath, "data/images", item.Photo);
+                                                string imagePath = item.Photo != null && File.Exists(path) ? $"~/data/images/{item.Photo}" : "~/data/images/DefaultImage.png";
                                                 Console.WriteLine("FILE Name : " + item.Photo);
                                                 Console.WriteLine("FILE : " + File.Exists(path));
 
@@ -157,7 +157,7 @@ else
                                                     </h6>
                                                     <div class="col-md-3 col-lg-2 col-xl-2 offset-lg-1">
 
-                                                        @if (item.PrixVente != null)
+                                                        @if (item.PrixVente != null && item.DateVente > DateTime.Now())
                                                         {
                                                             var prix = item.PrixVente * client.TotalItems;
                                                             <h6 class="col-md-12 col-lg-12 col-xl-12">

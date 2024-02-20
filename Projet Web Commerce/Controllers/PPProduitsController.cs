@@ -134,7 +134,7 @@ namespace Projet_Web_Commerce.Controllers
                 var tempFilename = "temp_filename";
                 string extension = Path.GetExtension(file.FileName);
                 pPProduits.Photo = file.FileName;
-                string tempFilePath = Path.Combine("wwwroot/Logo", tempFilename + extension);
+                string tempFilePath = Path.Combine("wwwroot/data/images", tempFilename + extension);
 
                 using (Stream fileStream = new FileStream(tempFilePath, FileMode.Create))
                 {
@@ -144,7 +144,7 @@ namespace Projet_Web_Commerce.Controllers
                 _context.Add(pPProduits);
                 await _context.SaveChangesAsync();
                 var finalFilename = $"{int.Parse(combined)}{extension}";
-                var finalFilePath = Path.Combine("wwwroot/Logo", finalFilename);
+                var finalFilePath = Path.Combine("wwwroot/data/images", finalFilename);
                 System.IO.File.Move(tempFilePath, finalFilePath);
 
                 pPProduits.Photo = finalFilename;
@@ -225,12 +225,12 @@ namespace Projet_Web_Commerce.Controllers
 
                     if (file != null && file.Length > 0)
                     {
-                        System.IO.File.Delete("wwwroot/Logo/" + pPProduits.Photo);
+                        System.IO.File.Delete("wwwroot/data/images/" + pPProduits.Photo);
 
                         // Save new photo
                         string extension = Path.GetExtension(file.FileName);
                         pPProduits.Photo = pPProduits.NoProduit.ToString() + extension;
-                        string tempFilePath = Path.Combine("wwwroot/Logo", pPProduits.NoProduit + extension);
+                        string tempFilePath = Path.Combine("wwwroot/data/images", pPProduits.NoProduit + extension);
                         using (Stream fileStream = new FileStream(tempFilePath, FileMode.Create))
                         {
                             await file.CopyToAsync(fileStream);
@@ -338,7 +338,7 @@ namespace Projet_Web_Commerce.Controllers
                     {
                         var articlesToDelete = _context.PPArticlesEnPanier.Where(a => a.NoProduit == id);
                         _context.PPArticlesEnPanier.RemoveRange(articlesToDelete);
-                        System.IO.File.Delete("wwwroot/Logo/" + pPProduits.Photo);
+                        System.IO.File.Delete("wwwroot/data/images/" + pPProduits.Photo);
                         Console.WriteLine("Deleted photo");
                         _context.PPProduits.Remove(pPProduits);
                     }
@@ -389,7 +389,7 @@ namespace Projet_Web_Commerce.Controllers
                     }
                     else
                     {                        
-                        System.IO.File.Delete("wwwroot/Logo/" + pPProduits.Photo);
+                        System.IO.File.Delete("wwwroot/data/images/" + pPProduits.Photo);
                         Console.WriteLine("Deleted photo");
                         _context.PPProduits.Remove(pPProduits);
                     }

@@ -2,7 +2,8 @@
 @using Microsoft.AspNetCore.Identity
 @inject UserManager<Projet_Web_Commerce.Areas.Identity.Data.Utilisateur> _userManager
 @inject SignInManager<Projet_Web_Commerce.Areas.Identity.Data.Utilisateur> SignInManager
-
+@using System.IO
+@inject IWebHostEnvironment env
 @{
     ViewData["Title"] = "Delete";
     var user = await _userManager.GetUserAsync(User);
@@ -31,8 +32,17 @@ else
             <dt class="col-sm-2">
                 Photo de l’article :
             </dt>
+            @{
+                var path = System.IO.Path.Combine(env.WebRootPath, "data/images", Model.Photo);
+                string imagePath = Model.Photo != null && File.Exists(path) ? $"~/data/images/{Model.Photo}" : "~/data/images/DefaultImage.png";
+                Console.WriteLine("FILE Name : " + Model.Photo);
+                Console.WriteLine("FILE : " + File.Exists(path));
+                
+            }
+
+
             <dd class="col-sm-10">
-                <img src="~/Logo/@(Model.Photo)" alt="@(Model.Photo)" width="140" height="200" />
+                <img src="@Url.Content(imagePath)" alt="@Model.Photo" width="140" height="200" />
             </dd>
 
             <dt class="col-sm-2">

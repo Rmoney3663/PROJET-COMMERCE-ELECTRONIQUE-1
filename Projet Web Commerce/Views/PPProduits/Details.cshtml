@@ -47,8 +47,8 @@ else
                 Photo de l’article :
             </dt>
             @{
-                var path = System.IO.Path.Combine(env.WebRootPath, "Logo", Model.Photo);
-                string imagePath = Model.Photo != null && File.Exists(path) ? $"~/Logo/{Model.Photo}" : "~/Logo/DefaultImage.png";
+                var path = System.IO.Path.Combine(env.WebRootPath, "data/images", Model.Photo);
+                string imagePath = Model.Photo != null && File.Exists(path) ? $"~/data/images/{Model.Photo}" : "~/data/images/DefaultImage.png";
                 Console.WriteLine("FILE Name : " + Model.Photo);
                 Console.WriteLine("FILE : " + File.Exists(path));
             }
@@ -219,11 +219,11 @@ else
                                 @unClient.AdresseEmail
                                 @for (int i = 0; i < cote; i++)
                                 {
-                                    <img src="~/Logo/iconeEtoileJaune.png" width="15" height="15" />
+                                    <img src="~/data/images/iconeEtoileJaune.png" width="15" height="15" />
                                 }
                                 @for (int i = cote; i < 5; i++)
                                 {
-                                    <img src="~/Logo/iconeEtoile.png" width="15" height="15" />
+                                    <img src="~/data/images/iconeEtoile.png" width="15" height="15" />
                                 } :
                             </h6>
                             @if (review.Commentaire != "" && review.Commentaire != null)
