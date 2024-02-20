@@ -162,7 +162,6 @@
         window.location.href = '@Url.Action("EnvoyerMessage")' + '?idMessage=' + noMessage + '&typeMessage=' + 'reponse';
     }
 
-
     function transferer(event, noMessage, transmetteur) {
         event.stopPropagation();
         window.location.href = '@Url.Action("EnvoyerMessage")' + '?idMessage=' + noMessage + '&typeMessage=' + 'transmission' + '&transmetteur=' + transmetteur;
@@ -171,8 +170,7 @@
     function supprimer(event, noMessage) {
         event.stopPropagation();
 
-        document.getElementById('idMessage').value = noMessage;
-        document.getElementById('frmCourriel').submit();
+        window.location.href = '@Url.Action("Supprimer")' + '?idMessage=' + noMessage;
     }
 
 </script>

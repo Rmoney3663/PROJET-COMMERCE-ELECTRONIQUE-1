@@ -219,7 +219,7 @@ namespace Projet_Web_Commerce.Controllers
             {
                 await _notificationsHubContext.Clients.User(email.Destinataire).SendAsync("NotificationMessage", email.Destinataire);
             }
-                if (typeMessage == 2)
+            if (typeMessage == 2)
                 TempData["MsgStatut"] = "Votre brouillon a été sauvegardé!";
             else if (typeMessage == 0)
                 TempData["MsgStatut"] = "Votre message a été envoyé!";
@@ -308,17 +308,20 @@ namespace Projet_Web_Commerce.Controllers
             return View();
         }
 
-        [HttpPost]
+        [HttpGet]
         public async Task<ActionResult> Supprimer(int? idMessage)
         {
-            var destMsg = _context.PPDestinatairesMessage
+            if (idMessage != null)
+            {
+                var destMsg = _context.PPDestinatairesMessage
                 .Where(m => m.NoMessage == idMessage)
                 .FirstOrDefault();
 
-            if (destMsg != null)
-            {
-                destMsg.Statut = -1;
-                await _context.SaveChangesAsync();
+                if (destMsg != null)
+                {
+                    destMsg.Statut = -1;
+                    await _context.SaveChangesAsync();
+                }
             }
 
             //var msg = _context.PPMessages
@@ -333,6 +336,38 @@ namespace Projet_Web_Commerce.Controllers
             //}
 
             return RedirectToAction("Supprimes");
+        }
+
+        [HttpGet]
+        public async Task<ActionResult> Restaurer(int idMessage)
+        {
+            var destMsg = _context.PPDestinatairesMessage
+                .Where(m => m.NoMessage == idMessage)
+                .FirstOrDefault();
+
+            if (destMsg != null)
+            {
+                destMsg.Statut = 0;
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToAction("BoiteDeReception");
+        }
+
+        [HttpGet]
+        public async Task<ActionResult> supprimerDefinitivement(int idMessage)
+        {
+            var destMsg = _context.PPDestinatairesMessage
+                .Where(m => m.NoMessage == idMessage)
+                .FirstOrDefault();
+
+            if (destMsg != null)
+            {
+                destMsg.Statut = -2;
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToAction("BoiteDeReception");
         }
 
 

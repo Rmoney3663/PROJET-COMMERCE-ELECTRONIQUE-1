@@ -30,7 +30,7 @@
 
 <style>
     .btns {
-        width: 8%;
+        width: 10%;
         height: 100%;
         color: rgb(124, 105, 146);
         background-color: rgb(236, 235, 243);
@@ -76,7 +76,8 @@
                     @if (ViewBag.destinataire != null && ViewBag.destinataire.Statut == -1)
                     {
                         <div class="card-footer" style="height: 55px;">
-                            <button class="btns" onclick="repondre('@Model.NoMessage')">Restaurer</button>
+                            <button class="btns" onclick="restaurer('@Model.NoMessage')">Restaurer</button>
+                            <button class="btns" onclick="supprimerDef('@Model.NoMessage')">Supprimer</button>
                         </div>
                     }
                     else
@@ -84,6 +85,10 @@
                         <div class="card-footer" style="height: 55px;">
                             <button class="btns" onclick="repondre('@Model.NoMessage')">Répondre</button>
                             <button class="btns" onclick="transferer('@Model.NoMessage', '@ViewBag.UtilisateurCourantId')">Transférer</button>
+                            @if (ViewBag.UtilisateurCourantId != Model.Auteur)
+                            {
+                                <button class="btns" onclick="supprimer('@Model.NoMessage')">Supprimer</button>
+                            }
                         </div>
                     }
                 </div>
@@ -100,5 +105,17 @@
 
     function transferer(noMessage, transmetteur) {
         window.location.href = '@Url.Action("EnvoyerMessage")' + '?idMessage=' + noMessage + '&typeMessage=' + 'transmission' + '&transmetteur=' + transmetteur;
+    }
+    
+    function supprimer(noMessage) {
+        window.location.href = '@Url.Action("Supprimer")' + '?idMessage=' + noMessage;
+    }
+
+    function restaurer(noMessage) {
+        window.location.href = '@Url.Action("Restaurer")' + '?idMessage=' + noMessage;
+    }
+    
+    function supprimerDef(noMessage) {
+        window.location.href = '@Url.Action("supprimerDefinitivement")' + '?idMessage=' + noMessage;
     }
 </script>
