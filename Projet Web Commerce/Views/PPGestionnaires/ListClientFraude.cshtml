@@ -1,0 +1,102 @@
+﻿@model Projet_Web_Commerce.Models.ModelListeClients
+@{
+    ViewData["Title"] = "Liste des clients fraud";
+}
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+
+
+<div class="row">
+    <div class="col">
+        <section>
+            <div>
+                @Html.Partial("GestionVendeursPages", "ListClientFraude")
+            </div>
+
+            <div class="container mt-4">
+                @foreach (var date in Model.MoisAnneesDistinctsList)
+                {
+                    <div class="card">
+                        <div class="card-body">
+                            <script>
+                                function getMonthName(monthNumber) {
+                                    const months = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
+                                    return months[monthNumber - 1];
+                                }
+
+                                const monthNumber = @date.Mois;
+                                const year = @date.Annee;
+                                const monthName = getMonthName(monthNumber);
+
+                                document.write('<h4 class="card-title"><u>' + monthName + ' ' + year + '</u></h4>');
+                            </script>
+
+                            @{
+
+                                var groupeParAnnee = (from client in Model.ClientsList
+                                                      join vendeurClient in Model.VendeursClientsList
+                                                      on client.NoClient equals vendeurClient.NoClient into vendeurClients
+                                                      from vc in vendeurClients.DefaultIfEmpty()
+                                                      join vendeur in Model.VendeursList
+                                                      on vc?.NoVendeur equals vendeur?.NoVendeur into vendeurs
+                                                      from v in vendeurs.DefaultIfEmpty()
+                                                      where client.DateCreation.Month == date.Mois && client.DateCreation.Year == date.Annee
+                                                      orderby v?.NomAffaires, client.Nom, client.Prenom
+                                                      select new
+                                                      {
+                                                          Client = client,
+                                                          VendeurClient = vc,
+                                                          Vendeur = v
+                                                      })
+                                .ToList();
+
+
+
+                            }
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        <th scope="col">No de client</th>
+                                        <th scope="col">Information personnelle</th>
+                                        <th scope="col">Date de création</th>
+                                        <th scope="col">Date de dernière connexion</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @{
+                                        var no = 0;
+                                    }
+                                    @foreach (var item in groupeParAnnee)
+                                    {
+                                        <tr>
+                                            <td>@(++no)</td>
+                                            <td>@Html.DisplayFor(modelItem => item.Client.NoClient)</td>
+                                            @if (item.Client.Nom != null && item.Client.Prenom != null)
+                                            {
+                                                <td>@Html.DisplayFor(modelItem => item.Client.Nom), @Html.DisplayFor(modelItem => item.Client.Prenom)</td>
+                                            }
+                                            else
+                                            {
+                                                <td>@Html.DisplayFor(modelItem => item.Client.AdresseEmail)</td>
+                                            }
+
+                                            <td>@Html.DisplayFor(modelItem => item.Client.DateCreation)</td>
+                                            <td>@Html.DisplayFor(modelItem => item.Client.DateDerniereConnexion)</td>
+                                        </tr>
+                                    }
+                                </tbody>
+
+                            </table>
+                        </div>
+                    </div>
+                }
+            </div>
+            @if (Model.MoisAnneesDistinctsList.Count() == 0)
+            {
+                <p>Aucun clients non confirmer.</p>
+            }
+        </section>
+    </div>
+</div>

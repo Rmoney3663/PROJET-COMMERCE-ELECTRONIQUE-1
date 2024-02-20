@@ -176,10 +176,15 @@ namespace Projet_Web_Commerce.Controllers
                 .GroupBy(p => p.NoVendeur)
                 .Count();
 
-            var CommandesList = _context.PPCommandes
-             .GroupBy(c => c.NoVendeur)
-             .Select(group => group.OrderByDescending(c => c.DateCommande).FirstOrDefault())
-             .ToList();
+
+            var commandesGrouped = _context.PPCommandes
+            .Where(c => c.Statut != "E")
+            .GroupBy(c => c.NoVendeur)
+            .ToList();
+
+            var latestCommandes = commandesGrouped
+                .Select(group => group.OrderByDescending(c => c.DateCommande).FirstOrDefault())
+                .ToList();
 
             var utilisateurList = _context.Users.ToList();
 
@@ -190,7 +195,7 @@ namespace Projet_Web_Commerce.Controllers
                 VendeursList = vendeurs,
                 ProduitsList = ProduitsList,
                 MoisAnneesDistinctsList = lstMoisAnneesDistincts,
-                CommandesList = CommandesList,
+                CommandesList = latestCommandes,
                 UtilisateurList = utilisateurList,
                 EvaluationList = evaluationList
 
@@ -218,7 +223,15 @@ namespace Projet_Web_Commerce.Controllers
                 .ToList();
 
             var ProduitsList = _context.PPProduits.ToList();
-            var CommandesList = _context.PPCommandes.Where(v => v.Statut != "E").ToList();
+
+            var commandesGrouped = _context.PPCommandes
+            .Where(c => c.Statut != "E")
+            .GroupBy(c => c.NoClient)
+            .ToList(); 
+
+            var latestCommandes = commandesGrouped
+                .Select(group => group.OrderByDescending(c => c.DateCommande).FirstOrDefault())
+                .ToList();
 
             var VendeursClientsList = _context.PPVendeursClients
             .GroupBy(vc => vc.NoClient)
@@ -241,7 +254,7 @@ namespace Projet_Web_Commerce.Controllers
                 ProduitsList = ProduitsList,
                 MoisAnneesDistinctsList = lstMoisAnneesDistincts,
                 ClientsList = ClientsList,
-                CommandesList = CommandesList,
+                CommandesList = latestCommandes,
                 VendeursClientsList = VendeursClientsList,
                 ClientPanierList = clientPanierList
             };
@@ -834,6 +847,36 @@ namespace Projet_Web_Commerce.Controllers
                 var articlesEnPanier = _context.PPArticlesEnPanier.Where(ap => panierToDelete.Contains(ap.NoClient));
                 _context.PPArticlesEnPanier.RemoveRange(articlesEnPanier);
 
+                foreach (var id in panierToDelete)
+                {
+                    var item = await _context.PPClients.FindAsync(id);
+                    if (item != null)
+                    {
+                        item.Statut = 0;
+                        var email = item.AdresseEmail;
+                        var idUSER = item.IdUtilisateur;
+                        var use = await _context.Users.FindAsync(idUSER);
+                        if (use != null)
+                        {
+                            use.EmailConfirmed = false;
+
+                            string returnUrl = Url.Content("~/");
+                            var code = await _userManager.GenerateEmailConfirmationTokenAsync(use);
+                            code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+                            var callbackUrl = Url.Page(
+                                "/Account/ConfirmEmail",
+                                pageHandler: null,
+                                values: new { area = "Identity", userId = use.Id, code = code, returnUrl = returnUrl },
+                                protocol: Request.Scheme);
+
+                            await Methodes.envoyerCourriel(
+                                "Vous devez reconfirmer votre adresse courriel",
+                                $"Veuillez reconfirmer votre compte en <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>cliquant ici</a>. Votre numéro de client est {item.NoClient}",
+                                email);
+                        }
+                    }
+                }
+
                 await _context.SaveChangesAsync();
                 return Ok(new { message = "Les paniers ont été supprimés avec succès." });
             }
@@ -842,6 +885,7 @@ namespace Projet_Web_Commerce.Controllers
                 return StatusCode(500, new { error = $"Une erreur s'est produite lors des paniers : {ex.Message}" });
             }
         }
+
 
         [HttpPost]
         public async Task<IActionResult> SupprimerVPanier()
@@ -857,6 +901,35 @@ namespace Projet_Web_Commerce.Controllers
                 var articlesEnPanier = _context.PPArticlesEnPanier.Where(ap => panierToDelete.Contains(ap.NoVendeur));
                 _context.PPArticlesEnPanier.RemoveRange(articlesEnPanier);
 
+                foreach (var id in panierToDelete)
+                {
+                    var item = await _context.PPVendeurs.FindAsync(id);
+                    if (item != null)
+                    {
+                        item.Statut = 0;
+                        var email = item.AdresseEmail;
+                        var idUSER = item.IdUtilisateur;
+                        var use = await _context.Users.FindAsync(idUSER);
+                        if (use != null)
+                        {
+                            use.EmailConfirmed = false;
+
+                            string returnUrl = Url.Content("~/");
+                            var code = await _userManager.GenerateEmailConfirmationTokenAsync(use);
+                            code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+                            var callbackUrl = Url.Page(
+                                "/Account/ConfirmEmail",
+                                pageHandler: null,
+                                values: new { area = "Identity", userId = use.Id, code = code, returnUrl = returnUrl },
+                                protocol: Request.Scheme);
+
+                            await Methodes.envoyerCourriel(
+                                "Vous devez reconfirmer votre adresse courriel",
+                                $"Veuillez reconfirmer votre compte en <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>cliquant ici</a>. Votre numéro de vendeur est {item.NoVendeur}",
+                                email);
+                        }
+                    }
+                }
 
 
                 await _context.SaveChangesAsync();
@@ -945,6 +1018,97 @@ namespace Projet_Web_Commerce.Controllers
             var lstMoisAnneesDistincts = _context.PPCommandes
                 .Where(v => v.Statut != "E")
                 .Select(v => new ModelMoisAnnees { Mois = v.DateCommande.Month, Annee = v.DateCommande.Year })
+                //.Select(v => new { Mois = v.DateCreation.Month, Annee = v.DateCreation.Year })
+                .Distinct()
+                .OrderByDescending(item => item.Annee)
+                .ThenByDescending(item => item.Mois)
+                .ToList();
+
+            var ProduitsList = _context.PPProduits.ToList();
+
+            var nbProduits = _context.PPProduits
+                .GroupBy(p => p.NoVendeur)
+                .Count();
+
+            var CommandesList = _context.PPCommandes
+             .GroupBy(c => c.NoVendeur)
+             .Select(group => group.OrderByDescending(c => c.DateCommande).FirstOrDefault())
+             .ToList();
+
+            var utilisateurList = _context.Users.ToList();
+
+            ModelListeVendeurs modelListeVendeurs = new ModelListeVendeurs()
+            {
+                VendeursList = vendeurs,
+                ProduitsList = ProduitsList,
+                MoisAnneesDistinctsList = lstMoisAnneesDistincts,
+                CommandesList = CommandesList,
+                UtilisateurList = utilisateurList
+
+            };
+
+            return View(modelListeVendeurs);
+        }
+
+
+        [HttpGet]
+        [Authorize(Roles = "Gestionnaire")]
+        public ActionResult ListClientFraude()
+        {
+            var vendeurs = _context.PPVendeurs
+              .Where(v => v.Statut == 0)
+              .OrderByDescending(v => v.NomAffaires)
+              .ToList();
+
+            var lstMoisAnneesDistincts = _context.PPClients
+                .Where(v => v.Statut == 0)
+                .Select(v => new ModelMoisAnnees { Mois = v.DateCreation.Month, Annee = v.DateCreation.Year })
+                .Distinct()
+                .OrderByDescending(item => item.Annee)
+                .ThenByDescending(item => item.Mois)
+                .ToList();
+
+            var ProduitsList = _context.PPProduits.ToList();
+
+            var CommandesList = _context.PPCommandes.ToList();
+
+            var VendeursClientsList = _context.PPVendeursClients
+            .GroupBy(vc => vc.NoClient)
+            .Select(group => group.OrderByDescending(vc => vc.DateVisite).FirstOrDefault())
+            .ToList();
+
+
+            var ClientsList = _context.PPClients.Where(v => v.Statut == 0).ToList();
+
+            var nbProduits = _context.PPProduits
+                .GroupBy(p => p.NoVendeur)
+                .Count();
+
+            ModelListeClients modelListeClients = new ModelListeClients()
+            {
+                VendeursList = vendeurs,
+                ProduitsList = ProduitsList,
+                MoisAnneesDistinctsList = lstMoisAnneesDistincts,
+                ClientsList = ClientsList,
+                CommandesList = CommandesList,
+                VendeursClientsList = VendeursClientsList
+            };
+
+            return View(modelListeClients);
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "Gestionnaire")]
+        public ActionResult ListVendeurFraude()
+        {
+            var vendeurs = _context.PPVendeurs
+                .Where(v => v.Statut == 0)
+                .OrderByDescending(v => v.NomAffaires)
+                .ToList();
+
+            var lstMoisAnneesDistincts = _context.PPVendeurs
+                .Where(v => v.Statut == 0)
+                .Select(v => new ModelMoisAnnees { Mois = v.DateCreation.Month, Annee = v.DateCreation.Year })
                 //.Select(v => new { Mois = v.DateCreation.Month, Annee = v.DateCreation.Year })
                 .Distinct()
                 .OrderByDescending(item => item.Annee)
