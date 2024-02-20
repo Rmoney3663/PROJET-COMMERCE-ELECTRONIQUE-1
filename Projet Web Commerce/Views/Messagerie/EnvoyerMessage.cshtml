@@ -136,7 +136,7 @@
                 @Html.Partial("MenuMessagerie", "EnvoyerMessage")
             </div>
             <div class="card">
-                <form id="frmCourriel" method="post" asp-route-envoyeur="@user.Email"> <!-- onsubmit="return soumettreForm()" -->
+                <form id="frmCourriel" method="post" asp-route-envoyeur="@user.Email" enctype="multipart/form-data"><!-- onsubmit="return soumettreForm()" -->
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center">
                             <h2 class="card-title">Envoyer un message</h2>
@@ -149,7 +149,6 @@
                                     Envoyer à
                                 </div>
                                 <div class="card-body">
-                                    
                                     <select name="ddlClients" id="ddlClients" onchange="ajouterDestinataire()">
                                         <option value=""></option>
                                     @foreach (var utilisateur in listeUtilisateurs)
@@ -169,6 +168,12 @@
                                     }
                                     </select>
                                     <br />
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="chkToutLeMonde" onclick="ajouterToutLeMonde()">
+                                        <label class="form-check-label" for="chkToutLeMonde">
+                                            Envoyer à tout le monde
+                                        </label>
+                                    </div>
                                     <div class="selected-names" id="selectedNamesContainer"></div>
                                 </div>
                             </div>
@@ -231,6 +236,31 @@
             }
         }
     });
+
+    function ajouterToutLeMonde() {
+        var dropdown = document.getElementById("ddlClients");
+
+        if (document.getElementById("chkToutLeMonde").checked) {
+            // Si la case à cocher est cochée, ajoute tous les destinataires
+            for (var i = 1; i < dropdown.options.length; i++) {
+                // Ignorer l'option vide
+                if (dropdown.options[i].value) {
+                    dropdown.selectedIndex = i;
+                    ajouterDestinataire();
+                }
+            }
+        } else {
+            // Si la case à cocher est décochée, supprime tous les destinataires
+            var selectedNamesContainer = document.getElementById("selectedNamesContainer");
+            selectedNamesContainer.innerHTML = "";
+            selectedDestinataire.value = "";
+        }
+
+        // Réinitialiser la sélection à l'option vide après avoir ajouté ou supprimé tous les destinataires
+        dropdown.selectedIndex = 0;
+    }
+
+
 
     function ajouterDestinataire() {
         var dropdown = document.getElementById("ddlClients");

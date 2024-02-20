@@ -10,6 +10,8 @@ using Org.BouncyCastle.Asn1.Cmp;
 using Projet_Web_Commerce.Areas.Identity.Data;
 using Projet_Web_Commerce.Data;
 using Projet_Web_Commerce.Models;
+using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.ExceptionServices;
 using System.Text;
 
@@ -21,12 +23,15 @@ namespace Projet_Web_Commerce.Controllers
         public readonly AuthDbContext _context;
         private readonly Microsoft.AspNetCore.Identity.UserManager<Utilisateur> _userManager;
         private readonly IHubContext<Notifications> _notificationsHubContext;
+        private readonly IHostingEnvironment _hostingEnvironment;
 
-        public MessagerieController(AuthDbContext context, Microsoft.AspNetCore.Identity.UserManager<Utilisateur> userManager, IHubContext<Notifications> notificationsHubContext)
+        public MessagerieController(AuthDbContext context, Microsoft.AspNetCore.Identity.UserManager<Utilisateur> userManager, IHubContext<Notifications> notificationsHubContext,
+            IHostingEnvironment hostingEnvironment)
         {
             _context = context;
             _userManager = userManager;
             _notificationsHubContext = notificationsHubContext;
+            _hostingEnvironment = hostingEnvironment;
         }
 
         [HttpGet]
@@ -38,7 +43,7 @@ namespace Projet_Web_Commerce.Controllers
 
             var msgRecus = _context.PPDestinatairesMessage
                 .Include(dest => dest.Message.Destinataires)
-                .Where(dest => dest.Destinataire == utilisateurCourantId)
+                .Where(dest => dest.Destinataire == utilisateurCourantId && dest.Statut == 0)
                 .Select(dest => dest.Message)
                 .Where(m => m.TypeMessage == 0)
                 .ToList();
@@ -105,7 +110,7 @@ namespace Projet_Web_Commerce.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> EnvoyerMessage(string sujet, string message, string pieceJointe, string selectedDestinataire
+        public async Task<IActionResult> EnvoyerMessage(string sujet, string message, IFormFile pieceJointe, string selectedDestinataire
             , string auteur, int typeMessage, int? idMessage)
         {
             int noMsg = 0;
@@ -120,10 +125,25 @@ namespace Projet_Web_Commerce.Controllers
             {
                 var msg = await _context.PPMessages
                     .FirstOrDefaultAsync(m => m.NoMessage == idMessage);
+
+                if (pieceJointe != null)
+                {
+                    var fileExtension = Path.GetExtension(pieceJointe.FileName);
+                    var nouveauNomFichier = $"{idMessage}{fileExtension}";
+                    string uploadsFolder = Path.Combine(_hostingEnvironment.WebRootPath, "data", "images");
+                    var filePath = Path.Combine(uploadsFolder, nouveauNomFichier);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await pieceJointe.CopyToAsync(stream);
+                    }
+                    nouveauNomFichier = $"{noMsg}{fileExtension}";
+                    msg.PieceJointe = nouveauNomFichier;
+                }
+
                 msg.Sujet = sujet == null ? "" : sujet;
                 msg.Message = message == null ? "" : message;
                 msg.TypeMessage = typeMessage;
-                msg.PieceJointe = pieceJointe;
                 noMsg = Convert.ToInt32(idMessage);
 
                 foreach (var dest in _context.PPDestinatairesMessage.ToList())
@@ -142,13 +162,29 @@ namespace Projet_Web_Commerce.Controllers
                     nouveauMessage.Auteur = auteur;
                     nouveauMessage.AuteurUser = await _userManager.FindByEmailAsync(auteur);
                     nouveauMessage.TypeMessage = typeMessage;
-                    nouveauMessage.PieceJointe = pieceJointe;
+                    nouveauMessage.PieceJointe = null;
                     nouveauMessage.Transmetteur = null;
                     nouveauMessage.DateEnvoi = DateTime.Now;
                 }
                 _context.PPMessages.Add(nouveauMessage);
                 await _context.SaveChangesAsync();
                 noMsg = nouveauMessage.NoMessage;
+
+                if (pieceJointe != null)
+                {
+                    var fileExtension = Path.GetExtension(pieceJointe.FileName);
+                    var nouveauNomFichier = $"{noMsg}{fileExtension}";
+                    string uploadsFolder = Path.Combine(_hostingEnvironment.WebRootPath, "data", "images");
+                    var filePath = Path.Combine(uploadsFolder, nouveauNomFichier);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await pieceJointe.CopyToAsync(stream);
+                    }
+
+                    nouveauMessage.PieceJointe = nouveauNomFichier;
+                    await _context.SaveChangesAsync();
+                }
             }
 
             var listClients = _context.PPClients.ToList();
@@ -193,10 +229,11 @@ namespace Projet_Web_Commerce.Controllers
         [HttpGet]
         public ActionResult Envoyes()
         {
-            var currentUserEmail = _userManager.Users.Where(u => u.Email == User.Identity.Name).FirstOrDefault().Id;
+            var currentUserId = _userManager.Users.Where(u => u.Email == User.Identity.Name).FirstOrDefault().Id;
+
             var msgEnvoyes = _context.PPMessages
-                .Where(message => message.Auteur == currentUserEmail 
-                && message.TypeMessage == 0)
+                .Where(message => message.Auteur == currentUserId
+                    && message.TypeMessage == 0)
                 .Include(m => m.Destinataires)
                 .ToList();
 
@@ -213,12 +250,14 @@ namespace Projet_Web_Commerce.Controllers
             ViewBag.UtilisateurCourantId = utilisateurCourantId;
 
             var messageCourant = await _context.PPMessages
+                .Where(m => m.NoMessage == idMessage)
                 .Include(m => m.Destinataires)
-                .FirstOrDefaultAsync(m => m.NoMessage == idMessage);
+                    .ThenInclude(d => d.DestinataireUser)
+                .FirstOrDefaultAsync();
 
             // Vérifier si l'utilisateur courant est le destinataire du message
             var destinataire = messageCourant.Destinataires.FirstOrDefault(dest => dest.Destinataire == utilisateurCourantId);
-
+            ViewBag.destinataire = destinataire;
             if (destinataire != null && !destinataire.MessageLu)
             {
                 destinataire.MessageLu = true;
@@ -249,14 +288,19 @@ namespace Projet_Web_Commerce.Controllers
         [HttpGet]
         public ActionResult Supprimes()
         {
-            var currentUserEmail = _userManager.Users.Where(u => u.Email == User.Identity.Name).FirstOrDefault().Id;
-            if (currentUserEmail != null)
+            var currentUserId = _userManager.Users.Where(u => u.Email == User.Identity.Name).FirstOrDefault().Id;
+            if (currentUserId != null)
             {
-                var msgSupprimes = _context.PPMessages
-                .Where(message => message.Auteur == currentUserEmail
-                    && message.TypeMessage == -1)
-                .Include(m => m.Destinataires)
-                .ToList();
+                //var msgSupprimes = _context.PPMessages
+                //.Where(message => message.Auteur == currentUserId
+                //    && message.TypeMessage == -1)
+                //.Include(m => m.Destinataires)
+                //.ToList();
+
+                var msgSupprimes = _context.PPDestinatairesMessage
+                    .Where(m => m.Statut == -1 && m.Destinataire == currentUserId)
+                    .Include(m => m.Message)
+                    .ToList();
 
                 return View(msgSupprimes);
             }
@@ -265,14 +309,28 @@ namespace Projet_Web_Commerce.Controllers
         }
 
         [HttpPost]
-        public ActionResult Supprimer(int? idMessage)
+        public async Task<ActionResult> Supprimer(int? idMessage)
         {
-            var msg = _context.PPMessages.Where(m => m.NoMessage == idMessage).FirstOrDefault();
-            if (msg != null)
+            var destMsg = _context.PPDestinatairesMessage
+                .Where(m => m.NoMessage == idMessage)
+                .FirstOrDefault();
+
+            if (destMsg != null)
             {
-                msg.TypeMessage = -1;
-                _context.SaveChangesAsync();
+                destMsg.Statut = -1;
+                await _context.SaveChangesAsync();
             }
+
+            //var msg = _context.PPMessages
+            //    .Where(m => m.NoMessage == idMessage)
+            //    .Include(m => m.Destinataires)
+            //    .FirstOrDefault();
+
+            //if (msg != null)
+            //{
+            //    msg.TypeMessage = -1;
+            //    _context.SaveChangesAsync();
+            //}
 
             return RedirectToAction("Supprimes");
         }
@@ -333,6 +391,25 @@ namespace Projet_Web_Commerce.Controllers
             {
                 return View();
             }
+        }
+
+        public IActionResult TelechargerPieceJointe(string cheminFichier)
+        {
+            if (string.IsNullOrEmpty(cheminFichier))
+            {
+                return NotFound();
+            }
+
+            var cheminComplet = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "data", "images", cheminFichier);
+            if (!System.IO.File.Exists(cheminComplet))
+            {
+                return NotFound();
+            }
+            var fileContents = System.IO.File.ReadAllBytes(cheminComplet);
+
+            var contentType = "application/octet-stream";
+
+            return File(fileContents, contentType, Path.GetFileName(cheminComplet));
         }
     }
 }
