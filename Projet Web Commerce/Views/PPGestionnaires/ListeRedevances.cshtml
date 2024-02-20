@@ -51,11 +51,17 @@
                                     <tr>
                                         <th scope="col">#</th>
                                         <th scope="col">No de vendeur</th>
-                                        <th scope="col">Information personnelle</th>
+                                        <th scope="col">
+                                            <a href="#" onclick="sortName('asc')">Information personnelle ▲</a> |
+                                            <a href="#" onclick="sortName('desc')">Information personnelle ▼</a>
+                                        </th>
                                         <th scope="col">Nom d'affaires</th>
                                         <th scope="col">Date de création</th>
                                         <th scope="col">% Redevance</th>
-                                        <th scope="col">$ Redevance Total </th>
+                                        <th scope="col">
+                                            <a href="#" onclick="sortRedevance('asc')">Total Redevance ▲</a> |
+                                            <a href="#" onclick="sortRedevance('desc')">Total Redevance ▼</a>
+                                        </th>
                                         <th scope="col"></th>
                                     </tr>
                                 </thead>
@@ -68,14 +74,7 @@
                                         <tr>
                                             <td>@(++no)</td>
                                             <td>@Html.DisplayFor(modelItem => item.Vendeur.NoVendeur)</td>
-                                            @if (item.Vendeur.Nom != null && item.Vendeur.Prenom != null)
-                                            {
-                                                <td>@Html.DisplayFor(modelItem => item.Vendeur.Nom), @Html.DisplayFor(modelItem => item.Vendeur.Prenom)</td>
-                                            }
-                                            else
-                                            {
-                                                <td>@Html.DisplayFor(modelItem => item.Vendeur.AdresseEmail)</td>
-                                            }
+                                            <td>@Html.DisplayFor(modelItem => item.Vendeur.Nom), @Html.DisplayFor(modelItem => item.Vendeur.Prenom)</td>
                                             <td>@Html.DisplayFor(modelItem => item.Vendeur.NomAffaires)</td>
                                             <td>@Html.DisplayFor(modelItem => item.Vendeur.DateCreation)</td>
 
@@ -109,7 +108,37 @@
 </div>
 
 <script>
-   
+    function sortRedevance(order) {
+        var rows = document.querySelectorAll('#redevanceTable tbody tr');
+        var sortedRows = Array.from(rows).sort((a, b) => {
+            var aValue = parseFloat(a.querySelector('td:nth-child(7)').textContent);
+            var bValue = parseFloat(b.querySelector('td:nth-child(7)').textContent);
+            if (order === 'asc') {
+                return aValue - bValue;
+            } else {
+                return bValue - aValue;
+            }
+        });
+        var tbody = document.querySelector('#redevanceTable tbody');
+        tbody.innerHTML = '';
+        sortedRows.forEach(row => tbody.appendChild(row));
+    }
+
+    function sortName(order) {
+        var rows = document.querySelectorAll('#redevanceTable tbody tr');
+        var sortedRows = Array.from(rows).sort((a, b) => {
+            var aName = a.querySelector('td:nth-child(3)').textContent.trim();
+            var bName = b.querySelector('td:nth-child(3)').textContent.trim();
+            if (order === 'asc') {
+                return aName.localeCompare(bName);
+            } else {
+                return bName.localeCompare(aName);
+            }
+        });
+        var tbody = document.querySelector('#redevanceTable tbody');
+        tbody.innerHTML = '';
+        sortedRows.forEach(row => tbody.appendChild(row));
+    }
 
 
 
