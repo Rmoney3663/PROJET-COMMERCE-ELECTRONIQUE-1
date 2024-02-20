@@ -931,5 +931,48 @@ namespace Projet_Web_Commerce.Controllers
             }
         }
 
+        [HttpGet]
+        [Authorize(Roles = "Gestionnaire")]
+        public ActionResult ListeRedevances()
+        {
+            var vendeurs = _context.PPVendeurs
+                .Where(v => v.Statut != 0)
+                .ToList();
+
+            var lstMoisAnneesDistincts = _context.PPCommandes
+                .Where(v => v.Statut != "E")
+                .Select(v => new ModelMoisAnnees { Mois = v.DateCommande.Month, Annee = v.DateCommande.Year })
+                //.Select(v => new { Mois = v.DateCreation.Month, Annee = v.DateCreation.Year })
+                .Distinct()
+                .OrderByDescending(item => item.Annee)
+                .ThenByDescending(item => item.Mois)
+                .ToList();
+
+            var ProduitsList = _context.PPProduits.ToList();
+
+            var nbProduits = _context.PPProduits
+                .GroupBy(p => p.NoVendeur)
+                .Count();
+
+            var CommandesList = _context.PPCommandes
+             .GroupBy(c => c.NoVendeur)
+             .Select(group => group.OrderByDescending(c => c.DateCommande).FirstOrDefault())
+             .ToList();
+
+            var utilisateurList = _context.Users.ToList();
+
+            ModelListeVendeurs modelListeVendeurs = new ModelListeVendeurs()
+            {
+                VendeursList = vendeurs,
+                ProduitsList = ProduitsList,
+                MoisAnneesDistinctsList = lstMoisAnneesDistincts,
+                CommandesList = CommandesList,
+                UtilisateurList = utilisateurList
+
+            };
+
+            return View(modelListeVendeurs);
+        }
+
     }
 }

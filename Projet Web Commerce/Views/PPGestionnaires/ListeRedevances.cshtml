@@ -1,5 +1,116 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model Projet_Web_Commerce.Models.ModelListeVendeurs
 @{
+    ViewData["Title"] = "Liste des redevances";
 }
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+
+
+<div class="row">
+    <div class="col">
+        <section>
+            <div>
+                @Html.Partial("GestionVendeursPages", "ListeRedevances")
+            </div>
+
+            <div class="container mt-4">
+                @foreach (var date in Model.MoisAnneesDistinctsList)
+                {
+                    <div class="card">
+                        <div class="card-body">
+                            <script>
+                                function getMonthName(monthNumber) {
+                                    const months = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
+                                    return months[monthNumber - 1];
+                                }
+
+                                const monthNumber = @date.Mois;
+                                const year = @date.Annee;
+                                const monthName = getMonthName(monthNumber);
+
+                                document.write('<h4 class="card-title"><u>' + monthName + ' ' + year + '</u></h4>');
+                            </script>
+                            @{
+                                var groupeParAnnee = (from vendeur in Model.VendeursList
+                                        join user in Model.UtilisateurList
+                                        on vendeur.IdUtilisateur equals user.Id
+                                        where user.EmailConfirmed && vendeur.DateCreation.Month == date.Mois && vendeur.DateCreation.Year == date.Annee
+                                        orderby vendeur.NomAffaires
+                                        select new
+                                        {
+                                            Vendeur = vendeur,
+                                            CommandesList = Model.CommandesList.Where(cp => cp.NoVendeur == vendeur.NoVendeur).ToList(),
+                                        })
+                                        .ToList();
+
+
+                            }
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        <th scope="col">No de vendeur</th>
+                                        <th scope="col">Information personnelle</th>
+                                        <th scope="col">Nom d'affaires</th>
+                                        <th scope="col">Date de création</th>
+                                        <th scope="col">% Redevance</th>
+                                        <th scope="col">$ Redevance Total </th>
+                                        <th scope="col"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @{
+                                        var no = 0;
+                                    }
+                                    @foreach (var item in groupeParAnnee)
+                                    {
+                                        <tr>
+                                            <td>@(++no)</td>
+                                            <td>@Html.DisplayFor(modelItem => item.Vendeur.NoVendeur)</td>
+                                            @if (item.Vendeur.Nom != null && item.Vendeur.Prenom != null)
+                                            {
+                                                <td>@Html.DisplayFor(modelItem => item.Vendeur.Nom), @Html.DisplayFor(modelItem => item.Vendeur.Prenom)</td>
+                                            }
+                                            else
+                                            {
+                                                <td>@Html.DisplayFor(modelItem => item.Vendeur.AdresseEmail)</td>
+                                            }
+                                            <td>@Html.DisplayFor(modelItem => item.Vendeur.NomAffaires)</td>
+                                            <td>@Html.DisplayFor(modelItem => item.Vendeur.DateCreation)</td>
+
+                                            <td>@Html.DisplayFor(modelItem => item.Vendeur.Pourcentage)</td>
+                                            <td>
+                                                @{
+                                                    decimal? totalRedevance = 0;
+                                                }
+                                                @foreach (var commande in item.CommandesList)
+                                                {
+                                                    var redevance = (commande.MontantTotAvantTaxes / 100) * item.Vendeur.Pourcentage;
+                                                    totalRedevance += redevance;
+                                                }
+                                                @totalRedevance
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+
+                            </table>
+                        </div>
+                    </div>
+                }
+                @if (Model.MoisAnneesDistinctsList.Count() == 0)
+                {
+                    <p>Il n'y a aucun Vendeurs</p>
+                }
+            </div>
+        </section>
+    </div>
+</div>
+
+<script>
+   
+
+
+
+</script>

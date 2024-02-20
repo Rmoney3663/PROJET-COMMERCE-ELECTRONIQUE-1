@@ -58,6 +58,11 @@
         Liste des clients inactifs
     </a>
 
+    <a class="btn @(Model == "ListeRedevances" ? "actif" : "pasActif")"
+       asp-area="" asp-controller="PPGestionnaires" asp-action="ListeRedevances">
+        Liste des redevances
+    </a>
+
     <a class="btn @(Model == "Statistiques" ? "actif" : "pasActif")"
        asp-area="" asp-controller="PPGestionnaires" asp-action="Statistiques">
         Statistiques
