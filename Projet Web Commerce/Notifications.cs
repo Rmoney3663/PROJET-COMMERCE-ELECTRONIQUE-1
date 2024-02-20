@@ -17,36 +17,37 @@ namespace Projet_Web_Commerce
             _userManager = userManager;
         }
 
-        public override async Task OnConnectedAsync()
+        public override Task OnConnectedAsync()
         {
-            var user = await _userManager.GetUserAsync(Context.User);
-            if (user != null)
+            var userId = Context.User?.Identity?.Name;
+            if (userId != null)
             {
-                _userConnections[user.Id] = Context.ConnectionId; // Store the mapping
+                var connectionId = Context.ConnectionId;
+                _userConnections[userId] = connectionId;
             }
-            await base.OnConnectedAsync();
+
+            return base.OnConnectedAsync();
         }
 
-        public override async Task OnDisconnectedAsync(Exception exception)
-        {
-            var user = await _userManager.GetUserAsync(Context.User);
-            if (user != null && _userConnections.ContainsKey(user.Id))
-            {
-                _userConnections.Remove(user.Id); // Remove the mapping
-            }
-            await base.OnDisconnectedAsync(exception);
-        }
 
         public async Task NotificationMessage(string userId)
         {
             if (_userConnections.TryGetValue(userId, out var connectionId))
             {
-                await Clients.Client(connectionId).SendAsync("NouveauMessage");
+                await Clients.Client(connectionId).SendAsync("ReceiveMessage");
             }
-            else
+        }
+
+        public override Task OnDisconnectedAsync(Exception exception)
+        {
+            // Remove user from mapping
+            var userId = Context.User?.Identity?.Name;
+            if (userId != null && _userConnections.ContainsKey(userId))
             {
-                // Handle the case where the user is not connected
+                _userConnections.Remove(userId);
             }
+
+            return base.OnDisconnectedAsync(exception);
         }
     }
 }

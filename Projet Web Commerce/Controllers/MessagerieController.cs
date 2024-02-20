@@ -165,7 +165,7 @@ namespace Projet_Web_Commerce.Controllers
 
             foreach (PPDestinatairesMessage email in destinatairesList)
             {
-                await _notificationsHubContext.Clients.All.SendAsync("NotificationMessage", email.Destinataire);
+                await _notificationsHubContext.Clients.User(email.Destinataire).SendAsync("NotificationMessage", email.Destinataire);
             }
                 if (typeMessage == 2)
                 TempData["MsgStatut"] = "Votre brouillon a été sauvegardé!";
