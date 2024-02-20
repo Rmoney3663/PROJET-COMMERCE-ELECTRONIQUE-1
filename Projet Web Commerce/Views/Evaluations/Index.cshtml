@@ -84,13 +84,13 @@ else
                             @for (int i = 0; i < numRating; i++)
                             {
                                 <button type="submit" name="rating" value="@i" style="border: 0; background-color:transparent">
-                                    <img src="~/Logo/iconeEtoileJaune.png" width="25" height="25" />
+                                    <img src="~/data/images/iconeEtoileJaune.png" width="25" height="25" />
                                 </button>
                             }
                             @for (int i = numRating; i < 5; i++)
                             {
                                 <button type="submit" name="rating" value="@i" style="border: 0; background-color:transparent">
-                                    <img src="~/Logo/iconeEtoile.png" width="25" height="25" />
+                                    <img src="~/data/images/iconeEtoile.png" width="25" height="25" />
                                 </button>
                             }
                         </form>
@@ -118,11 +118,11 @@ else
                                 (Vous) @client.AdresseEmail
                                 @for (int i = 0; i < cote; i++)
                                 {
-                                    <img src="~/Logo/iconeEtoileJaune.png" width="15" height="15" />
+                                    <img src="~/data/images/iconeEtoileJaune.png" width="15" height="15" />
                                 }
                                 @for (int i = cote; i < 5; i++)
                                 {
-                                    <img src="~/Logo/iconeEtoile.png" width="15" height="15" />
+                                    <img src="~/data/images/iconeEtoile.png" width="15" height="15" />
                                 } :
                             </h6>
                             @if (evalClientActu.Commentaire != "" && evalClientActu.Commentaire != null)
@@ -149,11 +149,11 @@ else
                                     @unClient.AdresseEmail
                                     @for (int i = 0; i < cote; i++)
                                     {
-                                        <img src="~/Logo/iconeEtoileJaune.png" width="15" height="15" />
+                                        <img src="~/data/images/iconeEtoileJaune.png" width="15" height="15" />
                                     }
                                     @for (int i = cote; i < 5; i++)
                                     {
-                                        <img src="~/Logo/iconeEtoile.png" width="15" height="15" />
+                                        <img src="~/data/images/iconeEtoile.png" width="15" height="15" />
                                     } :
                                 </h6>
                                 @if (review.Commentaire != "" && review.Commentaire != null)
