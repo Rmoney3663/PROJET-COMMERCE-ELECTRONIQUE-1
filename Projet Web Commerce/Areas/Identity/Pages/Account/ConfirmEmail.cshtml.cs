@@ -12,16 +12,19 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Projet_Web_Commerce.Areas.Identity.Data;
+using Projet_Web_Commerce.Data;
 
 namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
 {
     public class ConfirmEmailModel : PageModel
     {
         private readonly UserManager<Utilisateur> _userManager;
+        public readonly AuthDbContext _context;
 
-        public ConfirmEmailModel(UserManager<Utilisateur> userManager)
+        public ConfirmEmailModel(AuthDbContext context, UserManager<Utilisateur> userManager)
         {
             _userManager = userManager;
+            _context = context;
         }
 
         /// <summary>
@@ -46,6 +49,15 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
             code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code));
             var result = await _userManager.ConfirmEmailAsync(user, code);
             StatusMessage = result.Succeeded ? "Merci d'avoir confirmé votre courriel." : "Une erreur est survenue lors de la confirmation de votre courriel.";
+            if (result.Succeeded)
+            {
+                var client = _context.PPClients.FirstOrDefault(c => c.IdUtilisateur == user.Id);
+                if (client != null)
+                {
+                    client.Statut = 1; 
+                    await _context.SaveChangesAsync();
+                }
+            }
             return Page();
         }
     }
