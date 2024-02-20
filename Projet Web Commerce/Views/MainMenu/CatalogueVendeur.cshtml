@@ -207,7 +207,7 @@
                                         decimal average = _context.PPEvaluations.Where(e => e.NoProduit == item.NoProduit).Average(a => a.Cote);
                                          rating = (float)Math.Round(average, 2);
 
-                                        if (int.TryParse(rating.ToString(), out int test))
+                                        if (int.TryParse(rating.ToString(), out int valeur))
                                         {
                                             rating = (float)Math.Round(rating, 0);
                                         }
@@ -259,12 +259,6 @@
 
                                 @if (SignInManager.IsSignedIn(User) && User.IsInRole("Client") && item.NombreItems > 0)
                                 {
-                                    <a asp-controller="Evaluations"
-                                       asp-route-id="@item.NoProduit"
-                                       asp-action="Index"
-                                       class="btn btn-secondary mt-auto" style="background-color:@backgroundButtonEvaluation; color: @textButtonEvaluation">
-                                        Évaluations
-                                    </a>
                                     
                                     <form asp-controller="MainMenu" id="formAjoutPanier" asp-action="AjoutPanier" method="post">
                                         <input type="hidden" name="NoProduit" value="@item.NoProduit" />

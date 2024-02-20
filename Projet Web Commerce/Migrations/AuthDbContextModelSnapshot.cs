@@ -226,8 +226,8 @@ namespace Projet_Web_Commerce.Migrations
 
             modelBuilder.Entity("Projet_Web_Commerce.Models.PPArticlesEnPanier", b =>
                 {
-                    b.Property<int>("NoPanier")
-                        .HasColumnType("int");
+                    b.Property<long>("NoPanier")
+                        .HasColumnType("bigint");
 
                     b.Property<DateTime>("DateCreation")
                         .HasColumnType("datetime2");
