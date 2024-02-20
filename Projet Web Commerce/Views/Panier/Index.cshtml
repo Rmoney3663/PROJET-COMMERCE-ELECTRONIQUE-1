@@ -188,7 +188,7 @@
                                         <div class="d-flex justify-content-between align-items-center mb-5">
                                             @if (vendeur != null)
                                             {
-                                                <form asp-action="Index" asp-route-id="@client.NoClient" asp-route-delete="3" asp-route-vendeur="@vendeur.NoVendeur">
+                                                <form onclick="return confirm('Voulez-vous vraiment supprimer ce panier?')" asp-action="Index" asp-route-id="@client.NoClient" asp-route-delete="3" asp-route-vendeur="@vendeur.NoVendeur">
                                                     <button type="submit" class="btn btn-danger">Supprimer ce panier</button>
                                                 </form>
                                                 
