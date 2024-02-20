@@ -39,22 +39,16 @@
                                         <h5 class="card-title">@Html.DisplayFor(modelItem => item.AdresseEmail)</h5>
                                         <p class="card-text">No Vendeur: @Html.DisplayFor(modelItem => item.NoVendeur)</p>
                                         <p class="card-text">Date de demande : @Html.DisplayFor(modelItem => item.DateCreation)</p>
-                                        <form asp-controller="MainMenu" id="frmGestionVendeur" method="post">
-                                            <div class="form-floating mb-3">
-                                                <input type="number" name="Pourcentage" value="@item.Pourcentage" min="0" max="100" step="0.01" class="form-control" />
-                                                <label class="form-label">Pourcentage (taux de redevance)</label>
-                                            </div>
-                                            <input type="hidden" name="NoVendeur" value="@item.NoVendeur" />
-                                            <input type="hidden" id="vendeurAccepte" name="vendeurAccepte" />
-                                        </form>
-                                        <button href="#" onclick="courrielGestionVendeurs(
-                                            true,
+                                        <div class="form-floating mb-3">
+                                            <input type="number" name="Pourcentage" value="@item.Pourcentage" min="0" max="100" step="any" class="form-control pourcentage-input" />
+                                            <label class="form-label">Pourcentage (taux de redevance)</label>
+                                        </div>
+                                        <button href="#" onclick="validateAndAccept(event,
                                             '@item.NoVendeur',
                                             '@item.NomAffaires',
                                             '@item.PoidsMaxLivraison',
                                             '@item.LivraisonGratuite',
                                             '@item.Taxes',
-                                            '@item.Pourcentage',
                                             '@item.DateCreation',
                                             '@item.DateMAJ',
                                             '@item.AdresseEmail',
@@ -67,9 +61,12 @@
                                             '@item.Pays',
                                             '@item.Tel1',
                                             '@item.Tel2')"
-                                                class="btn btn-primary">
+                                        class="btn btn-primary">
                                             Accepter
                                         </button>
+
+                                        
+
                                         <button href="#" onclick="courrielGestionVendeurs(false, '@item.NoVendeur')" class="btn btn-secondary">Refuser</button>
                                     </div>
                                 </div>
@@ -96,6 +93,53 @@
     function lstVendeurs() {
         window.location = "https://localhost:44376/PPGestionnaires/ListeVendeurs"
     }
+
+    function validateAndAccept(event, noVendeur, nomAffaires, poidsMaxLivraison, livraisonGratuite, taxes, dateCreation, dateMAJ, courriel, nom, prenom, rue, ville, noProvince, codePostal, pays, tel, cell) {
+        var pourcentageInput = event.target.parentElement.querySelector('.pourcentage-input');
+        var pourcentageRedevence = parseFloat(pourcentageInput.value);
+        var errorMessageSpan = document.createElement('span');
+        errorMessageSpan.classList.add('error-message');
+
+
+        if (pourcentageRedevence < 0 || pourcentageRedevence > 100 || isNaN(pourcentageRedevence)) {
+            if (!errorMessageSpan) {
+                errorMessageSpan = document.createElement('span');
+                errorMessageSpan.classList.add('error-message');
+                pourcentageInput.parentElement.appendChild(errorMessageSpan);
+            }
+            errorMessageSpan.textContent = 'Le pourcentage doit être compris entre 0 et 100.';
+            pourcentageInput.classList.add('is-invalid');
+            return; 
+        } else {
+            if (errorMessageSpan) {
+                errorMessageSpan.remove();
+            }
+            pourcentageInput.classList.remove('is-invalid');
+        }
+
+        courrielGestionVendeurs(
+            true,
+            noVendeur,
+            nomAffaires,
+            poidsMaxLivraison,
+            livraisonGratuite,
+            taxes,
+            pourcentageRedevence,
+            dateCreation,
+            dateMAJ,
+            courriel,
+            nom,
+            prenom,
+            rue,
+            ville,
+            noProvince,
+            codePostal,
+            pays,
+            tel,
+            cell
+        );
+    }
+
 
     function courrielGestionVendeurs(
         accepte,

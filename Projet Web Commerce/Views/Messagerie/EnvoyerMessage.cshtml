@@ -119,11 +119,13 @@
 @{
     var sujet = "";
     var message = "";
+    var pieceJointe = "";
 
     if (Model != null)
     {
         sujet = Model.Sujet;
         message = Model.Message;
+        pieceJointe = Model.PieceJointe == null ? "" : Model.PieceJointe;
     }
 }
 
@@ -172,15 +174,14 @@
                             </div>
                         </div>
                         <div class="form-floating mb-3">
-                            <input name="sujet" id="sujet" class="form-control" aria-required="true" required
-                                   oninvalid="setCustomValidity('Veuillez remplir ce champ.')"
-                                   oninput="setCustomValidity('')" value="@sujet" />
+                            <input name="sujet" id="sujet" class="form-control" aria-required="true" value="@sujet" />
                             <label class="form-label">Le sujet</label>
                         </div>
                         <div class="form-floating mb-3">
                             <textarea title="Message" name="message" id="message" class="form-control" style="height: 200px">@message</textarea>
                             <label class="form-label">Votre message</label>
                         </div>
+                        <input type="file" name="pieceJointe" id="pieceJointe" value="@pieceJointe" class="form-control">
                         <br />
                         <div class="form-floating">
                             <a id="btnEnvoyer" class="w-100 btn btn-lg btn-primary mesBtns">Envoyer</a>

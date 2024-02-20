@@ -91,14 +91,14 @@ namespace Projet_Web_Commerce.Controllers
 
             model.sortOrderOptions = new List<SelectListItem>
             {
+                new SelectListItem { Value = "descProdAsc", Text = "Description du produit ↑" },
+                new SelectListItem { Value = "descProdDesc", Text = "Description du produit ↓" },
                 new SelectListItem { Value = "dateAsc", Text = "Date de parution ↑" },
                 new SelectListItem { Value = "dateDesc", Text = "Date de parution ↓" },
                 new SelectListItem { Value = "numProdAsc", Text = "Numéro de produit ↑" },
                 new SelectListItem { Value = "numProdDesc", Text = "Numéro de produit ↓" },
                 new SelectListItem { Value = "catProdAsc", Text = "Catégorie particulière de produit ↑" },
-                new SelectListItem { Value = "catProdDesc", Text = "Catégorie particulière de produit ↓" },
-                new SelectListItem { Value = "descProdAsc", Text = "Description du produit ↑" },
-                new SelectListItem { Value = "descProdDesc", Text = "Description du produit ↓" }
+                new SelectListItem { Value = "catProdDesc", Text = "Catégorie particulière de produit ↓" }
             };
 
             model.parPageOptions = new List<SelectListItem>
@@ -174,6 +174,12 @@ namespace Projet_Web_Commerce.Controllers
 
             switch (model.sortOrder)
             {
+                case "descProdAsc":
+                    ProduitsVendeur = ProduitsVendeur.OrderBy(p => p.Description);
+                    break;
+                case "descProdDesc":
+                    ProduitsVendeur = ProduitsVendeur.OrderByDescending(p => p.Description);
+                    break;
                 case "dateAsc":
                     ProduitsVendeur = ProduitsVendeur.OrderBy(p => p.DateCreation);
                     break;
@@ -191,12 +197,6 @@ namespace Projet_Web_Commerce.Controllers
                     break;
                 case "catProdDesc":
                     ProduitsVendeur = ProduitsVendeur.OrderByDescending(p => p.NoCategorie);
-                    break;
-                case "descProdAsc":
-                    ProduitsVendeur = ProduitsVendeur.OrderBy(p => p.Description);
-                    break;
-                case "descProdDesc":
-                    ProduitsVendeur = ProduitsVendeur.OrderByDescending(p => p.Description);
                     break;
             }
 
@@ -256,14 +256,14 @@ namespace Projet_Web_Commerce.Controllers
 
             model.sortOrderOptions = new List<SelectListItem>
             {
+                new SelectListItem { Value = "descProdAsc", Text = "Description du produit ↑" },
+                new SelectListItem { Value = "descProdDesc", Text = "Description du produit ↓" },
                 new SelectListItem { Value = "dateAsc", Text = "Date de parution ↑" },
                 new SelectListItem { Value = "dateDesc", Text = "Date de parution ↓" },
                 new SelectListItem { Value = "numProdAsc", Text = "Numéro de produit ↑" },
                 new SelectListItem { Value = "numProdDesc", Text = "Numéro de produit ↓" },
                 new SelectListItem { Value = "catProdAsc", Text = "Catégorie particulière de produit ↑" },
-                new SelectListItem { Value = "catProdDesc", Text = "Catégorie particulière de produit ↓" },
-                new SelectListItem { Value = "descProdAsc", Text = "Description du produit ↑" },
-                new SelectListItem { Value = "descProdDesc", Text = "Description du produit ↓" }
+                new SelectListItem { Value = "catProdDesc", Text = "Catégorie particulière de produit ↓" }
             };
 
             model.parPageOptions = new List<SelectListItem>
@@ -332,6 +332,12 @@ namespace Projet_Web_Commerce.Controllers
 
             switch (model.sortOrder)
             {
+                case "descProdAsc":
+                    ProduitsVendeur = ProduitsVendeur.OrderBy(p => p.Description);
+                    break;
+                case "descProdDesc":
+                    ProduitsVendeur = ProduitsVendeur.OrderByDescending(p => p.Description);
+                    break;
                 case "dateAsc":
                     ProduitsVendeur = ProduitsVendeur.OrderBy(p => p.DateCreation);
                     break;
@@ -349,12 +355,6 @@ namespace Projet_Web_Commerce.Controllers
                     break;
                 case "catProdDesc":
                     ProduitsVendeur = ProduitsVendeur.OrderByDescending(p => p.NoCategorie);
-                    break;
-                case "descProdAsc":
-                    ProduitsVendeur = ProduitsVendeur.OrderBy(p => p.Description);
-                    break;
-                case "descProdDesc":
-                    ProduitsVendeur = ProduitsVendeur.OrderByDescending(p => p.Description);
                     break;
             }
 

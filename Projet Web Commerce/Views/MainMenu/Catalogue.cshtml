@@ -62,6 +62,8 @@ else
                     nbTot += articleEnPanier.NbItems;
                 }
 
+                total = Math.Round(total, 2);
+
                 <a asp-route-id="@vendeur.NoVendeur" asp-area="" asp-controller="Panier" asp-action="Index">
                     <div class="slide">
                         <div class="card">
