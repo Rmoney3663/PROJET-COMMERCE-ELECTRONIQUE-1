@@ -30,6 +30,51 @@
         background-color: rgb(236, 235, 243);
         cursor: pointer;
     }
+
+    .menu-container {
+        display: block;
+        justify-content: space-between;
+        align-items: center;
+        padding-left: 30%;
+    }
+
+    .menu-btn {
+        border: none;
+        cursor: pointer;
+        text-decoration: none;
+        color: black;
+    }
+
+        .menu-btn:after {
+            content: '\2807';
+            font-size: 110%;
+        }
+
+    .menu-list {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+        display: none;
+        position: absolute;
+        background-color: #444;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    }
+
+        .menu-list li {
+            padding: 10px;
+        }
+
+            .menu-list li a {
+                text-decoration: none;
+                color: white;
+                display: block;
+            }
+
+                .menu-list li a:hover {
+                    text-decoration: underline;
+                    font-weight: bold;
+                }
 </style>
 
 <div class="row">
@@ -48,9 +93,9 @@
                                 <th scope="col" style="padding-right: 0px">#</th>
                                 <th scope="col" style="max-width: 50px;">Destinataire(s)</th>
                                 <th scope="col">Objet - <span class="msg">Message</span></th>
+                                <th scope="col"></th>
                             </tr>
                         </thead>
-
                         <tbody>
                             @{
                                 var no = 0;
@@ -71,6 +116,14 @@
                                         @dests
                                     </td>
                                     <td class="truncate">@Html.DisplayFor(modelItem => msg.Sujet) - <span class="msg">@Html.DisplayFor(modelItem => msg.Message)</span></td>
+                                    <td>
+                                        <div class="menu-container">
+                                            <a class="menu-btn" onclick="afficherMenu(event)">@* ☰ *@</a>
+                                            <ul class="menu-list">
+                                                <li><a href="#" onclick="supprimerBrouillon(event, '@msg.NoMessage')">Supprimer</a></li>
+                                            </ul>
+                                        </div>
+                                    </td>
                                 </tr>
                             }
                         </tbody>
@@ -80,3 +133,28 @@
         </section>
     </div>
 </div>
+
+<script>
+    document.addEventListener('click', function (event) {
+        var menuList = document.querySelectorAll('.menu-list');
+
+        // Vérifier si l'élément cliqué n'est pas à l'intérieur du menu
+        if (!event.target.closest('.menu-container')) {
+            // Masquer tous les menus
+            menuList.forEach(function (menu) {
+                menu.style.display = 'none';
+            });
+        }
+    });
+
+    function afficherMenu(event) {
+        event.stopPropagation();
+        var menuList = event.target.nextElementSibling;
+        menuList.style.display = (menuList.style.display === 'none' || menuList.style.display === '') ? 'block' : 'none';
+    }
+
+    function supprimerBrouillon(event, noMessage) {
+        event.stopPropagation();
+        window.location.href = '@Url.Action("SupprimerBrouillon")' + '?idMessage=' + noMessage;
+    }
+</script>

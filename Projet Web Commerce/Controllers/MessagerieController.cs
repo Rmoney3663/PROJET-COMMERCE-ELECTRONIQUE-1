@@ -370,6 +370,32 @@ namespace Projet_Web_Commerce.Controllers
             return RedirectToAction("BoiteDeReception");
         }
 
+        [HttpGet]
+        public async Task<ActionResult> SupprimerBrouillon(int idMessage)
+        {
+            var destMsg = _context.PPDestinatairesMessage
+               .Where(m => m.NoMessage == idMessage)
+               .FirstOrDefault();
+
+            var msg = _context.PPMessages
+                .Where(m => m.NoMessage == idMessage)
+                .FirstOrDefault();
+
+            if (destMsg != null)
+            {
+                _context.Remove(destMsg);
+                await _context.SaveChangesAsync();
+            }
+
+            if (msg != null)
+            {
+                _context.Remove(msg);
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToAction("BoiteDeReception");
+        }
+
 
         // POST: EmailSenderController/Create
         [HttpPost]
