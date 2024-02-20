@@ -5,6 +5,7 @@ namespace Projet_Web_Commerce.Models
 {
     public class PPArticlesEnPanier
     {
+        [Column(TypeName = "bigint")]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int NoPanier { get; set; }
 

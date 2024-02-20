@@ -51,86 +51,96 @@
             <br />
             <br />
 
-            <b>Information des commandes de client avec vendeur : </b><br>            
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>
-                            NoClient
-                        </th>
-                        <th>
-                            Nom/Prénom client
-                        </th>
-                        <th>
-                            Montant total
-                        </th>
-                        <th>
-                            Montant brut
-                        </th>
-                        <th>
-                            Montant livraison
-                        </th>
-                        <th>
-                            Date de dernière commande
-                        </th>
-                        <th>
-                            NoVendeur
-                        </th>
-                        <th>
-                            Nom vendeur
-                        </th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in Model.OrdersByClientAndVendeurList)
-                    {
+            <b>Information des commandes de client avec vendeur : </b><br>   
+            @if(Model.OrdersByClientAndVendeurList.Count > 0){
+                <table class="table">
+                    <thead>
                         <tr>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.NoClient)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.NomPrenomClient)
-                            </td>
-                            @{
-                                decimal? prixtot = item.TotalCommandeAT + item.CoutLivraison;
-                                if (item.TaxesVendeur != null && item.TaxesVendeur == true && item.PourcentageTaxeVendeur != null)
-                                {
-                                    prixtot = prixtot * (item.PourcentageTaxeVendeur / 100) + item.CoutLivraison;
-                                }
-                            }
-                            <td>
-                                @Html.DisplayFor(modelItem => prixtot)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.TotalCommandeAT)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.CoutLivraison)
-                            </td>
-                             <td>
-                                @Html.DisplayFor(modelItem => item.DateDerniereCommande)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.NoVendeur)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.NomPrenomVendeur)
-                            </td>
+                            <th>
+                                NoClient
+                            </th>
+                            <th>
+                                Nom/Prénom client
+                            </th>
+                            <th>
+                                Montant total
+                            </th>
+                            <th>
+                                Montant brut
+                            </th>
+                            <th>
+                                Montant livraison
+                            </th>
+                            <th>
+                                Date de dernière commande
+                            </th>
+                            <th>
+                                NoVendeur
+                            </th>
+                            <th>
+                                Nom vendeur
+                            </th>
+                            <th></th>
                         </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.OrdersByClientAndVendeurList)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.NoClient)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.NomPrenomClient)
+                                </td>
+                                @{
+                                    decimal? prixtot = item.TotalCommandeAT + item.CoutLivraison;
+                                    if (item.TaxesVendeur != null && item.TaxesVendeur == true && item.PourcentageTaxeVendeur != null)
+                                    {
+                                        prixtot = prixtot * (item.PourcentageTaxeVendeur / 100) + item.CoutLivraison;
+                                    }
+                                }
+                                <td>
+                                    @Html.DisplayFor(modelItem => prixtot)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.TotalCommandeAT)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.CoutLivraison)
+                                </td>
+                                 <td>
+                                    @Html.DisplayFor(modelItem => item.DateDerniereCommande)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.NoVendeur)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.NomPrenomVendeur)
+                                </td>
+                            </tr>
 
-                    }
-                </tbody>
-            </table>            
-            <br />
+                        }
+                    </tbody>
+                </table>
+                <br />
 
-            <button class="btn btn-success" onclick="generatePDFCV()">Creer PDF avec ce rapport</button>
+                <button class="btn btn-success" onclick="generatePDFCV()">Creer PDF avec ce rapport</button>
+            }
+            else
+            {
+                <h6>Il n'y a aucun de commande pour le moment</h6>
+                <br />
+            }
+               
+            <div id="errorChart"></div>
+            <div id="errorBar"></div>
             <br />
+            
             <br />
-
             <canvas id="orderChart" style="width:100%;max-width:700px"></canvas>
             <br />
-
+           
             <canvas id="salesChart" style="width:100%;max-width:700px"></canvas>
 
             
@@ -425,6 +435,9 @@
             visitesCountData.forEach(function (item) {
                 htmlContent += item.clientName + " a visité " + item.vendeurName + " : " + item.visitCount + " fois<br>";
             });
+            if (visitesCountData.length == 0) {
+                htmlContent += "Il y a eu aucun visite à date";
+            }
 
             document.getElementById("visitesCount").innerHTML = htmlContent;
         }
@@ -451,6 +464,8 @@
         }
 
         if (Array.isArray(orderPercentages) && orderPercentages.length > 0) {
+            document.getElementById('orderChart').style.display = 'block';
+            document.getElementById('errorChart').style.display = 'none';
             var labels = orderPercentages.map(op => op.vendeurName);
             var data = orderPercentages.map(op => op.percentage);
             console.log("orderPercentages Label:", labels);
@@ -492,53 +507,74 @@
             });
         } else {
             console.log("Aucune donnée n'est disponible pour afficher le graphique.");
+            var messageElement = document.createElement('h6');
+            messageElement.textContent = "Il n'y a aucun produit vendu.";
+            messageElement.classList.add('text-danger');
+            var errorChart = document.getElementById('errorChart');
+            errorChart.innerHTML = ''; 
+            errorChart.appendChild(messageElement);
+            errorChart.style.display = 'block';
+            document.getElementById('orderChart').style.display = 'none';
         }
 
         var labels = @Html.Raw(Json.Serialize(Model.Labels));
         var data = @Html.Raw(Json.Serialize(Model.Data));
         console.log("Labels : ", labels);
+        if (Array.isArray(labels) && labels.length > 0 && Array.isArray(data) && data.length > 0) {
+            document.getElementById('salesChart').style.display = 'block';
+            document.getElementById('errorBar').style.display = 'none';
+            var datasets = [{
+                        label: "Argent Total (CAD)",
+                        data: data,
+                        backgroundColor: backgroundColors,
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }];
 
-        var datasets = [{
-            label: "Argent Total (CAD)",
-            data: data,
-            backgroundColor: backgroundColors,
-            borderColor: 'rgba(54, 162, 235, 1)',
-            borderWidth: 1
-        }];
-
-        var ctx = document.getElementById('salesChart').getContext('2d');
-        var chart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: datasets
-            },
-            options: {
-                scales: {
-                    yAxes: [{
-                        ticks: {
-                            beginAtZero: true
-                        }
-                    }]
+            var ctx = document.getElementById('salesChart').getContext('2d');
+            var chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: datasets
                 },
-                title: {
-                    display: true,
-                    text: 'Montant total des ventes par mois pour les 12 derniers mois'
-                },
-                tooltips: {
-                    callbacks: {
-                        label: function (tooltipItem, data) {
-                            var label = data.labels[tooltipItem.index] || '';
-                            var value = data.datasets[0].data[tooltipItem.index] || 0;
-                            var percentage = ((value / totalOrders) * 100).toFixed(2) + ' $';
-                            var info = label + ': ' + percentage;
-                            console.log("LABEL ", info)
-                            return info;
+                options: {
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true
+                            }
+                        }]
+                    },
+                    title: {
+                        display: true,
+                        text: 'Montant total des ventes par mois pour les 12 derniers mois'
+                    },
+                    tooltips: {
+                        callbacks: {
+                            label: function (tooltipItem, data) {
+                                var label = data.labels[tooltipItem.index] || '';
+                                var value = data.datasets[0].data[tooltipItem.index] || 0;
+                                var percentage = ((value / totalOrders) * 100).toFixed(2) + ' $';
+                                var info = label + ': ' + percentage;
+                                console.log("LABEL ", info)
+                                return info;
+                            }
                         }
                     }
                 }
-            }
-        });
+            });
+        }
+        else {
+            console.log("Aucune donnée n'est disponible pour afficher le graphique.");
+            var messageElement = document.createElement('h6');
+            messageElement.textContent = "Il n'y a aucun vente pour les 12 derniers mois.";
+            messageElement.classList.add('text-danger');
+            var errorChart = document.getElementById('errorBar');
+            errorChart.appendChild(messageElement);
+            errorChart.style.display = 'block';
+            document.getElementById('salesChart').style.display = 'none';
+        }
 
 
     </script>
