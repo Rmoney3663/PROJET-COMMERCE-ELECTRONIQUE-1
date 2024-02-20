@@ -15,7 +15,7 @@
             </div>
             
             <div class="container mt-4">
-                @if (Model.MoisAnneesDistinctsList.Count == 0)
+                @foreach (var date in Model.MoisAnneesDistinctsList)
                 {
                     <div class="card">
                         <div class="card-body">
