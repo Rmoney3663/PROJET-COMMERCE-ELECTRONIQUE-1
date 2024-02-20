@@ -19,7 +19,6 @@ namespace Projet_Web_Commerce.Models
         // 2  = Brouillon
 
         // Nouveau!!
-        // -1 = Supprimé
         // 0  = Envoyé
         // 1  = Brouillon
         public int TypeMessage { get; set; }

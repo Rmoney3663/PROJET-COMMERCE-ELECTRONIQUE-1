@@ -124,7 +124,6 @@
                                             <ul class="menu-list">
                                                 <li><a href="#" onclick="repondre(event, '@msg.NoMessage')">Répondre</a></li>
                                                 <li><a href="#" onclick="transferer(event, '@msg.NoMessage', '@ViewBag.UtilisateurCourantId')">Transférer</a></li>
-                                                <li><a href="#" onclick="supprimer(event, '@msg.NoMessage')">Supprimer</a></li>
                                             </ul>
                                         </div>
                                     </td>
@@ -166,12 +165,5 @@
     function transferer(event, noMessage, transmetteur) {
         event.stopPropagation();
         window.location.href = '@Url.Action("EnvoyerMessage")' + '?idMessage=' + noMessage + '&typeMessage=' + 'transmission' + '&transmetteur=' + transmetteur;
-    }
-
-    function supprimer(event, noMessage) {
-        event.stopPropagation();
-
-        document.getElementById('idMessage').value = noMessage;
-        document.getElementById('frmCourriel').submit();
     }
 </script>
