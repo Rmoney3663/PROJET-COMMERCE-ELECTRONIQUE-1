@@ -1,99 +1,45 @@
 ﻿@model IEnumerable<Projet_Web_Commerce.Models.PPHistoriquePaiements>
 
 <!DOCTYPE html>
-
 <html>
 <head>
     <meta name="viewport" content="width=device-width" />
     <title>Index</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .card {
+            margin-bottom: 20px;
+        }
+    </style>
 </head>
 <body>
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.MontantVenteAvantLivraison)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.NoVendeur)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.NoClient)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.NoCommande)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DateVente)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.NoAutorisation)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.FraisLesi)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Redevance)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.FraisLivraison)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.FraisTPS)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.FraisTVQ)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.MontantVenteAvantLivraison)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.NoVendeur)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.NoClient)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.NoCommande)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DateVente)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.NoAutorisation)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.FraisLesi)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Redevance)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.FraisLivraison)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.FraisTPS)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.FraisTVQ)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.NoHistorique">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.NoHistorique">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.NoHistorique">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+    <div class="container">
+        <div class="row">
+            @foreach (var item in Model)
+            {
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Order Details</h5>
+                            <p class="card-text">NoCommande: @Html.DisplayFor(modelItem => item.NoCommande)</p>
+                            <p class="card-text">Montant Avant Livraison: @Html.DisplayFor(modelItem => item.MontantVenteAvantLivraison)</p>
+                            <p class="card-text">NoVendeur: @Html.DisplayFor(modelItem => item.NoVendeur)</p>
+                            <p class="card-text">NoClient: @Html.DisplayFor(modelItem => item.NoClient)</p>
+                            <p class="card-text">DateVente: @Html.DisplayFor(modelItem => item.DateVente)</p>
+                            <p class="card-text">NoAutorisation: @Html.DisplayFor(modelItem => item.NoAutorisation)</p>
+                            <p class="card-text">FraisLesi: @Html.DisplayFor(modelItem => item.FraisLesi)</p>
+                            <p class="card-text">FraisLivraison: @Html.DisplayFor(modelItem => item.FraisLivraison)</p>
+                            <p class="card-text">FraisTPS: @Html.DisplayFor(modelItem => item.FraisTPS)</p>
+                            <p class="card-text">FraisTVQ: @Html.DisplayFor(modelItem => item.FraisTVQ)</p>
+                            <a class="btn btn-primary" asp-action="DownloadG" asp-route-id="@item.NoCommande">Télécharger le reçu</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

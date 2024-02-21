@@ -1,14 +1,18 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO.Packaging;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using DocumentFormat.OpenXml.Bibliography;
 using DocumentFormat.OpenXml.Office2010.Excel;
+using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Build.Framework.Profiler;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using NuGet.Packaging.Signing;
@@ -64,7 +68,7 @@ namespace Projet_Web_Commerce.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Details(int? id, int noClient, bool eval, int rating, string msg)
+        public async Task<IActionResult> Details(int? id, int noClient,string first,string ajout, bool eval, int rating, string msg, string source, ModelCatalogueVendeur model)
         {
             if (id == null)
             {
@@ -84,25 +88,93 @@ namespace Projet_Web_Commerce.Controllers
             DateTime dateMaj = DateTime.Now;
             PPEvaluations newEvaluation = new PPEvaluations();
 
-            if (eval)
+            if (source == "tous")
             {
-                var evalActu = _context.PPEvaluations.Where(e => e.NoClient == noClient && e.NoProduit == id).FirstOrDefault();
-                evalActu.Commentaire = msg.Trim();
-                evalActu.Cote = rating;
-                evalActu.DateMAJ = dateMaj;
-                _context.SaveChanges();
+                ViewData["source"] = source;
+                ViewData["searchString"] = model.searchString;
+                ViewData["parPage"] = model.parPage;
+                ViewData["dateApres"] = model.dateApres;
+                ViewData["dateAvant"] = model.dateAvant;
+                ViewData["searchCat"] = model.searchCat;
+                ViewData["pageNumber"] = model.pageNumber;
+                ViewData["sortOrder"] = model.sortOrder;
             }
-            else
+            else if (source == "vendeur")
             {
-                newEvaluation.NoProduit = (int)id;
-                newEvaluation.NoClient = noClient;
-                newEvaluation.Commentaire = msg != null? msg.Trim():msg;
-                newEvaluation.Cote = rating;
-                newEvaluation.DateCreation = dateCreate;
-                newEvaluation.DateMAJ = dateMaj;
+                ViewData["source"] = source;
+                ViewData["nomAffaire"] = model.nomAffaire;
+                ViewData["searchString"] = model.searchString;
+                ViewData["parPage"] = model.parPage;
+                ViewData["dateApres"] = model.dateApres;
+                ViewData["dateAvant"] = model.dateAvant;
+                ViewData["searchCat"] = model.searchCat;
+                ViewData["pageNumber"] = model.pageNumber;
+                ViewData["sortOrder"] = model.sortOrder;
+                ViewData["premiereConnexion"] = model.premiereConnexion;
+            }
 
-                _context.Add(newEvaluation);
-                _context.SaveChanges();
+            if (first == null)
+            {
+                if (ajout == null)
+                {
+                    if (source == "tous")
+                    {
+
+                        return RedirectToAction("CatalogueTous", "MainMenu", new
+                        {
+                            searchString = model.searchString,
+                            parPage = model.parPage,
+                            dateApres = model.dateApres,
+                            dateAvant = model.dateAvant,
+                            searchCat = model.searchCat,
+                            pageNumber = model.pageNumber,
+                            sortOrder = model.sortOrder
+                        });
+                    }
+                    else if (source == "vendeur")
+                    {
+
+                        return RedirectToAction("CatalogueVendeur", "MainMenu", new
+                        {
+                            nomAffaire = model.nomAffaire,
+                            searchString = model.searchString,
+                            parPage = model.parPage,
+                            dateApres = model.dateApres,
+                            dateAvant = model.dateAvant,
+                            searchCat = model.searchCat,
+                            pageNumber = model.pageNumber,
+                            sortOrder = model.sortOrder,
+                            premiereConnexion = model.premiereConnexion
+                        });
+                    }
+                }
+
+                if (ajout != null)
+                {
+                    if (eval)
+                    {
+                        var evalActu = _context.PPEvaluations.Where(e => e.NoClient == noClient && e.NoProduit == id).FirstOrDefault();
+                        evalActu.Commentaire = msg.Trim();
+                        evalActu.Cote = rating;
+                        evalActu.DateMAJ = dateMaj;
+                        _context.SaveChanges();
+                    }
+                    else
+                    {
+                        newEvaluation.NoProduit = (int)id;
+                        newEvaluation.NoClient = noClient;
+                        newEvaluation.Commentaire = msg != null ? msg.Trim() : msg;
+                        newEvaluation.Cote = rating;
+                        newEvaluation.DateCreation = dateCreate;
+                        newEvaluation.DateMAJ = dateMaj;
+
+                        _context.Add(newEvaluation);
+                        _context.SaveChanges();
+                    }
+
+                }
+                else { 
+                }
             }
 
             ViewData["idProduit"] = id;

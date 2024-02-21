@@ -41,6 +41,10 @@ namespace Projet_Web_Commerce.Controllers
             {
                 return RedirectToAction("Index", "PPProduits", new { area = "" });
             }
+            if (User.IsInRole("Gestionnaire"))
+            {
+                return RedirectToAction("ListeVendeurs", "PPGestionnaires", new { area = "" });
+            }
             var CategoriesList = _context.PPCategories.ToList();
             var VendeursList = _context.PPVendeurs.ToList();
             var ProduitsList = _context.PPProduits.ToList();
@@ -64,7 +68,7 @@ namespace Projet_Web_Commerce.Controllers
 
         [Authorize(Roles = "Client")]
         [AllowAnonymous]
-        public async Task<IActionResult> CatalogueVendeurAsync(ModelCatalogueVendeur model)
+        public async Task<IActionResult> CatalogueVendeurAsync(ModelCatalogueVendeur model, int nbPourCon)
         {
             
             // Action logic
@@ -72,6 +76,18 @@ namespace Projet_Web_Commerce.Controllers
 
             model.nomAffaire = model.nomAffaire;
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (nbPourCon == 0 && model.premiereConnexion == 0)
+            {
+                var user = await _userManager.GetUserAsync(User);
+                PPVendeursClients vendeurClient = new PPVendeursClients();
+                vendeurClient.NoClient = _context.PPClients.Where(c=>c.AdresseEmail == user.Email).FirstOrDefault().NoClient;
+                vendeurClient.NoVendeur = vendeur.NoVendeur;
+                vendeurClient.DateVisite = DateTime.Now;
+                _context.Add(vendeurClient);
+                _context.SaveChanges();
+                model.premiereConnexion = 2;
+            }
 
             if (userId != null)
             {
@@ -394,6 +410,7 @@ namespace Projet_Web_Commerce.Controllers
         {
             var vendeur = _context.PPVendeurs.Where(v => v.NoVendeur == NoVendeur).FirstOrDefault();
             var produit = _context.PPProduits.Where(v => v.NoProduit == NoProduit).FirstOrDefault();
+            model.premiereConnexion = 2;
 
             var articlesEnPanier = _context.PPArticlesEnPanier
             .Where(a => a.NoProduit == NoProduit && a.NoClient == NoClient)
@@ -442,7 +459,8 @@ namespace Projet_Web_Commerce.Controllers
                             dateApres = model.dateApres,
                             dateAvant = model.dateAvant,
                             searchCat = model.searchCat,
-                            pageNumber = model.pageNumber
+                            pageNumber = model.pageNumber,
+                            sortOrder = model.sortOrder
                         });
                     }
                     else
@@ -456,6 +474,8 @@ namespace Projet_Web_Commerce.Controllers
                             dateAvant = model.dateAvant,
                             searchCat = model.searchCat,
                             pageNumber = model.pageNumber,
+                            sortOrder = model.sortOrder,
+                            premiereConnexion = model.premiereConnexion
                         });
                     }
 

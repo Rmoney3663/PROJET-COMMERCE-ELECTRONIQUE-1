@@ -115,6 +115,7 @@ else
                             if (group.Key != null)
                             {
                                 <a asp-controller="MainMenu"
+                                   asp-route-nbPourCon="0"
                                    asp-route-nomAffaire="@group.Key"
                                    asp-action="CatalogueVendeur">
                                     @group.Key (@group.Count())
