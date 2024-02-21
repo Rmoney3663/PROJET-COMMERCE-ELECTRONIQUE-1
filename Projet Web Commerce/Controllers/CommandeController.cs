@@ -408,7 +408,19 @@ namespace Projet_Web_Commerce.Controllers
 
                                             string fileName = $"{ppCommande.NoCommande}.pdf";
                                             string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "data", "pdf", fileName);
+                                            string filePath2 = Path.Combine(_webHostEnvironment.WebRootPath, "data", "pdf", fileName);
                                             System.IO.File.WriteAllBytes(filePath, pdfBytes);
+                                            var Auteur = _context.PPGestionnaire.FirstOrDefault().IdUtilisateur;
+                                            var ppMessage = new PPMessages
+                                            {
+                                               Sujet = "Confirmation de commande",
+                                               Message = "Voici le pdf qui contient l'information de la commande.",
+                                               Auteur = Auteur,
+                                               TypeMessage = 0,
+                                               PieceJointe = fileName
+
+                                            };
+                                            _context.Add(ppMessage);
 
                                         }
                                     }
@@ -416,6 +428,8 @@ namespace Projet_Web_Commerce.Controllers
                                     {
                                         throw new Exception();
                                     }
+
+                                   
 
 
                                     _context.SaveChanges();
