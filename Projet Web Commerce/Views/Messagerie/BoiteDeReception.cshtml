@@ -87,6 +87,21 @@
                     <h2 class="card-title">@ViewData["Title"]</h2>
                     <hr />
                     <form id="frmCourriel" method="post" asp-action="Supprimer">
+                        <div class="mb-3">
+                            <label for="triMessages" class="form-label">Trier par:</label>
+                            <select class="form-select" id="triMessages" name="triMessages">
+                                <option value="date">Date</option>
+                                <option value="expediteur">Expéditeur</option>
+                            </select>
+                        </div>
+                        <div id="btnSupprimer" style="display:none;">
+                            <a class="btn border">
+                                <img src="~/data/images/trash3.svg" />
+                            </a>
+                            <a class="btn border">
+                                <img src="~/data/images/courrielNonLu2.svg" />
+                            </a>
+                        </div>
                     <table class="table">
                         <thead>
                             <tr>
@@ -94,6 +109,7 @@
                                 <th scope="col">Expéditeur</th>
                                 <th scope="col">Objet - <span class="msg">Message</span></th>
                                 <th scope="col" class="text-end">Date de l'envoi</th>
+                                <th scope="col"></th>
                                 <th scope="col"></th>
                             </tr>
                         </thead>
@@ -103,6 +119,7 @@
                             }
                             @if(Model != null)
                             {
+
                                 @foreach (var msg in Model)
                                 {
                                     bool messageLu = msg.Destinataires?.Any(dest => dest.Destinataire == ViewBag.UtilisateurCourantId
@@ -115,6 +132,9 @@
                                         <td>@_context.Users.FirstOrDefault(u => u.Id == msg.Auteur)?.Email</td>
                                         <td class="truncate">@Html.DisplayFor(modelItem => msg.Sujet) - <span class="msg">@Html.DisplayFor(modelItem => msg.Message)</span></td>
                                         <td class="text-end">@Html.DisplayFor(modelItem => msg.DateEnvoi)</td>
+                                        <td style="padding-left: 1%">
+                                            <input type="checkbox" name="name1" onclick="event.stopPropagation()" />
+                                        </td>
                                         <td>
                                             <div class="menu-container">
                                                 <a class="menu-btn" onclick="afficherMenu(event)">@* ☰ *@</a>
@@ -149,6 +169,18 @@
                 menu.style.display = 'none';
             });
         }
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        var checkboxes = document.querySelectorAll('input[type="checkbox"]');
+        var btnSupprimer = document.getElementById('btnSupprimer');
+
+        checkboxes.forEach(function (checkbox) {
+            checkbox.addEventListener('change', function () {
+                var checkedCheckboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+                btnSupprimer.style.display = checkedCheckboxes.length > 0 ? 'block' : 'none';
+            });
+        });
     });
 
     function afficherMenu(event) {
