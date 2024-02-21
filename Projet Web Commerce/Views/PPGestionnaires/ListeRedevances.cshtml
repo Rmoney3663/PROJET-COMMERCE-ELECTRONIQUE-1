@@ -15,23 +15,16 @@
             </div>
 
             <div class="container mt-4">
+                @{
+                    var monthNames = new string[] { "Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre" };
+                }
                 @foreach (var date in Model.MoisAnneesDistinctsList)
                 {
                     <div class="card">
                         <div class="card-body">
-                            <script>
-                                function getMonthName(monthNumber) {
-                                    const months = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
-                                    return months[monthNumber - 1];
-                                }
-
-                                const monthNumber = @date.Mois;
-                                const year = @date.Annee;
-                                const monthName = getMonthName(monthNumber);
-
-                                document.write('<h4 class="card-title"><u>' + monthName + ' ' + year + '</u></h4>');
-                            </script>
+                            <h4 class="card-title"><u>@monthNames[date.Mois - 1] @date.Annee</u></h4>
                             @{
+                                var tableId = $"redevanceTable_{date.Mois}_{date.Annee}";
                                 var groupeParAnnee = (from vendeur in Model.VendeursList
                                         join user in Model.UtilisateurList
                                         on vendeur.IdUtilisateur equals user.Id
@@ -46,7 +39,7 @@
 
 
                             }
-                            <table class="table" id="redevanceTable">
+                            <table class="table" id="@tableId">
                                 <thead>
                                     <tr>
                                         <th scope="col">#</th>
@@ -57,10 +50,10 @@
                                         </th>
                                         <th scope="col">Nom d'affaires</th>
                                         <th scope="col">Date de création</th>
-                                        <th scope="col">% Redevance</th>
+                                        <th scope="col">Pourcentage</th>
                                         <th scope="col">
-                                            <a href="#" onclick="sortRedevance('asc')">$ Redevance ▲</a> |
-                                            <a href="#" onclick="sortRedevance('desc')">$ Redevance ▼</a>
+                                            <a href="#" onclick="sortRedevance('asc')">Montant Total ▲</a> |
+                                            <a href="#" onclick="sortRedevance('desc')">Montant Total ▼</a>
                                         </th>
                                         <th scope="col"></th>
                                     </tr>
@@ -78,17 +71,23 @@
                                             <td>@Html.DisplayFor(modelItem => item.Vendeur.NomAffaires)</td>
                                             <td>@Html.DisplayFor(modelItem => item.Vendeur.DateCreation)</td>
 
-                                            <td>@Html.DisplayFor(modelItem => item.Vendeur.Pourcentage)</td>
+                                            <td>@Html.DisplayFor(modelItem => item.Vendeur.Pourcentage) %</td>
                                             <td>
                                                 @{
                                                     decimal? totalRedevance = 0;
+                                                    foreach (var commande in item.CommandesList)
+                                                    {
+                                                        var redevance = (commande.MontantTotAvantTaxes / 100) * item.Vendeur.Pourcentage;
+                                                        totalRedevance += redevance;
+                                                    }
+
+                                                    if (totalRedevance.HasValue)
+                                                    {
+                                                        totalRedevance = Math.Round(totalRedevance.Value, 2);
+                                                    }
                                                 }
-                                                @foreach (var commande in item.CommandesList)
-                                                {
-                                                    var redevance = (commande.MontantTotAvantTaxes / 100) * item.Vendeur.Pourcentage;
-                                                    totalRedevance += redevance;
-                                                }
-                                                @totalRedevance
+                                                @totalRedevance $
+
                                             </td>
                                         </tr>
                                     }
@@ -108,8 +107,8 @@
 </div>
 
 <script>
-    function sortRedevance(order) {
-        var rows = document.querySelectorAll('#redevanceTable tbody tr');
+    function sortRedevance(order, tableId) {
+        var rows = document.querySelectorAll(`#${tableId} tbody tr`);
         var sortedRows = Array.from(rows).sort((a, b) => {
             var aValue = parseFloat(a.querySelector('td:nth-child(7)').textContent);
             var bValue = parseFloat(b.querySelector('td:nth-child(7)').textContent);
@@ -119,13 +118,13 @@
                 return bValue - aValue;
             }
         });
-        var tbody = document.querySelector('#redevanceTable tbody');
+        var tbody = document.querySelector(`#${tableId} tbody`);
         tbody.innerHTML = '';
         sortedRows.forEach(row => tbody.appendChild(row));
     }
 
-    function sortName(order) {
-        var rows = document.querySelectorAll('#redevanceTable tbody tr');
+    function sortName(order, tableId) {
+        var rows = document.querySelectorAll(`#${tableId} tbody tr`);
         var sortedRows = Array.from(rows).sort((a, b) => {
             var aName = a.querySelector('td:nth-child(3)').textContent.trim();
             var bName = b.querySelector('td:nth-child(3)').textContent.trim();
@@ -135,11 +134,9 @@
                 return bName.localeCompare(aName);
             }
         });
-        var tbody = document.querySelector('#redevanceTable tbody');
+        var tbody = document.querySelector(`#${tableId} tbody`);
         tbody.innerHTML = '';
         sortedRows.forEach(row => tbody.appendChild(row));
     }
-
-
-
 </script>
+

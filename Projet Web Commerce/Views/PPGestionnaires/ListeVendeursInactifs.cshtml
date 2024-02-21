@@ -15,29 +15,15 @@
             </div>
 
             <div class="container mt-4">
+                @{
+                    var monthNames = new string[] { "Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre" };
+                }
                 @foreach (var date in Model.MoisAnneesDistinctsList)
                 {
                     <div class="card">
                         <div class="card-body">
-                            <script>
-                                function getMonthName(monthNumber) {
-                                    const months = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
-                                    return months[monthNumber - 1];
-                                }
-
-                                const monthNumber = @date.Mois;
-                                const year = @date.Annee;
-                                const monthName = getMonthName(monthNumber);
-
-                                document.write('<h4 class="card-title"><u>' + monthName + ' ' + year + '</u></h4>');
-                            </script>
+                            <h4 class="card-title"><u>@monthNames[date.Mois - 1] @date.Annee</u></h4>
                             @{
-                                /*
-                                var groupeParAnnee = Model.VendeursList
-                                .Where(item => item.DateCreation.Month == date.Mois && item.DateCreation.Year == date.Annee)
-                                .OrderBy(item => item.NomAffaires)
-                                .ToList();
-                                */
 
                                 var groupeParAnnee = (from vendeur in Model.VendeursList
                                                       join user in Model.UtilisateurList

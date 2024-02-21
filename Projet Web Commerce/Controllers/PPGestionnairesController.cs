@@ -210,7 +210,7 @@ namespace Projet_Web_Commerce.Controllers
         {
 
             var vendeurs = _context.PPVendeurs
-                .Where(v => v.Statut == 1)
+                .Where(v => v.Statut != 0)
                 .OrderByDescending(v => v.NomAffaires)
                 .ToList();
 

@@ -13,24 +13,16 @@
             <div>
                 @Html.Partial("GestionVendeursPages", "ListeVendeurs")
             </div>
-            
+
             <div class="container mt-4">
+                @{
+                    var monthNames = new string[] { "Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre" };
+                }
                 @foreach (var date in Model.MoisAnneesDistinctsList)
                 {
                     <div class="card">
                         <div class="card-body">
-                            <script>
-                                function getMonthName(monthNumber) {
-                                    const months = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
-                                    return months[monthNumber - 1];
-                                }
-
-                                const monthNumber = @date.Mois;
-                                const year = @date.Annee;
-                                const monthName = getMonthName(monthNumber);
-
-                                document.write('<h4 class="card-title"><u>' + monthName + ' ' + year + '</u></h4>');
-                            </script>
+                            <h4 class="card-title"><u>@monthNames[date.Mois - 1] @date.Annee</u></h4>
                             @{
                                 var groupeParAnnee = (from vendeur in Model.VendeursList
                                                       join user in Model.UtilisateurList
@@ -54,27 +46,6 @@
                                                       .Average()
                                                       })
                                 .ToList();
-                               /*
-                                var groupeParAnnee = (from vendeur in Model.VendeursList
-                                                      join user in Model.UtilisateurList
-                                                      on vendeur.IdUtilisateur equals user.Id
-                                                      where user.EmailConfirmed && vendeur.DateCreation.Month == date.Mois && vendeur.DateCreation.Year == date.Annee
-                                                      orderby vendeur.NomAffaires
-                                                      join commande in Model.CommandesList
-                                                      on vendeur.NoVendeur equals commande.NoVendeur into vendeurCommandes
-                                                      from vc in vendeurCommandes.DefaultIfEmpty()
-                                                      orderby vc?.DateCommande
-                                                      select new
-                                                      {
-                                                          Vendeur = vendeur,
-                                                          Commande = vc,
-                                                          CommandesList = Model.CommandesList.Where(cp => cp.NoVendeur == vendeur.NoVendeur).ToList(),
-                                                         
-                                                          
-                                                      })
-                                .ToList();
-                                */
-
                             }
                             <table class="table">
                                 <thead>
@@ -171,6 +142,12 @@
 </div>
 
 <script>
+    function getMonthName(monthNumber) {
+        const months = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
+        return months[monthNumber - 1];
+    }
+
+
     document.getElementById('enregistrementButton').addEventListener('click', function () {
         var panierCheckboxes = document.getElementsByName('SPanier');
         var vendeurCheckboxes = document.getElementsByName('SVendeur');

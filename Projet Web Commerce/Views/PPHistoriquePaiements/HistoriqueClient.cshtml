@@ -5,10 +5,8 @@
 <head>
     <meta name="viewport" content="width=device-width" />
     <title>Index</title>
-    <!-- Include Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        /* Optional custom styles */
         .card {
             margin-bottom: 20px;
         }
@@ -33,14 +31,13 @@
                             <p class="card-text">FraisLivraison: @Html.DisplayFor(modelItem => item.FraisLivraison)</p>
                             <p class="card-text">FraisTPS: @Html.DisplayFor(modelItem => item.FraisTPS)</p>
                             <p class="card-text">FraisTVQ: @Html.DisplayFor(modelItem => item.FraisTVQ)</p>
+                            <a class="btn btn-primary" asp-action="Download" asp-route-id="@item.NoCommande">Télécharger le reçu</a>
                         </div>
                     </div>
                 </div>
             }
         </div>
     </div>
-
-    <!-- Include Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
