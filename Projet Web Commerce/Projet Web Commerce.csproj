@@ -49,7 +49,7 @@
 
 
   <ItemGroup>
-    <Folder Include="wwwroot\data\images\" />
+    <Folder Include="wwwroot\data\piecesJointes\" />
     <Folder Include="wwwroot\data\pdf\" />
   </ItemGroup>
 

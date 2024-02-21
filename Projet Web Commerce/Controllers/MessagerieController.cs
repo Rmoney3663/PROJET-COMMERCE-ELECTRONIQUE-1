@@ -14,6 +14,7 @@ using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.ExceptionServices;
 using System.Text;
+using DocumentFormat.OpenXml.Drawing.Charts;
 
 namespace Projet_Web_Commerce.Controllers
 {
@@ -46,16 +47,49 @@ namespace Projet_Web_Commerce.Controllers
                 .Where(dest => dest.Destinataire == utilisateurCourantId && dest.Statut == 0)
                 .Select(dest => dest.Message)
                 .Where(m => m.TypeMessage == 0)
+                .OrderByDescending(m => m.DateEnvoi)
                 .ToList();
+
+            ViewBag.TriMessages = "DateDesc";
 
             return View(msgRecus);
         }
 
         [HttpPost]
-        public async Task<ActionResult> BoiteDeReception(string sujet, string message, string selectedDestinataire, string auteur)
+        public async Task<ActionResult> BoiteDeReception(string triMessages)
         {
-            
-            return View();
+            var utilisateurCourantId = _userManager.Users.Where(u => u.Email == User.Identity.Name).FirstOrDefault().Id;
+            ViewBag.UtilisateurCourantId = utilisateurCourantId;
+
+            var msgRecus = _context.PPDestinatairesMessage
+                .Include(dest => dest.Message.Destinataires)
+                .Where(dest => dest.Destinataire == utilisateurCourantId && dest.Statut == 0)
+                .Select(dest => dest.Message)
+                .Where(m => m.TypeMessage == 0)
+                .ToList();
+
+            switch (triMessages)
+            {
+                case "DateDesc":
+                    msgRecus = msgRecus.OrderByDescending(m => m.DateEnvoi).ToList();
+                    break;
+
+                case "DateCroiss":
+                    msgRecus = msgRecus.OrderBy(m => m.DateEnvoi).ToList();
+                    break;
+
+                case "ExpeDesc":
+                    msgRecus = msgRecus.OrderByDescending(m => m.Auteur).ToList();
+                    break;
+
+                case "ExpeCroiss":
+                    msgRecus = msgRecus.OrderBy(m => m.Auteur).ToList();
+                    break;
+            }
+
+            ViewBag.TriMessages = triMessages;
+
+            return View(msgRecus);
         }
 
         [HttpGet]
@@ -111,17 +145,17 @@ namespace Projet_Web_Commerce.Controllers
 
         [HttpPost]
         public async Task<IActionResult> EnvoyerMessage(string sujet, string message, IFormFile pieceJointe, string selectedDestinataire
-            , string auteur, int typeMessage, int? idMessage)
+            , string auteur, int typeMessage, int idMessage, string typeMessageStr)
         {
             int noMsg = 0;
-            var utilisateurCourantId = _userManager.Users.Where(u => u.Email == User.Identity.Name).FirstOrDefault().Id;
+            var utilisateurCourantEmail = _userManager.Users.Where(u => u.Email == User.Identity.Name).FirstOrDefault().Email;
 
-            if (utilisateurCourantId != auteur) // Si réponse à courriel
+            if (utilisateurCourantEmail != auteur) // Si réponse à courriel
             {
-                idMessage = null;
+                //idMessage = null;
             }
             
-            if (idMessage != null)
+            if (idMessage != 0 && typeMessageStr == "brouillon") // Si envoi d'un brouillon
             {
                 var msg = await _context.PPMessages
                     .FirstOrDefaultAsync(m => m.NoMessage == idMessage);
@@ -130,7 +164,7 @@ namespace Projet_Web_Commerce.Controllers
                 {
                     var fileExtension = Path.GetExtension(pieceJointe.FileName);
                     var nouveauNomFichier = $"{idMessage}{fileExtension}";
-                    string uploadsFolder = Path.Combine(_hostingEnvironment.WebRootPath, "data", "images");
+                    string uploadsFolder = Path.Combine(_hostingEnvironment.WebRootPath, "data", "piecesJointes");
                     var filePath = Path.Combine(uploadsFolder, nouveauNomFichier);
 
                     using (var stream = new FileStream(filePath, FileMode.Create))
@@ -174,7 +208,7 @@ namespace Projet_Web_Commerce.Controllers
                 {
                     var fileExtension = Path.GetExtension(pieceJointe.FileName);
                     var nouveauNomFichier = $"{noMsg}{fileExtension}";
-                    string uploadsFolder = Path.Combine(_hostingEnvironment.WebRootPath, "data", "images");
+                    string uploadsFolder = Path.Combine(_hostingEnvironment.WebRootPath, "data", "piecesJointes");
                     var filePath = Path.Combine(uploadsFolder, nouveauNomFichier);
 
                     using (var stream = new FileStream(filePath, FileMode.Create))
@@ -219,10 +253,12 @@ namespace Projet_Web_Commerce.Controllers
             {
                 await _notificationsHubContext.Clients.User(email.Destinataire).SendAsync("NotificationMessage", email.Destinataire);
             }
-                if (typeMessage == 2)
+
+            if (typeMessage == 2)
                 TempData["MsgStatut"] = "Votre brouillon a été sauvegardé!";
             else if (typeMessage == 0)
                 TempData["MsgStatut"] = "Votre message a été envoyé!";
+
             return View();
         }
 
@@ -231,13 +267,70 @@ namespace Projet_Web_Commerce.Controllers
         {
             var currentUserId = _userManager.Users.Where(u => u.Email == User.Identity.Name).FirstOrDefault().Id;
 
-            var msgEnvoyes = _context.PPMessages
+            if (currentUserId != null)
+            {
+                var msgEnvoyes = _context.PPMessages
                 .Where(message => message.Auteur == currentUserId
                     && message.TypeMessage == 0)
                 .Include(m => m.Destinataires)
                 .ToList();
+                ViewBag.TriMessages = "DateDesc";
 
-            return View(msgEnvoyes);
+                return View(msgEnvoyes);
+            }
+
+            return View();
+        }
+
+        [HttpPost]
+        // Post: EmailSenderController/Envoyes
+        public ActionResult Envoyes(string triMessages)
+        {
+            var currentUserId = _userManager.Users.Where(u => u.Email == User.Identity.Name).FirstOrDefault().Id;
+            //ViewBag.UtilisateurCourantId = utilisateurCourantId;
+
+            if (currentUserId != null)
+            {
+                var msgEnvoyes = _context.PPMessages
+                    .Where(message => message.Auteur == currentUserId
+                        && message.TypeMessage == 0)
+                    .Include(m => m.Destinataires)
+                        .ThenInclude(dest => dest.DestinataireUser)
+                    .ToList();
+
+                switch (triMessages)
+                {
+                    case "DateDesc":
+                        msgEnvoyes = msgEnvoyes.OrderByDescending(m => m.DateEnvoi).ToList();
+                        break;
+
+                    case "DateCroiss":
+                        msgEnvoyes = msgEnvoyes.OrderBy(m => m.DateEnvoi).ToList();
+                        break;
+
+                    case "ExpeDesc":
+                        msgEnvoyes = msgEnvoyes.OrderByDescending(b => b.Destinataires
+                            .OrderByDescending(dest => dest.DestinataireUser.Email)
+                            .First().DestinataireUser.Email)
+                            .ToList();
+
+                        break;
+
+                    case "ExpeCroiss":
+                        msgEnvoyes = msgEnvoyes.OrderBy(b => b.Destinataires
+                            .OrderBy(dest => dest.DestinataireUser.Email)
+                            .First().DestinataireUser.Email)
+                            .ToList();
+
+                        break;
+                }
+
+                ViewBag.TriMessages = triMessages;
+
+                return View(msgEnvoyes);
+            }
+
+            return View();
         }
 
         [HttpGet]
@@ -271,17 +364,71 @@ namespace Projet_Web_Commerce.Controllers
         // GET: EmailSenderController/Brouillons
         public ActionResult Brouillons()
         {
-            var currentUserEmail = _userManager.Users.Where(u => u.Email == User.Identity.Name).FirstOrDefault().Id;
-            if (currentUserEmail != null)
+            var currentUserId = _userManager.Users.Where(u => u.Email == User.Identity.Name).FirstOrDefault().Id;
+            if (currentUserId != null)
             {
                 var brouillons = _context.PPMessages
-                .Where(message => message.Auteur == currentUserEmail
-                    && message.TypeMessage == 2)
-                .Include(m => m.Destinataires)
-                .ToList();
+                    .Where(message => message.Auteur == currentUserId
+                        && message.TypeMessage == 2)
+                    .Include(m => m.Destinataires)
+                    .OrderByDescending(m => m.DateEnvoi)
+                    .ToList();
+                ViewBag.TriMessages = "DateDesc";
+
                 return View(brouillons);
             }
             
+            return View();
+        }
+
+        [HttpPost]
+        // Post: EmailSenderController/Brouillons
+        public ActionResult Brouillons(string triMessages)
+        {
+            var currentUserId = _userManager.Users.Where(u => u.Email == User.Identity.Name).FirstOrDefault().Id;
+            //ViewBag.UtilisateurCourantId = utilisateurCourantId;
+
+            if (currentUserId != null)
+            {
+                var brouillons = _context.PPMessages
+                    .Where(message => message.Auteur == currentUserId
+                        && message.TypeMessage == 2)
+                    .Include(m => m.Destinataires)
+                        .ThenInclude(dest => dest.DestinataireUser)
+                    .ToList();
+
+                switch (triMessages)
+                {
+                    case "DateDesc":
+                        brouillons = brouillons.OrderByDescending(m => m.DateEnvoi).ToList();
+                        break;
+
+                    case "DateCroiss":
+                        brouillons = brouillons.OrderBy(m => m.DateEnvoi).ToList();
+                        break;
+
+                    case "ExpeDesc":
+                        brouillons = brouillons.OrderByDescending(b => b.Destinataires
+                            .OrderByDescending(dest => dest.DestinataireUser.Email)
+                            .First().DestinataireUser.Email)
+                            .ToList();
+
+                        break;
+
+                    case "ExpeCroiss":
+                        brouillons = brouillons.OrderBy(b => b.Destinataires
+                            .OrderBy(dest => dest.DestinataireUser.Email)
+                            .First().DestinataireUser.Email)
+                            .ToList();
+
+                        break;
+                }
+
+                ViewBag.TriMessages = triMessages;
+
+                return View(brouillons);
+            }
+
             return View();
         }
 
@@ -302,6 +449,8 @@ namespace Projet_Web_Commerce.Controllers
                     .Include(m => m.Message)
                     .ToList();
 
+                ViewBag.TriMessages = "DateDesc";
+
                 return View(msgSupprimes);
             }
             
@@ -309,16 +458,72 @@ namespace Projet_Web_Commerce.Controllers
         }
 
         [HttpPost]
+        // Post: EmailSenderController/Supprimes
+        public ActionResult Supprimes(string triMessages)
+        {
+            var currentUserId = _userManager.Users.Where(u => u.Email == User.Identity.Name).FirstOrDefault().Id;
+            //ViewBag.UtilisateurCourantId = utilisateurCourantId;
+
+            if (currentUserId != null)
+            {
+                var msgSupprimes = _context.PPDestinatairesMessage
+                    .Where(m => m.Statut == -1 && m.Destinataire == currentUserId)
+                    .Include(m => m.Message)
+                    .ToList();
+
+                switch (triMessages)
+                {
+                    case "DateDesc":
+                        msgSupprimes = msgSupprimes.OrderByDescending(m => m.Message.DateEnvoi).ToList();
+                        break;
+
+                    case "DateCroiss":
+                        msgSupprimes = msgSupprimes.OrderBy(m => m.Message.DateEnvoi).ToList();
+                        break;
+
+                    case "ExpeDesc":
+                        msgSupprimes = msgSupprimes.OrderByDescending(b => b.Message.Destinataires
+                            .OrderByDescending(dest => dest.DestinataireUser.Email)
+                            .First().DestinataireUser.Email)
+                            .ToList();
+
+                        break;
+
+                    case "ExpeCroiss":
+                        msgSupprimes = msgSupprimes.OrderBy(b => b.Message.Destinataires
+                            .OrderBy(dest => dest.DestinataireUser.Email)
+                            .First().DestinataireUser.Email)
+                            .ToList();
+
+                        break;
+                }
+
+                ViewBag.TriMessages = triMessages;
+
+                return View(msgSupprimes);
+            }
+
+            return View();
+        }
+
+        [HttpGet]
         public async Task<ActionResult> Supprimer(int? idMessage)
         {
-            var destMsg = _context.PPDestinatairesMessage
-                .Where(m => m.NoMessage == idMessage)
-                .FirstOrDefault();
-
-            if (destMsg != null)
+            if (idMessage != null)
             {
-                destMsg.Statut = -1;
-                await _context.SaveChangesAsync();
+                var currentUserId = _userManager.Users.Where(u => u.Email == User.Identity.Name).FirstOrDefault().Id;
+                if (currentUserId != null)
+                {
+                    var destMsg = _context.PPDestinatairesMessage
+                        .Where(m => m.NoMessage == idMessage && m.Destinataire == currentUserId)
+                        .FirstOrDefault();
+
+                    if (destMsg != null)
+                    {
+                        destMsg.Statut = -1;
+                        await _context.SaveChangesAsync();
+                    }
+                }
             }
 
             //var msg = _context.PPMessages
@@ -335,63 +540,178 @@ namespace Projet_Web_Commerce.Controllers
             return RedirectToAction("Supprimes");
         }
 
-
-        // POST: EmailSenderController/Create
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        [HttpGet]
+        public async Task<ActionResult> Restaurer(int idMessage)
         {
-            try
+            var currentUserId = _userManager.Users.Where(u => u.Email == User.Identity.Name).FirstOrDefault().Id;
+            if (currentUserId != null)
             {
-                return RedirectToAction(nameof(Index));
+                var destMsg = _context.PPDestinatairesMessage
+                    .Where(m => m.NoMessage == idMessage && m.Destinataire == currentUserId)
+                    .FirstOrDefault();
+
+                if (destMsg != null)
+                {
+                    destMsg.Statut = 0;
+                    await _context.SaveChangesAsync();
+                }
             }
-            catch
-            {
-                return View();
-            }
+
+            return RedirectToAction("BoiteDeReception");
         }
 
-        // GET: EmailSenderController/Edit/5
-        public ActionResult Edit(int id)
+        [HttpGet]
+        public async Task<ActionResult> SupprimerDefinitivement(int idMessage)
         {
-            return View();
+            var currentUserId = _userManager.Users.Where(u => u.Email == User.Identity.Name).FirstOrDefault().Id;
+            if (currentUserId != null)
+            {
+                var destMsg = _context.PPDestinatairesMessage
+                    .Where(m => m.NoMessage == idMessage && m.Destinataire == currentUserId)
+                    .FirstOrDefault();
+
+                if (destMsg != null)
+                {
+                    destMsg.Statut = -2;
+                    await _context.SaveChangesAsync();
+                }
+            }
+
+            return RedirectToAction("BoiteDeReception");
         }
 
-        // POST: EmailSenderController/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        [HttpGet]
+        public async Task<ActionResult> SupprimerBrouillon(int idMessage)
         {
-            try
+            var destMsg = _context.PPDestinatairesMessage
+               .Where(m => m.NoMessage == idMessage)
+               .FirstOrDefault();
+
+            var msg = _context.PPMessages
+                .Where(m => m.NoMessage == idMessage)
+                .FirstOrDefault();
+
+            if (destMsg != null)
             {
-                return RedirectToAction(nameof(Index));
+                _context.Remove(destMsg);
+                await _context.SaveChangesAsync();
             }
-            catch
+
+            if (msg != null)
             {
-                return View();
+                _context.Remove(msg);
+                await _context.SaveChangesAsync();
             }
+
+            return RedirectToAction("BoiteDeReception");
         }
 
-        // GET: EmailSenderController/Delete/5
-        public ActionResult Delete(int id)
+        [HttpGet]
+        public async Task<ActionResult> MarquerLu(int idMessage)
         {
-            return View();
+            var currentUserId = _userManager.Users.Where(u => u.Email == User.Identity.Name).FirstOrDefault().Id;
+
+            var messageCourant = await _context.PPMessages
+                .Where(m => m.NoMessage == idMessage)
+                .Include(m => m.Destinataires)
+                    .ThenInclude(d => d.DestinataireUser)
+                .FirstOrDefaultAsync();
+
+            if (messageCourant != null && currentUserId != null)
+            {
+                var destinataire = messageCourant.Destinataires.FirstOrDefault(dest => dest.Destinataire == currentUserId);
+
+                if (destinataire != null && !destinataire.MessageLu)
+                {
+                    destinataire.MessageLu = true;
+                    await _context.SaveChangesAsync();
+                }
+            }
+
+            return RedirectToAction("BoiteDeReception");
         }
 
-        // POST: EmailSenderController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        [HttpGet]
+        public async Task<ActionResult> MarquerNonLu(int idMessage)
         {
-            try
+            var currentUserId = _userManager.Users.Where(u => u.Email == User.Identity.Name).FirstOrDefault().Id;
+
+            var messageCourant = await _context.PPMessages
+                .Where(m => m.NoMessage == idMessage)
+                .Include(m => m.Destinataires)
+                    .ThenInclude(d => d.DestinataireUser)
+                .FirstOrDefaultAsync();
+
+            if (messageCourant != null && currentUserId != null)
             {
-                return RedirectToAction(nameof(Index));
+                var destinataire = messageCourant.Destinataires.FirstOrDefault(dest => dest.Destinataire == currentUserId);
+
+                if (destinataire != null && destinataire.MessageLu)
+                {
+                    destinataire.MessageLu = false;
+                    await _context.SaveChangesAsync();
+                }
             }
-            catch
-            {
-                return View();
-            }
+
+            return RedirectToAction("BoiteDeReception");
         }
+
+        //// POST: EmailSenderController/Create
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public ActionResult Create(IFormCollection collection)
+        //{
+        //    try
+        //    {
+        //        return RedirectToAction(nameof(Index));
+        //    }
+        //    catch
+        //    {
+        //        return View();
+        //    }
+        //}
+
+        //// GET: EmailSenderController/Edit/5
+        //public ActionResult Edit(int id)
+        //{
+        //    return View();
+        //}
+
+        //// POST: EmailSenderController/Edit/5
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public ActionResult Edit(int id, IFormCollection collection)
+        //{
+        //    try
+        //    {
+        //        return RedirectToAction(nameof(Index));
+        //    }
+        //    catch
+        //    {
+        //        return View();
+        //    }
+        //}
+
+        //// GET: EmailSenderController/Delete/5
+        //public ActionResult Delete(int id)
+        //{
+        //    return View();
+        //}
+
+        //// POST: EmailSenderController/Delete/5
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public ActionResult Delete(int id, IFormCollection collection)
+        //{
+        //    try
+        //    {
+        //        return RedirectToAction(nameof(Index));
+        //    }
+        //    catch
+        //    {
+        //        return View();
+        //    }
+        //}
 
         public IActionResult TelechargerPieceJointe(string cheminFichier)
         {
@@ -400,9 +720,9 @@ namespace Projet_Web_Commerce.Controllers
                 return NotFound();
             }
 
-            var cheminComplet = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "data", "images", cheminFichier);
+            var cheminComplet = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "data", "piecesJointes", cheminFichier);
             if (!System.IO.File.Exists(cheminComplet))
-            {
+            {   
                 return NotFound();
             }
             var fileContents = System.IO.File.ReadAllBytes(cheminComplet);

@@ -23,6 +23,51 @@
         background-color: rgb(236, 235, 243);
         cursor: pointer;
     }
+
+    .menu-container {
+        display: block;
+        justify-content: space-between;
+        align-items: center;
+        padding-left: 30%;
+    }
+
+    .menu-btn {
+        border: none;
+        cursor: pointer;
+        text-decoration: none;
+        color: black;
+    }
+
+        .menu-btn:after {
+            content: '\2807';
+            font-size: 110%;
+        }
+
+    .menu-list {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+        display: none;
+        position: absolute;
+        background-color: #444;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    }
+
+        .menu-list li {
+            padding: 10px;
+        }
+
+            .menu-list li a {
+                text-decoration: none;
+                color: white;
+                display: block;
+            }
+
+                .menu-list li a:hover {
+                    text-decoration: underline;
+                    font-weight: bold;
+                }
 </style>
 
 <div class="row">
@@ -35,32 +80,91 @@
                 <div class="card-body">
                     <h2 class="card-title">@ViewData["Title"]</h2>
                     <hr />
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th scope="col">#</th>
-                                <th scope="col">Expéditeur</th>
-                                <th scope="col">Objet - <span class="msg">Message</span></th>
-                                <th scope="col">Date de l'envoi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @{
-                                var no = 0;
-                            }
-                            @foreach (var msg in Model)
-                            {
-                                <tr class="flotter" onclick="window.location.href = '@Url.Action("Details", new { idMessage = msg.NoMessage })'">
-                                    <td>@(++no)</td>
-                                    <td>@_context.Users.Where(u => u.Id == msg.Message.Auteur).FirstOrDefault().Email</td>
-                                    <td class="truncate">@Html.DisplayFor(modelItem => msg.Message.Sujet) - <span class="msg">@Html.DisplayFor(modelItem => msg.Message.Message)</span></td>
-                                    <td>@Html.DisplayFor(modelItem => msg.Message.DateEnvoi)</td>
+                    <form id="frmSupprimes" method="post" asp-action="Supprimes">
+                        <div class="mb-3">
+                            <label for="triMessages" class="form-label">Trier par:</label>
+                            <select class="form-select" id="triMessages" name="triMessages" onchange="this.form.submit()">
+                                <option value="DateDesc">Date ↑</option>
+                                <option value="DateCroiss">Date ↓</option>
+                                <option value="ExpeDesc">Destinataire(s) ↑</option>
+                                <option value="ExpeCroiss">Destinataire(s) ↓</option>
+                            </select>
+                        </div>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Expéditeur</th>
+                                    <th scope="col">Objet - <span class="msg">Message</span></th>
+                                    <th scope="col" class="text-end">Date de l'envoi</th>
+                                    <th scope="col"></th>
                                 </tr>
-                            }
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                @{
+                                    var no = 0;
+                                }
+                                @if (Model != null)
+                                {
+                                    @foreach (var msg in Model)
+                                    {
+                                        <tr class="flotter" onclick="window.location.href = '@Url.Action("Details", new { idMessage = msg.NoMessage })'">
+                                            <td>@(++no)</td>
+                                            <td>@_context.Users.Where(u => u.Id == msg.Message.Auteur).FirstOrDefault().Email</td>
+                                            <td class="truncate">@Html.DisplayFor(modelItem => msg.Message.Sujet) - <span class="msg">@Html.DisplayFor(modelItem => msg.Message.Message)</span></td>
+                                            <td class="text-end">@Html.DisplayFor(modelItem => msg.Message.DateEnvoi)</td>
+                                            <td>
+                                                <div class="menu-container">
+                                                    <a class="menu-btn" onclick="afficherMenu(event)">@* ☰ *@</a>
+                                                    <ul class="menu-list">
+                                                        <li><a href="#" onclick="restaurer(event, '@msg.NoMessage')">Restaurer</a></li>
+                                                        <li><a href="#" onclick="supprimerDef(event, '@msg.NoMessage')">Supprimer</a></li>
+                                                    </ul>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </form>
                 </div>
             </div>
         </section>
     </div>
 </div>
+
+<script>
+    document.addEventListener('click', function (event) {
+        var menuList = document.querySelectorAll('.menu-list');
+
+        // Vérifier si l'élément cliqué n'est pas à l'intérieur du menu
+        if (!event.target.closest('.menu-container')) {
+            // Masquer tous les menus
+            menuList.forEach(function (menu) {
+                menu.style.display = 'none';
+            });
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        var ddlTri = document.getElementById('triMessages');
+        ddlTri.value = '@ViewBag.TriMessages';
+    });
+
+    function afficherMenu(event) {
+        event.stopPropagation();
+        var menuList = event.target.nextElementSibling;
+        menuList.style.display = (menuList.style.display === 'none' || menuList.style.display === '') ? 'block' : 'none';
+    }
+
+    function restaurer(event, noMessage) {
+        event.stopPropagation();
+        window.location.href = '@Url.Action("Restaurer")' + '?idMessage=' + noMessage;
+    }
+
+    function supprimerDef(event, noMessage) {
+        event.stopPropagation();
+        window.location.href = '@Url.Action("SupprimerDefinitivement")' + '?idMessage=' + noMessage;
+    }
+</script>

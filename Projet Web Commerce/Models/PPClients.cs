@@ -17,6 +17,9 @@ namespace Projet_Web_Commerce.Models
 
         public DateTime? DateDerniereConnexion { get; set; }
 
+        // 0: Peut pas log in, doit confirmer son courriel
+        // 1: Peut log in (normal/actif)
+        // 2: Inactif
         public int? Statut { get; set; }
 
         public string AdresseEmail { get; set; }
