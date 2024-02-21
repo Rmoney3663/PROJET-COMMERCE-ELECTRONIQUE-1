@@ -6,7 +6,6 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
 
-
 <div class="row">
     <div class="col">
         <section>
@@ -18,78 +17,43 @@
                 @{
                     var monthNames = new string[] { "Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre" };
                 }
-                @foreach (var date in Model.MoisAnneesDistinctsList)
+                @for (int i = 0; i < Model.MoisAnneesDistinctsList.Count; i++)
                 {
+                    var date = Model.MoisAnneesDistinctsList[i];
+                    var redevancesForMonth = Model.Redevances[i];
                     <div class="card">
                         <div class="card-body">
                             <h4 class="card-title"><u>@monthNames[date.Mois - 1] @date.Annee</u></h4>
-                            @{
-                                var tableId = $"redevanceTable_{date.Mois}_{date.Annee}";
-                                var groupeParAnnee = (from vendeur in Model.VendeursList
-                                        join user in Model.UtilisateurList
-                                        on vendeur.IdUtilisateur equals user.Id
-                                        where user.EmailConfirmed && vendeur.DateCreation.Month == date.Mois && vendeur.DateCreation.Year == date.Annee
-                                        orderby vendeur.NomAffaires
-                                        select new
-                                        {
-                                            Vendeur = vendeur,
-                                            CommandesList = Model.CommandesList.Where(cp => cp.NoVendeur == vendeur.NoVendeur).ToList(),
-                                        })
-                                        .ToList();
-
-
-                            }
-                            <table class="table" id="@tableId">
+                            <table class="table" id="redevanceTable_@i">
                                 <thead>
                                     <tr>
                                         <th scope="col">#</th>
                                         <th scope="col">No de vendeur</th>
-                                        <th scope="col">
-                                            <a href="#" onclick="sortName('asc')">Nom ▲</a> |
-                                            <a href="#" onclick="sortName('desc')">Nom ▼</a>
-                                        </th>
                                         <th scope="col">Nom d'affaires</th>
                                         <th scope="col">Date de création</th>
                                         <th scope="col">Pourcentage</th>
-                                        <th scope="col">
-                                            <a href="#" onclick="sortRedevance('asc')">Montant Total ▲</a> |
-                                            <a href="#" onclick="sortRedevance('desc')">Montant Total ▼</a>
-                                        </th>
-                                        <th scope="col"></th>
+                                        <th scope="col">Montant Total</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @{
                                         var no = 0;
                                     }
-                                    @foreach (var item in groupeParAnnee)
+                                    @for (int j = 0; j < Model.VendeursList.Count; j++)
                                     {
-                                        <tr>
-                                            <td>@(++no)</td>
-                                            <td>@Html.DisplayFor(modelItem => item.Vendeur.NoVendeur)</td>
-                                            <td>@Html.DisplayFor(modelItem => item.Vendeur.Nom), @Html.DisplayFor(modelItem => item.Vendeur.Prenom)</td>
-                                            <td>@Html.DisplayFor(modelItem => item.Vendeur.NomAffaires)</td>
-                                            <td>@Html.DisplayFor(modelItem => item.Vendeur.DateCreation)</td>
-
-                                            <td>@Html.DisplayFor(modelItem => item.Vendeur.Pourcentage) %</td>
-                                            <td>
-                                                @{
-                                                    decimal? totalRedevance = 0;
-                                                    foreach (var commande in item.CommandesList)
-                                                    {
-                                                        var redevance = (commande.MontantTotAvantTaxes / 100) * item.Vendeur.Pourcentage;
-                                                        totalRedevance += redevance;
-                                                    }
-
-                                                    if (totalRedevance.HasValue)
-                                                    {
-                                                        totalRedevance = Math.Round(totalRedevance.Value, 2);
-                                                    }
-                                                }
-                                                @totalRedevance $
-
-                                            </td>
-                                        </tr>
+                                        var vendeur = Model.VendeursList[j];
+                                        var redevance = redevancesForMonth[j];
+                                        if (redevance > 0 && redevance != null)
+                                        {
+                                            <tr>
+                                                <td>@(++no)</td>
+                                                <td>@Html.DisplayFor(modelItem => vendeur.NoVendeur)</td>
+                                                <td>@Html.DisplayFor(modelItem => vendeur.NomAffaires)</td>
+                                                <td>@Html.DisplayFor(modelItem => vendeur.DateCreation)</td>
+                                                <td>@Html.DisplayFor(modelItem => vendeur.Pourcentage) %</td>
+                                                <td>@(redevance.HasValue ? redevance.Value.ToString("0.00") : "") $</td>
+                                            </tr>
+                                        }
                                     }
                                 </tbody>
 

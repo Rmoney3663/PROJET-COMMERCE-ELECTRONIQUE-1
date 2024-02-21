@@ -19,5 +19,6 @@ namespace Projet_Web_Commerce.Models
         public List<PPCommandes> CommandesList { get; set; }
 
         public List<Utilisateur> UtilisateurList { get; set; }
+        public List<List<decimal?>> Redevances { get; set; }
     }
 }

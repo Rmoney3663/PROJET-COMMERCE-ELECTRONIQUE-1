@@ -36,7 +36,7 @@ namespace Projet_Web_Commerce.Controllers
         public ActionResult Statistiques()
         {
             var vendeurs = _context.PPVendeurs
-                .Where(v => v.Statut == 1)
+                .Where(v => v.Statut != 0)
                 .ToList();
 
             var vendeurdate = _context.PPVendeurs
@@ -415,111 +415,6 @@ namespace Projet_Web_Commerce.Controllers
 
             return View(modelListeVendeurs);
         }
-
-
-        // GET: PPGestionnaires
-        public async Task<IActionResult> Index()
-        {
-            var authDbContext = _context.PPGestionnaire.Include(p => p.Utilisateur);
-            return View(await authDbContext.ToListAsync());
-        }
-
-        // GET: PPGestionnaires/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var pPGestionnaire = await _context.PPGestionnaire
-                .Include(p => p.Utilisateur)
-                .FirstOrDefaultAsync(m => m.NoGestionnaire == id);
-            if (pPGestionnaire == null)
-            {
-                return NotFound();
-            }
-
-            return View(pPGestionnaire);
-        }
-
-        // GET: PPGestionnaires/Create
-        public IActionResult Create()
-        {
-            ViewData["IdUtilisateur"] = new SelectList(_context.Users, "Id", "Id");
-            return View();
-        }
-
-        // POST: PPGestionnaires/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("NoGestionnaire,DateCreation,AdresseEmail,MotDePasse,Nom,Prenom,IdUtilisateur")] PPGestionnaire pPGestionnaire)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(pPGestionnaire);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["IdUtilisateur"] = new SelectList(_context.Users, "Id", "Id", pPGestionnaire.IdUtilisateur);
-            return View(pPGestionnaire);
-        }
-
-        // GET: PPGestionnaires/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var pPGestionnaire = await _context.PPGestionnaire.FindAsync(id);
-            if (pPGestionnaire == null)
-            {
-                return NotFound();
-            }
-            ViewData["IdUtilisateur"] = new SelectList(_context.Users, "Id", "Id", pPGestionnaire.IdUtilisateur);
-            return View(pPGestionnaire);
-        }
-
-        // POST: PPGestionnaires/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("NoGestionnaire,DateCreation,AdresseEmail,MotDePasse,Nom,Prenom,IdUtilisateur")] PPGestionnaire pPGestionnaire)
-        {
-            if (id != pPGestionnaire.NoGestionnaire)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(pPGestionnaire);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!PPGestionnaireExists(pPGestionnaire.NoGestionnaire))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["IdUtilisateur"] = new SelectList(_context.Users, "Id", "Id", pPGestionnaire.IdUtilisateur);
-            return View(pPGestionnaire);
-        }
-
 
         public async Task<IActionResult> FraudeC(int? id)
         {
@@ -1018,7 +913,6 @@ namespace Projet_Web_Commerce.Controllers
             var lstMoisAnneesDistincts = _context.PPCommandes
                 .Where(v => v.Statut != "E")
                 .Select(v => new ModelMoisAnnees { Mois = v.DateCommande.Month, Annee = v.DateCommande.Year })
-                //.Select(v => new { Mois = v.DateCreation.Month, Annee = v.DateCreation.Year })
                 .Distinct()
                 .OrderByDescending(item => item.Annee)
                 .ThenByDescending(item => item.Mois)
@@ -1030,21 +924,32 @@ namespace Projet_Web_Commerce.Controllers
                 .GroupBy(p => p.NoVendeur)
                 .Count();
 
-            var CommandesList = _context.PPCommandes
-             .GroupBy(c => c.NoVendeur)
-             .Select(group => group.OrderByDescending(c => c.DateCommande).FirstOrDefault())
-             .ToList();
-
             var utilisateurList = _context.Users.ToList();
+
+            List<List<decimal?>> redevances = new List<List<decimal?>>();
+
+            foreach (var date in lstMoisAnneesDistincts)
+            {
+                var redevancesForMonth = vendeurs.Select(v =>
+                {
+                    var commandesForVendeur = _context.PPCommandes
+                        .Where(c => c.NoVendeur == v.NoVendeur && c.DateCommande.Month == date.Mois && c.DateCommande.Year == date.Annee)
+                        .ToList();
+
+                    decimal? totalRedevance = commandesForVendeur.Sum(c => (c.MontantTotAvantTaxes / 100) * v.Pourcentage);
+                    return totalRedevance;
+                }).ToList();
+
+                redevances.Add(redevancesForMonth);
+            }
 
             ModelListeVendeurs modelListeVendeurs = new ModelListeVendeurs()
             {
                 VendeursList = vendeurs,
                 ProduitsList = ProduitsList,
                 MoisAnneesDistinctsList = lstMoisAnneesDistincts,
-                CommandesList = CommandesList,
+                Redevances = redevances,
                 UtilisateurList = utilisateurList
-
             };
 
             return View(modelListeVendeurs);
