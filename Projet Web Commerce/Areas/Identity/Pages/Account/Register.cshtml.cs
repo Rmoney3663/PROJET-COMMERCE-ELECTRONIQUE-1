@@ -10,6 +10,7 @@ using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading;
 using System.Threading.Tasks;
+using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -95,7 +96,7 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
             /// </summary>
             [Required(ErrorMessage = "Le mot de passe est requis.")]
             [StringLength(100, ErrorMessage = "Le {0} doit comporter au moins {2} et au maximum {1} caractères.", MinimumLength = 6)]
-            [DataType(DataType.Password)]
+            [DataType(System.ComponentModel.DataAnnotations.DataType.Password)]
             [Display(Name = "Password")]
             public string Password { get; set; }
 
@@ -103,17 +104,24 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
-            [DataType(DataType.Password)]
+            [DataType(System.ComponentModel.DataAnnotations.DataType.Password)]
             [Display(Name = "Confirmer le mot de passe")]
             [Compare("Password", ErrorMessage = "Les mots de passe ne correspondent pas.")]
             public string ConfirmPassword { get; set; }
         }
 
 
-        public async Task OnGetAsync(string returnUrl = null)
+        public async Task<IActionResult> OnGetAsync(string returnUrl = null)
         {
             ReturnUrl = returnUrl;
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+            if (_signInManager.IsSignedIn(User))
+            {
+                return Redirect("/MainMenu");
+            }
+            else
+                return Page();
+           
         }
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
