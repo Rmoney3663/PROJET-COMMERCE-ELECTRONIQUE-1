@@ -62,12 +62,19 @@
        asp-area="" asp-controller="PPGestionnaires" asp-action="ListeRedevances">
         Liste des redevances
     </a>
-
+    <a class="btn @(Model == "ListClientFraude" ? "actif" : "pasActif")"
+       asp-area="" asp-controller="PPGestionnaires" asp-action="ListClientFraude">
+        Liste des clients non confirmer
+    </a>
+    <a class="btn @(Model == "ListVendeurFraude" ? "actif" : "pasActif")"
+       asp-area="" asp-controller="PPGestionnaires" asp-action="ListVendeurFraude">
+        Liste des vendeurs non confirmer
+    </a>
     <a class="btn @(Model == "Statistiques" ? "actif" : "pasActif")"
        asp-area="" asp-controller="PPGestionnaires" asp-action="Statistiques">
         Statistiques
     </a>
-
+    
     <!-- #pragma warning restore CSS024 -->
 </div>
 

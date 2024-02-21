@@ -13,32 +13,17 @@
             <div>
                 @Html.Partial("GestionVendeursPages", "ListeVendeurs")
             </div>
-            
+
             <div class="container mt-4">
+                @{
+                    var monthNames = new string[] { "Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre" };
+                }
                 @foreach (var date in Model.MoisAnneesDistinctsList)
                 {
                     <div class="card">
                         <div class="card-body">
-                            <script>
-                                function getMonthName(monthNumber) {
-                                    const months = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
-                                    return months[monthNumber - 1];
-                                }
-
-                                const monthNumber = @date.Mois;
-                                const year = @date.Annee;
-                                const monthName = getMonthName(monthNumber);
-
-                                document.write('<h4 class="card-title"><u>' + monthName + ' ' + year + '</u></h4>');
-                            </script>
+                            <h4 class="card-title"><u>@monthNames[date.Mois - 1] @date.Annee</u></h4>
                             @{
-                                /*
-                                var groupeParAnnee = Model.VendeursList
-                                .Where(item => item.DateCreation.Month == date.Mois && item.DateCreation.Year == date.Annee)
-                                .OrderBy(item => item.NomAffaires)
-                                .ToList();
-                                */
-
                                 var groupeParAnnee = (from vendeur in Model.VendeursList
                                                       join user in Model.UtilisateurList
                                                       on vendeur.IdUtilisateur equals user.Id
@@ -53,12 +38,14 @@
                                                           Vendeur = vendeur,
                                                           Commande = vc,
                                                           CommandesList = Model.CommandesList.Where(cp => cp.NoVendeur == vendeur.NoVendeur).ToList(),
+                                                          NbProduitsInscrits = Model.ProduitsList.Count(p => p.NoVendeur == vendeur.NoVendeur),
+                                                          EvaluationMoyenne = Model.EvaluationList
+                                                      .Where(e => Model.ProduitsList.Any(p => p.NoVendeur == vendeur.NoVendeur && p.NoProduit == e.NoProduit))
+                                                      .Select(e => (decimal?)e.Cote)
+                                                      .DefaultIfEmpty(null)
+                                                      .Average()
                                                       })
                                 .ToList();
-
-
-
-
                             }
                             <table class="table">
                                 <thead>
@@ -69,6 +56,7 @@
                                         <th scope="col">Nom d'affaires</th>
                                         <th scope="col">Date de création</th>
                                         <th scope="col">Nb de produits inscrits</th>
+                                        <th scope="col">Cote Moyen</th>
                                         <th scope="col">Date de dernière commande</th>
                                         <th scope="col">Montant total avant taxes </th>
                                         <th scope="col">Supprimer Panier</th>
@@ -97,6 +85,17 @@
                                             <td>@Html.DisplayFor(modelItem => item.Vendeur.NomAffaires)</td>
                                             <td>@Html.DisplayFor(modelItem => item.Vendeur.DateCreation)</td>
                                             <td>@Model.ProduitsList.Count(modelItem => modelItem.NoVendeur == item.Vendeur.NoVendeur)</td>
+                                            <td>
+                                                @if (item.EvaluationMoyenne.HasValue)
+                                                {
+                                                    @(item.EvaluationMoyenne.ToString() + "/5")
+                                                }
+                                                else
+                                                {
+                                                    <p>Aucune évaluation à ce jour</p>
+                                                }
+                                            </td>
+
                                             <td>@Html.DisplayFor(modelItem => item.Commande.DateCommande)</td>
                                             <td>@Html.DisplayFor(modelItem => item.Commande.MontantTotAvantTaxes)</td>
                                             <td>
@@ -143,6 +142,12 @@
 </div>
 
 <script>
+    function getMonthName(monthNumber) {
+        const months = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
+        return months[monthNumber - 1];
+    }
+
+
     document.getElementById('enregistrementButton').addEventListener('click', function () {
         var panierCheckboxes = document.getElementsByName('SPanier');
         var vendeurCheckboxes = document.getElementsByName('SVendeur');

@@ -1,6 +1,6 @@
 ﻿@model Projet_Web_Commerce.Models.ModelListeClients
 @{
-    ViewData["Title"] = "Liste des clients inactifs";
+    ViewData["Title"] = "Liste des clients fraud";
 }
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
@@ -11,7 +11,7 @@
     <div class="col">
         <section>
             <div>
-                @Html.Partial("GestionVendeursPages", "ListeClientsInactifs")
+                @Html.Partial("GestionVendeursPages", "ListClientFraude")
             </div>
 
             <div class="container mt-4">
@@ -53,9 +53,6 @@
                                         <th scope="col">Information personnelle</th>
                                         <th scope="col">Date de création</th>
                                         <th scope="col">Date de dernière connexion</th>
-                                        <th scope="col">Date de dernière visite</th>
-                                        <th scope="col">Nom d'affaire</th>
-                                        <th scope="col"></th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -78,11 +75,6 @@
 
                                             <td>@Html.DisplayFor(modelItem => item.Client.DateCreation)</td>
                                             <td>@Html.DisplayFor(modelItem => item.Client.DateDerniereConnexion)</td>
-                                            <td>@Html.DisplayFor(modelItem => item.VendeurClient.DateVisite)</td>
-                                            <td>@Html.DisplayFor(modelItem => item.Vendeur.NomAffaires)</td>
-                                            <td>
-                                                <a asp-action="FraudeC" class="btn btn-danger" asp-route-id="@item.Client.NoClient">Fraude</a>
-                                            </td>
                                         </tr>
                                     }
                                 </tbody>
@@ -91,11 +83,11 @@
                         </div>
                     </div>
                 }
-            </div>
-            @if (Model.MoisAnneesDistinctsList.Count() == 0)
-            {
-                <p>Aucun clients inactif.</p>
-            }
+                @if (Model.MoisAnneesDistinctsList.Count() == 0)
+                {
+                    <p>Aucun clients non confirmer.</p>
+                }
+            </div>           
         </section>
     </div>
 </div>

@@ -6,7 +6,6 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
 
-
 <div class="row">
     <div class="col">
         <section>
@@ -15,82 +14,46 @@
             </div>
 
             <div class="container mt-4">
-                @foreach (var date in Model.MoisAnneesDistinctsList)
+                @{
+                    var monthNames = new string[] { "Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre" };
+                }
+                @for (int i = 0; i < Model.MoisAnneesDistinctsList.Count; i++)
                 {
+                    var date = Model.MoisAnneesDistinctsList[i];
+                    var redevancesForMonth = Model.Redevances[i];
                     <div class="card">
                         <div class="card-body">
-                            <script>
-                                function getMonthName(monthNumber) {
-                                    const months = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
-                                    return months[monthNumber - 1];
-                                }
-
-                                const monthNumber = @date.Mois;
-                                const year = @date.Annee;
-                                const monthName = getMonthName(monthNumber);
-
-                                document.write('<h4 class="card-title"><u>' + monthName + ' ' + year + '</u></h4>');
-                            </script>
-                            @{
-                                var groupeParAnnee = (from vendeur in Model.VendeursList
-                                        join user in Model.UtilisateurList
-                                        on vendeur.IdUtilisateur equals user.Id
-                                        where user.EmailConfirmed && vendeur.DateCreation.Month == date.Mois && vendeur.DateCreation.Year == date.Annee
-                                        orderby vendeur.NomAffaires
-                                        select new
-                                        {
-                                            Vendeur = vendeur,
-                                            CommandesList = Model.CommandesList.Where(cp => cp.NoVendeur == vendeur.NoVendeur).ToList(),
-                                        })
-                                        .ToList();
-
-
-                            }
-                            <table class="table">
+                            <h4 class="card-title"><u>@monthNames[date.Mois - 1] @date.Annee</u></h4>
+                            <table class="table" id="redevanceTable_@i">
                                 <thead>
                                     <tr>
                                         <th scope="col">#</th>
                                         <th scope="col">No de vendeur</th>
-                                        <th scope="col">
-                                            <a href="#" onclick="sortName('asc')">Information personnelle ▲</a> |
-                                            <a href="#" onclick="sortName('desc')">Information personnelle ▼</a>
-                                        </th>
                                         <th scope="col">Nom d'affaires</th>
                                         <th scope="col">Date de création</th>
-                                        <th scope="col">% Redevance</th>
-                                        <th scope="col">
-                                            <a href="#" onclick="sortRedevance('asc')">Total Redevance ▲</a> |
-                                            <a href="#" onclick="sortRedevance('desc')">Total Redevance ▼</a>
-                                        </th>
-                                        <th scope="col"></th>
+                                        <th scope="col">Pourcentage</th>
+                                        <th scope="col">Montant Total</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @{
                                         var no = 0;
                                     }
-                                    @foreach (var item in groupeParAnnee)
+                                    @for (int j = 0; j < Model.VendeursList.Count; j++)
                                     {
-                                        <tr>
-                                            <td>@(++no)</td>
-                                            <td>@Html.DisplayFor(modelItem => item.Vendeur.NoVendeur)</td>
-                                            <td>@Html.DisplayFor(modelItem => item.Vendeur.Nom), @Html.DisplayFor(modelItem => item.Vendeur.Prenom)</td>
-                                            <td>@Html.DisplayFor(modelItem => item.Vendeur.NomAffaires)</td>
-                                            <td>@Html.DisplayFor(modelItem => item.Vendeur.DateCreation)</td>
-
-                                            <td>@Html.DisplayFor(modelItem => item.Vendeur.Pourcentage)</td>
-                                            <td>
-                                                @{
-                                                    decimal? totalRedevance = 0;
-                                                }
-                                                @foreach (var commande in item.CommandesList)
-                                                {
-                                                    var redevance = (commande.MontantTotAvantTaxes / 100) * item.Vendeur.Pourcentage;
-                                                    totalRedevance += redevance;
-                                                }
-                                                @totalRedevance
-                                            </td>
-                                        </tr>
+                                        var vendeur = Model.VendeursList[j];
+                                        var redevance = redevancesForMonth[j];
+                                        if (redevance > 0 && redevance != null)
+                                        {
+                                            <tr>
+                                                <td>@(++no)</td>
+                                                <td>@Html.DisplayFor(modelItem => vendeur.NoVendeur)</td>
+                                                <td>@Html.DisplayFor(modelItem => vendeur.NomAffaires)</td>
+                                                <td>@Html.DisplayFor(modelItem => vendeur.DateCreation)</td>
+                                                <td>@Html.DisplayFor(modelItem => vendeur.Pourcentage) %</td>
+                                                <td>@(redevance.HasValue ? redevance.Value.ToString("0.00") : "") $</td>
+                                            </tr>
+                                        }
                                     }
                                 </tbody>
 
@@ -108,8 +71,8 @@
 </div>
 
 <script>
-    function sortRedevance(order) {
-        var rows = document.querySelectorAll('#redevanceTable tbody tr');
+    function sortRedevance(order, tableId) {
+        var rows = document.querySelectorAll(`#${tableId} tbody tr`);
         var sortedRows = Array.from(rows).sort((a, b) => {
             var aValue = parseFloat(a.querySelector('td:nth-child(7)').textContent);
             var bValue = parseFloat(b.querySelector('td:nth-child(7)').textContent);
@@ -119,13 +82,13 @@
                 return bValue - aValue;
             }
         });
-        var tbody = document.querySelector('#redevanceTable tbody');
+        var tbody = document.querySelector(`#${tableId} tbody`);
         tbody.innerHTML = '';
         sortedRows.forEach(row => tbody.appendChild(row));
     }
 
-    function sortName(order) {
-        var rows = document.querySelectorAll('#redevanceTable tbody tr');
+    function sortName(order, tableId) {
+        var rows = document.querySelectorAll(`#${tableId} tbody tr`);
         var sortedRows = Array.from(rows).sort((a, b) => {
             var aName = a.querySelector('td:nth-child(3)').textContent.trim();
             var bName = b.querySelector('td:nth-child(3)').textContent.trim();
@@ -135,11 +98,9 @@
                 return bName.localeCompare(aName);
             }
         });
-        var tbody = document.querySelector('#redevanceTable tbody');
+        var tbody = document.querySelector(`#${tableId} tbody`);
         tbody.innerHTML = '';
         sortedRows.forEach(row => tbody.appendChild(row));
     }
-
-
-
 </script>
+

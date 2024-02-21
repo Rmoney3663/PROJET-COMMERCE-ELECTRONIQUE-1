@@ -41,6 +41,10 @@ namespace Projet_Web_Commerce.Controllers
             {
                 return RedirectToAction("Index", "PPProduits", new { area = "" });
             }
+            if (User.IsInRole("Gestionnaire"))
+            {
+                return RedirectToAction("ListeVendeurs", "PPGestionnaires", new { area = "" });
+            }
             var CategoriesList = _context.PPCategories.ToList();
             var VendeursList = _context.PPVendeurs.ToList();
             var ProduitsList = _context.PPProduits.ToList();

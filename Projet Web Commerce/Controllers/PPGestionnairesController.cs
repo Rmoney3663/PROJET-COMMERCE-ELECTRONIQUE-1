@@ -36,7 +36,7 @@ namespace Projet_Web_Commerce.Controllers
         public ActionResult Statistiques()
         {
             var vendeurs = _context.PPVendeurs
-                .Where(v => v.Statut == 1)
+                .Where(v => v.Statut != 0)
                 .ToList();
 
             var vendeurdate = _context.PPVendeurs
@@ -176,20 +176,28 @@ namespace Projet_Web_Commerce.Controllers
                 .GroupBy(p => p.NoVendeur)
                 .Count();
 
-            var CommandesList = _context.PPCommandes
-             .GroupBy(c => c.NoVendeur)
-             .Select(group => group.OrderByDescending(c => c.DateCommande).FirstOrDefault())
-             .ToList();
+
+            var commandesGrouped = _context.PPCommandes
+            .Where(c => c.Statut != "E")
+            .GroupBy(c => c.NoVendeur)
+            .ToList();
+
+            var latestCommandes = commandesGrouped
+                .Select(group => group.OrderByDescending(c => c.DateCommande).FirstOrDefault())
+                .ToList();
 
             var utilisateurList = _context.Users.ToList();
+
+            var evaluationList = _context.PPEvaluations.ToList();
 
             ModelListeVendeurs modelListeVendeurs = new ModelListeVendeurs()
             {
                 VendeursList = vendeurs,
                 ProduitsList = ProduitsList,
                 MoisAnneesDistinctsList = lstMoisAnneesDistincts,
-                CommandesList = CommandesList,
-                UtilisateurList = utilisateurList
+                CommandesList = latestCommandes,
+                UtilisateurList = utilisateurList,
+                EvaluationList = evaluationList
 
             };
 
@@ -202,7 +210,7 @@ namespace Projet_Web_Commerce.Controllers
         {
 
             var vendeurs = _context.PPVendeurs
-                .Where(v => v.Statut == 1)
+                .Where(v => v.Statut != 0)
                 .OrderByDescending(v => v.NomAffaires)
                 .ToList();
 
@@ -215,7 +223,15 @@ namespace Projet_Web_Commerce.Controllers
                 .ToList();
 
             var ProduitsList = _context.PPProduits.ToList();
-            var CommandesList = _context.PPCommandes.Where(v => v.Statut != "E").ToList();
+
+            var commandesGrouped = _context.PPCommandes
+            .Where(c => c.Statut != "E")
+            .GroupBy(c => c.NoClient)
+            .ToList(); 
+
+            var latestCommandes = commandesGrouped
+                .Select(group => group.OrderByDescending(c => c.DateCommande).FirstOrDefault())
+                .ToList();
 
             var VendeursClientsList = _context.PPVendeursClients
             .GroupBy(vc => vc.NoClient)
@@ -238,7 +254,7 @@ namespace Projet_Web_Commerce.Controllers
                 ProduitsList = ProduitsList,
                 MoisAnneesDistinctsList = lstMoisAnneesDistincts,
                 ClientsList = ClientsList,
-                CommandesList = CommandesList,
+                CommandesList = latestCommandes,
                 VendeursClientsList = VendeursClientsList,
                 ClientPanierList = clientPanierList
             };
@@ -399,111 +415,6 @@ namespace Projet_Web_Commerce.Controllers
 
             return View(modelListeVendeurs);
         }
-
-
-        // GET: PPGestionnaires
-        public async Task<IActionResult> Index()
-        {
-            var authDbContext = _context.PPGestionnaire.Include(p => p.Utilisateur);
-            return View(await authDbContext.ToListAsync());
-        }
-
-        // GET: PPGestionnaires/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var pPGestionnaire = await _context.PPGestionnaire
-                .Include(p => p.Utilisateur)
-                .FirstOrDefaultAsync(m => m.NoGestionnaire == id);
-            if (pPGestionnaire == null)
-            {
-                return NotFound();
-            }
-
-            return View(pPGestionnaire);
-        }
-
-        // GET: PPGestionnaires/Create
-        public IActionResult Create()
-        {
-            ViewData["IdUtilisateur"] = new SelectList(_context.Users, "Id", "Id");
-            return View();
-        }
-
-        // POST: PPGestionnaires/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("NoGestionnaire,DateCreation,AdresseEmail,MotDePasse,Nom,Prenom,IdUtilisateur")] PPGestionnaire pPGestionnaire)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(pPGestionnaire);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["IdUtilisateur"] = new SelectList(_context.Users, "Id", "Id", pPGestionnaire.IdUtilisateur);
-            return View(pPGestionnaire);
-        }
-
-        // GET: PPGestionnaires/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var pPGestionnaire = await _context.PPGestionnaire.FindAsync(id);
-            if (pPGestionnaire == null)
-            {
-                return NotFound();
-            }
-            ViewData["IdUtilisateur"] = new SelectList(_context.Users, "Id", "Id", pPGestionnaire.IdUtilisateur);
-            return View(pPGestionnaire);
-        }
-
-        // POST: PPGestionnaires/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("NoGestionnaire,DateCreation,AdresseEmail,MotDePasse,Nom,Prenom,IdUtilisateur")] PPGestionnaire pPGestionnaire)
-        {
-            if (id != pPGestionnaire.NoGestionnaire)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(pPGestionnaire);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!PPGestionnaireExists(pPGestionnaire.NoGestionnaire))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["IdUtilisateur"] = new SelectList(_context.Users, "Id", "Id", pPGestionnaire.IdUtilisateur);
-            return View(pPGestionnaire);
-        }
-
 
         public async Task<IActionResult> FraudeC(int? id)
         {
@@ -831,6 +742,36 @@ namespace Projet_Web_Commerce.Controllers
                 var articlesEnPanier = _context.PPArticlesEnPanier.Where(ap => panierToDelete.Contains(ap.NoClient));
                 _context.PPArticlesEnPanier.RemoveRange(articlesEnPanier);
 
+                foreach (var id in panierToDelete)
+                {
+                    var item = await _context.PPClients.FindAsync(id);
+                    if (item != null)
+                    {
+                        item.Statut = 0;
+                        var email = item.AdresseEmail;
+                        var idUSER = item.IdUtilisateur;
+                        var use = await _context.Users.FindAsync(idUSER);
+                        if (use != null)
+                        {
+                            use.EmailConfirmed = false;
+
+                            string returnUrl = Url.Content("~/");
+                            var code = await _userManager.GenerateEmailConfirmationTokenAsync(use);
+                            code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+                            var callbackUrl = Url.Page(
+                                "/Account/ConfirmEmail",
+                                pageHandler: null,
+                                values: new { area = "Identity", userId = use.Id, code = code, returnUrl = returnUrl },
+                                protocol: Request.Scheme);
+
+                            await Methodes.envoyerCourriel(
+                                "Vous devez reconfirmer votre adresse courriel",
+                                $"Veuillez reconfirmer votre compte en <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>cliquant ici</a>. Votre numéro de client est {item.NoClient}",
+                                email);
+                        }
+                    }
+                }
+
                 await _context.SaveChangesAsync();
                 return Ok(new { message = "Les paniers ont été supprimés avec succès." });
             }
@@ -839,6 +780,7 @@ namespace Projet_Web_Commerce.Controllers
                 return StatusCode(500, new { error = $"Une erreur s'est produite lors des paniers : {ex.Message}" });
             }
         }
+
 
         [HttpPost]
         public async Task<IActionResult> SupprimerVPanier()
@@ -854,6 +796,35 @@ namespace Projet_Web_Commerce.Controllers
                 var articlesEnPanier = _context.PPArticlesEnPanier.Where(ap => panierToDelete.Contains(ap.NoVendeur));
                 _context.PPArticlesEnPanier.RemoveRange(articlesEnPanier);
 
+                foreach (var id in panierToDelete)
+                {
+                    var item = await _context.PPVendeurs.FindAsync(id);
+                    if (item != null)
+                    {
+                        item.Statut = 0;
+                        var email = item.AdresseEmail;
+                        var idUSER = item.IdUtilisateur;
+                        var use = await _context.Users.FindAsync(idUSER);
+                        if (use != null)
+                        {
+                            use.EmailConfirmed = false;
+
+                            string returnUrl = Url.Content("~/");
+                            var code = await _userManager.GenerateEmailConfirmationTokenAsync(use);
+                            code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+                            var callbackUrl = Url.Page(
+                                "/Account/ConfirmEmail",
+                                pageHandler: null,
+                                values: new { area = "Identity", userId = use.Id, code = code, returnUrl = returnUrl },
+                                protocol: Request.Scheme);
+
+                            await Methodes.envoyerCourriel(
+                                "Vous devez reconfirmer votre adresse courriel",
+                                $"Veuillez reconfirmer votre compte en <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>cliquant ici</a>. Votre numéro de vendeur est {item.NoVendeur}",
+                                email);
+                        }
+                    }
+                }
 
 
                 await _context.SaveChangesAsync();
@@ -942,6 +913,107 @@ namespace Projet_Web_Commerce.Controllers
             var lstMoisAnneesDistincts = _context.PPCommandes
                 .Where(v => v.Statut != "E")
                 .Select(v => new ModelMoisAnnees { Mois = v.DateCommande.Month, Annee = v.DateCommande.Year })
+                .Distinct()
+                .OrderByDescending(item => item.Annee)
+                .ThenByDescending(item => item.Mois)
+                .ToList();
+
+            var ProduitsList = _context.PPProduits.ToList();
+
+            var nbProduits = _context.PPProduits
+                .GroupBy(p => p.NoVendeur)
+                .Count();
+
+            var utilisateurList = _context.Users.ToList();
+
+            List<List<decimal?>> redevances = new List<List<decimal?>>();
+
+            foreach (var date in lstMoisAnneesDistincts)
+            {
+                var redevancesForMonth = vendeurs.Select(v =>
+                {
+                    var commandesForVendeur = _context.PPCommandes
+                        .Where(c => c.NoVendeur == v.NoVendeur && c.DateCommande.Month == date.Mois && c.DateCommande.Year == date.Annee)
+                        .ToList();
+
+                    decimal? totalRedevance = commandesForVendeur.Sum(c => (c.MontantTotAvantTaxes / 100) * v.Pourcentage);
+                    return totalRedevance;
+                }).ToList();
+
+                redevances.Add(redevancesForMonth);
+            }
+
+            ModelListeVendeurs modelListeVendeurs = new ModelListeVendeurs()
+            {
+                VendeursList = vendeurs,
+                ProduitsList = ProduitsList,
+                MoisAnneesDistinctsList = lstMoisAnneesDistincts,
+                Redevances = redevances,
+                UtilisateurList = utilisateurList
+            };
+
+            return View(modelListeVendeurs);
+        }
+
+
+        [HttpGet]
+        [Authorize(Roles = "Gestionnaire")]
+        public ActionResult ListClientFraude()
+        {
+            var vendeurs = _context.PPVendeurs
+              .Where(v => v.Statut == 0)
+              .OrderByDescending(v => v.NomAffaires)
+              .ToList();
+
+            var lstMoisAnneesDistincts = _context.PPClients
+                .Where(v => v.Statut == 0)
+                .Select(v => new ModelMoisAnnees { Mois = v.DateCreation.Month, Annee = v.DateCreation.Year })
+                .Distinct()
+                .OrderByDescending(item => item.Annee)
+                .ThenByDescending(item => item.Mois)
+                .ToList();
+
+            var ProduitsList = _context.PPProduits.ToList();
+
+            var CommandesList = _context.PPCommandes.ToList();
+
+            var VendeursClientsList = _context.PPVendeursClients
+            .GroupBy(vc => vc.NoClient)
+            .Select(group => group.OrderByDescending(vc => vc.DateVisite).FirstOrDefault())
+            .ToList();
+
+
+            var ClientsList = _context.PPClients.Where(v => v.Statut == 0).ToList();
+
+            var nbProduits = _context.PPProduits
+                .GroupBy(p => p.NoVendeur)
+                .Count();
+
+            ModelListeClients modelListeClients = new ModelListeClients()
+            {
+                VendeursList = vendeurs,
+                ProduitsList = ProduitsList,
+                MoisAnneesDistinctsList = lstMoisAnneesDistincts,
+                ClientsList = ClientsList,
+                CommandesList = CommandesList,
+                VendeursClientsList = VendeursClientsList
+            };
+
+            return View(modelListeClients);
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "Gestionnaire")]
+        public ActionResult ListVendeurFraude()
+        {
+            var vendeurs = _context.PPVendeurs
+                .Where(v => v.Statut == 0)
+                .OrderByDescending(v => v.NomAffaires)
+                .ToList();
+
+            var lstMoisAnneesDistincts = _context.PPVendeurs
+                .Where(v => v.Statut == 0)
+                .Select(v => new ModelMoisAnnees { Mois = v.DateCreation.Month, Annee = v.DateCreation.Year })
                 //.Select(v => new { Mois = v.DateCreation.Month, Annee = v.DateCreation.Year })
                 .Distinct()
                 .OrderByDescending(item => item.Annee)

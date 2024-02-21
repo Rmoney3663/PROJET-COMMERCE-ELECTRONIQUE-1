@@ -13,7 +13,11 @@ using System.Net;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using iTextSharp.text;
+using iTextSharp.text.pdf;
+using System.IO;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using Microsoft.AspNetCore.Hosting;
 
 namespace Projet_Web_Commerce.Controllers
 {
@@ -24,12 +28,14 @@ namespace Projet_Web_Commerce.Controllers
         private readonly AuthDbContext _context;
         private readonly Microsoft.AspNetCore.Identity.UserManager<Utilisateur> _userManager;
         private readonly IHubContext<Notifications> _notificationsHubContext;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public CommandeController(AuthDbContext context, Microsoft.AspNetCore.Identity.UserManager<Utilisateur> userManager, IHubContext<Notifications> notificationsHubContext)
+        public CommandeController(IWebHostEnvironment webHostEnvironment, AuthDbContext context, Microsoft.AspNetCore.Identity.UserManager<Utilisateur> userManager, IHubContext<Notifications> notificationsHubContext)
         {
             _context = context;
             _userManager = userManager;
             _notificationsHubContext = notificationsHubContext;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         public ActionResult Commander(ModelConfirmerCommande model)
@@ -342,12 +348,15 @@ namespace Projet_Web_Commerce.Controllers
 
                                     decimal fraisLesi;
                                     if (decimal.TryParse(FraisMarchand,
-                     NumberStyles.Number,
-                     CultureInfo.InvariantCulture,
-                     out fraisLesi))
+                                         NumberStyles.Number,
+                                         CultureInfo.InvariantCulture,
+                                         out fraisLesi))
                                     {
 
-                                        var Redevance = _context.PPVendeurs.Where(v => v.NoVendeur == model.NoVendeur).FirstOrDefault().Pourcentage;
+                                        var RedevancePourcentage = _context.PPVendeurs.Where(v => v.NoVendeur == model.NoVendeur).FirstOrDefault().Pourcentage;
+                                        decimal? Redevance = (sousTotal.Value/100)* RedevancePourcentage;
+
+
                                         var ppHistoriqueCommande = new PPHistoriquePaiements
                                         {
                                             MontantVenteAvantLivraison = Math.Round(sousTotal.Value, 2),
@@ -357,7 +366,7 @@ namespace Projet_Web_Commerce.Controllers
                                             DateVente = ppCommande.DateCommande,
                                             NoAutorisation = NoAutorisation.ToString(),
                                             FraisLesi = fraisLesi,
-                                            Redevance = Redevance.Value,
+                                            Redevance = Math.Round(Redevance.Value, 2),
                                             FraisLivraison = roundedFraisLivraison,
                                             FraisTPS = ppCommande.TPS,
                                             FraisTVQ = ppCommande.TVQ
@@ -369,8 +378,44 @@ namespace Projet_Web_Commerce.Controllers
                                         throw new Exception();
                                     }
 
+                                    if (ppCommande.NoCommande != null)
+                                    {
+                                        using (MemoryStream memoryStream = new MemoryStream())
+                                        {
+                                            Document document = new Document();
+                                            PdfWriter.GetInstance(document, memoryStream);
+                                            document.Open();
 
-                                    
+                                            Paragraph title = new Paragraph("Reçu");
+                                            title.Alignment = Element.ALIGN_CENTER;
+                                            document.Add(title);
+
+                                            Paragraph orderInfo = new Paragraph();
+                                            orderInfo.Add($"\nDate de la commande: {ppCommande.DateCommande}\n");
+                                            orderInfo.Add($"Nom du vendeur: {vendeur.Prenom} {vendeur.Nom}\n");
+                                            orderInfo.Add($"Numéro de client: {client.NoClient}\n");
+                                            orderInfo.Add($"Numéro d'autorisation: {ppCommande.NoAutorisation}\n");
+                                            orderInfo.Add($"Montant de vente avant la taxes: {ppCommande.MontantTotAvantTaxes}$\n");
+                                            orderInfo.Add($"Cout de livraison: {ppCommande.CoutLivraison}$\n");
+                                            orderInfo.Add($"Poids total: {ppCommande.PoidsTotal}kg\n");
+                                            orderInfo.Add($"Destination: {client.Rue}, {client.Ville}, {client.NoProvince}, {client.CodePostal}\n");
+
+                                            document.Add(orderInfo);
+
+                                            document.Close();
+
+                                            byte[] pdfBytes = memoryStream.ToArray();
+
+                                            string fileName = $"{ppCommande.NoCommande}.pdf";
+                                            string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "data", "pdf", fileName);
+                                            System.IO.File.WriteAllBytes(filePath, pdfBytes);
+
+                                        }
+                                    }
+                                    else
+                                    {
+                                        throw new Exception();
+                                    }
 
 
                                     _context.SaveChanges();
