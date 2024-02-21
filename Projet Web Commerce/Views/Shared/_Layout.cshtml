@@ -119,8 +119,12 @@
                         @if (SignInManager.IsSignedIn(User) && User.IsInRole("Client"))
                         {
                             <li class="nav-item">
-                                <a class="nav-link" style="color: rgb(249, 229, 71); font-size: 23px" asp-area="" asp-controller="PPHistoriquePaiements" asp-action="HistoriqueClient">Historique de Paiements</a>
+                                <a class="nav-link" style="color: rgb(249, 229, 71); font-size: 23px" asp-area="" asp-controller="PPHistoriquePaiements" asp-action="HistoriqueClient">Mes Commandes</a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link" style="color: rgb(249, 229, 71); font-size: 23px" asp-area="Identity" asp-page="/Account/RegisterVendeur">S'inscrire comme vendeur</a>
+                            </li>
+
                             <div class="d-flex justify-content-center flex-grow-1">
                                 <form method="post" class="d-flex mx-auto" asp-controller="MainMenu" asp-action="CatalogueTous" class="mx-3">
                                     <input class="form-control me-2" name="searchString" id="searchString" type="search" placeholder="Search" aria-label="Search">
@@ -128,7 +132,7 @@
                                 </form>
                             </div>
 
-                           
+                            
                         }
                         
                     </ul>

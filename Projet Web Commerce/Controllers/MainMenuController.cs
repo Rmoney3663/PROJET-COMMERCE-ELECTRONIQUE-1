@@ -23,11 +23,13 @@ namespace Projet_Web_Commerce.Controllers
 
         private readonly AuthDbContext _context;
         private readonly Microsoft.AspNetCore.Identity.UserManager<Utilisateur> _userManager;
+        private readonly SignInManager<Utilisateur> _signInManager;
 
-        public MainMenuController(AuthDbContext context, Microsoft.AspNetCore.Identity.UserManager<Utilisateur> userManager)
+        public MainMenuController(AuthDbContext context, Microsoft.AspNetCore.Identity.UserManager<Utilisateur> userManager, SignInManager<Utilisateur> signInManager)
         {
             _context = context;
             _userManager = userManager;
+            _signInManager = signInManager;
         }
 
         // GET: MainMenuController
@@ -77,7 +79,7 @@ namespace Projet_Web_Commerce.Controllers
             model.nomAffaire = model.nomAffaire;
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            if (nbPourCon == 0 && model.premiereConnexion == 0)
+            if (nbPourCon == 0 && model.premiereConnexion == 0 && _signInManager.IsSignedIn(User))
             {
                 var user = await _userManager.GetUserAsync(User);
                 PPVendeursClients vendeurClient = new PPVendeursClients();

@@ -138,8 +138,10 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
             public string PhoneNumber2 { get; set; }
         }
 
-        public async Task OnGetAsync(string returnUrl = null)
+        public async Task<IActionResult> OnGetAsync(string returnUrl = null)
         {
+
+                
             ReturnUrl = returnUrl;
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 
@@ -152,6 +154,13 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
 
             Input.SelectedNumberLivraison = 0;
             Input.Tax = true;
+
+            if (User.IsInRole("Gestionnaire") || User.IsInRole("Vendeur"))
+            {
+                return Redirect("/MainMenu");
+            }
+            else
+                return Page();
         }
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
@@ -230,6 +239,11 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
 
                     _context.PPVendeurs.Add(nouveauVendeur);
                     _context.SaveChanges();
+
+                    if (_signInManager.IsSignedIn(User))
+                    {
+                        _signInManager.SignOutAsync();
+                    }
 
 
                     _logger.LogInformation("L'utilisateur a créé un nouveau compte avec un mot de passe.");

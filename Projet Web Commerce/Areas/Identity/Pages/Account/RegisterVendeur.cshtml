@@ -1,10 +1,19 @@
 ﻿@page
 @model RegisterModel2
+@inject Microsoft.AspNetCore.Identity.SignInManager<Utilisateur> SignInManager
+
 @{
     ViewData["Title"] = "Inscription vendeur";
 }
-
+@if (SignInManager.IsSignedIn(User))
+{
+    <a asp-area="" asp-controller="MainMenu" asp-action="Catalogue">Retour au catalogue</a>
+}
+else
+{
 <a asp-area="Identity" asp-page="/Account/Register">Retour</a>
+}
+
 <h1>@ViewData["Title"]</h1>
 
 <div class="row">
