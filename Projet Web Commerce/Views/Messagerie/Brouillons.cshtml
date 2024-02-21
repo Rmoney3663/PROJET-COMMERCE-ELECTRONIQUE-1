@@ -87,47 +87,73 @@
                 <div class="card-body">
                     <h2 class="card-title">@ViewData["Title"]</h2>
                     <hr />
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th scope="col" style="padding-right: 0px">#</th>
-                                <th scope="col" style="max-width: 50px;">Destinataire(s)</th>
-                                <th scope="col">Objet - <span class="msg">Message</span></th>
-                                <th scope="col"></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @{
-                                var no = 0;
-                            }
-                            @foreach (var msg in Model)
-                            {
-                                var idDestinataires = msg.Destinataires.Select(d => d.Destinataire);
-                                <tr class="flotter" onclick="window.location.href = '@Url.Action("EnvoyerMessage", new { idMessage = msg.NoMessage, typeMessage = "brouillon" })'">
-                                    <td>@(++no)</td>
-                                    <td class="truncateDest">
-                                        @{
-                                            var destinataires = idDestinataires
-                                            .Select(dest => _context.Users.FirstOrDefault(u => u.Id == dest)?.Email)
-                                            .Where(email => !string.IsNullOrWhiteSpace(email));
-
-                                            var dests = string.Join(", ", destinataires);
-                                        }
-                                        @dests
-                                    </td>
-                                    <td class="truncate">@Html.DisplayFor(modelItem => msg.Sujet) - <span class="msg">@Html.DisplayFor(modelItem => msg.Message)</span></td>
-                                    <td>
-                                        <div class="menu-container">
-                                            <a class="menu-btn" onclick="afficherMenu(event)">@* ☰ *@</a>
-                                            <ul class="menu-list">
-                                                <li><a href="#" onclick="supprimerBrouillon(event, '@msg.NoMessage')">Supprimer</a></li>
-                                            </ul>
-                                        </div>
-                                    </td>
+                    <form id="frmBrouillons" method="post" asp-action="Brouillons">
+                        <div class="mb-3">
+                            <label for="triMessages" class="form-label">Trier par:</label>
+                            <select class="form-select" id="triMessages" name="triMessages" onchange="this.form.submit()">
+                                <option value="DateDesc">Date ↑</option>
+                                <option value="DateCroiss">Date ↓</option>
+                                <option value="ExpeDesc">Destinataire(s) ↑</option>
+                                <option value="ExpeCroiss">Destinataire(s) ↓</option>
+                            </select>
+                        </div>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col" style="padding-right: 0px">#</th>
+                                    <th scope="col" style="max-width: 50px;">Destinataire(s)</th>
+                                    <th scope="col">Objet - <span class="msg">Message</span></th>
+                                    <th scope="col" class="text-end">Date</th>
+                                    <th scope="col"></th>
                                 </tr>
-                            }
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                @{
+                                    var no = 0;
+                                }
+                                @if (Model != null)
+                                {
+                                    @foreach (var msg in Model)
+                                    {
+                                        var idDestinataires = msg.Destinataires.Select(d => d.Destinataire);
+                                        <tr class="flotter" onclick="window.location.href = '@Url.Action("EnvoyerMessage", new { idMessage = msg.NoMessage, typeMessage = "brouillon" })'">
+                                            <td>@(++no)</td>
+                                            <td class="truncateDest">
+                                                @{
+                                                    var destinatairesMsgCourant = idDestinataires
+                                                        .Select(dest => _context.Users.FirstOrDefault(u => u.Id == dest)?.Email)
+                                                        .Where(email => !string.IsNullOrWhiteSpace(email));
+
+                                                    switch (ViewBag.TriMessages)
+                                                    {
+                                                        case "ExpeDesc":
+                                                            destinatairesMsgCourant = destinatairesMsgCourant.OrderByDescending(d => d);
+                                                            break;
+
+                                                        case "ExpeCroiss":
+                                                            destinatairesMsgCourant = destinatairesMsgCourant.OrderBy(d => d);
+                                                            break;
+                                                    }
+                                                    var dests = string.Join(", ", destinatairesMsgCourant);
+                                                }
+                                                @dests
+                                            </td>
+                                            <td class="truncate">@Html.DisplayFor(modelItem => msg.Sujet) - <span class="msg">@Html.DisplayFor(modelItem => msg.Message)</span></td>
+                                            <td class="text-end">@Html.DisplayFor(modelItem => msg.DateEnvoi)</td>
+                                            <td>
+                                                <div class="menu-container">
+                                                    <a class="menu-btn" onclick="afficherMenu(event)">@* ☰ *@</a>
+                                                    <ul class="menu-list">
+                                                        <li><a href="#" onclick="supprimerBrouillon(event, '@msg.NoMessage')">Supprimer</a></li>
+                                                    </ul>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </form>
                 </div>
             </div>
         </section>
@@ -145,6 +171,11 @@
                 menu.style.display = 'none';
             });
         }
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        var ddlTri = document.getElementById('triMessages');
+        ddlTri.value = '@ViewBag.TriMessages';
     });
 
     function afficherMenu(event) {

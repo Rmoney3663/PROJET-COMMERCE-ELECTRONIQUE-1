@@ -195,6 +195,7 @@
                         <input type="hidden" name="auteur" id="auteur" value="" />
                         <input type="hidden" name="typeMessage" id="typeMessage" value="" />
                         <input type="hidden" name="idMessage" id="idMessage" value="" />
+                        <input type="hidden" name="typeMessageStr" id="typeMessageStr" value="" />
                     </div>
                 </form>
             </div>
@@ -313,6 +314,7 @@
         else {
             var params = new URLSearchParams(document.location.search);
             var idMessage = params.get('idMessage');
+            var typeMessageStr = params.get('typeMessage')
             var destinatairesSelectionnes = destinataires.split(';');
             for (var i = 0; i < destinatairesSelectionnes.length; i++) {
                 if (destinatairesSelectionnes[i] == '')
@@ -324,6 +326,7 @@
             document.getElementById('auteur').value = '@user.Email';
             document.getElementById('typeMessage').value = 2;
             document.getElementById('idMessage').value = idMessage;
+            document.getElementById('typeMessageStr').value = typeMessageStr;
 
             document.getElementById('frmCourriel').submit();
         }
@@ -349,6 +352,7 @@
         else {
             var params = new URLSearchParams(document.location.search);
             var idMessage = params.get('idMessage');
+            var typeMessageStr = params.get('typeMessage')
             var destinatairesSelectionnes = document.getElementById('selectedDestinataire').value.split(';');
             for (var i = 0; i < destinatairesSelectionnes.length; i++) {
                 if (destinatairesSelectionnes[i] == '')
@@ -358,6 +362,7 @@
             document.getElementById('auteur').value = '@user.Email';
             document.getElementById('typeMessage').value = 0;
             document.getElementById('idMessage').value = idMessage;
+            document.getElementById('typeMessageStr').value = typeMessageStr;
 
             var valide = true;
             var msgErreur = "";

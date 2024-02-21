@@ -80,40 +80,54 @@
                 <div class="card-body">
                     <h2 class="card-title">@ViewData["Title"]</h2>
                     <hr />
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th scope="col">#</th>
-                                <th scope="col">Expéditeur</th>
-                                <th scope="col">Objet - <span class="msg">Message</span></th>
-                                <th scope="col" class="text-end">Date de l'envoi</th>
-                                <th scope="col"></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @{
-                                var no = 0;
-                            }
-                            @foreach (var msg in Model)
-                            {
-                                <tr class="flotter" onclick="window.location.href = '@Url.Action("Details", new { idMessage = msg.NoMessage })'">
-                                    <td>@(++no)</td>
-                                    <td>@_context.Users.Where(u => u.Id == msg.Message.Auteur).FirstOrDefault().Email</td>
-                                    <td class="truncate">@Html.DisplayFor(modelItem => msg.Message.Sujet) - <span class="msg">@Html.DisplayFor(modelItem => msg.Message.Message)</span></td>
-                                    <td class="text-end">@Html.DisplayFor(modelItem => msg.Message.DateEnvoi)</td>
-                                    <td>
-                                        <div class="menu-container">
-                                            <a class="menu-btn" onclick="afficherMenu(event)">@* ☰ *@</a>
-                                            <ul class="menu-list">
-                                                <li><a href="#" onclick="restaurer(event, '@msg.NoMessage')">Restaurer</a></li>
-                                                <li><a href="#" onclick="supprimerDef(event, '@msg.NoMessage')">Supprimer</a></li>
-                                            </ul>
-                                        </div>
-                                    </td>
+                    <form id="frmSupprimes" method="post" asp-action="Supprimes">
+                        <div class="mb-3">
+                            <label for="triMessages" class="form-label">Trier par:</label>
+                            <select class="form-select" id="triMessages" name="triMessages" onchange="this.form.submit()">
+                                <option value="DateDesc">Date ↑</option>
+                                <option value="DateCroiss">Date ↓</option>
+                                <option value="ExpeDesc">Destinataire(s) ↑</option>
+                                <option value="ExpeCroiss">Destinataire(s) ↓</option>
+                            </select>
+                        </div>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Expéditeur</th>
+                                    <th scope="col">Objet - <span class="msg">Message</span></th>
+                                    <th scope="col" class="text-end">Date de l'envoi</th>
+                                    <th scope="col"></th>
                                 </tr>
-                            }
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                @{
+                                    var no = 0;
+                                }
+                                @if (Model != null)
+                                {
+                                    @foreach (var msg in Model)
+                                    {
+                                        <tr class="flotter" onclick="window.location.href = '@Url.Action("Details", new { idMessage = msg.NoMessage })'">
+                                            <td>@(++no)</td>
+                                            <td>@_context.Users.Where(u => u.Id == msg.Message.Auteur).FirstOrDefault().Email</td>
+                                            <td class="truncate">@Html.DisplayFor(modelItem => msg.Message.Sujet) - <span class="msg">@Html.DisplayFor(modelItem => msg.Message.Message)</span></td>
+                                            <td class="text-end">@Html.DisplayFor(modelItem => msg.Message.DateEnvoi)</td>
+                                            <td>
+                                                <div class="menu-container">
+                                                    <a class="menu-btn" onclick="afficherMenu(event)">@* ☰ *@</a>
+                                                    <ul class="menu-list">
+                                                        <li><a href="#" onclick="restaurer(event, '@msg.NoMessage')">Restaurer</a></li>
+                                                        <li><a href="#" onclick="supprimerDef(event, '@msg.NoMessage')">Supprimer</a></li>
+                                                    </ul>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </form>
                 </div>
             </div>
         </section>
@@ -133,6 +147,11 @@
         }
     });
 
+    document.addEventListener('DOMContentLoaded', function () {
+        var ddlTri = document.getElementById('triMessages');
+        ddlTri.value = '@ViewBag.TriMessages';
+    });
+
     function afficherMenu(event) {
         event.stopPropagation();
         var menuList = event.target.nextElementSibling;
@@ -146,6 +165,6 @@
 
     function supprimerDef(event, noMessage) {
         event.stopPropagation();
-        window.location.href = '@Url.Action("supprimerDefinitivement")' + '?idMessage=' + noMessage;
+        window.location.href = '@Url.Action("SupprimerDefinitivement")' + '?idMessage=' + noMessage;
     }
 </script>

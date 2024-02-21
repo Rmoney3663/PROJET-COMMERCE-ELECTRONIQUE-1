@@ -74,6 +74,23 @@
                     text-decoration: underline;
                     font-weight: bold;
                 }
+
+    .tooltip .tooltiptext {
+        visibility: hidden;
+        width: 120px;
+        background-color: black;
+        color: #fff;
+        text-align: center;
+        border-radius: 6px;
+        padding: 5px 0;
+        /* Position the tooltip */
+        position: absolute;
+        z-index: 1;
+    }
+
+    .tooltip:hover .tooltiptext {
+        visibility: visible;
+    }
 </style>
 
 <div class="row">
@@ -86,71 +103,76 @@
                 <div class="card-body">
                     <h2 class="card-title">@ViewData["Title"]</h2>
                     <hr />
-                    <form id="frmCourriel" method="post" asp-action="Supprimer">
+                    <form id="frmCourriel" method="post" asp-action="BoiteDeReception">
                         <div class="mb-3">
                             <label for="triMessages" class="form-label">Trier par:</label>
-                            <select class="form-select" id="triMessages" name="triMessages">
-                                <option value="date">Date</option>
-                                <option value="expediteur">Expéditeur</option>
+                            <select class="form-select" id="triMessages" name="triMessages" onchange="this.form.submit()">
+                                <option value="DateDesc">Date ↑</option>
+                                <option value="DateCroiss">Date ↓</option>
+                                <option value="ExpeDesc">Expéditeur ↑</option>
+                                <option value="ExpeCroiss">Expéditeur ↓</option>
                             </select>
                         </div>
-                        <div id="btnSupprimer" style="display:none;">
-                            <a class="btn border">
+                        <div id="divOperations" style="display:none;">
+                            <a class="btn border" id="btnSupprimer" title="Supprimer">
                                 <img src="~/data/images/trash3.svg" />
                             </a>
-                            <a class="btn border">
+                            <a class="btn border" id="btnLu" title="Marquer comme lu">
+                                <img src="~/data/images/courrielLu.svg" />
+                            </a>
+                            <a class="btn border" id="btnNonLu" title="Marquer comme non lu">
                                 <img src="~/data/images/courrielNonLu2.svg" />
                             </a>
                         </div>
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th scope="col">#</th>
-                                <th scope="col">Expéditeur</th>
-                                <th scope="col">Objet - <span class="msg">Message</span></th>
-                                <th scope="col" class="text-end">Date de l'envoi</th>
-                                <th scope="col"></th>
-                                <th scope="col"></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @{
-                                var no = 0;
-                            }
-                            @if(Model != null)
-                            {
-
-                                @foreach (var msg in Model)
-                                {
-                                    bool messageLu = msg.Destinataires?.Any(dest => dest.Destinataire == ViewBag.UtilisateurCourantId
-                                    && dest.MessageLu) ?? false;
-
-                                    string rowClass = (!messageLu && msg.TypeMessage == 0) ? "flotter email-non-lu" : "flotter";
-
-                                    <tr class="@rowClass" onclick="window.location.href = '@Url.Action("Details", new { idMessage = msg.NoMessage })'">
-                                        <td>@(++no)</td>
-                                        <td>@_context.Users.FirstOrDefault(u => u.Id == msg.Auteur)?.Email</td>
-                                        <td class="truncate">@Html.DisplayFor(modelItem => msg.Sujet) - <span class="msg">@Html.DisplayFor(modelItem => msg.Message)</span></td>
-                                        <td class="text-end">@Html.DisplayFor(modelItem => msg.DateEnvoi)</td>
-                                        <td style="padding-left: 1%">
-                                            <input type="checkbox" name="name1" onclick="event.stopPropagation()" />
-                                        </td>
-                                        <td>
-                                            <div class="menu-container">
-                                                <a class="menu-btn" onclick="afficherMenu(event)">@* ☰ *@</a>
-                                                <ul class="menu-list">
-                                                    <li><a href="#" onclick="repondre(event, '@msg.NoMessage')">Répondre</a></li>
-                                                    <li><a href="#" onclick="transferer(event, '@msg.NoMessage', '@ViewBag.UtilisateurCourantId')">Transférer</a></li>
-                                                    <li><a href="#" onclick="supprimer(event, '@msg.NoMessage')">Supprimer</a></li>
-                                                </ul>
-                                            </div>
-                                        </td>
-                                    </tr>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Expéditeur</th>
+                                    <th scope="col">Objet - <span class="msg">Message</span></th>
+                                    <th scope="col" class="text-end">Date de l'envoi</th>
+                                    <th scope="col"></th>
+                                    <th scope="col"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{
+                                    var no = 0;
                                 }
-                            }
-                        </tbody>
-                        <input type="hidden" name="idMessage" id="idMessage" value="" />
-                    </table>
+                                @if(Model != null)
+                                {
+
+                                    @foreach (var msg in Model)
+                                    {
+                                        bool messageLu = msg.Destinataires?.Any(dest => dest.Destinataire == ViewBag.UtilisateurCourantId
+                                        && dest.MessageLu) ?? false;
+
+                                        string rowClass = (!messageLu && msg.TypeMessage == 0) ? "flotter email-non-lu" : "flotter";
+
+                                            <tr class="@rowClass" data-noMessage="@msg.NoMessage" onclick="window.location.href = '@Url.Action("Details", new { idMessage = msg.NoMessage })'">
+                                            <td>@(++no)</td>
+                                            <td>@_context.Users.FirstOrDefault(u => u.Id == msg.Auteur)?.Email</td>
+                                            <td class="truncate">@Html.DisplayFor(modelItem => msg.Sujet) - <span class="msg">@Html.DisplayFor(modelItem => msg.Message)</span></td>
+                                            <td class="text-end">@Html.DisplayFor(modelItem => msg.DateEnvoi)</td>
+                                            <td style="padding-left: 1%">
+                                                <input type="checkbox" name="name1" onclick="event.stopPropagation()" />
+                                            </td>
+                                            <td>
+                                                <div class="menu-container">
+                                                    <a class="menu-btn" onclick="afficherMenu(event)">@* ☰ *@</a>
+                                                    <ul class="menu-list">
+                                                        <li><a href="#" onclick="repondre(event, '@msg.NoMessage')">Répondre</a></li>
+                                                        <li><a href="#" onclick="transferer(event, '@msg.NoMessage', '@ViewBag.UtilisateurCourantId')">Transférer</a></li>
+                                                        <li><a href="#" onclick="supprimer(event, '@msg.NoMessage')">Supprimer</a></li>
+                                                    </ul>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                            <input type="hidden" name="idMessage" id="idMessage" value="" />
+                        </table>
                     </form>
                 </div>
             </div>
@@ -172,13 +194,44 @@
     });
 
     document.addEventListener('DOMContentLoaded', function () {
+        var ddlTri = document.getElementById('triMessages');
+        ddlTri.value = '@ViewBag.TriMessages';
+
         var checkboxes = document.querySelectorAll('input[type="checkbox"]');
+        var divOperations = document.getElementById('divOperations');
+
         var btnSupprimer = document.getElementById('btnSupprimer');
+        var btnLu = document.getElementById('btnLu');
+        var btnNonLu = document.getElementById('btnNonLu');
 
         checkboxes.forEach(function (checkbox) {
             checkbox.addEventListener('change', function () {
                 var checkedCheckboxes = document.querySelectorAll('input[type="checkbox"]:checked');
-                btnSupprimer.style.display = checkedCheckboxes.length > 0 ? 'block' : 'none';
+                divOperations.style.display = checkedCheckboxes.length > 0 ? 'block' : 'none';
+            });
+        });
+
+        btnSupprimer.addEventListener('click', function () {
+            var checkedCheckboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+            checkedCheckboxes.forEach(function (checkbox) {
+                var noMessage = checkbox.closest('tr').getAttribute('data-noMessage');
+                supprimer(null, noMessage);
+            });
+        });
+        
+        btnLu.addEventListener('click', function () {
+            var checkedCheckboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+            checkedCheckboxes.forEach(function (checkbox) {
+                var noMessage = checkbox.closest('tr').getAttribute('data-noMessage');
+                marquerLu(noMessage);
+            });
+        });
+        
+        btnNonLu.addEventListener('click', function () {
+            var checkedCheckboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+            checkedCheckboxes.forEach(function (checkbox) {
+                var noMessage = checkbox.closest('tr').getAttribute('data-noMessage');
+                marquerNonLu(noMessage);
             });
         });
     });
@@ -200,9 +253,18 @@
     }
 
     function supprimer(event, noMessage) {
-        event.stopPropagation();
+        if (event != null)
+            event.stopPropagation();
 
         window.location.href = '@Url.Action("Supprimer")' + '?idMessage=' + noMessage;
+    }
+
+    function marquerLu(noMessage) {
+        window.location.href = '@Url.Action("MarquerLu")' + '?idMessage=' + noMessage;
+    }
+    
+    function marquerNonLu(noMessage) {
+        window.location.href = '@Url.Action("MarquerNonLu")' + '?idMessage=' + noMessage;
     }
 
 </script>

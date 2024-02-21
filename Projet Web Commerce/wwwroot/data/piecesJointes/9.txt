@@ -1,0 +1,12 @@
+dames
+connect4
+poker
+minesweeper
+gps (chemin plus rapide)
+scrabble
+chatbot
+search engine
+handwritten notes recognition
+emotion detecter
+cube rubik
+rush hour
