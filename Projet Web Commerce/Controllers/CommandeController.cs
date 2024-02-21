@@ -18,6 +18,7 @@ using iTextSharp.text.pdf;
 using System.IO;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 
 namespace Projet_Web_Commerce.Controllers
 {
@@ -406,9 +407,8 @@ namespace Projet_Web_Commerce.Controllers
 
                                             byte[] pdfBytes = memoryStream.ToArray();
 
-                                            string fileName = $"{ppCommande.NoCommande}.pdf";
-                                            string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "data", "pdf", fileName);
-                                            string filePath2 = Path.Combine(_webHostEnvironment.WebRootPath, "data", "pdf", fileName);
+                                            string fileName = $"{ppCommande.NoCommande}.pdf";                                            
+                                            string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "data", "pdf", fileName);                                           
                                             System.IO.File.WriteAllBytes(filePath, pdfBytes);
                                             var Auteur = _context.PPGestionnaire.FirstOrDefault().IdUtilisateur;
                                             var ppMessage = new PPMessages
@@ -417,11 +417,43 @@ namespace Projet_Web_Commerce.Controllers
                                                Message = "Voici le pdf qui contient l'information de la commande.",
                                                Auteur = Auteur,
                                                TypeMessage = 0,
-                                               PieceJointe = fileName
-
+                                               PieceJointe = null,
+                                               Transmetteur = null,
+                                                DateEnvoi = DateTime.Now
                                             };
-                                            _context.Add(ppMessage);
 
+                                            _context.PPMessages.Add(ppMessage);
+                                            await _context.SaveChangesAsync();
+                                            string fileName2 = $"{ppMessage.NoMessage}.pdf";
+                                            string filePath2 = Path.Combine(_webHostEnvironment.WebRootPath, "data", "piecesJointes", fileName2);
+                                            System.IO.File.WriteAllBytes(filePath2, pdfBytes);
+                                            ppMessage.PieceJointe = fileName2;
+                                            await _context.SaveChangesAsync();
+
+                                            var vendeurmessage = _context.PPVendeurs.Where(v => v.NoVendeur == ppCommande.NoVendeur).FirstOrDefault().AdresseEmail;
+                                            var userV = _context.Users.Where(v => v.Email == vendeurmessage).FirstOrDefault();
+                                            PPDestinatairesMessage destinatairesMessage1 = new PPDestinatairesMessage
+                                            {
+                                                NoMessage = ppMessage.NoMessage,
+                                                Destinataire = userV.Email,
+                                                DestinataireUser = await _userManager.FindByEmailAsync(userV.Email)
+                                            };
+
+                                            var clientmessage = _context.PPClients.Where(v => v.NoClient == ppCommande.NoClient).FirstOrDefault().AdresseEmail;
+                                            var userC = _context.Users.Where(v => v.Email == clientmessage).FirstOrDefault();
+                                            PPDestinatairesMessage destinatairesMessage2 = new PPDestinatairesMessage
+                                            {
+                                                NoMessage = ppMessage.NoMessage,
+                                                Destinataire = userC.Email,
+                                                DestinataireUser = await _userManager.FindByEmailAsync(userC.Email)
+                                            };
+
+                                            _context.PPDestinatairesMessage.Add(destinatairesMessage1);
+                                            _context.PPDestinatairesMessage.Add(destinatairesMessage2);
+                                            await _context.SaveChangesAsync();
+
+                                            await _notificationsHubContext.Clients.User(destinatairesMessage1.Destinataire).SendAsync("NotificationMessage", destinatairesMessage1.Destinataire);
+                                            await _notificationsHubContext.Clients.User(destinatairesMessage2.Destinataire).SendAsync("NotificationMessage", destinatairesMessage2.Destinataire);
                                         }
                                     }
                                     else
