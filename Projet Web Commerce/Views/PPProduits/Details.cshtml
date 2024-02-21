@@ -3,7 +3,7 @@
 @inject UserManager<Projet_Web_Commerce.Areas.Identity.Data.Utilisateur> _userManager
 @inject SignInManager<Projet_Web_Commerce.Areas.Identity.Data.Utilisateur> SignInManager
 @inject AuthDbContext _context
-@model Projet_Web_Commerce.Models.PPProduits
+@model dynamic
 @using System.IO
 @inject IWebHostEnvironment env
 @{
@@ -29,15 +29,6 @@
         }
     </script>
 }
-
-<style>
-    .evaluation {
-        background-color: white;
-        padding: 5px;
-        margin-bottom: 10px;
-        border-radius: 5px
-    }
-</style>
 
 @if (!SignInManager.IsSignedIn(User) )
 {
@@ -80,28 +71,28 @@ else
                 Nom du produit :
             </dt>
             <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.Nom)
+                <p>@Model.Nom</p>
             </dd>
 
             <dt class="col-sm-2">
                 Description plus élaborée :
             </dt>
             <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.Description)
+                <p>@Model.Description</p>
             </dd>
 
             <dt class="col-sm-2">
                 Catégorie du produit :
             </dt>
             <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.PPCategories.Description)
+                <p>@Model.PPCategories.Description</p>
             </dd>
 
             <dt class="col-sm-2">
                 Prix demandé :
             </dt>
             <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.PrixDemande) $
+                <p>@Model.PrixDemande $</p>
             </dd>
 
             <dt class="col-sm-2">
@@ -124,14 +115,14 @@ else
                 Poids de l’article :
             </dt>
             <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.Poids) Kg
+                <p>@Model.Poids Kg</p>
             </dd>
 
             <dt class="col-sm-2">
                 Nombre d’items :
             </dt>
             <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.NombreItems)
+                <p>@Model.NombreItems</p>
             </dd>
 
             <dt class="col-sm-2">
@@ -140,7 +131,7 @@ else
             @if (Model.PrixVente != null)
             {
                 <dd class="col-sm-10">
-                    @Html.DisplayFor(model => model.PrixVente) $
+                    <p>@Model.PrixVente $</p>
                 </dd>
             }
             else
@@ -156,7 +147,7 @@ else
             @if (Model.DateVente != null)
             {
                 <dd class="col-sm-10">
-                    @Html.DisplayFor(model => model.DateVente) 
+                    <p>@Model.DateVente</p>
                 </dd>
             }
             else
@@ -174,6 +165,25 @@ else
                     <input type="hidden" name="NoProduit" value="@Model.NoProduit" />
                     <input type="hidden" name="NoClient" value="@client.NoClient" />
                     <input type="hidden" name="NoVendeur" value="@Model.NoVendeur" />
+
+                    @if (ViewBag.source == "vendeur")
+                    {
+                        <input type="hidden" name="source" value="vendeur" />
+                        <input type="hidden" name="nomAffaire" value="@ViewBag.nomAffaire" />
+                        <input type="hidden" name="premiereConnexion" value="@ViewBag.premiereConnexion" />
+                    }
+                    else
+                    {
+                        <input type="hidden" name="source" value="tous" />
+                    }
+                    <input type="hidden" name="searchString" value="@ViewBag.searchString" />
+                    <input type="hidden" name="parPage" value="@ViewBag.parPage" />
+                    <input type="hidden" name="searchCat" value="@ViewBag.searchCat" />
+                    <input type="hidden" name="pageNumber" value="@ViewBag.pageNumber" />
+                    <input type="hidden" name="dateApres" value="@ViewBag.dateApres" />
+                    <input type="hidden" name="dateAvant" value="@ViewBag.dateAvant" />
+                    <input type="hidden" name="sortOrder" value="@ViewBag.sortOrder" />
+
                     <button class="btn btn-secondary" type="submit">Ajouter au panier</button>
                     <select name="quantite">
                         @for (int i = 1; i <= Model.NombreItems && i < 21; i++)
@@ -189,7 +199,34 @@ else
     <div>
         @if ( !User.IsInRole("Vendeur") && vendeur != null)
         {
-            <a asp-controller="MainMenu" asp-route-nomAffaire="@vendeur" asp-action="CatalogueVendeur">Retour au catalogue du vendeur</a>
+
+            <form asp-controller="PPProduits" asp-route-id="@Model.NoProduit" asp-action="Details" method="post">
+
+                @if (ViewBag.source == "vendeur")
+                {
+                    <input type="hidden" name="source" value="vendeur" />
+                    <input type="hidden" name="nomAffaire" value="@ViewBag.nomAffaire" />
+                    <input type="hidden" name="premiereConnexion" value="@ViewBag.premiereConnexion" />
+                }
+                else
+                {
+                    <input type="hidden" name="source" value="tous" />
+                }
+                <input type="hidden" name="searchString" value="@ViewBag.searchString" />
+                <input type="hidden" name="parPage" value="@ViewBag.parPage" />
+                <input type="hidden" name="searchCat" value="@ViewBag.searchCat" />
+                <input type="hidden" name="pageNumber" value="@ViewBag.pageNumber" />
+                <input type="hidden" name="dateApres" value="@ViewBag.dateApres" />
+                <input type="hidden" name="dateAvant" value="@ViewBag.dateAvant" />
+                <input type="hidden" name="sortOrder" value="@ViewBag.sortOrder" />
+
+                <button type="submit" style="background: none; border: none; padding: 0; color: #069; text-decoration: underline; cursor: pointer;">Retour au catalogue du vendeur</button>
+
+                @*<button type="submit" class="btn btn-secondary mt-auto" style="margin-bottom:10px; background-color:@backgroundButtonDetail; color: @textButtonDetail">Details</button>*@
+
+            </form>
+
+            
 
         }
         else
@@ -204,10 +241,11 @@ else
     var lstReview = _context.PPEvaluations.ToList();
     bool trouve = false;
     PPEvaluations evalClientActu = null;
+    int noProduit = Model.NoProduit;
 
     @if (User.IsInRole("Client"))
     {
-        evalClientActu = _context.PPEvaluations.Where(e => e.NoClient == client.NoClient && e.NoProduit == Model.NoProduit).FirstOrDefault();
+        evalClientActu = _context.PPEvaluations.Where(e => e.NoClient == client.NoClient && e.NoProduit == noProduit).FirstOrDefault();
     }
 
 
@@ -251,7 +289,26 @@ else
                         </button>
                     }
                     <br />
-                    <form asp-route-id="@Model.NoProduit" asp-route-noClient="@client.NoClient" asp-route-eval="@trouve">
+                    <form asp-route-id="@Model.NoProduit" asp-route-noClient="@client.NoClient" asp-route-ajout="L" asp-route-eval="@trouve">
+
+                        @if (ViewBag.source == "vendeur")
+                        {
+                            <input type="hidden" name="source" value="vendeur" />
+                            <input type="hidden" name="nomAffaire" value="@ViewBag.nomAffaire" />
+                            <input type="hidden" name="premiereConnexion" value="@ViewBag.premiereConnexion" />
+                        }
+                        else
+                        {
+                            <input type="hidden" name="source" value="tous" />
+                        }
+                        <input type="hidden" name="searchString" value="@ViewBag.searchString" />
+                        <input type="hidden" name="parPage" value="@ViewBag.parPage" />
+                        <input type="hidden" name="searchCat" value="@ViewBag.searchCat" />
+                        <input type="hidden" name="pageNumber" value="@ViewBag.pageNumber" />
+                        <input type="hidden" name="dateApres" value="@ViewBag.dateApres" />
+                        <input type="hidden" name="dateAvant" value="@ViewBag.dateAvant" />
+                        <input type="hidden" name="sortOrder" value="@ViewBag.sortOrder" />
+
                         <input type="hidden" name="rating" id="newRating" />
                         @if (evalClientActu != null)
                         {
