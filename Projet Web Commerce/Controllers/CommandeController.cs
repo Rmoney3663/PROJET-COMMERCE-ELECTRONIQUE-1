@@ -279,7 +279,7 @@ namespace Projet_Web_Commerce.Controllers
                                     NoVendeur = model.NoVendeur,
                                     DateCommande = DateTime.Now,
                                     PoidsTotal = poidsTotal,
-                                    Statut = "s",
+                                    Statut = "P",
                                     MontantTotAvantTaxes = Math.Round(sousTotal.Value, 2),
                                     TPS = Math.Round(sousTotal.Value * (tps / 100), 2),
                                     TVQ = Math.Round(sousTotal.Value * (tvq / 100), 2),

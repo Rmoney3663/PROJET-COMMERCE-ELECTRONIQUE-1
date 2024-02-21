@@ -1,2 +1,68 @@
-﻿@{
-}
+﻿@model IEnumerable<Projet_Web_Commerce.Models.PPCommandes>
+@using Projet_Web_Commerce.Data
+@inject AuthDbContext _context
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .card {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            @foreach (var item in Model)
+            {
+                <div class="col-md-4">
+                    @{
+                        string styleContour = "";
+                    }
+                    @if (item.Statut == "P")
+                    {
+                        styleContour = "border: 5px solid blue; box - sizing:border - box";
+                    }
+
+                    <div class="card" >
+                        <div class="card-body" style="@styleContour">
+                            <h5 class="card-title">Order Details</h5>
+                            <p class="card-text">NoCommande: @item.NoCommande</p>
+                            <p class="card-text">Numéro du client: @item.NoClient</p>
+                            <p class="card-text">Montant total avant taxes: @item.MontantTotAvantTaxes</p>
+                            <p class="card-text">Date de la commande: @item.DateCommande</p>
+                            <p class="card-text">Poids de la livraison: @item.PoidsTotal</p>
+                            <p class="card-text">NoAutorisation: @item.NoAutorisation</p>
+                            <p class="card-text">Type de livraison: @_context.PPTypesLivraison.Where(l=>l.CodeLivraison == item.TypeLivraison).FirstOrDefault().Description</p>
+                            <p class="card-text">Frais de livraison: @item.CoutLivraison</p>
+                            <p class="card-text">TPS: @item.TPS</p>
+                            <p class="card-text">TVQ: @item.TVQ</p>
+                            @if (item.Statut == "P")
+                            {
+                                <p class="card-text">Statut: Prêt pour la livraison</p>
+                            }
+                            else
+                            {
+                                <p class="card-text">Statut: Livré</p>
+                            }
+                            @if (item.Statut == "P")
+                            {
+                                <form asp-controller="PPProduits" asp-action="GestionCommandes" asp-route-noCommande="@item.NoCommande" method="post">
+                                    <button type="submit" class="btn btn-primary">Comfirmer la livraison</button>
+                                </form>
+                                
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

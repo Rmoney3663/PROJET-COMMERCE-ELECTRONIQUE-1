@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using DocumentFormat.OpenXml.Bibliography;
 using DocumentFormat.OpenXml.Office2010.Excel;
+using DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -65,6 +66,32 @@ namespace Projet_Web_Commerce.Controllers
             }
 
             return View(pPProduits);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GestionCommandes()
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            var noVendeur = _context.PPVendeurs.Where(c => c.AdresseEmail == user.Email).FirstOrDefault().NoVendeur;
+
+            return View(await _context.PPCommandes.Where(c=>c.NoVendeur == noVendeur).OrderByDescending(d=>d.DateCommande).ToListAsync());
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GestionCommandes(int noCommande)
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            var noVendeur = _context.PPVendeurs.Where(c => c.AdresseEmail == user.Email).FirstOrDefault().NoVendeur;
+
+            PPCommandes commande = _context.PPCommandes.Where(c => c.NoCommande == noCommande).FirstOrDefault();
+            commande.Statut = "L";
+
+            _context.SaveChanges();
+            var commandes = await _context.PPCommandes.Where(c => c.NoVendeur == noVendeur).OrderByDescending(d => d.DateCommande).ToListAsync();
+
+            return View(commandes);
         }
 
         [HttpPost]
