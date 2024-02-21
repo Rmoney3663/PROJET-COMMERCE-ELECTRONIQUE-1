@@ -16,12 +16,15 @@
 </head>
 <body>
     <div class="container">
+        <h1>Voici les commandes que vous avez reçus</h1>
         <div class="row">
             @foreach (var item in Model)
             {
                 <div class="col-md-4">
                     @{
                         string styleContour = "";
+
+                        var montantTot = item.MontantTotAvantTaxes + item.CoutLivraison + item.TPS + item.TVQ;
                     }
                     @if (item.Statut == "P")
                     {
@@ -30,17 +33,18 @@
 
                     <div class="card" >
                         <div class="card-body" style="@styleContour">
-                            <h5 class="card-title">Order Details</h5>
-                            <p class="card-text">NoCommande: @item.NoCommande</p>
+                            <h5 class="card-title">Détails des commandes</h5>
+                            <p class="card-text">Numéro de la Commande: @item.NoCommande</p>
                             <p class="card-text">Numéro du client: @item.NoClient</p>
-                            <p class="card-text">Montant total avant taxes: @item.MontantTotAvantTaxes</p>
+                            <p class="card-text">Montant total avant taxes: @item.MontantTotAvantTaxes $</p>
                             <p class="card-text">Date de la commande: @item.DateCommande</p>
-                            <p class="card-text">Poids de la livraison: @item.PoidsTotal</p>
+                            <p class="card-text">Poids de la livraison: @item.PoidsTotal Kg</p>
                             <p class="card-text">NoAutorisation: @item.NoAutorisation</p>
                             <p class="card-text">Type de livraison: @_context.PPTypesLivraison.Where(l=>l.CodeLivraison == item.TypeLivraison).FirstOrDefault().Description</p>
-                            <p class="card-text">Frais de livraison: @item.CoutLivraison</p>
-                            <p class="card-text">TPS: @item.TPS</p>
-                            <p class="card-text">TVQ: @item.TVQ</p>
+                            <p class="card-text">Frais de livraison: @Math.Round(item.CoutLivraison, 2) $</p>
+                            <p class="card-text">TPS: @Math.Round(item.TPS, 2) $</p>
+                            <p class="card-text">TVQ: @Math.Round(item.TVQ, 2) $</p>
+                            <p class="card-text">Montant total de la commande: @Math.Round(montantTot, 2) $</p>
                             @if (item.Statut == "P")
                             {
                                 <p class="card-text">Statut: Prêt pour la livraison</p>

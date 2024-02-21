@@ -75,7 +75,7 @@ namespace Projet_Web_Commerce.Controllers
 
             var noVendeur = _context.PPVendeurs.Where(c => c.AdresseEmail == user.Email).FirstOrDefault().NoVendeur;
 
-            return View(await _context.PPCommandes.Where(c=>c.NoVendeur == noVendeur).OrderByDescending(d=>d.DateCommande).ToListAsync());
+            return View(await _context.PPCommandes.Where(c=>c.NoVendeur == noVendeur).OrderByDescending(o=>o.Statut).ThenByDescending(d => d.DateCommande).ToListAsync());
         }
 
         [HttpPost]
@@ -89,7 +89,7 @@ namespace Projet_Web_Commerce.Controllers
             commande.Statut = "L";
 
             _context.SaveChanges();
-            var commandes = await _context.PPCommandes.Where(c => c.NoVendeur == noVendeur).OrderByDescending(d => d.DateCommande).ToListAsync();
+            var commandes = await _context.PPCommandes.Where(c => c.NoVendeur == noVendeur).OrderByDescending(o => o.Statut).ThenByDescending(d => d.DateCommande).ToListAsync();
 
             return View(commandes);
         }
