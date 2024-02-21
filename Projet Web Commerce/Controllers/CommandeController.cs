@@ -353,7 +353,10 @@ namespace Projet_Web_Commerce.Controllers
                                          out fraisLesi))
                                     {
 
-                                        var Redevance = _context.PPVendeurs.Where(v => v.NoVendeur == model.NoVendeur).FirstOrDefault().Pourcentage;
+                                        var RedevancePourcentage = _context.PPVendeurs.Where(v => v.NoVendeur == model.NoVendeur).FirstOrDefault().Pourcentage;
+                                        decimal? Redevance = (sousTotal.Value/100)* RedevancePourcentage;
+
+
                                         var ppHistoriqueCommande = new PPHistoriquePaiements
                                         {
                                             MontantVenteAvantLivraison = Math.Round(sousTotal.Value, 2),
@@ -363,7 +366,7 @@ namespace Projet_Web_Commerce.Controllers
                                             DateVente = ppCommande.DateCommande,
                                             NoAutorisation = NoAutorisation.ToString(),
                                             FraisLesi = fraisLesi,
-                                            Redevance = Redevance.Value,
+                                            Redevance = Math.Round(Redevance.Value, 2),
                                             FraisLivraison = roundedFraisLivraison,
                                             FraisTPS = ppCommande.TPS,
                                             FraisTVQ = ppCommande.TVQ
