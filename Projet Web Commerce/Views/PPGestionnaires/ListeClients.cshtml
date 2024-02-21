@@ -15,25 +15,16 @@
             </div>
 
             <div class="container mt-4">
+                @{
+                    var monthNames = new string[] { "Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre" };
+                }
                 @foreach (var date in Model.MoisAnneesDistinctsList)
                 {
                     <div class="card">
                         <div class="card-body">
-                            <script>
-                                function getMonthName(monthNumber) {
-                                    const months = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
-                                    return months[monthNumber - 1];
-                                }
-
-                                const monthNumber = @date.Mois;
-                                const year = @date.Annee;
-                                const monthName = getMonthName(monthNumber);
-
-                                document.write('<h4 class="card-title"><u>' + monthName + ' ' + year + '</u></h4>');
-                            </script>
+                            <h4 class="card-title"><u>@monthNames[date.Mois - 1] @date.Annee</u></h4>
 
                             @{
-
                                 var groupeParAnnee = (from client in Model.ClientsList
                                                       join vendeurClient in Model.VendeursClientsList
                                                       on client.NoClient equals vendeurClient.NoClient into vendeurClients
@@ -52,8 +43,8 @@
                                                           ClientPanierList = Model.ClientPanierList.Where(cp => cp.NoClient == client.NoClient).ToList()
                                                       })
                                 .ToList();
-
                             }
+
 
                             <table class="table">
                                 <thead>
@@ -116,14 +107,18 @@
                                                 {
                                                     var produit = Model.ProduitsList.FirstOrDefault(p => p.NoProduit == panier.NoProduit);
                                                     var vendeur = Model.VendeursList.FirstOrDefault(p => p.NoVendeur == panier.NoVendeur);
-                                                    if (vendeur.Nom != null && vendeur.Prenom != null)
+                                                    if (vendeur != null)
                                                     {
-                                                        <p>@produit.Nom par @vendeur.Prenom @vendeur.Nom crée le @panier.DateCreation</p>
+                                                        if (vendeur.Nom != null && vendeur.Prenom != null)
+                                                        {
+                                                            <p>@produit.Nom par @vendeur.Prenom @vendeur.Nom crée le @panier.DateCreation</p>
+                                                        }
+                                                        else if (vendeur.AdresseEmail != null)
+                                                        {
+                                                            <p>@produit.Nom par @vendeur.AdresseEmail crée le @panier.DateCreation</p>
+                                                        }
                                                     }
-                                                    else
-                                                    {
-                                                        <p>@produit.Nom par @vendeur.AdresseEmail crée le @panier.DateCreation</p>
-                                                    }
+                                                    
                                                 }
                                                 @if (item.ClientPanierList.Count() == 0)
                                                 {

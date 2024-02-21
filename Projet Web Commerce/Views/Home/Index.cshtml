@@ -6,7 +6,13 @@
 
 @if (SignInManager.IsSignedIn(User))
 {
-    if (!User.IsInRole("Vendeur"))
+    if (User.IsInRole("Vendeur"))
+    {
+        <head>
+            <meta http-equiv="refresh" content="0; url=/PPProduits" />
+        </head>        
+    }
+    else if (User.IsInRole("Client"))
     {
         <head>
             <meta http-equiv="refresh" content="0; url=/MainMenu" />
@@ -15,7 +21,7 @@
     else
     {
         <head>
-            <meta http-equiv="refresh" content="0; url=/PPProduits" />
+            <meta http-equiv="refresh" content="0; url=/PPGestionnaires/ListeVendeurs" />
         </head>
     }
 }

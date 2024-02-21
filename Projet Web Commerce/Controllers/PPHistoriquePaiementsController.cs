@@ -10,6 +10,8 @@ using Microsoft.EntityFrameworkCore;
 using Projet_Web_Commerce.Areas.Identity.Data;
 using Projet_Web_Commerce.Data;
 using Projet_Web_Commerce.Models;
+using Microsoft.AspNetCore.Mvc;
+using System.IO;
 
 namespace Projet_Web_Commerce.Controllers
 {
@@ -17,11 +19,13 @@ namespace Projet_Web_Commerce.Controllers
     {
         private readonly AuthDbContext _context;
         private readonly UserManager<Utilisateur> _userManager;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public PPHistoriquePaiementsController(AuthDbContext context, UserManager<Utilisateur> userManager)
+        public PPHistoriquePaiementsController(IWebHostEnvironment webHostEnvironment, AuthDbContext context, UserManager<Utilisateur> userManager)
         {
             _context = context;
             _userManager = userManager;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         // GET: PPHistoriquePaiements
@@ -40,134 +44,44 @@ namespace Projet_Web_Commerce.Controllers
             var historique = await _context.PPHistoriquePaiements.Where(h => h.NoClient == client.NoClient).ToListAsync();
             return View(historique);
         }
-
-        // GET: PPHistoriquePaiements/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var pPHistoriquePaiements = await _context.PPHistoriquePaiements
-                .FirstOrDefaultAsync(m => m.NoHistorique == id);
-            if (pPHistoriquePaiements == null)
-            {
-                return NotFound();
-            }
-
-            return View(pPHistoriquePaiements);
-        }
-
-        // GET: PPHistoriquePaiements/Create
-        //public IActionResult Create()
-        //{
-        //    return View();
-        //}
-
-        //// POST: PPHistoriquePaiements/Create
-        //// To protect from overposting attacks, enable the specific properties you want to bind to.
-        //// For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> Create([Bind("NoHistorique,MontantVenteAvantLivraison,NoVendeur,NoClient,NoCommande,DateVente,NoAutorisation,FraisLesi,Redevance,FraisLivraison,FraisTPS,FraisTVQ")] PPHistoriquePaiements pPHistoriquePaiements)
-        //{
-        //    if (ModelState.IsValid)
-        //    {
-        //        _context.Add(pPHistoriquePaiements);
-        //        await _context.SaveChangesAsync();
-        //        return RedirectToAction(nameof(Index));
-        //    }
-        //    return View(pPHistoriquePaiements);
-        //}
-
-        //// GET: PPHistoriquePaiements/Edit/5
-        //public async Task<IActionResult> Edit(int? id)
-        //{
-        //    if (id == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    var pPHistoriquePaiements = await _context.PPHistoriquePaiements.FindAsync(id);
-        //    if (pPHistoriquePaiements == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    return View(pPHistoriquePaiements);
-        //}
-
-        // POST: PPHistoriquePaiements/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> Edit(int id, [Bind("NoHistorique,MontantVenteAvantLivraison,NoVendeur,NoClient,NoCommande,DateVente,NoAutorisation,FraisLesi,Redevance,FraisLivraison,FraisTPS,FraisTVQ")] PPHistoriquePaiements pPHistoriquePaiements)
-        //{
-        //    if (id != pPHistoriquePaiements.NoHistorique)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    if (ModelState.IsValid)
-        //    {
-        //        try
-        //        {
-        //            _context.Update(pPHistoriquePaiements);
-        //            await _context.SaveChangesAsync();
-        //        }
-        //        catch (DbUpdateConcurrencyException)
-        //        {
-        //            if (!PPHistoriquePaiementsExists(pPHistoriquePaiements.NoHistorique))
-        //            {
-        //                return NotFound();
-        //            }
-        //            else
-        //            {
-        //                throw;
-        //            }
-        //        }
-        //        return RedirectToAction(nameof(Index));
-        //    }
-        //    return View(pPHistoriquePaiements);
-        //}
-
-        // GET: PPHistoriquePaiements/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var pPHistoriquePaiements = await _context.PPHistoriquePaiements
-                .FirstOrDefaultAsync(m => m.NoHistorique == id);
-            if (pPHistoriquePaiements == null)
-            {
-                return NotFound();
-            }
-
-            return View(pPHistoriquePaiements);
-        }
-
-        // POST: PPHistoriquePaiements/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var pPHistoriquePaiements = await _context.PPHistoriquePaiements.FindAsync(id);
-            if (pPHistoriquePaiements != null)
-            {
-                _context.PPHistoriquePaiements.Remove(pPHistoriquePaiements);
-            }
-
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
+        
         private bool PPHistoriquePaiementsExists(int id)
         {
             return _context.PPHistoriquePaiements.Any(e => e.NoHistorique == id);
+        }
+
+        public IActionResult Download(int id)
+        {
+            string fileName = $"{id}.pdf";
+            string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "data", "pdf", fileName);
+
+            if (!System.IO.File.Exists(filePath))
+            {
+                ViewBag.ErrorMessage = $"Le fichier demandé '{fileName}' n'a pas été trouvé.";
+
+                return View("FileNotFound");
+            }
+
+            byte[] fileBytes = System.IO.File.ReadAllBytes(filePath);
+
+            return File(fileBytes, "application/pdf", fileName);
+        }
+
+        public IActionResult DownloadG(int id)
+        {
+            string fileName = $"{id}.pdf";
+            string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "data", "pdf", fileName);
+
+            if (!System.IO.File.Exists(filePath))
+            {
+                ViewBag.ErrorMessage = $"Le fichier demandé '{fileName}' n'a pas été trouvé.";
+
+                return View("FileNotFoundG");
+            }
+
+            byte[] fileBytes = System.IO.File.ReadAllBytes(filePath);
+
+            return File(fileBytes, "application/pdf", fileName);
         }
     }
 }
