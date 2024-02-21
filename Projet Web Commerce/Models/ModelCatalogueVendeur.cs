@@ -11,6 +11,9 @@ namespace Projet_Web_Commerce.Models
         public PaginatedList<PPProduits> ProduitsList { get; set; }
         public List<PPProduits> NouveauxProduits { get; set; }
 
+        // pour savoir si c'est la première visite //
+        public int premiereConnexion { get; set; }
+
         // Search fields //
         public string? searchString { get; set; }
 
