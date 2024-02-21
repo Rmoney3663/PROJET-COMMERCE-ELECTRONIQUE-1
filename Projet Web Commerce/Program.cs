@@ -1,20 +1,27 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.Blazor;
 using Projet_Web_Commerce;
 using Projet_Web_Commerce.Areas.Identity.Data;
+using Projet_Web_Commerce.Areas.Identity.Pages.Account;
 using Projet_Web_Commerce.Data;
 using Projet_Web_Commerce.Models;
 using System.Collections.Generic;
+using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("AuthDbContextConnection") ?? throw new InvalidOperationException("Connection string 'AuthDbContextConnection' not found.");
 
-builder.Services.AddDbContext<AuthDbContext>(options => options.UseSqlServer(connectionString));
+builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 
-builder.Services.AddDefaultIdentity<Utilisateur>(options => options.SignIn.RequireConfirmedAccount = true).AddRoles<IdentityRole>().AddEntityFrameworkStores<AuthDbContext>();
+builder.Services.AddDbContext<AuthDbContext>(options => options.UseSqlServer(connectionString));
+builder.Services.AddDefaultIdentity<Utilisateur>(options => options.SignIn.RequireConfirmedAccount = true)
+    .AddRoles<IdentityRole>()
+    .AddEntityFrameworkStores<AuthDbContext>()
+    .AddErrorDescriber<MultilanguageIdentityErrorDescriber>();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -23,6 +30,13 @@ builder.Services.AddSignalR();
 
 
 var app = builder.Build();
+
+app.UseRequestLocalization(new RequestLocalizationOptions
+{
+    DefaultRequestCulture = new RequestCulture("en-US"),
+    SupportedCultures = CultureInfo.GetCultures(CultureTypes.AllCultures),
+    SupportedUICultures = CultureInfo.GetCultures(CultureTypes.AllCultures)
+});
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
