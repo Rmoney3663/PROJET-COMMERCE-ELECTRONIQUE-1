@@ -14,29 +14,36 @@
 </head>
 <body>
     <div class="container">
-        <div class="row">
-            @foreach (var item in Model)
-            {
-                <div class="col-md-4">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">Détails de la commande</h5>
-                            <p class="card-text">NoCommande: @Html.DisplayFor(modelItem => item.NoCommande)</p>
-                            <p class="card-text">Montant Avant Livraison: @Html.DisplayFor(modelItem => item.MontantVenteAvantLivraison)</p>
-                            <p class="card-text">NoVendeur: @Html.DisplayFor(modelItem => item.NoVendeur)</p>
-                            <p class="card-text">NoClient: @Html.DisplayFor(modelItem => item.NoClient)</p>
-                            <p class="card-text">DateVente: @Html.DisplayFor(modelItem => item.DateVente)</p>
-                            <p class="card-text">NoAutorisation: @Html.DisplayFor(modelItem => item.NoAutorisation)</p>
-                            <p class="card-text">FraisLesi: @Html.DisplayFor(modelItem => item.FraisLesi)</p>
-                            <p class="card-text">FraisLivraison: @Html.DisplayFor(modelItem => item.FraisLivraison)</p>
-                            <p class="card-text">FraisTPS: @Html.DisplayFor(modelItem => item.FraisTPS)</p>
-                            <p class="card-text">FraisTVQ: @Html.DisplayFor(modelItem => item.FraisTVQ)</p>
-                            <a class="btn btn-primary" asp-action="DownloadG" asp-route-id="@item.NoCommande">Télécharger le reçu</a>
+        @if (!Model.Any())
+        {
+            <p>Aucune commande</p>
+        }
+        else
+        {
+            <div class="row">
+                @foreach (var item in Model)
+                {
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Détails de la commande</h5>
+                                <p class="card-text">NoCommande: @Html.DisplayFor(modelItem => item.NoCommande)</p>
+                                <p class="card-text">Montant Avant Livraison: @Html.DisplayFor(modelItem => item.MontantVenteAvantLivraison)</p>
+                                <p class="card-text">NoVendeur: @Html.DisplayFor(modelItem => item.NoVendeur)</p>
+                                <p class="card-text">NoClient: @Html.DisplayFor(modelItem => item.NoClient)</p>
+                                <p class="card-text">DateVente: @Html.DisplayFor(modelItem => item.DateVente)</p>
+                                <p class="card-text">NoAutorisation: @Html.DisplayFor(modelItem => item.NoAutorisation)</p>
+                                <p class="card-text">FraisLesi: @Html.DisplayFor(modelItem => item.FraisLesi)</p>
+                                <p class="card-text">FraisLivraison: @Html.DisplayFor(modelItem => item.FraisLivraison)</p>
+                                <p class="card-text">FraisTPS: @Html.DisplayFor(modelItem => item.FraisTPS)</p>
+                                <p class="card-text">FraisTVQ: @Html.DisplayFor(modelItem => item.FraisTVQ)</p>
+                                <a class="btn btn-primary" asp-action="DownloadG" asp-route-id="@item.NoCommande">Télécharger le reçu</a>
+                            </div>
                         </div>
                     </div>
-                </div>
-            }
-        </div>
+                }
+            </div>
+        }
     </div>
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>

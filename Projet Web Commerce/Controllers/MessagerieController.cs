@@ -287,6 +287,7 @@ namespace Projet_Web_Commerce.Controllers
                 var msgEnvoyes = _context.PPMessages
                 .Where(message => message.Auteur == currentUserId
                     && message.TypeMessage == 0)
+                .OrderByDescending(m => m.DateEnvoi)
                 .Include(m => m.Destinataires)
                 .ToList();
                 ViewBag.TriMessages = "DateDesc";
