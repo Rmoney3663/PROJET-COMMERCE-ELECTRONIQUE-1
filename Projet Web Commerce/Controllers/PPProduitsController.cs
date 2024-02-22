@@ -661,5 +661,57 @@ namespace Projet_Web_Commerce.Controllers
                 return RedirectToAction("Error", "PPProduits");
             }
         }
+
+        //[Route("/PPProduitsController/ValiderAsync")]
+        ////[Authorize(Roles = "Gestionnaire")]
+        //public async Task<IActionResult> ValiderAsync(int noVendeur, string sujet, string message)
+        //{
+        //    var vendeurAEnvoyerCourriel = _context.PPVendeurs.FirstOrDefault(v => v.NoVendeur == noVendeur);
+
+        //    var result = new
+        //    {
+        //        Success = false,
+        //        Message = $"Erreur%"
+        //    };
+
+        //    if (vendeurAEnvoyerCourriel != null)
+        //    {
+        //        var user = await _userManager.FindByEmailAsync(vendeurAUpdate.AdresseEmail);
+        //        if (user != null)
+        //        {
+        //            if (infosSupp != null)
+        //                message += "\n\n" + infosSupp;
+        //            await Methodes.envoyerCourriel(sujet, message, vendeurAUpdate.AdresseEmail);
+        //            if (vendeurAccepte)
+        //            {
+        //                vendeurAUpdate.Statut = 1;
+        //                vendeurAUpdate.Pourcentage = pourcentageRedevence;
+        //                _context.Update(vendeurAUpdate);
+        //                await _context.SaveChangesAsync();
+        //            }
+        //            else
+        //            {
+        //                _context.PPVendeurs.Remove(vendeurAUpdate);
+        //                await _userManager.DeleteAsync(user);
+        //            }
+        //            _context.SaveChanges();
+
+        //            var vendeursStatutZero = _context.PPVendeurs
+        //                    .Where(v => v.Statut == 0)
+        //                    .OrderBy(v => v.DateCreation)
+        //                    .ToList();
+
+        //            View(vendeursStatutZero);
+
+        //            result = new
+        //            {
+        //                Success = true,
+        //                Message = $"Courriel envoyé%."
+        //            };
+        //        }
+        //    }
+
+        //    return Json(result);
+        //}
     }
 }

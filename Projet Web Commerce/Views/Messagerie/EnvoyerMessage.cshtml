@@ -134,6 +134,11 @@
         message = Model.Message;
         pieceJointe = Model.PieceJointe == null ? "" : Model.PieceJointe;
     }
+
+    if (ViewBag.Sujet != null)
+    {
+        sujet = ViewBag.Sujet;
+    }
 }
 
 <div class="row">

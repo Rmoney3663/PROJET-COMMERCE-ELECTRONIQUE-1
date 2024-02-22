@@ -93,8 +93,18 @@ namespace Projet_Web_Commerce.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult> EnvoyerMessage(int? idMessage, string? typeMessage, string? transmetteur)
+        public async Task<ActionResult> EnvoyerMessage(int? idMessage, string? typeMessage, string? emailDest, string? sujet)
         {
+            if (emailDest != null)
+            {
+                List<string> lstCourrielsDests = new List<string>();
+                var msgDest = _userManager.Users.Where(u => u.Email == emailDest).FirstOrDefault().Email;
+                lstCourrielsDests.Add(msgDest);
+                ViewBag.Dests = lstCourrielsDests;
+                ViewBag.Sujet = sujet;
+                return View();
+            }
+
             if (idMessage == null)
             {
                 return View();
