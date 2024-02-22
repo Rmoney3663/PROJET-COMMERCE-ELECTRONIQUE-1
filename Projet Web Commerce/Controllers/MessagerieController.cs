@@ -93,8 +93,18 @@ namespace Projet_Web_Commerce.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult> EnvoyerMessage(int? idMessage, string? typeMessage, string? transmetteur)
+        public async Task<ActionResult> EnvoyerMessage(int? idMessage, string? typeMessage, string? emailDest, string? sujet)
         {
+            if (emailDest != null)
+            {
+                List<string> lstCourrielsDests = new List<string>();
+                var msgDest = _userManager.Users.Where(u => u.Email == emailDest).FirstOrDefault().Email;
+                lstCourrielsDests.Add(msgDest);
+                ViewBag.Dests = lstCourrielsDests;
+                ViewBag.Sujet = sujet;
+                return View();
+            }
+
             if (idMessage == null)
             {
                 return View();
@@ -145,7 +155,7 @@ namespace Projet_Web_Commerce.Controllers
 
         [HttpPost]
         public async Task<IActionResult> EnvoyerMessage(string sujet, string message, IFormFile pieceJointe, string selectedDestinataire
-            , string auteur, int typeMessage, int idMessage, string typeMessageStr)
+            , string auteur, int typeMessage, int idMessage, string typeMessageStr, string supprimerPieceJointe)
         {
             int noMsg = 0;
             var utilisateurCourantEmail = _userManager.Users.Where(u => u.Email == User.Identity.Name).FirstOrDefault().Email;
@@ -155,10 +165,15 @@ namespace Projet_Web_Commerce.Controllers
                 //idMessage = null;
             }
             
-            if (idMessage != 0 && typeMessageStr == "brouillon") // Si envoi d'un brouillon
+            if (idMessage != 0 && typeMessageStr == "brouillon") // Si brouillon (envoi ou mod brouillon)
             {
+                noMsg = idMessage;
                 var msg = await _context.PPMessages
                     .FirstOrDefaultAsync(m => m.NoMessage == idMessage);
+                if (supprimerPieceJointe == "true")
+                {
+                    msg.PieceJointe = null;
+                }
 
                 if (pieceJointe != null)
                 {
@@ -655,63 +670,6 @@ namespace Projet_Web_Commerce.Controllers
 
             return RedirectToAction("BoiteDeReception");
         }
-
-        //// POST: EmailSenderController/Create
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public ActionResult Create(IFormCollection collection)
-        //{
-        //    try
-        //    {
-        //        return RedirectToAction(nameof(Index));
-        //    }
-        //    catch
-        //    {
-        //        return View();
-        //    }
-        //}
-
-        //// GET: EmailSenderController/Edit/5
-        //public ActionResult Edit(int id)
-        //{
-        //    return View();
-        //}
-
-        //// POST: EmailSenderController/Edit/5
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public ActionResult Edit(int id, IFormCollection collection)
-        //{
-        //    try
-        //    {
-        //        return RedirectToAction(nameof(Index));
-        //    }
-        //    catch
-        //    {
-        //        return View();
-        //    }
-        //}
-
-        //// GET: EmailSenderController/Delete/5
-        //public ActionResult Delete(int id)
-        //{
-        //    return View();
-        //}
-
-        //// POST: EmailSenderController/Delete/5
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public ActionResult Delete(int id, IFormCollection collection)
-        //{
-        //    try
-        //    {
-        //        return RedirectToAction(nameof(Index));
-        //    }
-        //    catch
-        //    {
-        //        return View();
-        //    }
-        //}
 
         public IActionResult TelechargerPieceJointe(string cheminFichier)
         {
