@@ -28,21 +28,16 @@
                                 var groupeParAnnee = (from vendeur in Model.VendeursList
                                                       join user in Model.UtilisateurList
                                                       on vendeur.IdUtilisateur equals user.Id
-                                                      where user.EmailConfirmed && vendeur.DateCreation.Month == date.Mois && vendeur.DateCreation.Year == date.Annee
+                                                      where vendeur.DateCreation.Month == date.Mois && vendeur.DateCreation.Year == date.Annee
                                                       orderby vendeur.NomAffaires
-                                                      join commande in Model.CommandesList
-                                                      on vendeur.NoVendeur equals commande.NoVendeur into vendeurCommandes
-                                                      from vc in vendeurCommandes.DefaultIfEmpty()
-                                                      orderby vc?.DateCommande
                                                       select new
                                                       {
-                                                          Vendeur = vendeur,
-                                                          Commande = vc
+                                                          Vendeur = vendeur
                                                       })
                                 .ToList();
 
 
-
+                                
 
                             }
                             <table class="table">

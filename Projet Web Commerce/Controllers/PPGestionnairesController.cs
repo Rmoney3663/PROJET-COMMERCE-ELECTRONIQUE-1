@@ -1026,11 +1026,6 @@ namespace Projet_Web_Commerce.Controllers
                 .GroupBy(p => p.NoVendeur)
                 .Count();
 
-            var CommandesList = _context.PPCommandes
-             .GroupBy(c => c.NoVendeur)
-             .Select(group => group.OrderByDescending(c => c.DateCommande).FirstOrDefault())
-             .ToList();
-
             var utilisateurList = _context.Users.ToList();
 
             ModelListeVendeurs modelListeVendeurs = new ModelListeVendeurs()
@@ -1038,7 +1033,6 @@ namespace Projet_Web_Commerce.Controllers
                 VendeursList = vendeurs,
                 ProduitsList = ProduitsList,
                 MoisAnneesDistinctsList = lstMoisAnneesDistincts,
-                CommandesList = CommandesList,
                 UtilisateurList = utilisateurList
 
             };
