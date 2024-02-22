@@ -10,6 +10,7 @@ using DocumentFormat.OpenXml.Office2010.Excel;
 using DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -29,13 +30,15 @@ namespace Projet_Web_Commerce.Controllers
     {
         private readonly AuthDbContext _context;
         private readonly UserManager<Utilisateur> _userManager;
+        private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly SignInManager<Utilisateur> SignInManager;
 
-        public PPProduitsController(AuthDbContext context, UserManager<Utilisateur> userManager, SignInManager<Utilisateur> signInManager)
+        public PPProduitsController(IWebHostEnvironment webHostEnvironment, AuthDbContext context, UserManager<Utilisateur> userManager, SignInManager<Utilisateur> signInManager)
         {
             _context = context;
             _userManager = userManager;
             SignInManager = signInManager;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         // GET: PPProduits
@@ -92,6 +95,23 @@ namespace Projet_Web_Commerce.Controllers
             var commandes = await _context.PPCommandes.Where(c => c.NoVendeur == noVendeur).OrderByDescending(o => o.Statut).ThenByDescending(d => d.DateCommande).ToListAsync();
 
             return View(commandes);
+        }
+
+        public IActionResult Download(int id)
+        {
+            string fileName = $"{id}.pdf";
+            string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "data", "pdf", fileName);
+
+            if (!System.IO.File.Exists(filePath))
+            {
+                ViewBag.ErrorMessage = $"Le fichier demandé '{fileName}' n'a pas été trouvé.";
+
+                return View("FileNotFound");
+            }
+
+            byte[] fileBytes = System.IO.File.ReadAllBytes(filePath);
+
+            return File(fileBytes, "application/pdf", fileName);
         }
 
         [HttpPost]

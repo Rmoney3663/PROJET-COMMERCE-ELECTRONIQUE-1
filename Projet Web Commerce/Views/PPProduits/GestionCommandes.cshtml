@@ -36,6 +36,7 @@
                             <h5 class="card-title">Détails des commandes</h5>
                             <p class="card-text">Numéro de la Commande: @item.NoCommande</p>
                             <p class="card-text">Numéro du client: @item.NoClient</p>
+                            <p class="card-text">Nombre de connexions du client: @_context.PPVendeursClients.Where(v=>v.NoClient == item.NoClient).Count()</p>
                             <p class="card-text">Montant total avant taxes: @item.MontantTotAvantTaxes $</p>
                             <p class="card-text">Date de la commande: @item.DateCommande</p>
                             <p class="card-text">Poids de la livraison: @item.PoidsTotal Kg</p>
@@ -56,10 +57,10 @@
                             @if (item.Statut == "P")
                             {
                                 <form asp-controller="PPProduits" asp-action="GestionCommandes" asp-route-noCommande="@item.NoCommande" method="post">
-                                    <button type="submit" class="btn btn-primary">Comfirmer la livraison</button>
+                                    <button type="submit" class="btn btn-success">Comfirmer la livraison</button>
                                 </form>
-                                
                             }
+                            <a style="margin-top:10px" class="btn btn-primary" asp-action="Download" asp-route-id="@item.NoCommande">Télécharger les détails de la commande</a>
                         </div>
                     </div>
                 </div>

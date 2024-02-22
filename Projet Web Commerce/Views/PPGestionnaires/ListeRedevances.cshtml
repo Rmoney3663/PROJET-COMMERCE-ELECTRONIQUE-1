@@ -29,10 +29,19 @@
                                     <tr>
                                         <th scope="col">#</th>
                                         <th scope="col">No de vendeur</th>
-                                        <th scope="col">Nom d'affaires</th>
+                                        <th scope="col">
+                                            Nom d'affaires
+                                            <button onclick="sortName('asc', 'redevanceTable_@i')">▲</button> |
+                                            <button onclick="sortName('desc', 'redevanceTable_@i')">▼</button>
+                                        </th>
                                         <th scope="col">Date de création</th>
                                         <th scope="col">Pourcentage</th>
-                                        <th scope="col">Montant Total</th>
+                                        <th scope="col">
+                                            Montant Total
+                                            <button onclick="sortRedevance('asc', 'redevanceTable_@i')">▲</button> |
+                                            <button onclick="sortRedevance('desc', 'redevanceTable_@i')">▼</button>
+                                        </th>
+
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -74,8 +83,8 @@
     function sortRedevance(order, tableId) {
         var rows = document.querySelectorAll(`#${tableId} tbody tr`);
         var sortedRows = Array.from(rows).sort((a, b) => {
-            var aValue = parseFloat(a.querySelector('td:nth-child(7)').textContent);
-            var bValue = parseFloat(b.querySelector('td:nth-child(7)').textContent);
+            var aValue = parseFloat(a.querySelector('td:nth-child(6)').textContent);
+            var bValue = parseFloat(b.querySelector('td:nth-child(6)').textContent);
             if (order === 'asc') {
                 return aValue - bValue;
             } else {
@@ -86,6 +95,7 @@
         tbody.innerHTML = '';
         sortedRows.forEach(row => tbody.appendChild(row));
     }
+
 
     function sortName(order, tableId) {
         var rows = document.querySelectorAll(`#${tableId} tbody tr`);
