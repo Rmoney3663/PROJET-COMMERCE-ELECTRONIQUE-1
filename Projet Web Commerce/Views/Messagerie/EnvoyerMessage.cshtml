@@ -23,6 +23,8 @@
     var listGestionnaires = _context.PPGestionnaire;
     var listClients = _context.PPClients;
 
+    var role = "";
+
     if (User.IsInRole("Client"))
     {
         foreach (PPVendeurs vendeur in listVendeurs)
@@ -47,6 +49,7 @@
     }
     else
     {
+        role = "gestionnaire";
         foreach (PPVendeurs vendeur in listVendeurs)
         {
             listeUtilisateurs.Add(_context.Users.Where(v => v.Email == vendeur.AdresseEmail).FirstOrDefault());
@@ -54,6 +57,10 @@
         foreach (PPClients client in listClients)
         {
             listeUtilisateurs.Add(_context.Users.Where(v => v.Email == client.AdresseEmail).FirstOrDefault());
+        }
+        foreach (PPGestionnaire gestionnaire in listGestionnaires)
+        {
+            listeUtilisateurs.Add(_context.Users.Where(v => v.Email == gestionnaire.AdresseEmail).FirstOrDefault());
         }
     }
 }
@@ -174,6 +181,20 @@
                                             Envoyer à tout le monde
                                         </label>
                                     </div>
+                                    @* <div class="form-check" style="@(role == "gestionnaire" ? "display:inline" : "display:none")" id="divGestionnaire">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="chkTousLesVendeurs" onclick="ajouterToutLeMonde()">
+                                            <label class="form-check-label" for="chkTousLesVendeurs">
+                                                Envoyer à tous les vendeurs
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="chkToutLesClients" onclick="ajouterToutLeMonde()">
+                                            <label class="form-check-label" for="chkToutLesClients">
+                                                Envoyer à tous les clients
+                                            </label>
+                                        </div>
+                                    </div> *@
                                     <div class="selected-names" id="selectedNamesContainer"></div>
                                 </div>
                             </div>
@@ -186,7 +207,19 @@
                             <textarea title="Message" name="message" id="message" class="form-control" style="height: 200px">@message</textarea>
                             <label class="form-label">Votre message</label>
                         </div>
-                        <input type="file" name="pieceJointe" id="pieceJointe" value="@pieceJointe" class="form-control">
+                        <div style="border:solid 1px; border-color: lightgray; border-radius: 5px;">
+                            <label class="form-label" style="color: grey; font-size: 14px;">Pièce jointe</label>
+                            <br />
+                            @if (pieceJointe != "")
+                            {
+                                <a class="btn btn-lg btn-primary mesBtns" name="btnModifierPieceJointe" id="btnModifierPieceJointe" onclick="modifierPieceJointe()">Modifier</a>
+                                <a class="btn btn-lg btn-primary mesBtns" name="btnSupprimerPieceJointe" id="btnSupprimerPieceJointe" onclick="supprimerPieceJointe()">Supprimer</a>
+
+                                <br />
+                            }
+                            <input type="file" name="pieceJointe" id="pieceJointe" value="@pieceJointe" class="form-control">
+                        </div>
+                        <br />
                         <br />
                         <div class="form-floating">
                             <a id="btnEnvoyer" class="w-100 btn btn-lg btn-primary mesBtns">Envoyer</a>
@@ -196,6 +229,7 @@
                         <input type="hidden" name="typeMessage" id="typeMessage" value="" />
                         <input type="hidden" name="idMessage" id="idMessage" value="" />
                         <input type="hidden" name="typeMessageStr" id="typeMessageStr" value="" />
+                        <input type="hidden" name="supprimerPieceJointe" id="supprimerPieceJointe" value="false" />
                     </div>
                 </form>
             </div>
@@ -205,36 +239,24 @@
 
 <script>
     $(document).ready(function () {
-        // Check if Model.Destinataires is not null
-        // if (@(Model != null ? "true" : "false") === true) {
+        if (@(pieceJointe != "" ? "true" : "false") === true) {
+            document.getElementById('pieceJointe').style.display = "none";
+        }
+
+
         if (@(ViewBag.Dests != null ? "true" : "false") === true) {
 
-            // Serialize the email addresses
-            // var idDestinataires = @Html.Raw(Json.Serialize(Model?.Destinataires.Select(d => d.DestinataireUser?.Email).Where(email => !string.IsNullOrWhiteSpace(email))));
             var dests = @Html.Raw(Json.Serialize(ViewBag.Dests));
-
-            // Add the pre-selected destinataires to selectedNamesContainer
+            var dropdown = document.getElementById("ddlClients");
             for (var i = 0; i < dests.length; i++) {
-                var selectedNamesContainer = document.getElementById("selectedNamesContainer");
-
-                var nameElement = document.createElement("span");
-                nameElement.innerHTML = dests[i];
-
-                var deleteIcon = document.createElement("span");
-                deleteIcon.innerHTML = " &#10006;";
-                deleteIcon.className = "delete-icon";
-                deleteIcon.onclick = function () {
-                    let option = document.createElement("option");
-                    option.text = nameElement.firstChild.textContent;
-                    option.value = option.text;
-                    selectedNamesContainer.removeChild(nameElement);
-                    document.getElementById('selectedDestinataire').value = document.getElementById('selectedDestinataire').value.replace(nameElement.firstChild.textContent + ';', '');
-                };
-
-                selectedDestinataire.value += nameElement.innerHTML + ';';
-                nameElement.appendChild(deleteIcon);
-                selectedNamesContainer.appendChild(nameElement);
+                for (var j = 0; j < dropdown.length; j++) {
+                    if (dests[i] == dropdown.options[j].value) {
+                        dropdown.selectedIndex = j;
+                        ajouterDestinataire();
+                    }
+                }
             }
+            dropdown.selectedIndex = 0;
         }
     });
 
@@ -387,5 +409,18 @@
             }
         }
     });
+
+    function modifierPieceJointe() {
+        var stylePieceJointe = document.getElementById('pieceJointe').style;
+        if (stylePieceJointe.display == 'inline')
+            stylePieceJointe.display = 'none';
+        else if (stylePieceJointe.display == 'none') {
+            stylePieceJointe.display = 'inline';
+        }
+    }
+
+    function supprimerPieceJointe() {
+        document.getElementById('supprimerPieceJointe').value = "true";
+    }
 
 </script>
