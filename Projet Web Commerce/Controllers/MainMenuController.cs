@@ -41,7 +41,7 @@ namespace Projet_Web_Commerce.Controllers
         {
             if (User.IsInRole("Vendeur"))
             {
-                return RedirectToAction("GestionCommandes", "PPProduits", new { area = "" });
+                return RedirectToAction("Index", "PPProduits", new { area = "" });
             }
             if (User.IsInRole("Gestionnaire"))
             {
