@@ -379,6 +379,9 @@ namespace Projet_Web_Commerce.Controllers
                                         throw new Exception();
                                     }
 
+                                    var TypeLivre = _context.PPTypesLivraison.Where(v => v.CodeLivraison == ppCommande.TypeLivraison).FirstOrDefault().Description;
+                                    string prixtot = ((ppCommande.MontantTotAvantTaxes / 100) * vendeur.PourcentageTaxe + ppCommande.CoutLivraison + ppCommande.MontantTotAvantTaxes)?.ToString("F2");
+
                                     if (ppCommande.NoCommande != null)
                                     {
                                         using (MemoryStream memoryStream = new MemoryStream())
@@ -396,9 +399,11 @@ namespace Projet_Web_Commerce.Controllers
                                             orderInfo.Add($"Nom du vendeur: {vendeur.Prenom} {vendeur.Nom}\n");
                                             orderInfo.Add($"Numéro de client: {client.NoClient}\n");
                                             orderInfo.Add($"Numéro d'autorisation: {ppCommande.NoAutorisation}\n");
-                                            orderInfo.Add($"Montant de vente avant la taxes: {ppCommande.MontantTotAvantTaxes}$\n");
+                                            orderInfo.Add($"Montant de vente avant la taxes: {ppCommande.MontantTotAvantTaxes}$\n");                                            
                                             orderInfo.Add($"Cout de livraison: {ppCommande.CoutLivraison}$\n");
+                                            orderInfo.Add($"Type de livraison: {TypeLivre}\n");
                                             orderInfo.Add($"Poids total: {ppCommande.PoidsTotal}kg\n");
+                                            orderInfo.Add($"Montant total de vente: {prixtot}$\n");
                                             orderInfo.Add($"Destination: {client.Rue}, {client.Ville}, {client.NoProvince}, {client.CodePostal}\n");
 
                                             document.Add(orderInfo);
