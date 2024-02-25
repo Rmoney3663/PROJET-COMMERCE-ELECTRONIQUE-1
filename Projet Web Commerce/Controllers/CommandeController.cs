@@ -279,7 +279,7 @@ namespace Projet_Web_Commerce.Controllers
                                     NoClient = model.NoClient,
                                     NoVendeur = model.NoVendeur,
                                     DateCommande = DateTime.Now,
-                                    PoidsTotal = poidsTotal,
+                                    PoidsTotal = poidsTotal.Value,
                                     Statut = "P",
                                     MontantTotAvantTaxes = Math.Round(sousTotal.Value, 2),
                                     TPS = Math.Round(sousTotal.Value * (tps / 100), 2),
@@ -327,7 +327,7 @@ namespace Projet_Web_Commerce.Controllers
                                         continue;
                                     }
 
-                                    int newQuantity = produit.NombreItems - article.NbItems;
+                                    int newQuantity = produit.NombreItems.Value - article.NbItems;
 
                                     if (newQuantity < 0)
                                     {
@@ -516,7 +516,7 @@ namespace Projet_Web_Commerce.Controllers
 
 
             model.sousTotal = sousTotal.Value;
-            model.poidsTotal = poidsTotal;
+            model.poidsTotal = poidsTotal.Value;
             model.client.CodePostal = model.client.CodePostal;
 
 

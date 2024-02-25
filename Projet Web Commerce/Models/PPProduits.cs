@@ -10,16 +10,16 @@ namespace Projet_Web_Commerce.Models
         public int NoVendeur { get; set; }
         public int NoCategorie { get; set; }
         public DateTime DateCreation { get; set; }
-        public int NombreItems { get; set; }
-        public DateTime DateMAJ { get; set; }
+        public int? NombreItems { get; set; }
+        public DateTime? DateMAJ { get; set; }
         public string Nom { get; set; }
         public string Description { get; set; }
-        public string Photo { get; set; }
+        public string? Photo { get; set; }
         [Column(TypeName = "smallmoney")]
         public decimal PrixDemande { get; set; }
         public bool Disponibilite { get; set; }
         [Column(TypeName = "numeric(8,1)")]
-        public decimal Poids { get; set; }
+        public decimal? Poids { get; set; }
         public DateTime? DateVente { get; set; }
         [Column(TypeName = "smallmoney")]
         public decimal? PrixVente { get; set; }

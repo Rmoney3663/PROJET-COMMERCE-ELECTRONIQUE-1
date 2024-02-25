@@ -197,7 +197,12 @@
                                     <h5 class="card-text float-end" style="color: orangered; font-size:15px">Nouveau !</h5>
                                 }
                                 @{
-                                    var path = System.IO.Path.Combine(env.WebRootPath, "data/images", item.Photo);
+                                    var path = "";
+                                    if (item.Photo != null)
+                                    {
+                                        path = System.IO.Path.Combine(env.WebRootPath, "data/images", item.Photo);
+                                    }
+                                    
                                     string imagePath = item.Photo != null && File.Exists(path) ? $"~/data/images/{item.Photo}" : "~/data/images/DefaultImage.png";
                                     Console.WriteLine("FILE Name : " + item.Photo);
                                     Console.WriteLine("FILE : " + File.Exists(path));
