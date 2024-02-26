@@ -202,7 +202,12 @@
                                     {
                                         path = System.IO.Path.Combine(env.WebRootPath, "data\\images", item.Photo);
                                     }
-                                    
+
+                                    if (File.Exists(path))
+                                    {
+                                        var test = "adawd";
+                                    }
+
                                     string imagePath = item.Photo != null && File.Exists(path) ? $"~/data/images/{item.Photo}" : "~/data/images/DefaultImage.png";
                                     Console.WriteLine("FILE Name : " + item.Photo);
                                     Console.WriteLine("FILE : " + File.Exists(path));
