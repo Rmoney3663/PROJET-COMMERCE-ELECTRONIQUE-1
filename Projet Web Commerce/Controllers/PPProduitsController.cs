@@ -201,7 +201,7 @@ namespace Projet_Web_Commerce.Controllers
                     if (eval)
                     {
                         var evalActu = _context.PPEvaluations.Where(e => e.NoClient == noClient && e.NoProduit == id).FirstOrDefault();
-                        evalActu.Commentaire = msg.Trim();
+                        evalActu.Commentaire = msg != null ? msg.Trim() : msg;
                         evalActu.Cote = rating;
                         evalActu.DateMAJ = dateMaj;
                         _context.SaveChanges();
