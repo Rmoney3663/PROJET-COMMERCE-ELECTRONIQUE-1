@@ -258,6 +258,10 @@ namespace Projet_Web_Commerce.Controllers
                             try
                             {
                                 var client = _context.PPClients.FirstOrDefault(c => c.NoClient == model.NoClient);
+                                if (postalClient.Length == 6)
+                                {
+                                    postalClient = postalClient.Insert(3, " ");
+                                }
                                 if (client != null)
                                 {
                                     client.Nom = nomClient;
@@ -403,9 +407,8 @@ namespace Projet_Web_Commerce.Controllers
                                             PdfWriter.GetInstance(document, memoryStream);
                                             document.Open();
 
-                                            Paragraph title = new Paragraph("Reçu");
+                                            Paragraph title = new Paragraph("Reçu", FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 20, BaseColor.BLACK));
                                             title.Alignment = Element.ALIGN_CENTER;
-                                            title.Font = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 20, BaseColor.BLACK);
                                             document.Add(title);
 
                                             Paragraph orderInfo = new Paragraph();
@@ -421,13 +424,13 @@ namespace Projet_Web_Commerce.Controllers
                                             LineSeparator line = new LineSeparator(1f, 100f, BaseColor.BLACK, Element.ALIGN_CENTER, -1);
                                             orderInfo.Add(new Chunk(line));
 
-                                            Chunk totalChunk = new Chunk($"\n\nTotal: ".PadLeft(20) + $"{prixtot}$\n", FontFactory.GetFont("Arial", 16, iTextSharp.text.Font.BOLD, BaseColor.BLACK));
+                                            Chunk totalChunk = new Chunk($"\n\nTotal: ".PadRight(25) + $"{prixtot} $\n", FontFactory.GetFont("Arial", 16, iTextSharp.text.Font.BOLD, BaseColor.BLACK));
                                             orderInfo.Add(totalChunk);
-                                            orderInfo.Add($"Montant : ".PadLeft(20) + $"{ppCommande.MontantTotAvantTaxes}$\n");
-                                            orderInfo.Add($"Taxe: ".PadLeft(20) + $"{prixtaxe}$\n");
-                                            orderInfo.Add($"Coût de livraison: ".PadLeft(20) + $"{ppCommande.CoutLivraison}$\n");
-                                            orderInfo.Add($"Type de livraison: ".PadLeft(20) + $"{TypeLivre}\n");
-                                            orderInfo.Add($"Poids total: ".PadLeft(20) + $"{ppCommande.PoidsTotal}kg\n");
+                                            orderInfo.Add($"Montant: ".PadRight(30) + $"{ppCommande.MontantTotAvantTaxes} $\n");
+                                            orderInfo.Add($"Taxe: ".PadRight(32) + $"{prixtaxe} $\n");
+                                            orderInfo.Add($"Coût de livraison: ".PadRight(26) + $"{ppCommande.CoutLivraison} $\n");
+                                            orderInfo.Add($"Type de livraison: ".PadRight(26) + $"{TypeLivre}\n");
+                                            orderInfo.Add($"Poids total: ".PadRight(30) + $"{ppCommande.PoidsTotal} kg\n");
 
                                             orderInfo.Add(new Chunk(line));
 
@@ -607,10 +610,10 @@ namespace Projet_Web_Commerce.Controllers
                 }
 
                 // Validate CodePostal format
-                if (string.IsNullOrEmpty(model.PostalClient) || !Regex.IsMatch(model.PostalClient, "^[A-Za-z]\\d[A-Za-z] \\d[A-Za-z]\\d$"))
+                if (string.IsNullOrEmpty(model.PostalClient) || !Regex.IsMatch(model.PostalClient, "^([A-Za-z]\\d[A-Za-z] \\d[A-Za-z]\\d)|([A-Za-z]\\d[A-Za-z]\\d[A-Za-z]\\d)$"))
                 {
-                    errors.Add("Le code postal doit être dans le format A1A1A1.");
-                    ModelState.AddModelError("PostalClient", "Le code postal doit être dans le format A1A1A1.");
+                    errors.Add("Le code postal doit être dans le format A1A1A1 ou A1A 1A1.");
+                    ModelState.AddModelError("PostalClient", "Le code postal doit être dans le format A1A1A1 ou A1A 1A1.");
                 }
 
                 if (string.IsNullOrEmpty(model.CVV) || !Regex.IsMatch(model.CVV, @"^\d{3,4}$"))
@@ -619,8 +622,7 @@ namespace Projet_Web_Commerce.Controllers
                     ModelState.AddModelError("CVV", "Le champ CVV doit contenir 3 ou 4 chiffres.");
                 }
                 DateTime currentDateTime = DateTime.Now;
-                if (string.IsNullOrEmpty(model.dateExpiration) ||
-       !Regex.IsMatch(model.dateExpiration, @"^(0[1-9]|1[0-2])-\d{4}$"))
+                if (string.IsNullOrEmpty(model.dateExpiration) || !Regex.IsMatch(model.dateExpiration, @"^(0[1-9]|1[0-2])-\d{4}$"))
                 {
                     errors.Add("Le code postal doit être dans le format A1A1A1.");
                     ModelState.AddModelError("dateExpiration", "La date d'expiration doit être dans le format MM-AAAA.");

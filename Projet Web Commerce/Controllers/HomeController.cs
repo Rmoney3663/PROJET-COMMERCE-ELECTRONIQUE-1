@@ -28,9 +28,16 @@ namespace Projet_Web_Commerce.Controllers
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
+        public IActionResult Error(int? statusCode)
         {
+            if (statusCode.HasValue && statusCode.Value == 404)
+            {
+                return View("NotFound");
+            }
+
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+
+      
     }
 }

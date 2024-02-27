@@ -389,11 +389,13 @@ namespace Projet_Web_Commerce.Controllers
                         }
                     }
 
-                    if (file != null && file.Length > 0)
+                    if (file != null && file.Length > 0 )
                     {
-                        System.IO.File.Delete("wwwroot/data/images/" + pPProduits.Photo);
-
-                        // Save new photo
+                        if (pPProduits.Photo != null)
+                        {
+                            System.IO.File.Delete("wwwroot/data/images/" + pPProduits.Photo);
+                        }
+                       
                         string extension = Path.GetExtension(file.FileName);
                         pPProduits.Photo = pPProduits.NoProduit.ToString() + extension;
                         string tempFilePath = Path.Combine("wwwroot/data/images", pPProduits.NoProduit + extension);
@@ -504,8 +506,10 @@ namespace Projet_Web_Commerce.Controllers
                     {
                         var articlesToDelete = _context.PPArticlesEnPanier.Where(a => a.NoProduit == id);
                         _context.PPArticlesEnPanier.RemoveRange(articlesToDelete);
-                        System.IO.File.Delete("wwwroot/data/images/" + pPProduits.Photo);
-                        Console.WriteLine("Deleted photo");
+                        if (pPProduits.Photo != null)
+                        {
+                            System.IO.File.Delete("wwwroot/data/images/" + pPProduits.Photo);
+                        }
                         _context.PPProduits.Remove(pPProduits);
                     }
                 }
@@ -554,9 +558,11 @@ namespace Projet_Web_Commerce.Controllers
                         _context.Update(pPProduits);
                     }
                     else
-                    {                        
-                        System.IO.File.Delete("wwwroot/data/images/" + pPProduits.Photo);
-                        Console.WriteLine("Deleted photo");
+                    {
+                        if (pPProduits.Photo != null)
+                        {
+                            System.IO.File.Delete("wwwroot/data/images/" + pPProduits.Photo);
+                        }
                         _context.PPProduits.Remove(pPProduits);
                     }
                 }
