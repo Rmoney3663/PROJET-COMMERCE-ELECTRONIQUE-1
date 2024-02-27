@@ -68,6 +68,7 @@ namespace Projet_Web_Commerce.Controllers
             return View(modelCatalogue);
         }
 
+        [HttpPost]
         [Authorize(Roles = "Client")]
         [AllowAnonymous]
         public async Task<IActionResult> CatalogueVendeurAsync(ModelCatalogueVendeur model, int nbPourCon)

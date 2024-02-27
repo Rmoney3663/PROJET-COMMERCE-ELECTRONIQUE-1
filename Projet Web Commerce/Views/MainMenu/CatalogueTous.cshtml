@@ -173,7 +173,17 @@
                                     <h5 class="card-text float-end" style="color: orangered; font-size:15px">Nouveau !</h5>
                                 }
                                 @{
-                                    var path = System.IO.Path.Combine(env.WebRootPath, "data/images", item.Photo);
+                                    var path = "";
+                                    if (item.Photo != null)
+                                    {
+                                        path = System.IO.Path.Combine(env.WebRootPath, "data\\images", item.Photo);
+                                    }
+
+                                    if (File.Exists(path))
+                                    {
+                                        var test = "adawd";
+                                    }
+
                                     string imagePath = item.Photo != null && File.Exists(path) ? $"~/data/images/{item.Photo}" : "~/data/images/DefaultImage.png";
                                     Console.WriteLine("FILE Name : " + item.Photo);
                                     Console.WriteLine("FILE : " + File.Exists(path));
@@ -270,36 +280,39 @@
                         @if (Model.ProduitsList.HasPreviousPage)
                         {
                             <li class="page-item">
-                                <a class="page-link" href="@Url.Action("CatalogueTous", new {
-    sortOrder = Model.sortOrder,
-    pageNumber = Model.pageNumber - 1,
-    parPage = Model.parPage,
-    searchString = Model.searchString
-})">Précédent</a>
+                                <form id="prevForm" method="post" action="@Url.Action("CatalogueTous")">
+                                    <input type="hidden" name="sortOrder" value="@Model.sortOrder" />
+                                    <input type="hidden" name="pageNumber" value="@(Model.ProduitsList.PageIndex - 1)" />
+                                    <input type="hidden" name="parPage" value="@Model.parPage" />
+                                    <input type="hidden" name="searchString" value="@Model.searchString" />
+                                    <button type="submit" class="page-link">Précédent</button>
+                                </form>
                             </li>
                         }
 
                         @for (int i = 1; i <= Model.ProduitsList.TotalPages; i++)
                         {
                             <li class="page-item @(i == Model.ProduitsList.PageIndex ? "active" : "")">
-                                <a class="page-link" href="@Url.Action("CatalogueTous", new {
-    sortOrder = Model.sortOrder,
-    pageNumber = i,
-    parPage = Model.parPage,
-    searchString = Model.searchString
-})">@i</a>
+                                <form id="pageForm_@i" method="post" action="@Url.Action("CatalogueTous")">
+                                    <input type="hidden" name="sortOrder" value="@Model.sortOrder" />
+                                    <input type="hidden" name="pageNumber" value="@i" />
+                                    <input type="hidden" name="parPage" value="@Model.parPage" />
+                                    <input type="hidden" name="searchString" value="@Model.searchString" />
+                                    <button type="submit" class="page-link">@i</button>
+                                </form>
                             </li>
                         }
 
                         @if (Model.ProduitsList.HasNextPage)
                         {
                             <li class="page-item">
-                                <a class="page-link" href="@Url.Action("CatalogueTous", new {
-    sortOrder = Model.sortOrder,
-    pageNumber = Model.ProduitsList.PageIndex + 1,
-    parPage = Model.parPage,
-    searchString = Model.searchString
-})">Suivant</a>
+                                <form id="nextForm" method="post" action="@Url.Action("CatalogueTous")">
+                                    <input type="hidden" name="sortOrder" value="@Model.sortOrder" />
+                                    <input type="hidden" name="pageNumber" value="@(Model.ProduitsList.PageIndex + 1)" />
+                                    <input type="hidden" name="parPage" value="@Model.parPage" />
+                                    <input type="hidden" name="searchString" value="@Model.searchString" />
+                                    <button type="submit" class="page-link">Suivant</button>
+                                </form>
                             </li>
                         }
                     </ul>
