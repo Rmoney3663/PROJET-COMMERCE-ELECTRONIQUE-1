@@ -258,6 +258,10 @@ namespace Projet_Web_Commerce.Controllers
                             try
                             {
                                 var client = _context.PPClients.FirstOrDefault(c => c.NoClient == model.NoClient);
+                                if (postalClient.Length == 6)
+                                {
+                                    postalClient = postalClient.Insert(3, " ");
+                                }
                                 if (client != null)
                                 {
                                     client.Nom = nomClient;
@@ -606,10 +610,10 @@ namespace Projet_Web_Commerce.Controllers
                 }
 
                 // Validate CodePostal format
-                if (string.IsNullOrEmpty(model.PostalClient) || !Regex.IsMatch(model.PostalClient, "^[A-Za-z]\\d[A-Za-z] \\d[A-Za-z]\\d$"))
+                if (string.IsNullOrEmpty(model.PostalClient) || !Regex.IsMatch(model.PostalClient, "^([A-Za-z]\\d[A-Za-z] \\d[A-Za-z]\\d)|([A-Za-z]\\d[A-Za-z]\\d[A-Za-z]\\d)$"))
                 {
-                    errors.Add("Le code postal doit être dans le format A1A1A1.");
-                    ModelState.AddModelError("PostalClient", "Le code postal doit être dans le format A1A1A1.");
+                    errors.Add("Le code postal doit être dans le format A1A1A1 ou A1A 1A1.");
+                    ModelState.AddModelError("PostalClient", "Le code postal doit être dans le format A1A1A1 ou A1A 1A1.");
                 }
 
                 if (string.IsNullOrEmpty(model.CVV) || !Regex.IsMatch(model.CVV, @"^\d{3,4}$"))
@@ -618,8 +622,7 @@ namespace Projet_Web_Commerce.Controllers
                     ModelState.AddModelError("CVV", "Le champ CVV doit contenir 3 ou 4 chiffres.");
                 }
                 DateTime currentDateTime = DateTime.Now;
-                if (string.IsNullOrEmpty(model.dateExpiration) ||
-       !Regex.IsMatch(model.dateExpiration, @"^(0[1-9]|1[0-2])-\d{4}$"))
+                if (string.IsNullOrEmpty(model.dateExpiration) || !Regex.IsMatch(model.dateExpiration, @"^(0[1-9]|1[0-2])-\d{4}$"))
                 {
                     errors.Add("Le code postal doit être dans le format A1A1A1.");
                     ModelState.AddModelError("dateExpiration", "La date d'expiration doit être dans le format MM-AAAA.");

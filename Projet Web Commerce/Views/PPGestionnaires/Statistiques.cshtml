@@ -529,8 +529,8 @@
                         data: data,
                         backgroundColor: backgroundColors,
                         borderColor: 'rgba(54, 162, 235, 1)',
-                        borderWidth: 1
-                    }];
+                        borderWidth: 1,           
+            }];
 
             var ctx = document.getElementById('salesChart').getContext('2d');
             var chart = new Chart(ctx, {
@@ -549,7 +549,7 @@
                     },
                     title: {
                         display: true,
-                        text: 'Montant total des ventes par mois pour les 12 derniers mois'
+                        text: 'Montant total des ventes par mois pour les 12 derniers mois qui a rapporté de l\'argent'
                     },
                     tooltips: {
                         callbacks: {
