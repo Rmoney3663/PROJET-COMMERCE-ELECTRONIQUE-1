@@ -82,16 +82,16 @@
         }
 
     .selected-names {
-        display: flex;
-        flex-wrap: wrap;
+        /* display: flex;
+        flex-wrap: wrap; */
     }
 
         .selected-names span {
+            display: inline-block;
             background-color: #ddd;
-            padding: 5px;
-            margin-right: 5px;
-            display: flex;
-            align-items: center;
+            padding: 5px 5px;
+            margin: 2px;
+            border-radius: 5px;
         }
 
     .delete-icon {
@@ -152,7 +152,7 @@
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center">
                             <h2 class="card-title">Envoyer un message</h2>
-                            <a id="btnEnregistrer" class="btn btn-lg btn-primary mesBtns">Enregister le brouillon</a>
+                            <a id="btnEnregistrer" class="btn btn-lg btn-primary mesBtns">Enregistrer le brouillon</a>
                         </div>
                         <hr />
                         <div class="form-floating mb-3">
@@ -186,20 +186,18 @@
                                             Envoyer à tout le monde
                                         </label>
                                     </div>
-                                    @* <div class="form-check" style="@(role == "gestionnaire" ? "display:inline" : "display:none")" id="divGestionnaire">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" id="chkTousLesVendeurs" onclick="ajouterToutLeMonde()">
-                                            <label class="form-check-label" for="chkTousLesVendeurs">
-                                                Envoyer à tous les vendeurs
-                                            </label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" id="chkToutLesClients" onclick="ajouterToutLeMonde()">
-                                            <label class="form-check-label" for="chkToutLesClients">
-                                                Envoyer à tous les clients
-                                            </label>
-                                        </div>
-                                    </div> *@
+                                    <div class="form-check" style="@(role == "gestionnaire" ? "display:block" : "display:none")">
+                                        <input class="form-check-input" type="checkbox" id="chkTousLesVendeurs" onclick="ajouterTousLesVendeurs()">
+                                        <label class="form-check-label" for="chkTousLesVendeurs">
+                                            Envoyer à tous les vendeurs
+                                        </label>
+                                    </div>
+                                    <div class="form-check" style="@(role == "gestionnaire" ? "display:block" : "display:none")">
+                                        <input class="form-check-input" type="checkbox" id="chkTousLesClients" onclick="ajouterTousLesClients()">
+                                        <label class="form-check-label" for="chkTousLesClients">
+                                            Envoyer à tous les clients
+                                        </label>
+                                    </div>
                                     <div class="selected-names" id="selectedNamesContainer"></div>
                                 </div>
                             </div>
@@ -212,7 +210,7 @@
                             <textarea title="Message" name="message" id="message" class="form-control" style="height: 200px">@message</textarea>
                             <label class="form-label">Votre message</label>
                         </div>
-                        <div style="border:solid 1px; border-color: lightgray; border-radius: 5px;">
+                        <div style="border:solid 1px; border-color: lightgray; border-radius: 5px; padding-left: 10px; padding-top: 5px; padding-bottom: 10px;">
                             <label class="form-label" style="color: grey; font-size: 14px;">Pièce jointe</label>
                             <br />
                             @if (pieceJointe != "")
@@ -266,6 +264,8 @@
     });
 
     function ajouterToutLeMonde() {
+        document.getElementById('chkTousLesVendeurs').checked = false;
+        document.getElementById('chkTousLesClients').checked = false;
         var dropdown = document.getElementById("ddlClients");
 
         if (document.getElementById("chkToutLeMonde").checked) {
@@ -277,18 +277,61 @@
                     ajouterDestinataire();
                 }
             }
-        } else {
-            // Si la case à cocher est décochée, supprime tous les destinataires
-            var selectedNamesContainer = document.getElementById("selectedNamesContainer");
-            selectedNamesContainer.innerHTML = "";
-            selectedDestinataire.value = "";
-        }
+        } else
+            retirerDestinataires();
 
         // Réinitialiser la sélection à l'option vide après avoir ajouté ou supprimé tous les destinataires
         dropdown.selectedIndex = 0;
     }
 
+    function ajouterTousLesVendeurs() {
+        retirerDestinataires();
 
+        document.getElementById('chkToutLeMonde').checked = false;
+        document.getElementById('chkTousLesClients').checked = false;
+
+        var dropdown = document.getElementById("ddlClients");
+
+        if (document.getElementById("chkTousLesVendeurs").checked) {
+            for (var i = 1; i < dropdown.options.length; i++) {
+                if (dropdown.options[i].value && dropdown.options[i].innerHTML.includes('Vendeur')) {
+                    dropdown.selectedIndex = i;
+                    ajouterDestinataire();
+                }
+            }
+        } else
+            retirerDestinataires();
+
+        dropdown.selectedIndex = 0;
+    }
+
+    function ajouterTousLesClients() {
+        retirerDestinataires();
+
+        document.getElementById('chkToutLeMonde').checked = false;
+        document.getElementById('chkTousLesVendeurs').checked = false;
+
+        var dropdown = document.getElementById("ddlClients");
+
+        if (document.getElementById("chkTousLesClients").checked) {
+            for (var i = 1; i < dropdown.options.length; i++) {
+                if (dropdown.options[i].value && dropdown.options[i].innerHTML.includes('Client')) {
+                    dropdown.selectedIndex = i;
+                    ajouterDestinataire();
+                }
+            }
+        } else
+            retirerDestinataires();
+
+        dropdown.selectedIndex = 0;
+    }
+
+    function retirerDestinataires() {
+        // Si la case à cocher est décochée, supprime tous les destinataires
+        var selectedNamesContainer = document.getElementById("selectedNamesContainer");
+        selectedNamesContainer.innerHTML = "";
+        selectedDestinataire.value = "";
+    }
 
     function ajouterDestinataire() {
         var dropdown = document.getElementById("ddlClients");
@@ -327,7 +370,9 @@
         }
     }
 
-    document.getElementById("btnEnregistrer").addEventListener("click", function() {
+    document.getElementById("btnEnregistrer").addEventListener("click", btnEnregistrerClick);
+
+    function btnEnregistrerClick() {
         var destinataires = document.getElementById('selectedDestinataire').value;
         var sujet = document.getElementById('sujet').value;
         var msg = document.getElementById('message').value
@@ -354,12 +399,15 @@
             document.getElementById('typeMessage').value = 2;
             document.getElementById('idMessage').value = idMessage;
             document.getElementById('typeMessageStr').value = typeMessageStr;
+            document.getElementById("btnEnregistrer").removeEventListener("click", btnEnregistrerClick);
 
             document.getElementById('frmCourriel').submit();
         }
-    });
+    }
 
-    document.getElementById("btnEnvoyer").addEventListener("click", function () {
+    document.getElementById("btnEnvoyer").addEventListener("click", btnEnvoyerClick);
+
+    function btnEnvoyerClick() {
         var sujet = document.getElementById('sujet').value;
         var msg = document.getElementById('message').value
         if (sujet == '') {
@@ -400,6 +448,7 @@
             }
 
             if (valide) {
+                document.getElementById("btnEnvoyer").removeEventListener("click", btnEnvoyerClick);
                 document.getElementById('frmCourriel').submit();
             }
             else {
@@ -413,7 +462,7 @@
                 });
             }
         }
-    });
+    }
 
     function modifierPieceJointe() {
         var stylePieceJointe = document.getElementById('pieceJointe').style;

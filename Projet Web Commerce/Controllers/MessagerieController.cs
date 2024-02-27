@@ -352,6 +352,11 @@ namespace Projet_Web_Commerce.Controllers
         // GET: EmailSenderController/Details/5
         public async Task<ActionResult> Details(int idMessage)
         {
+            if (idMessage == 0)
+            {
+                return View("/Views/Shared/404.cshtml");
+            }
+
             var user = await _userManager.GetUserAsync(User);
             var utilisateurCourantId = await _userManager.GetUserIdAsync(user);
 
@@ -366,10 +371,18 @@ namespace Projet_Web_Commerce.Controllers
             // Vérifier si l'utilisateur courant est le destinataire du message
             var destinataire = messageCourant.Destinataires.FirstOrDefault(dest => dest.Destinataire == utilisateurCourantId);
             ViewBag.destinataire = destinataire;
-            if (destinataire != null && !destinataire.MessageLu)
+
+            if (destinataire == null)
             {
-                destinataire.MessageLu = true;
-                await _context.SaveChangesAsync();
+                return View("/Views/Shared/404.cshtml");
+            }
+            else
+            {
+                if (!destinataire.MessageLu)
+                {
+                    destinataire.MessageLu = true;
+                    await _context.SaveChangesAsync();
+                }
             }
 
             return View(messageCourant);
