@@ -97,7 +97,7 @@ namespace Projet_Web_Commerce.Controllers
             {
                 client = client,
                 vendeur = vendeur,
-                poidsTotal = poidsTotal,
+                poidsTotal = poidsTotal.Value,
                 sousTotal = sousTotal
             };
 
@@ -140,7 +140,7 @@ namespace Projet_Web_Commerce.Controllers
                         }
                         else
                         {
-                            article.NbItems = produit.NombreItems;
+                            article.NbItems = produit.NombreItems.Value;
                         }
                         _context.PPArticlesEnPanier.Update(article);
                     }

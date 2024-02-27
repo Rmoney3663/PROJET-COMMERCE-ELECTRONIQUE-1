@@ -70,7 +70,7 @@ else
     <div class="row">
         <div class="col-md-4">
             <section>
-                <form asp-route-id="@vendeur.NoVendeur" id="customize" method="post" enctype="multipart/form-data">
+                <form asp-route-id="@vendeur.NoVendeur" asp-route-reset="false" id="customize" method="post" enctype="multipart/form-data">
                     <h2>Personnalisation de votre page</h2>
                     <div class="form-floating mb-3">
                         <h5>Votre logo</h5>
@@ -152,9 +152,10 @@ else
                         <h5>Couleur de text du sélecteur de quantité</h5>
                         <input type="color" value="@textQuantite" name="textQuantite" />
                     </div>
-                    <div>
-                        <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary" style="color: rgb(249, 229, 71); background-color: rgb(124, 105, 146)">Confirmer</button>
-                    </div>
+                    <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary" style="color: rgb(249, 229, 71); background-color: rgb(124, 105, 146); margin-bottom:10px">Confirmer</button>
+                </form>
+                <form asp-route-id="@vendeur.NoVendeur" asp-route-reset="true" id="reset" method="post">
+                    <button id="reset-submit" type="submit" class="w-100 btn btn-lg btn-primary" style="color: #FFFFFF; background-color: #808080">Réinitialiser</button>
                 </form>
             </section>
         </div>

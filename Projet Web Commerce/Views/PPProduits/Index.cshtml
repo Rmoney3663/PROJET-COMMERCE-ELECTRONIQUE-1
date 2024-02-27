@@ -79,7 +79,8 @@
             {
                 <div class="card" style="width:320px; margin: 10px;background-color:@backgroundCard">
                     @{
-                        var path = System.IO.Path.Combine(env.WebRootPath, "data/images", item.Photo);
+                        var nomImage = item.Photo != null ? item.Photo : "DefaultImage.png";
+                        var path = System.IO.Path.Combine(env.WebRootPath, "data/images", nomImage);
                         string imagePath = item.Photo != null && File.Exists(path) ? $"~/data/images/{item.Photo}" : "~/data/images/DefaultImage.png";
                         Console.WriteLine("FILE Name : " + item.Photo);
                         Console.WriteLine("FILE : " + File.Exists(path));

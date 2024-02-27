@@ -19,6 +19,7 @@ using System.IO;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
+using iTextSharp.text.pdf.draw;
 
 namespace Projet_Web_Commerce.Controllers
 {
@@ -279,7 +280,7 @@ namespace Projet_Web_Commerce.Controllers
                                     NoClient = model.NoClient,
                                     NoVendeur = model.NoVendeur,
                                     DateCommande = DateTime.Now,
-                                    PoidsTotal = poidsTotal,
+                                    PoidsTotal = poidsTotal.Value,
                                     Statut = "P",
                                     MontantTotAvantTaxes = Math.Round(sousTotal.Value, 2),
                                     TPS = Math.Round(sousTotal.Value * (tps / 100), 2),
@@ -327,7 +328,7 @@ namespace Projet_Web_Commerce.Controllers
                                         continue;
                                     }
 
-                                    int newQuantity = produit.NombreItems - article.NbItems;
+                                    int newQuantity = produit.NombreItems.Value - article.NbItems;
 
                                     if (newQuantity < 0)
                                     {
@@ -380,7 +381,19 @@ namespace Projet_Web_Commerce.Controllers
                                     }
 
                                     var TypeLivre = _context.PPTypesLivraison.Where(v => v.CodeLivraison == ppCommande.TypeLivraison).FirstOrDefault().Description;
-                                    string prixtot = ((ppCommande.MontantTotAvantTaxes / 100) * vendeur.PourcentageTaxe + ppCommande.CoutLivraison + ppCommande.MontantTotAvantTaxes)?.ToString("F2");
+                                    string prixtot = null;
+                                    string prixtaxe = null;
+                                    if (vendeur.Taxes == true)
+                                    {
+                                        prixtaxe = ((ppCommande.MontantTotAvantTaxes / 100) * vendeur.PourcentageTaxe)?.ToString("F2");
+                                        prixtot = ((ppCommande.MontantTotAvantTaxes / 100) * vendeur.PourcentageTaxe + ppCommande.CoutLivraison + ppCommande.MontantTotAvantTaxes)?.ToString("F2");
+                                    }
+                                    else
+                                    {
+                                        prixtaxe = "0.00";
+                                        prixtot = (ppCommande.MontantTotAvantTaxes + ppCommande.CoutLivraison + ppCommande.MontantTotAvantTaxes).ToString("F2");
+                                    }
+                                    
 
                                     if (ppCommande.NoCommande != null)
                                     {
@@ -392,23 +405,38 @@ namespace Projet_Web_Commerce.Controllers
 
                                             Paragraph title = new Paragraph("Reçu");
                                             title.Alignment = Element.ALIGN_CENTER;
+                                            title.Font = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 20, BaseColor.BLACK);
                                             document.Add(title);
 
                                             Paragraph orderInfo = new Paragraph();
-                                            orderInfo.Add($"\nDate de la commande: {ppCommande.DateCommande}\n");
+                                            orderInfo.SpacingBefore = 20f; 
+                                            orderInfo.Alignment = Element.ALIGN_LEFT;
+                                            orderInfo.Font = FontFactory.GetFont("Arial", 12, iTextSharp.text.Font.NORMAL, BaseColor.BLACK);
+
+                                            orderInfo.Add($"Date de la commande: {ppCommande.DateCommande}\n");
                                             orderInfo.Add($"Nom du vendeur: {vendeur.Prenom} {vendeur.Nom}\n");
                                             orderInfo.Add($"Numéro de client: {client.NoClient}\n");
                                             orderInfo.Add($"Numéro d'autorisation: {ppCommande.NoAutorisation}\n");
-                                            orderInfo.Add($"Montant de vente avant la taxes: {ppCommande.MontantTotAvantTaxes}$\n");                                            
-                                            orderInfo.Add($"Cout de livraison: {ppCommande.CoutLivraison}$\n");
-                                            orderInfo.Add($"Type de livraison: {TypeLivre}\n");
-                                            orderInfo.Add($"Poids total: {ppCommande.PoidsTotal}kg\n");
-                                            orderInfo.Add($"Montant total de vente: {prixtot}$\n");
-                                            orderInfo.Add($"Destination: {client.Rue}, {client.Ville}, {client.NoProvince}, {client.CodePostal}\n");
+
+                                            LineSeparator line = new LineSeparator(1f, 100f, BaseColor.BLACK, Element.ALIGN_CENTER, -1);
+                                            orderInfo.Add(new Chunk(line));
+
+                                            Chunk totalChunk = new Chunk($"\n\nTotal: ".PadLeft(20) + $"{prixtot}$\n", FontFactory.GetFont("Arial", 16, iTextSharp.text.Font.BOLD, BaseColor.BLACK));
+                                            orderInfo.Add(totalChunk);
+                                            orderInfo.Add($"Montant : ".PadLeft(20) + $"{ppCommande.MontantTotAvantTaxes}$\n");
+                                            orderInfo.Add($"Taxe: ".PadLeft(20) + $"{prixtaxe}$\n");
+                                            orderInfo.Add($"Coût de livraison: ".PadLeft(20) + $"{ppCommande.CoutLivraison}$\n");
+                                            orderInfo.Add($"Type de livraison: ".PadLeft(20) + $"{TypeLivre}\n");
+                                            orderInfo.Add($"Poids total: ".PadLeft(20) + $"{ppCommande.PoidsTotal}kg\n");
+
+                                            orderInfo.Add(new Chunk(line));
+
+                                            orderInfo.Add($"\n\nDestination: {client.Rue}, {client.Ville}, {client.NoProvince}, {client.CodePostal}\n");
 
                                             document.Add(orderInfo);
 
                                             document.Close();
+
 
                                             byte[] pdfBytes = memoryStream.ToArray();
 
@@ -516,7 +544,7 @@ namespace Projet_Web_Commerce.Controllers
 
 
             model.sousTotal = sousTotal.Value;
-            model.poidsTotal = poidsTotal;
+            model.poidsTotal = poidsTotal.Value;
             model.client.CodePostal = model.client.CodePostal;
 
 

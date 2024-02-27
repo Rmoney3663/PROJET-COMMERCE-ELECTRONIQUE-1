@@ -11,7 +11,7 @@
     var user = await _userManager.GetUserAsync(User);
 
     var vendeur = Model.PPVendeurs.NomAffaires;
-    int numRating = 0;
+    int numRating = 1;
 
     int noVendeur = 0;
     string emailDest = "";
@@ -32,10 +32,10 @@
             document.getElementById("newRating").value=valeur + 1
             for (var i = 0; i < 5; i++){
                 if (i <= valeur) {
-                    document.getElementById(i.toString()).src = "/Logo/iconeEtoileJaune.png"
+                    document.getElementById(i.toString()).src = "../data/images/iconeEtoileJaune.png"
                 }
                 else {
-                    document.getElementById(i.toString()).src = "/Logo/iconeEtoile.png"
+                    document.getElementById(i.toString()).src = "../data/images/iconeEtoile.png"
                 }
             }
         }
@@ -132,7 +132,8 @@ else
                 Photo de l’article :
             </dt>
             @{
-                var path = System.IO.Path.Combine(env.WebRootPath, "data/images", Model.Photo);
+                var nomImage = Model.Photo != null ? Model.Photo : "DefaultImage.png";
+                var path = System.IO.Path.Combine(env.WebRootPath, "data/images", nomImage);
                 string imagePath = Model.Photo != null && File.Exists(path) ? $"~/data/images/{Model.Photo}" : "~/data/images/DefaultImage.png";
                 Console.WriteLine("FILE Name : " + Model.Photo);
                 Console.WriteLine("FILE : " + File.Exists(path));
@@ -356,13 +357,13 @@ else
                     @for (int i = 0; i < numRating; i++)
                     {
                         <button onclick="Etoiles(@i)" style="border: 0; background-color:transparent">
-                            <img id="@i" src="~/Logo/iconeEtoileJaune.png" width="25" height="25" />
+                            <img id="@i" src="~/data/images/iconeEtoileJaune.png" width="25" height="25" />
                         </button>
                     }
                     @for (int i = numRating; i < 5; i++)
                     {
                         <button onclick="Etoiles(@i)" style="border: 0; background-color:transparent">
-                            <img id="@i" src="~/Logo/iconeEtoile.png" width="25" height="25" />
+                            <img id="@i" src="~/data/images/iconeEtoile.png" width="25" height="25" />
                         </button>
                     }
                     <br />
@@ -386,7 +387,7 @@ else
                         <input type="hidden" name="dateAvant" value="@ViewBag.dateAvant" />
                         <input type="hidden" name="sortOrder" value="@ViewBag.sortOrder" />
 
-                        <input type="hidden" name="rating" id="newRating" />
+                        <input type="hidden" name="rating" id="newRating" value=1 />
                         @if (evalClientActu != null)
                         {
                             <textarea rows="4" cols="50" name="msg" placeholder="Modifier votre commentaire">@evalClientActu.Commentaire</textarea>
@@ -409,11 +410,11 @@ else
                             (Vous) @client.AdresseEmail
                             @for (int i = 0; i < cote; i++)
                             {
-                                <img src="~/Logo/iconeEtoileJaune.png" width="15" height="15" />
+                                <img src="~/data/images/iconeEtoileJaune.png" width="15" height="15" />
                             }
                             @for (int i = cote; i < 5; i++)
                             {
-                                <img src="~/Logo/iconeEtoile.png" width="15" height="15" />
+                                <img src="~/data/images/iconeEtoile.png" width="15" height="15" />
                             } :
                         </h6>
                         @if (evalClientActu.Commentaire != "" && evalClientActu.Commentaire != null)
