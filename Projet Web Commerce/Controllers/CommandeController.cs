@@ -135,11 +135,11 @@ namespace Projet_Web_Commerce.Controllers
 
             // CALCUL POIDS
             var poidsTotal = articlesEnPanier
-                .Join(_context.PPProduits,
-                      article => article.NoProduit,
-                      produit => produit.NoProduit,
-                      (article, produit) => article.NbItems * produit.Poids)
-                .Sum();
+    .Join(_context.PPProduits.Where(produit => produit.Disponibilite), // Filter only available products
+          article => article.NoProduit,
+          produit => produit.NoProduit,
+          (article, produit) => article.NbItems * produit.Poids)
+    .Sum();
 
             // CALCUL SOUS TOTAL
 
