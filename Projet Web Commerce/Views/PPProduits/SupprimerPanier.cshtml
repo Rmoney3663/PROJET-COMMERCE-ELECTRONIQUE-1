@@ -139,10 +139,11 @@ else
 
                                                 var produit = _context.PPProduits.FirstOrDefault(p => p.NoProduit == item.NoProduit);
 
-                                                var path = System.IO.Path.Combine(env.WebRootPath, "data/images", item.Photo);
-                                                string imagePath = item.Photo != null && File.Exists(path) ? $"~/data/images/{item.Photo}" : "~/data/images/DefaultImage.png";
-                                                Console.WriteLine("FILE Name : " + item.Photo);
-                                                Console.WriteLine("FILE : " + File.Exists(path));
+                                               var nomImage = item.Photo != null ? item.Photo : "DefaultImage.png";
+                        var path = System.IO.Path.Combine(env.WebRootPath, "data/images", nomImage);
+                        string imagePath = item.Photo != null && File.Exists(path) ? $"~/data/images/{item.Photo}" : "~/data/images/DefaultImage.png";
+                        Console.WriteLine("FILE Name : " + item.Photo);
+                        Console.WriteLine("FILE : " + File.Exists(path));
 
                                                 <div class="row mb-4 d-flex justify-content-between align-items-center">
                                                     <div class="col-md-2 col-lg-2 col-xl-2">
