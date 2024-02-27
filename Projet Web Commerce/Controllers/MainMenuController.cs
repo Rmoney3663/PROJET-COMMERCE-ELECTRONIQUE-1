@@ -430,7 +430,7 @@ namespace Projet_Web_Commerce.Controllers
                     {
                         var ajoutPanier = new PPArticlesEnPanier
                         {
-                            NoPanier = int.Parse(NoClient.ToString() + NoVendeur.ToString() + NoProduit.ToString()),
+                            NoPanier = Convert.ToInt64(NoClient.ToString() + NoVendeur.ToString() + NoProduit.ToString()),
                             NoClient = NoClient, // Provide the NoClient value
                             NoVendeur = NoVendeur, // Provide the NoVendeur value
                             NoProduit = NoProduit, // Provide the NoProduit value

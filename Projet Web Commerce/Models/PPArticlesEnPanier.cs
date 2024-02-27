@@ -7,7 +7,7 @@ namespace Projet_Web_Commerce.Models
     {
         [Column(TypeName = "bigint")]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public int NoPanier { get; set; }
+        public long NoPanier { get; set; }
 
         public int NoClient { get; set; }
 
