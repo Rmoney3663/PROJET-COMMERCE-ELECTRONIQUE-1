@@ -114,11 +114,12 @@ else
                         {
                             if (group.Key != null)
                             {
-                                <form method="post" action="@Url.Action("CatalogueVendeur", "MainMenu")">
-                                    <input type="hidden" name="nbPourCon" value="0" />
-                                    <input type="hidden" name="nomAffaire" value="@group.Key" />
-                                    <button type="submit">@group.Key (@group.Count())</button>
-                                </form>
+                                <a asp-controller="MainMenu"
+                                   asp-route-nbPourCon="0"
+                                   asp-route-nomAffaire="@group.Key"
+                                   asp-action="CatalogueVendeur">
+                                    @group.Key (@group.Count())
+                                </a>
 
                                 <br />
                             }
