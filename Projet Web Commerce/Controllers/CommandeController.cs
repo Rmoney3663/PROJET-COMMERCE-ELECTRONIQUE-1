@@ -403,9 +403,8 @@ namespace Projet_Web_Commerce.Controllers
                                             PdfWriter.GetInstance(document, memoryStream);
                                             document.Open();
 
-                                            Paragraph title = new Paragraph("Reçu");
+                                            Paragraph title = new Paragraph("Reçu", FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 20, BaseColor.BLACK));
                                             title.Alignment = Element.ALIGN_CENTER;
-                                            title.Font = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 20, BaseColor.BLACK);
                                             document.Add(title);
 
                                             Paragraph orderInfo = new Paragraph();
@@ -421,13 +420,13 @@ namespace Projet_Web_Commerce.Controllers
                                             LineSeparator line = new LineSeparator(1f, 100f, BaseColor.BLACK, Element.ALIGN_CENTER, -1);
                                             orderInfo.Add(new Chunk(line));
 
-                                            Chunk totalChunk = new Chunk($"\n\nTotal: ".PadLeft(20) + $"{prixtot}$\n", FontFactory.GetFont("Arial", 16, iTextSharp.text.Font.BOLD, BaseColor.BLACK));
+                                            Chunk totalChunk = new Chunk($"\n\nTotal: ".PadRight(25) + $"{prixtot} $\n", FontFactory.GetFont("Arial", 16, iTextSharp.text.Font.BOLD, BaseColor.BLACK));
                                             orderInfo.Add(totalChunk);
-                                            orderInfo.Add($"Montant : ".PadLeft(20) + $"{ppCommande.MontantTotAvantTaxes}$\n");
-                                            orderInfo.Add($"Taxe: ".PadLeft(20) + $"{prixtaxe}$\n");
-                                            orderInfo.Add($"Coût de livraison: ".PadLeft(20) + $"{ppCommande.CoutLivraison}$\n");
-                                            orderInfo.Add($"Type de livraison: ".PadLeft(20) + $"{TypeLivre}\n");
-                                            orderInfo.Add($"Poids total: ".PadLeft(20) + $"{ppCommande.PoidsTotal}kg\n");
+                                            orderInfo.Add($"Montant: ".PadRight(30) + $"{ppCommande.MontantTotAvantTaxes} $\n");
+                                            orderInfo.Add($"Taxe: ".PadRight(32) + $"{prixtaxe} $\n");
+                                            orderInfo.Add($"Coût de livraison: ".PadRight(26) + $"{ppCommande.CoutLivraison} $\n");
+                                            orderInfo.Add($"Type de livraison: ".PadRight(26) + $"{TypeLivre}\n");
+                                            orderInfo.Add($"Poids total: ".PadRight(30) + $"{ppCommande.PoidsTotal} kg\n");
 
                                             orderInfo.Add(new Chunk(line));
 
