@@ -52,7 +52,7 @@
                                         int nbItems = 0;
 
                                         var oldestProductDate = DateTime.Now;
-                                        foreach (int produit in panier.articles)
+                                        foreach (long produit in panier.articles)
                                         {
                                             PPArticlesEnPanier produitActu = _context.PPArticlesEnPanier.Where(v => v.NoPanier == produit).FirstOrDefault();
                                             if (produitActu.DateCreation < oldestProductDate)
