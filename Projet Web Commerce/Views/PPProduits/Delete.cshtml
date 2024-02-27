@@ -33,7 +33,8 @@ else
                 Photo de l’article :
             </dt>
             @{
-                var path = System.IO.Path.Combine(env.WebRootPath, "data/images", Model.Photo);
+                var nomImage = Model.Photo != null ? Model.Photo : "DefaultImage.png";
+                var path = System.IO.Path.Combine(env.WebRootPath, "data/images", nomImage);
                 string imagePath = Model.Photo != null && File.Exists(path) ? $"~/data/images/{Model.Photo}" : "~/data/images/DefaultImage.png";
                 Console.WriteLine("FILE Name : " + Model.Photo);
                 Console.WriteLine("FILE : " + File.Exists(path));
