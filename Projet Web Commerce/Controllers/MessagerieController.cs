@@ -114,10 +114,20 @@ namespace Projet_Web_Commerce.Controllers
                 .Include(m => m.Destinataires)
                 .FirstOrDefaultAsync(m => m.NoMessage == idMessage);
 
+            if (msg == null)
+            {
+                return View();
+            }
+
             var utilisateurCourantId = _userManager.Users.Where(u => u.Email == User.Identity.Name).FirstOrDefault().Id;
             
             if (typeMessage == "brouillon") // Si brouillon
             {
+                if (msg.Auteur != utilisateurCourantId)
+                {
+                    return View("/Views/Shared/404.cshtml");
+                }
+
                 List<string> lstCourrielsDests = new List<string>();
                 foreach (var dest in msg.Destinataires)
                 {
@@ -368,15 +378,20 @@ namespace Projet_Web_Commerce.Controllers
                     .ThenInclude(d => d.DestinataireUser)
                 .FirstOrDefaultAsync();
 
-            // Vérifier si l'utilisateur courant est le destinataire du message
-            var destinataire = messageCourant.Destinataires.FirstOrDefault(dest => dest.Destinataire == utilisateurCourantId);
-            ViewBag.destinataire = destinataire;
-
-            if (destinataire == null)
+            if (messageCourant == null)
             {
                 return View("/Views/Shared/404.cshtml");
             }
-            else
+            // Vérifier si l'utilisateur courant est le destinataire du message
+            var destinataire = messageCourant.Destinataires.FirstOrDefault(dest => dest.Destinataire == utilisateurCourantId);
+            //var auteurMsg = messageCourant.Auteur == utilisateurCourantId;
+            ViewBag.destinataire = destinataire;
+
+            if (destinataire == null && messageCourant.Auteur != utilisateurCourantId)
+            {
+                return View("/Views/Shared/404.cshtml");
+            }
+            else if (destinataire != null)
             {
                 if (!destinataire.MessageLu)
                 {
