@@ -395,7 +395,7 @@ namespace Projet_Web_Commerce.Controllers
                                     else
                                     {
                                         prixtaxe = "0.00";
-                                        prixtot = (ppCommande.MontantTotAvantTaxes + ppCommande.CoutLivraison + ppCommande.MontantTotAvantTaxes).ToString("F2");
+                                        prixtot = (ppCommande.MontantTotAvantTaxes + ppCommande.CoutLivraison ).ToString("F2");
                                     }
                                     
 

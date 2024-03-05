@@ -54,7 +54,7 @@ else
                 PPVendeurs vendeur = Model.VendeursList.Where(p => p.NoVendeur == panier.vendeur).FirstOrDefault();
                 decimal total = 0;
                 int nbTot = 0;
-                foreach (int article in panier.articles){
+                foreach (long article in panier.articles){
                     var articleEnPanier = _context.PPArticlesEnPanier.Where(p => p.NoPanier == article).FirstOrDefault();
                     var produit = Model.ProduitsList.Where(p => p.NoProduit == articleEnPanier.NoProduit).FirstOrDefault();
                     var prixProduit = produit.PrixVente != null && DateTime.Now < produit.DateVente?produit.PrixVente:produit.PrixDemande;
