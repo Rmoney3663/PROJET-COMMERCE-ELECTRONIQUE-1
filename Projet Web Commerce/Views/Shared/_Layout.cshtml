@@ -64,54 +64,46 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         @if (!User.IsInRole("Vendeur") && !User.IsInRole("Gestionnaire"))
-                        {              
-
+                        {
                              <li class="nav-item">
-                                    <a class="nav-link" style="color: rgb(249, 229, 71); font-size: 23px" asp-area="" asp-controller="MainMenu" asp-action="Catalogue">Catalogue</a>
-
-                                </li>
-
-
+                                <a class="nav-link" style="color: rgb(249, 229, 71); font-size: 23px" asp-area="" asp-controller="MainMenu" asp-action="Catalogue">Catalogue</a>
+                            </li>
                         }                        
 
                         @if (SignInManager.IsSignedIn(User) && User.IsInRole("Vendeur"))
                         {
                             <li class="nav-item">
-                                <a class="nav-link" style="color: rgb(249, 229, 71); font-size: 23px" asp-area="" asp-controller="PPProduits" asp-action="Index">Mes Produits</a>
+                                <a class="nav-link" style="color: rgb(249, 229, 71); font-size: 23px" asp-area="" asp-controller="PPProduits" asp-action="Index">Mes produits</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" style="color: rgb(249, 229, 71); font-size: 23px" asp-area="" asp-controller="PPProduits" asp-action="ListePanier">Mes Paniers</a>
+                                <a class="nav-link" style="color: rgb(249, 229, 71); font-size: 23px" asp-area="" asp-controller="PPProduits" asp-action="ListePanier">Mes paniers</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" style="color: rgb(249, 229, 71); font-size: 23px" asp-area="" asp-controller="Personnaliser" asp-action="Index">Presonnaliser votre page</a>
-
+                                <a class="nav-link" style="color: rgb(249, 229, 71); font-size: 23px" asp-area="" asp-controller="Personnaliser" asp-action="Index">Personnaliser votre page</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" style="color: rgb(249, 229, 71); font-size: 23px" asp-area="" asp-controller="PPProduits" asp-action="GestionCommandes">Gestion des commandes</a>
-
                             </li>
-                           
                         }
-
 
                         @if (SignInManager.IsSignedIn(User) && User.IsInRole("Gestionnaire"))
                         {
                             <li class="nav-item">
                                 <a class="nav-link" style="color: rgb(249, 229, 71); font-size: 23px"
                                     asp-controller="PPGestionnaires" asp-action="ListeVendeurs">
-                                    Module Gestionnaires
+                                    Module gestionnaire
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" style="color: rgb(249, 229, 71); font-size: 23px"
                                    asp-controller="PPCategories" asp-action="Index">
-                                    Gestion Catégories
+                                    Gestion catégories
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" style="color: rgb(249, 229, 71); font-size: 23px"
                                    asp-controller="PPHistoriquePaiements" asp-action="Index">
-                                    Gestion Historique de Paiements
+                                    Gestion historique de paiements
                                 </a>
                             </li>
                         }
@@ -119,7 +111,7 @@
                         @if (SignInManager.IsSignedIn(User) && User.IsInRole("Client"))
                         {
                             <li class="nav-item">
-                                <a class="nav-link" style="color: rgb(249, 229, 71); font-size: 23px" asp-area="" asp-controller="PPHistoriquePaiements" asp-action="HistoriqueClient">Mes Commandes</a>
+                                <a class="nav-link" style="color: rgb(249, 229, 71); font-size: 23px" asp-area="" asp-controller="PPHistoriquePaiements" asp-action="HistoriqueClient">Mes commandes</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" style="color: rgb(249, 229, 71); font-size: 23px" asp-area="Identity" asp-page="/Account/RegisterVendeur">S'inscrire comme vendeur</a>
@@ -127,7 +119,7 @@
 
                             <div class="d-flex justify-content-center flex-grow-1">
                                 <form method="post" class="d-flex mx-auto" asp-controller="MainMenu" asp-action="CatalogueTous" class="mx-3">
-                                    <input class="form-control me-2" name="searchString" id="searchString" type="search" placeholder="Rechercher par Nom,Description ou NoProduit" aria-label="Search">
+                                    <input class="form-control me-2" name="searchString" id="searchString" type="search" placeholder="Rechercher par Nom, description ou no de produit" aria-label="Search">
                                     <button class="btn btn-secondary" type="submit">Rechercher</button> 
                                 </form>
                             </div>
