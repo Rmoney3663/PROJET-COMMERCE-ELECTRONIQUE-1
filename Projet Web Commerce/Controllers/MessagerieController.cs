@@ -287,6 +287,7 @@ namespace Projet_Web_Commerce.Controllers
             return View();
         }
 
+        // Liste des messages envoyés
         [HttpGet]
         public ActionResult Envoyes()
         {

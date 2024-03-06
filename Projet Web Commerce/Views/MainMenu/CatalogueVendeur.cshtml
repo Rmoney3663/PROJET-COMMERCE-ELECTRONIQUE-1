@@ -231,7 +231,7 @@
                                 }
                                 else
                                 {
-                                    <b>Aucune évaluations!</b>
+                                    <b>Aucune évaluation!</b>
                                 }
                                
                                 <div>
@@ -362,12 +362,13 @@
                         {
                             <li class="page-item">
                                 <a class="page-link" href="@Url.Action("CatalogueVendeur", new {
-    sortOrder = Model.sortOrder,
-    pageNumber = Model.ProduitsList.PageIndex + 1,
-    parPage = Model.parPage,
-    searchString = Model.searchString,
-    nomAffaire = Model.nomAffaire
-})">Suivant</a>
+                                sortOrder = Model.sortOrder,
+                                pageNumber = Model.ProduitsList.PageIndex + 1,
+                                parPage = Model.parPage,
+                                searchString = Model.searchString,
+                                nomAffaire = Model.nomAffaire})">
+                                    Suivant
+                                </a>
                             </li>
                         }
                     </ul>

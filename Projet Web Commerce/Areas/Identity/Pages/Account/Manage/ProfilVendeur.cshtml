@@ -3,6 +3,7 @@
 @inject AuthDbContext _context
 @using Projet_Web_Commerce.Data
 @{
+    ViewData["Title"] = "Modifier le profil";
     ViewData["ActivePage"] = ManageNavPages.ProfilVendeur;
 
     var vendeur = _context.PPVendeurs.Where(v => v.AdresseEmail == Model.Courriel).FirstOrDefault();
@@ -77,8 +78,7 @@
             </div>
             <div class="col-md-6">
                 <div class="form-floating mb-3">
-                    <input asp-for="Input.LivraisonGratuite" class="form-control" type="number" min="0" step="any" data-val="true" required />
-                                            
+                    <input asp-for="Input.LivraisonGratuite" class="form-control" type="number" min="0" step="any" data-val="true" required />                 
                     <label asp-for="Input.LivraisonGratuite" class="form-label"></label>
                     <span asp-validation-for="Input.LivraisonGratuite" class="text-danger"></span>
                 </div>
@@ -94,7 +94,7 @@
             </div>
             <div class="col-md-6">
                 <div class="form-floating mb-3">
-                    <select asp-for="Input.Taxes" class="form-control">
+                    <select asp-for="Input.Taxes" class="form-control" disabled>
                         <option value="@true">Oui</option>
                         <option value="@false">Non</option>
                     </select>
