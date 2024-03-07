@@ -155,11 +155,12 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account.Manage
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
 
-            var compagnieExistante = _context.PPVendeurs.FirstOrDefault(c => c.NomAffaires == Input.NomAffaires);
+            var compagnieCurrentUser = _context.PPVendeurs.FirstOrDefault(c => c.AdresseEmail == user.Email).NomAffaires;
+            var compagnieExistante = _context.PPVendeurs.FirstOrDefault(c => c.NomAffaires == Input.NomAffaires && c.NomAffaires != compagnieCurrentUser);
 
             if (compagnieExistante != null)
             {
-                ModelState.AddModelError(string.Empty, "Ce nom d'affaires existe déjà");
+                ModelState.AddModelError("Input.NomAffaires", "Ce nom d'affaires existe déjà");
             }
 
             if (!ModelState.IsValid)
