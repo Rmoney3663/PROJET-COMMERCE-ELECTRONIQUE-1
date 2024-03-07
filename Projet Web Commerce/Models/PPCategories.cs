@@ -7,8 +7,12 @@ namespace Projet_Web_Commerce.Models
     {
         [Key]
         public int NoCategorie { get; set; }
+
+        [Required(ErrorMessage = "Le champ Description est requis.")]
         public string Description { get; set; }
+        [Required(ErrorMessage = "Le champ Details est requis.")]
         public string Details { get; set; }
+
         [InverseProperty("PPCategories")]
         public virtual ICollection<PPProduits>? PPProduits { get; set; }
     }

@@ -88,6 +88,10 @@ else
                                 <p>Aucun</p>
                             }
                             <input type="file" id="image" name="image" accept="image/jpeg" class="form-control" />
+                            @if (ViewBag.erreur != null)
+                            {
+                                <label class="text-danger">Veuillez entrer un format d'image valide (jpg, jpeg)</label>
+                            }
                         </div>
                     </div>
                     <div class="form-floating mb-3">

@@ -380,11 +380,11 @@ namespace Projet_Web_Commerce.Controllers
                 .Where(v => v.Statut == 2)
                 .OrderByDescending(v => v.NomAffaires)
                 .ToList();
+            
 
-            var lstMoisAnneesDistincts = _context.PPVendeurs
+            var lstMoisAnneesDistincts = vendeurs
                 .Where(v => v.Statut == 2)
                 .Select(v => new ModelMoisAnnees { Mois = v.DateCreation.Month, Annee = v.DateCreation.Year })
-                //.Select(v => new { Mois = v.DateCreation.Month, Annee = v.DateCreation.Year })
                 .Distinct()
                 .OrderByDescending(item => item.Annee)
                 .ThenByDescending(item => item.Mois)
