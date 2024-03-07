@@ -5,7 +5,7 @@
 @using System.IO
 @inject IWebHostEnvironment env
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Modifier";
     var user = await _userManager.GetUserAsync(User);    
 }
 
@@ -21,7 +21,7 @@
 }
 else
 {
-    <h1>Modification du Produit</h1>
+    <h1>Modification d'un produit</h1>
 
     <h4>Produit</h4>
     <hr />
@@ -145,13 +145,11 @@ else
 
                 <div class="form-group">
                     <input type="submit" value="Modifier" class="btn btn-primary" />
+                    |
+                    <a class="btn btn-success" asp-action="Index">Retour à la liste</a>
                 </div>
             </form>
         </div>
-    </div>
-
-    <div>
-        <a asp-action="Index">Retour à la liste</a>
     </div>
 
     @section Scripts {

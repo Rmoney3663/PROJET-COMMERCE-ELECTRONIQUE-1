@@ -5,7 +5,7 @@
 @using System.IO
 @inject IWebHostEnvironment env
 @{
-    ViewData["Title"] = "Delete";
+    ViewData["Title"] = "Supprimer";
     var user = await _userManager.GetUserAsync(User);
     Console.WriteLine("NoProduit : " + Model.NoProduit);
 }
@@ -116,7 +116,7 @@ else
             else
             {
                 <dd class="col-sm-10">
-                    Le prix de vente n'est pas précisée
+                    Le prix de vente n'est pas précisé
                 </dd>
             }
 
@@ -126,8 +126,9 @@ else
             <input type="hidden" asp-for="NoProduit" name="Id" />
             <button type="submit" class="btn btn-danger" onclick="return confirm('Confirmer Suppression')">
                 Supprimer
-            </button> |
-            <a asp-action="Index">Retour à la liste</a>
+            </button>
+            |
+            <a class="btn btn-success" asp-action="Index">Retour à la liste</a>
         </form>
     </div>
 }
