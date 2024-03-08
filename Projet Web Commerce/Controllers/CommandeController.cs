@@ -82,12 +82,13 @@ namespace Projet_Web_Commerce.Controllers
         }
         
 
-        public ActionResult CommandeCompleter(string NoAutorisation, string DateAutorisation, string FraisMarchand, string InfoSuppl)
+        public ActionResult CommandeCompleter(string NoAutorisation, string DateAutorisation, string FraisMarchand, string InfoSuppl, string NoCommande)
         {
             ViewBag.NoAutorisation = NoAutorisation;
             ViewBag.DateAutorisation = DateAutorisation;
             ViewBag.FraisMarchand = FraisMarchand;
             ViewBag.InfoSuppl = InfoSuppl;
+            ViewBag.NoCommande = NoCommande;
             return View();
         }
 
@@ -503,7 +504,7 @@ namespace Projet_Web_Commerce.Controllers
                                     _context.SaveChanges();
                                     transaction.Commit(); // Commit the transaction if all operations succeed
                                     TempData.Clear();
-                                    return RedirectToAction("CommandeCompleter", new { NoAutorisation = NoAutorisation, DateAutorisation = DateAutorisation, FraisMarchand = FraisMarchand, InfoSuppl = InfoSuppl });
+                                    return RedirectToAction("CommandeCompleter", new { NoAutorisation = NoAutorisation, DateAutorisation = DateAutorisation, FraisMarchand = FraisMarchand, InfoSuppl = InfoSuppl, NoCommande = ppCommande.NoCommande });
                                 }
                                 else
                                 {
@@ -664,6 +665,7 @@ namespace Projet_Web_Commerce.Controllers
                 }
 
                 string formPageUrl = "http://424w.informatique.cgodin.qc.ca/lesi-20XX/lesi-effectue-paiement.php";
+                //string formPageUrl = "https://424w.cgodin.qc.ca/lesi-20XX/lesi-effectue-paiement.php";
 
                 // Create an instance of HttpClient
 
@@ -696,7 +698,7 @@ namespace Projet_Web_Commerce.Controllers
                 }
 
                 // Send the POST request to submit the form
-                HttpResponseMessage response = await httpClient.PostAsync(formPageUrl, formData);
+                 HttpResponseMessage response = await httpClient.PostAsync(formPageUrl, formData);
 
                 // Check if the request was successful
                 if (response.IsSuccessStatusCode)
