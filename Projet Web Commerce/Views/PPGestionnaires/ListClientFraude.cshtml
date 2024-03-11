@@ -1,6 +1,6 @@
 ﻿@model Projet_Web_Commerce.Models.ModelListeClients
 @{
-    ViewData["Title"] = "Liste des clients fraud";
+    ViewData["Title"] = "Liste des clients non confirmés";
 }
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
@@ -85,7 +85,7 @@
                 }
                 @if (Model.MoisAnneesDistinctsList.Count() == 0)
                 {
-                    <p>Aucun clients non confirmer.</p>
+                    <p>Aucun client non confirmé.</p>
                 }
             </div>           
         </section>

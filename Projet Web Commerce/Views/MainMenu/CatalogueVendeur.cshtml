@@ -10,6 +10,8 @@
 @inject AuthDbContext _context
 
 @{
+    ViewData["Title"] = "Catalogue vendeur";
+
     ViewBag.Current = Model.nomAffaire;
     var productList = SignInManager.IsSignedIn(User) ? Model.ProduitsList : Model.NouveauxProduits;
     var text = "#000000";
@@ -93,7 +95,7 @@
 
 
         <div class="col-md-4 d-flex align-items-start" style="gap:10px">
-            <h3 style="color:@text; font-family:@font">Liste de tout les produits @Model.nomAffaire </h3>
+            <h3 style="color:@text; font-family:@font">Liste de tous les produits de @Model.nomAffaire </h3>
 
             @if (logo != "none")
             {
@@ -111,7 +113,7 @@
                             <div class="flex-grow-1">
                                 <div class="input-group" style="width:400px;">
                                     <!-- Adjust width and remove margin -->
-                            @Html.TextBoxFor(model => model.searchString, new { placeholder = "Rechercher par Nom,Description ou NoProduit", @class = "form-control", @style="background-color:" + backgroundBarre + ";color:" + textBarre })
+                            @Html.TextBoxFor(model => model.searchString, new { placeholder = "Rechercher par nom, description ou no de produit", @class = "form-control", @style="background-color:" + backgroundBarre + ";color:" + textBarre })
 
                                     <div class="input-group-append">
                                         <span class="input-group-text">
@@ -273,7 +275,7 @@
                                     @Html.HiddenFor(m => m.sortOrder)
                                     @Html.HiddenFor(m => m.premiereConnexion)
 
-                                    <button type="submit" class="btn btn-secondary mt-auto" style="margin-bottom:10px; background-color:@backgroundButtonDetail; color: @textButtonDetail">Details</button>
+                                    <button type="submit" class="btn btn-secondary mt-auto" style="margin-bottom:10px; background-color:@backgroundButtonDetail; color: @textButtonDetail;">Détails</button>
 
                                 </form>
 
@@ -321,7 +323,7 @@
         }
         else
         {
-            <p>Aucun produits.</p>
+            <p>Aucun produit.</p>
         }
     </div>
 
@@ -387,12 +389,12 @@
 
 <style>
     .dropdown-menu {
-        max-height: 200px; /* Set maximum height for the dropdown */
-        overflow-y: auto; /* Enable vertical scrolling if needed */
+        max-height: 200px; 
+        overflow-y: auto; 
     }
 
     a:hover {
-        color: #ccc; /* Light gray color on hover */
+        color: #ccc;
     }
 
     input[type="date"]:before {
@@ -442,7 +444,7 @@
 
 
             $(document).ready(function () {
-                var isContainerVisible = false; // Variable to track visibility state
+                var isContainerVisible = false;
 
                 $(".show-options-link").click(function () {
                     console.log("Clicked");
@@ -451,10 +453,8 @@
                         height: 'toggle'
                     });
 
-                    // Toggle the boolean variable
                     isContainerVisible = !isContainerVisible;
 
-                    // Change the text based on current state
                     var linkText = isContainerVisible ? 'Diminuer' : 'Afficher plus d\'options +';
                     console.log("Link Text: ", linkText);
                     $(this).text(linkText);
