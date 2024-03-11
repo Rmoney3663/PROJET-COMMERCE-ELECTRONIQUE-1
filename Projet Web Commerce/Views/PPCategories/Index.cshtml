@@ -1,5 +1,7 @@
 ﻿@model IEnumerable<Projet_Web_Commerce.Models.PPCategories>
-
+@{
+    ViewData["Title"] = "Liste des catégories";
+}
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 <!DOCTYPE html>
@@ -7,12 +9,12 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width" />
-    <title>Liste de Categories</title>
+    <title>Liste des catégories</title>
 </head>
 <body>
-    <h2>Liste de Categories</h2>
+    <h2>Liste des catégories</h2>
 <p>
-    <a asp-action="Create">Ajouter un Nouveau Categorie</a>
+    <a asp-action="Create" class="btn btn-primary">Ajouter une nouvelle catégorie</a>
 </p>
 <table class="table">
     <thead>

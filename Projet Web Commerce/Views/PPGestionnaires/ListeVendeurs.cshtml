@@ -56,11 +56,11 @@
                                         <th scope="col">Nom d'affaires</th>
                                         <th scope="col">Date de création</th>
                                         <th scope="col">Nb de produits inscrits</th>
-                                        <th scope="col">Cote Moyen</th>
+                                        <th scope="col">Cote moyenne</th>
                                         <th scope="col">Date de dernière commande</th>
                                         <th scope="col">Montant total avant taxes </th>
-                                        <th scope="col">Supprimer Panier</th>
-                                        <th scope="col">Supprimer Vendeur</th>
+                                        <th scope="col">Supprimer le panier</th>
+                                        <th scope="col">Supprimer le vendeur</th>
                                         <th scope="col"></th>
                                     </tr>
                                 </thead>
@@ -116,7 +116,7 @@
                                                 <a asp-action="InactifV" class="btn btn-warning" asp-route-id="@item.Vendeur.NoVendeur">Inactif</a>
                                                 @if (item.Commande == null )
                                                 {
-                                                    <a asp-action="Taux" class="btn btn-success"  asp-route-id="@item.Vendeur.NoVendeur">Taux Redevance</a>                                                   
+                                                    <a asp-action="Taux" class="btn btn-success"  asp-route-id="@item.Vendeur.NoVendeur">Taux redevance</a>                                                   
                                                 }
                                             </td>
                                         </tr>
@@ -129,12 +129,12 @@
                 } 
                 @if (Model.MoisAnneesDistinctsList.Count() == 0)
                 {
-                    <p>Il n'y a aucun Vendeurs</p>
+                    <p>Il n'y a aucun vendeur</p>
                 }
                 else
                 {
                     <br />
-                    <a id="enregistrementButton" class="btn btn-danger">Enregistrement des modifications</a>
+                    <a id="enregistrementButton" class="btn btn-danger">Enregistrer les modifications</a>
                 }
             </div>
         </section>
@@ -175,8 +175,8 @@
         if (panierCount > 0 || vendeurCount > 0) {
             Swal.fire({
                 title: 'Enregistrement des modifications',
-                html: 'Nombre de Panier Supprimer : ' + panierCount + '<br>' +
-                    'Nombre de Vendeurs Supprimer : ' + vendeurCount,
+                html: 'Nombre de paniers à supprimer : ' + panierCount + '<br>' +
+                    'Nombre de vendeurs à supprimer : ' + vendeurCount,
                 icon: 'warning',
                 showDenyButton: true,
                 confirmButtonText: "Confirmer",
@@ -232,7 +232,7 @@
                                 Swal.showValidationMessage(`Request failed: ${error}`);
                             });
                     } else {
-                        Swal.showValidationMessage("Aucun vendeur ou paniers n'a été sélectionné.");
+                        Swal.showValidationMessage("Aucun vendeur ou panier n'a été sélectionné.");
                         return;
                     }
                 }

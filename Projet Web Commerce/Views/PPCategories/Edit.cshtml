@@ -1,5 +1,7 @@
 ﻿@model Projet_Web_Commerce.Models.PPCategories
-
+@{
+    ViewData["Title"] = "Modifier";
+}
 
 
 <!DOCTYPE html>
@@ -7,11 +9,11 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width" />
-    <title>Modifier un Categorie</title>
+    <title>Modifier une catégorie</title>
 </head>
 <body>
 
-    <h2>Modifier un Categorie</h2>
+    <h2>Modifier une catégorie</h2>
 <hr />
 <div class="row">
     <div class="col-md-6">
@@ -38,7 +40,7 @@
 </div>
 
 <div>
-        <a asp-action="Index">Retour à la liste</a>
+        <a asp-action="Index" class="btn btn-success">Retour à la liste</a>
 </div>
 
 </body>

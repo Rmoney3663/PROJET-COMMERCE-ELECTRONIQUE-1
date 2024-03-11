@@ -1,5 +1,7 @@
 ﻿@model Projet_Web_Commerce.Models.PPCategories
-
+@{
+    ViewData["Title"] = "Ajouter";
+}
 
 
 <!DOCTYPE html>
@@ -7,11 +9,11 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width" />
-    <title>Ajouter un Nouveau Categorie</title>
+    <title>Ajouter une nouvelle catégorie</title>
 </head>
 <body>
 
-    <h2>Ajouter un Nouveau Categorie</h2>
+    <h2>Ajouter une nouvelle catégorie</h2>
 <hr />
 <div class="row">
     <div class="col-md-6">
@@ -37,7 +39,7 @@
 </div>
 
 <div>
-        <a asp-action="Index">Retour à la liste</a>
+        <a asp-action="Index" class="btn btn-success">Retour à la liste</a>
 </div>
 
 </body>
