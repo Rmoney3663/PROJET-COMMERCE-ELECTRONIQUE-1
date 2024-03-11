@@ -243,8 +243,9 @@
                                                 <h5>
                                                     @if (tps.HasValue)
                                                     {
-                                                        prixFinal += tps;
+                                                        
                                                         decimal r = Math.Round(tps.Value, 2);
+                                                        prixFinal += tps;
                                                         @Html.DisplayFor(modelItem => r)
 
                                                         
@@ -264,9 +265,9 @@
                                                     <h5>
                                                         @if (tvq.HasValue)
                                                         {
+                                                            decimal r = Math.Round(tvq.Value, 2);
                                                             prixFinal += tvq;
 
-                                                            decimal r = Math.Round(tvq.Value, 2);
                                                             @Html.DisplayFor(modelItem => r)
 
                                                             

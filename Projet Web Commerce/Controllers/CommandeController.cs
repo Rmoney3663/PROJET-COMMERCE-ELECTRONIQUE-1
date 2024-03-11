@@ -293,7 +293,7 @@ namespace Projet_Web_Commerce.Controllers
                                     DateCommande = DateTime.Now,
                                     PoidsTotal = poidsTotal.Value,
                                     Statut = "P",
-                                    MontantTotAvantTaxes = Math.Round(sousTotal.Value, 2),
+                                    MontantTotAvantTaxes = Math.Round(sousTotal.Value - tps - tvq, 2),
                                     TPS = Math.Round(sousTotal.Value * (tps / 100), 2),
                                     TVQ = Math.Round(sousTotal.Value * (tvq / 100), 2),
                                     CoutLivraison = roundedFraisLivraison,
@@ -707,7 +707,7 @@ namespace Projet_Web_Commerce.Controllers
                     { "DateExpirationCarteCredit", $"{model.dateExpiration}" },
                     { "MontantPaiement",prixtotString },
                     { "NoSecuriteCarteCredit", $"{model.CVV}" },
-                    { "NomPageRetour", $"https://424q.cgodin.qc.ca/Commande/ConfirmerCommande"},
+                    { "NomPageRetour", $"http://localhost:5091/Commande/ConfirmerCommande"},
                     { "InfoSuppl", "Coucou" }
                     // Add other form fields as needed
                 };
