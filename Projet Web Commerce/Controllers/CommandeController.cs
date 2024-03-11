@@ -705,7 +705,7 @@ namespace Projet_Web_Commerce.Controllers
                     { "DateExpirationCarteCredit", $"{model.dateExpiration}" },
                     { "MontantPaiement",prixtotString },
                     { "NoSecuriteCarteCredit", $"{model.CVV}" },
-                    { "NomPageRetour", $"https://localhost:5091/Commande/ConfirmerCommande"},
+                    { "NomPageRetour", $"https://424q.cgodin.qc.ca/Commande/ConfirmerCommande"},
                     { "InfoSuppl", "Coucou" }
                     // Add other form fields as needed
                 };
