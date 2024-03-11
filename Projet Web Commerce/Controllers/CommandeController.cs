@@ -684,7 +684,9 @@ namespace Projet_Web_Commerce.Controllers
                 }
 
                 //string formPageUrl = "http://424w.informatique.cgodin.qc.ca/lesi-20XX/lesi-effectue-paiement.php";
-                string formPageUrl = "https://424w.cgodin.qc.ca/lesi-20XX/lesi-effectue-paiement.php";
+                //string formPageUrl = "https://424w.cgodin.qc.ca/lesi-20XX/lesi-effectue-paiement.php";
+
+                string formPageUrl = "http://424w.informatique.cgodin.qc.ca/lesi-20XX/lesi-effectue-paiement.php";
 
                 // Create an instance of HttpClient
 
