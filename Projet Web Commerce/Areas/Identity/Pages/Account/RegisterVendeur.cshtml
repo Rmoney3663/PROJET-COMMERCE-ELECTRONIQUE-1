@@ -11,7 +11,7 @@
 }
 else
 {
-<a asp-area="Identity" asp-page="/Account/Register">Retour</a>
+    <a asp-area="Identity" asp-page="/Account/Register">Retour</a>
 }
 
 <h1>@ViewData["Title"]</h1>
@@ -71,12 +71,12 @@ else
             </div>
 
             <div class="form-floating mb-3">
-                <select asp-for="Input.Tax" class="form-control" aria-required="true">
+                <select asp-for="Input.Taxe" class="form-control" aria-required="true">
                     <option value="True">Oui</option>
                     <option value="False">Non</option>
                 </select>
-                <label asp-for="Input.Tax">Client doit payer taxe?</label>
-                <span asp-validation-for="Input.Tax" class="text-danger"></span>
+                <label asp-for="Input.Taxe">Client doit payer taxe?</label>
+                <span asp-validation-for="Input.Taxe" class="text-danger"></span>
             </div>
 
             <div class="form-floating mb-3">

@@ -97,7 +97,7 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
 
             [Required(ErrorMessage = "Le taxe est requis.")]
             [Display(Name = "Client doit payer taxe?")]
-            public bool Tax { get; set; }
+            public bool Taxe { get; set; }
 
             [Required(ErrorMessage = "La province est requise.")]
             [Display(Name = "Sélectionner la province")]
@@ -153,7 +153,7 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
             Input.SelectedNumberPoids = 0;
 
             Input.SelectedNumberLivraison = 0;
-            Input.Tax = true;
+            Input.Taxe = true;
 
             if (User.IsInRole("Gestionnaire") || User.IsInRole("Vendeur"))
             {
@@ -182,7 +182,7 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
                 var email = Input.Email;
                 var password = Input.Password;
                 var date = DateTime.Now;
-                var taxe = Input.Tax;
+                var taxe = Input.Taxe;
                 var province = Input.SelectedProvince;
                 var ville = Input.Ville;
                 var rue = Input.Rue;

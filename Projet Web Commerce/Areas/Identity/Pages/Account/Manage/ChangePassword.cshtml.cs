@@ -8,11 +8,13 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Projet_Web_Commerce.Areas.Identity.Data;
 using Projet_Web_Commerce.Data;
+using SharpDX;
 
 namespace Projet_Web_Commerce.Areas.Identity.Pages.Account.Manage
 {
@@ -69,7 +71,7 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account.Manage
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
             [Required(ErrorMessage = "Le nouveau mot de passe est requis.")]
-            [StringLength(100, ErrorMessage = "Le {0} doit comporter au moins {2} et au maximum {1} caractères.", MinimumLength = 6)]
+            [StringLength(100, ErrorMessage = "Le nouveau mot de passe doit comporter au moins {2} et au maximum {1} caractères.", MinimumLength = 6)]
             [DataType(DataType.Password)]
             [Display(Name = "Nouveau mot de passe")]
             public string NewPassword { get; set; }
@@ -118,16 +120,30 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account.Manage
 
             if (!changePasswordResult.Succeeded)
             {
-                string verifySpecialChar = @"^.*[^a-zA-Z0-9]+.*";
-                System.Text.RegularExpressions.Match m = Regex.Match(Input.NewPassword, verifySpecialChar);
-                if (!m.Success)
+                //string verifySpecialChar = @"^.*[^a-zA-Z0-9]+.*";
+                //System.Text.RegularExpressions.Match m = Regex.Match(Input.NewPassword, verifySpecialChar);
+                //if (!m.Success)
+                //{
+                //    ModelState.AddModelError(string.Empty, "Le nouveau mot de passe doit contenir au moins un caractère qui n'est pas alphanumérique.");
+                //}
+                //else
+                //{
+                //    ModelState.AddModelError(string.Empty, "Mot de passe invalide");
+                //}
+                foreach (var error in changePasswordResult.Errors)
                 {
-                    ModelState.AddModelError(string.Empty, "Le nouveau mot de passe doit contenir un charactère qui n'est pas alphanuméric.");
+                    if (error.Code == "PasswordRequiresNonAlphanumeric")
+                        ModelState.AddModelError(string.Empty, "Les mots de passe doivent comporter au moins un caractère non alphanumérique.");
+                    else if (error.Code == "PasswordRequiresDigit")
+                        ModelState.AddModelError(string.Empty, "Les mots de passe doivent comporter au moins un chiffre ('0'-'9').");
+                    else if (error.Code == "PasswordRequiresLower")
+                        ModelState.AddModelError(string.Empty, "Les mots de passe doivent comporter au moins une minuscule ('a'-'z').");
+                    else if (error.Code == "PasswordRequiresUpper")
+                        ModelState.AddModelError(string.Empty, "Les mots de passe doivent comporter au moins une majuscule ('A'-'Z').");
+                    else
+                        ModelState.AddModelError(string.Empty, error.Description);
                 }
-                else
-                {
-                    ModelState.AddModelError(string.Empty, "Mot de passe invalide");
-                }
+
                 return Page();
             }
             else

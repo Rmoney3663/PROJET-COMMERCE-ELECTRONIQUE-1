@@ -4,41 +4,50 @@
         color: rgb(124, 105, 146);
         border-color: rgb(124, 105, 146);
         accent-color: rgb(249, 229, 71);
+
+        /* color: #495057;
+        background-color: #fff;
+        border-color: #dee2e6 #dee2e6 #fff; */
     }
 
     .newMsg {
         border-color: rgb();
     }
+
+    .nav-link:hover {
+        color: rgb(249, 229, 71);
+        background-color: rgb(124, 105, 146);
+        cursor: pointer;
+    }
 </style>
 
-
-<ul class="nav nav-tabs">
+<ul class="nav nav-tabs" style="border-bottom:0; ">
     <li class="nav-item">
-        <a class="nav-link @(Model == "BoiteDeReception" ? "active" : "pasActif")"
+        <a class="nav-link @(Model == "BoiteDeReception" ? "active" : "pasActif")" style="@(Model == "BoiteDeReception" ? "border-bottom-color:white;" : "border-color:rgb(124, 105, 146); ")"
            asp-area="" asp-controller="Messagerie" asp-action="BoiteDeReception">
             Boîte de réception
         </a>
     </li>
     <li class="nav-item">
-        <a class="nav-link @(Model == "Envoyes" ? "active" : "pasActif")"
+        <a class="nav-link @(Model == "Envoyes" ? "active" : "pasActif")" style="@(Model == "Envoyes" ? "border-bottom-color:white;" : "border-color:rgb(124, 105, 146); ")"
            asp-area="" asp-controller="Messagerie" asp-action="Envoyes">
             Envoyés
         </a>
     </li>
     <li class="nav-item">
-        <a class="nav-link @(Model == "Brouillons" ? "active" : "pasActif")"
+        <a class="nav-link @(Model == "Brouillons" ? "active" : "pasActif")" style="@(Model == "Brouillons" ? "border-bottom-color:white;" : "border-color:rgb(124, 105, 146); ")"
            asp-area="" asp-controller="Messagerie" asp-action="Brouillons">
             Brouillons
         </a>
     </li>
     <li class="nav-item">
-        <a class="nav-link @(Model == "Supprimes" ? "active" : "pasActif")"
+        <a class="nav-link @(Model == "Supprimes" ? "active" : "pasActif")" style="@(Model == "Supprimes" ? "border-bottom-color:white;" : "border-color:rgb(124, 105, 146); ")"
            asp-area="" asp-controller="Messagerie" asp-action="Supprimes">
             Supprimés
         </a>
     </li>
     <li class="nav-item ms-auto">
-        <a class="nav-link border-bottom-0 border-3 @(Model == "EnvoyerMessage" ? "active" : "pasActif")" style="border-color: rgb(124, 105, 146)"
+        <a class="nav-link border-1 @(Model == "EnvoyerMessage" ? "active border-bottom-0" : "pasActif")" style="border-color: rgb(124, 105, 146)"
            asp-area="" asp-controller="Messagerie" asp-action="EnvoyerMessage">
             <img src="~/data/images/pen.svg" />
         </a>
@@ -64,7 +73,6 @@
     </div>
 </div> *@
 
-<!-- Bootstrap JS and jQuery (optional, depending on your needs) -->
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>

@@ -7,12 +7,11 @@
 @using System.IO
 @inject IWebHostEnvironment env
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Liste des paniers";
     var user = await _userManager.GetUserAsync(User);
     }
     @if (!SignInManager.IsSignedIn(User) || User.IsInRole("Client"))
     {
-        Console.WriteLine("yes");
         <text>
             <script>
                 debugger;
@@ -26,7 +25,6 @@
 
     @if (vendeur == null)
     {
-        Console.WriteLine("among us");
         <div>
             <p>Vous n'avez pas accès à cette page.</p>
             <a href="/PPProduits/ErrorProduit">Retourner à la catalogue</a>
@@ -102,8 +100,8 @@
         Console.WriteLine("CLIENT Distint : " + distinctClientsCount);
 
 
-        <h1>Liste de panier</h1>
-        <h3>Vous avez @distinctClientsCount Client</h3>
+        <h1>Liste des paniers</h1>
+        <h3>Vous avez @distinctClientsCount client(s)</h3>
 
         <div class="d-flex flex-wrap align-content-start bg-light overflow-auto" style="margin-bottom:50px; height:600px;">
             @foreach (var clientGroup in clientProducts.GroupBy(p => p.NoClient))
@@ -113,13 +111,13 @@
                 <div class="card" style="width:400px; margin: 10px;">
                     <div class="card-body">
                         <p class="card-text">
-                            <b>Adresse de courriel :</b>
+                            <b>Adresse courriel :</b>
                             @Html.DisplayFor(modelItem => client.AdresseEmail)
                         </p>
                         @if (!string.IsNullOrEmpty(client.Prenom))
                         {
                             <p class="card-text">
-                                <b>Prenom :</b>
+                                <b>Prénom :</b>
                                 @Html.DisplayFor(modelItem => client.Prenom)
                             </p>
                         }
@@ -141,12 +139,12 @@
                             @{
                                 var oldestProductDate = oldestProductDatesPerClient.FirstOrDefault(c => c.NoClient == client.NoClient)?.OldestProductDate;
                             }
-                            <b>Date de creation :</b>
+                            <b>Date de création :</b>
                             @Html.DisplayFor(modelItem => oldestProductDate)
                         </p>
                         <div>
                             <div>
-                                <a class="btn btn-success" asp-action="DetailsPanier" asp-route-id="@client.NoClient">Details</a>
+                                <a class="btn btn-success" asp-action="DetailsPanier" asp-route-id="@client.NoClient">Détails</a>
                                 @{
                                     if (oldestProductDate != null && oldestProductDate < DateTime.Now.AddMonths(-6))
                                     {

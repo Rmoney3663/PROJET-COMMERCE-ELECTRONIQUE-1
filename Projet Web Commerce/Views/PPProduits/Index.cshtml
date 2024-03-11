@@ -63,7 +63,7 @@
         var sortedModel = _context.PPProduits.Where(p => p.NoVendeur == vendeur.NoVendeur).ToList();
 
         <div class="col-md-4 d-flex align-items-start" style="gap:10px">
-            <h1 style="color:@text;font-family:@font">Liste de produits</h1>
+            <h1 style="color:@text; font-family:@font; ">Liste des produits</h1>
 
             @if (logo != "none")
             {
@@ -72,7 +72,7 @@
             </div>
 
         <p>
-            <a asp-action="Create">Ajouter Nouveau</a>
+            <a class="btn btn-primary" asp-action="Create">Ajouter un nouveau produit</a>
         </p>
         <div class="d-flex flex-wrap align-content-start" style="margin-bottom:50px;background-color:@background;font-family:@font">
             @foreach (var item in sortedModel)
