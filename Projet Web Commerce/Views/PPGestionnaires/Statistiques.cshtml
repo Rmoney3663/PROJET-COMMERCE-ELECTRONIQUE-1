@@ -273,12 +273,9 @@
         }
 
         var vendeursList = @Html.Raw(vendeursListJson);
-        console.log("Vendeurs List:", vendeursList);
         var clientsList = @Html.Raw(clientsListJson);
-        console.log("Clients List:", clientsList);
      
         var ordersByClientAndVendeurData = @Html.Raw(ordersByClientAndVendeurDataJson);
-        console.log("Order By Client Vendeur List:", ordersByClientAndVendeurData);
 
         var currentDate = new Date();
         var currentYearMonth = currentDate.toISOString().slice(0, 7);
@@ -324,8 +321,6 @@
             var startDateInput = document.getElementById("startDateV").value;
             var endDateInput = document.getElementById("endDateV").value;
 
-            console.log("Start Date Input:", startDateInput);
-            console.log("End Date Input:", endDateInput);
 
             if (!startDateInput || !endDateInput) {
                 document.getElementById("reportV").innerHTML = "Veuillez sélectionner les dates de début et de fin.";
@@ -362,8 +357,6 @@
             var startDateInput = document.getElementById("startDateC").value;
             var endDateInput = document.getElementById("endDateC").value;
 
-            console.log("Start Date Input:", startDateInput);
-            console.log("End Date Input:", endDateInput);
 
             if (!startDateInput || !endDateInput) {
                 document.getElementById("reportC").innerHTML = "Veuillez sélectionner les dates de début et de fin.";
@@ -444,13 +437,11 @@
         //------------------------------------------------------------------
        
         var visitesCountData = @Html.Raw(visitesCountDataJson);
-        console.log("VendeursClient List:", visitesCountData);
         function displayVisitesCount(visitesCountData) {
             var htmlContent = "<b>Nombre de visites d’un client pour un vendeur : </b><br>";
 
             for (var i = 0; i < visitesCountData.length; i++) {
                 var visite = visitesCountData[i];
-                console.log("VendeursClient :", visite)
             }
            
             
@@ -478,7 +469,6 @@
 
         var orderPercentages = @Html.Raw(Json.Serialize(Model.OrderPercentages));
 
-        console.log("orderPercentages List:", orderPercentages);
 
         var totalOrders = 0;
         for (var i = 0; i < orderPercentages.length; i++) {
@@ -490,8 +480,6 @@
             document.getElementById('errorChart').style.display = 'none';
             var labels = orderPercentages.map(op => op.vendeurName);
             var data = orderPercentages.map(op => op.percentage);
-            console.log("orderPercentages Label:", labels);
-            console.log("orderPercentages Data:", data);
             var backgroundColors = [];
             for (var i = 0; i < orderPercentages.length; i++) {
                 backgroundColors.push(generateRandomColor());
@@ -520,7 +508,6 @@
                                 var value = data.datasets[0].data[tooltipItem.index] || 0;
                                 var percentage = ((value / totalOrders) * 100).toFixed(2) + ' %';
                                 var info = label + ': ' + percentage;
-                                console.log("LABEL ", info)
                                 return info;
                             }
                         }
@@ -528,7 +515,6 @@
                 }
             });
         } else {
-            console.log("Aucune donnée n'est disponible pour afficher le graphique.");
             var messageElement = document.createElement('h6');
             messageElement.textContent = "Il n'y a aucun produit vendu.";
             messageElement.classList.add('text-danger');
@@ -541,7 +527,6 @@
 
         var labels = @Html.Raw(Json.Serialize(Model.Labels));
         var data = @Html.Raw(Json.Serialize(Model.Data));
-        console.log("Labels : ", labels);
         if (Array.isArray(labels) && labels.length > 0 && Array.isArray(data) && data.length > 0) {
             document.getElementById('salesChart').style.display = 'block';
             document.getElementById('errorBar').style.display = 'none';
@@ -579,7 +564,6 @@
                                 var value = data.datasets[0].data[tooltipItem.index] || 0;
                                 var percentage = ((value / totalOrders) * 100).toFixed(2) + ' $';
                                 var info = label + ': ' + percentage;
-                                console.log("LABEL ", info)
                                 return info;
                             }
                         }
@@ -588,7 +572,6 @@
             });
         }
         else {
-            console.log("Aucune donnée n'est disponible pour afficher le graphique.");
             var messageElement = document.createElement('h6');
             messageElement.textContent = "Il n'y a aucune vente pour les 12 derniers mois.";
             messageElement.classList.add('text-danger');

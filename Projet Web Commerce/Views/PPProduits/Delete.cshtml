@@ -7,12 +7,10 @@
 @{
     ViewData["Title"] = "Supprimer";
     var user = await _userManager.GetUserAsync(User);
-    Console.WriteLine("NoProduit : " + Model.NoProduit);
 }
 
 @if (!SignInManager.IsSignedIn(User) || User.IsInRole("Client"))
 {
-    Console.WriteLine("yes");
     <text>
         <script>
             debugger;
@@ -36,8 +34,6 @@ else
                 var nomImage = Model.Photo != null ? Model.Photo : "DefaultImage.png";
                 var path = System.IO.Path.Combine(env.WebRootPath, "data/images", nomImage);
                 string imagePath = Model.Photo != null && File.Exists(path) ? $"~/data/images/{Model.Photo}" : "~/data/images/DefaultImage.png";
-                Console.WriteLine("FILE Name : " + Model.Photo);
-                Console.WriteLine("FILE : " + File.Exists(path));
                 
             }
 
