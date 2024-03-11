@@ -194,13 +194,19 @@ namespace Projet_Web_Commerce.Controllers
             // CALCUL DES TAXES
             decimal taxes = 0;
 
+            var test = _context.PPTaxeFederale;
+
             var tvq = _context.PPTaxeProvinciale
-                    .Where(t => t.DateEffectiveTVQ > DateTime.Now)
-                    .Select(t => t.TauxTVQ).FirstOrDefault();
+                            .Where(t => DateTime.Now > t.DateEffectiveTVQ)
+                            .OrderByDescending(t => t.DateEffectiveTVQ) // specify the key to order by
+                            .Select(t => t.TauxTVQ)
+                            .FirstOrDefault();
 
             var tps = _context.PPTaxeFederale
-                .Where(t => t.DateEffectiveTPS > DateTime.Now)
-                .Select(t => t.TauxTPS).FirstOrDefault();
+                            .Where(t => DateTime.Now > t.DateEffectiveTPS)
+                            .OrderByDescending(t => t.DateEffectiveTPS) // specify the key to order by
+                            .Select(t => t.TauxTPS)
+                            .FirstOrDefault();
 
 
 
@@ -589,12 +595,18 @@ namespace Projet_Web_Commerce.Controllers
                     ModelState.AddModelError("RueClient", "La rue est requise.");
                 }
 
-                // Validate Tel1
-                if (string.IsNullOrEmpty(model.TelClient) || !Regex.IsMatch(model.TelClient, "^(\\+\\d{1,2}\\s)?\\(?\\d{3}\\)?[\\s.-]\\d{3}[\\s.-]\\d{4}$"))
+                if (string.IsNullOrEmpty(model.TelClient))
                 {
                     errors.Add("Le numéro de téléphone est requis.");
-                    ModelState.AddModelError("TelClient", "Le téléphone est requis.");
+                    ModelState.AddModelError("TelClient", "Le numéro de téléphone est requis.");
                 }
+                else if (!Regex.IsMatch(model.TelClient, "^(\\+\\d{1,2}\\s)?\\(?\\d{3}\\)?[\\s.-]\\d{3}[\\s.-]\\d{4}$"))
+                {
+                    errors.Add("Le numéro de téléphone est requis.");
+                    ModelState.AddModelError("TelClient", "Le numéro de téléphone doit être dans le format 999-999-9999.");
+                }
+
+
 
                 // Validate NoProvince
                 if (string.IsNullOrEmpty(model.ProvinceCLient))
@@ -611,7 +623,12 @@ namespace Projet_Web_Commerce.Controllers
                 }
 
                 // Validate CodePostal format
-                if (string.IsNullOrEmpty(model.PostalClient) || !Regex.IsMatch(model.PostalClient, "^([A-Za-z]\\d[A-Za-z] \\d[A-Za-z]\\d)|([A-Za-z]\\d[A-Za-z]\\d[A-Za-z]\\d)$"))
+                if (string.IsNullOrEmpty(model.PostalClient))
+                {
+                    errors.Add("Le code postal doit être dans le format A1A1A1 ou A1A 1A1.");
+                    ModelState.AddModelError("PostalClient", "Le code postal est requis.");
+                }
+                else if (!Regex.IsMatch(model.PostalClient, "^([A-Za-z]\\d[A-Za-z] \\d[A-Za-z]\\d)|([A-Za-z]\\d[A-Za-z]\\d[A-Za-z]\\d)$"))
                 {
                     errors.Add("Le code postal doit être dans le format A1A1A1 ou A1A 1A1.");
                     ModelState.AddModelError("PostalClient", "Le code postal doit être dans le format A1A1A1 ou A1A 1A1.");
@@ -628,16 +645,18 @@ namespace Projet_Web_Commerce.Controllers
                     errors.Add("Le code postal doit être dans le format A1A1A1.");
                     ModelState.AddModelError("dateExpiration", "La date d'expiration doit être dans le format MM-AAAA.");
                 }
-                else if (currentDateTime.Year.ToString() != model.dateExpiration.Substring(model.dateExpiration.Length - 4))
-                {
-                    errors.Add("Le code postal doit être dans le format A1A1A1.");
-                    ModelState.AddModelError("dateExpiration", "La date d'expiration doit être avant l'an 2025");
-                }
-                else if ((int.Parse(model.dateExpiration.Substring(0, 2)) <= currentDateTime.Month))
-                {
-                    errors.Add("Le code postal doit être dans le format A1A1A1.");
-                    ModelState.AddModelError("dateExpiration", "La date d'expiration doit être après la date d'aujourd'hui");
-                }
+
+
+                //else if (currentDateTime.Year.ToString() != model.dateExpiration.Substring(model.dateExpiration.Length - 4))
+                //{
+                //    errors.Add("Le code postal doit être dans le format A1A1A1.");
+                //    ModelState.AddModelError("dateExpiration", "La date d'expiration doit être avant l'an 2025");
+                //}
+                //else if ((int.Parse(model.dateExpiration.Substring(0, 2)) <= currentDateTime.Month))
+                //{
+                //    errors.Add("Le code postal doit être dans le format A1A1A1.");
+                //    ModelState.AddModelError("dateExpiration", "La date d'expiration doit être après la date d'aujourd'hui");
+                //}
 
                     if (string.IsNullOrEmpty(model.NoCarte) || !Regex.IsMatch(model.NoCarte, @"^\d{16}$"))
                 {
@@ -664,8 +683,8 @@ namespace Projet_Web_Commerce.Controllers
                     return RedirectToAction("Index", "Home");
                 }
 
-                string formPageUrl = "http://424w.informatique.cgodin.qc.ca/lesi-20XX/lesi-effectue-paiement.php";
-                //string formPageUrl = "https://424w.cgodin.qc.ca/lesi-20XX/lesi-effectue-paiement.php";
+                //string formPageUrl = "http://424w.informatique.cgodin.qc.ca/lesi-20XX/lesi-effectue-paiement.php";
+                string formPageUrl = "https://424w.cgodin.qc.ca/lesi-20XX/lesi-effectue-paiement.php";
 
                 // Create an instance of HttpClient
 
@@ -698,50 +717,63 @@ namespace Projet_Web_Commerce.Controllers
                 }
 
                 // Send the POST request to submit the form
-                 HttpResponseMessage response = await httpClient.PostAsync(formPageUrl, formData);
+
+                try
+                {
+                    HttpResponseMessage response = await httpClient.PostAsync(formPageUrl, formData);
+
 
                 // Check if the request was successful
-                if (response.IsSuccessStatusCode)
+                    if (response.IsSuccessStatusCode)
+                    {
+                        // Read the HTML content of the response
+                        string htmlContent = await response.Content.ReadAsStringAsync();
+
+                        string scriptToInsert = @"<style>body { display: none; }</style>
+                        <script>
+                            // Find the form element by tag name (assuming it's the first form in the document)
+                            var form = document.getElementById('frmTransmission');
+                            form.submit();
+
+                        </script>";
+
+
+
+                        // Insert the script directly into the HTML content
+                        htmlContent += scriptToInsert;
+
+                        TempData["NoVendeur"] = model.NoVendeur;
+                        TempData["NoClient"] = model.NoClient;
+
+                        TempData["NomClient"] = model.NomClient;
+                        TempData["PrenomClient"] = model.PrenomClient;
+                        TempData["AdresseClient"] = model.AdresseClient;
+                        TempData["TelClient"] = model.TelClient;
+                        TempData["RueClient"] = model.RueClient;
+                        TempData["VilleClient"] = model.VilleClient;
+                        TempData["PostalClient"] = model.PostalClient;
+                        TempData["provClient"] = model.ProvinceCLient;
+
+                        string tempFrais = model.FraisLivraison.ToString();
+                        TempData["fraisLivraison"] = tempFrais;
+
+                        TempData.Keep();
+
+                        return Content(htmlContent, "text/html");
+                    }
+                    else
+                    {
+                        TempData["ErrorMessage"] = "Une erreur inattendue s'est produite.";
+                    }
+                }
+                catch (Exception e)
                 {
-                    // Read the HTML content of the response
-                    string htmlContent = await response.Content.ReadAsStringAsync();
-
-                    string scriptToInsert = @"<style>body { display: none; }</style>
-                    <script>
-                        // Find the form element by tag name (assuming it's the first form in the document)
-                        var form = document.getElementById('frmTransmission');
-                        form.submit();
-
-                    </script>";
-
-
-
-                    // Insert the script directly into the HTML content
-                    htmlContent += scriptToInsert;
-
-                    TempData["NoVendeur"] = model.NoVendeur;
-                    TempData["NoClient"] = model.NoClient;
-
-                    TempData["NomClient"] = model.NomClient;
-                    TempData["PrenomClient"] = model.PrenomClient;
-                    TempData["AdresseClient"] = model.AdresseClient;
-                    TempData["TelClient"] = model.TelClient;
-                    TempData["RueClient"] = model.RueClient;
-                    TempData["VilleClient"] = model.VilleClient;
-                    TempData["PostalClient"] = model.PostalClient;
-                    TempData["provClient"] = model.ProvinceCLient;
-
-                    string tempFrais = model.FraisLivraison.ToString();
-                    TempData["fraisLivraison"] = tempFrais;
-
-                    TempData.Keep();
-
-                    return Content(htmlContent, "text/html");
+                    TempData["ErrorMessage"] = "Une erreur inattendue s'est produite.";
                 }
 
 
 
-                    return View(model);
+                return View(model);
             }
 
             return View(model);
