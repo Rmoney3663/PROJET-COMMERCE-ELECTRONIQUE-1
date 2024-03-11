@@ -173,12 +173,24 @@
             const formattedDate = currentDate.getDate() + '/' + (currentDate.getMonth() + 1) + '/' + currentDate.getFullYear();
             const rapportText = "Rapport créé: " + formattedDate;
             doc.text(rapportText, 10, 10);
-            doc.text("Rapport sur le nombre de vendeurs créer entre les mois sélectionnées", 10, 20);
+            doc.text("Rapport sur le nombre de vendeurs créés entre les mois sélectionnées", 10, 20);
             doc.text("Date de début: " + startDate, 10, 30);
             doc.text("Date de fin: " + endDate, 80, 30);
-            doc.text(lines, 10, 40);
+
+            let yPosition = 40;
+
+            lines.forEach(line => {
+                if (yPosition > 280) { 
+                    doc.addPage(); 
+                    yPosition = 10; 
+                }
+                doc.text(line, 10, yPosition); 
+                yPosition += 10; 
+            });
+
             doc.save("vendeurs_info.pdf");
         }
+
 
         function generatePDFC() {
             const doc = new jsPDF();
@@ -194,7 +206,16 @@
             doc.text("Rapport sur le nombre de connexions des clients entre les dates sélectionnées", 10, 20);
             doc.text("Date de début: " + startDate, 10, 30);
             doc.text("Date de fin: " + endDate, 80, 30);
-            doc.text(lines, 10, 40);
+            let yPosition = 40;
+
+            lines.forEach(line => {
+                if (yPosition > 280) {
+                    doc.addPage();
+                    yPosition = 10;
+                }
+                doc.text(line, 10, yPosition);
+                yPosition += 10;
+            });
             doc.save("client_info.pdf");
         }
 

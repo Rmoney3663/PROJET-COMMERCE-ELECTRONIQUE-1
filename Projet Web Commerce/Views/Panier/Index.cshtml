@@ -68,7 +68,11 @@
                                             @if (vendeur != null)
                                             {
                                                 <h1 class="fw-bold mb-0 text-black">
-                                                    Panier associé à <a asp-controller="MainMenu" asp-route-nomAffaire="@vendeur.NomAffaires" asp-action="CatalogueVendeur">@vendeur.NomAffaires</a>
+                                                    <form id="myForm" method="post" action="@Url.Action("CatalogueVendeur", "MainMenu")">
+                                                        <input type="hidden" name="nomAffaire" value="@vendeur.NomAffaires" />
+                                                        Panier associé à 
+                                                        <button type="submit" class="styled-link">@vendeur.NomAffaires</button>
+                                                    </form>
                                                 </h1>
                                             }
                                             <h6 class="mb-0 text-muted">@Html.DisplayFor(modelItem => nbTotal) Items</h6>
@@ -294,17 +298,19 @@
 
                                             @if (totalPoids < vendeur.PoidsMaxLivraison && enStock == true)
                                             {
-                                                <form asp-controller="Commande" id="formAjoutPanier" asp-action="ConfirmerCommande" method="post">
+                                                if (totalPrice >= 5)
+                                                {
+                                                    <form asp-controller="Commande" id="formAjoutPanier" asp-action="ConfirmerCommande" method="post">
 
-                                                    <input type="hidden" name="NoVendeur" value="@vendeur.NoVendeur" />
-                                                    <input type="hidden" name="NoClient" value="@client.NoClient" />
+                                                        <input type="hidden" name="NoVendeur" value="@vendeur.NoVendeur" />
+                                                        <input type="hidden" name="NoClient" value="@client.NoClient" />
 
-                                                    <button type="submit" class="btn btn-dark btn-lg" data-mdb-ripple-color="dark">
-                                                        Passer à la commande
-                                                    </button>
-                                                </form>
-
-
+                                                        <button type="submit" class="btn btn-dark btn-lg" data-mdb-ripple-color="dark">
+                                                            Passer à la commande
+                                                        </button>
+                                                    </form>
+                                                }
+                                                
                                             }
                                             else if (enStock == false)
                                             {
@@ -380,4 +386,20 @@
         padding: 0;
     }
 
+    .styled-link {
+        border: none;
+        background-color: transparent;
+        color: rgb(124, 105, 146);
+        text-decoration: underline;
+        cursor: pointer;
+        padding: 0;
+        margin: 0;
+        font: inherit;
+        text-decoration: none;
+    }
+
+        .styled-link:hover {
+            outline: none;
+            color: rgb(184, 165, 206);
+        }
 </style>
