@@ -1,11 +1,12 @@
 ﻿@model Projet_Web_Commerce.Models.PPCategories
-
+@{
+    ViewData["Title"] = "Supprimer";
+}
 
 <body>
 
 <div>
-        <h2>Supprimer un Categorie</h2>
-        <h4>Êtes-vous sûr de vouloir le supprimer ?</h4>
+        <h2>Supprimer une catégorie</h2>
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">
@@ -15,7 +16,7 @@
             @Html.DisplayFor(model => model.Description)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Details)
+            Détails
         </dt>
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.Details)
@@ -24,10 +25,10 @@
     
     <form asp-action="Delete">
             <input type="hidden" asp-for="NoCategorie" name="Id" />
-            <button type="submit" class="btn btn-danger" onclick="return confirm('Confirmer Suppression')">
+            <button type="submit" class="btn btn-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette catégorie ?')">
                 Supprimer
             </button> |
-            <a asp-action="Index">Retour à la liste</a>
+            <a asp-action="Index" class="btn btn-success">Retour à la liste</a>
     </form>
 </div>
 </body>

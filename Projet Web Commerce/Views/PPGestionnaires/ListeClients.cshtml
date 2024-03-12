@@ -56,8 +56,8 @@
                                         <th scope="col">Date de dernière connexion</th>
                                         <th scope="col">Date de dernière visite</th>
                                         <th scope="col">Vendeur</th>
-                                        <th scope="col">Supprimer Panier</th>
-                                        <th scope="col">Supprimer Client</th>
+                                        <th scope="col">Supprimer panier</th>
+                                        <th scope="col">Supprimer client</th>
                                         <th scope="col"></th>
                                     </tr>
                                 </thead>
@@ -111,11 +111,11 @@
                                                     {
                                                         if (vendeur.Nom != null && vendeur.Prenom != null)
                                                         {
-                                                            <p>@produit.Nom par @vendeur.Prenom @vendeur.Nom crée le @panier.DateCreation</p>
+                                                            <p>@produit.Nom par @vendeur.Prenom @vendeur.Nom créé le @panier.DateCreation</p>
                                                         }
                                                         else if (vendeur.AdresseEmail != null)
                                                         {
-                                                            <p>@produit.Nom par @vendeur.AdresseEmail crée le @panier.DateCreation</p>
+                                                            <p>@produit.Nom par @vendeur.AdresseEmail créé le @panier.DateCreation</p>
                                                         }
                                                     }
                                                     
@@ -138,7 +138,7 @@
                     <p>Il n'y a aucun Client</p>
                 }else{
                     <br />
-                    <a id="enregistrementButton" class="btn btn-danger">Enregistrement des modifications</a>
+                    <a id="enregistrementButton" class="btn btn-danger">Enregistrer les modifications</a>
                 }
                 
             </div>
@@ -179,13 +179,11 @@
             }
         }
 
-        console.log("Panier to delete: ", formData.getAll('panierToDelete'));
-        console.log("Clients to delete: ", formData.getAll('clientsToDelete'));
 
         if (panierCount > 0 || clientCount > 0) {
             Swal.fire({
                 title: 'Enregistrement des modifications',
-                html: 'Nombre de Panier Supprimer : ' + panierCount + '<br>' +
+                html: 'Nombre de paniers à supprimer : ' + panierCount + '<br>' +
                     'Nombre de suppressions de clients : ' + clientCount,
                 icon: 'warning',
                 showDenyButton: true,
@@ -242,7 +240,7 @@
                                 Swal.showValidationMessage(`Request failed: ${error}`);
                             });
                     } else {
-                        Swal.showValidationMessage("Aucun client ou paniers n'a été sélectionné.");
+                        Swal.showValidationMessage("Aucun client ou panier n'a été sélectionné.");
                         return;
                     }
                 }

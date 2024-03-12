@@ -1,4 +1,7 @@
 ﻿@model Projet_Web_Commerce.Models.PPClients
+@{
+    ViewData["Title"] = "Inactif client";
+}
 
 <h2>Confirmation que vous voulez rendre ce compte inactif</h2>
 
@@ -6,6 +9,6 @@
 
 <form asp-action="InactifC" method="post">
     <input type="hidden" name="id" value="@Model.NoClient" />
-    <button type="submit" class="btn btn-danger">Confirmer le chagment</button>
+    <button type="submit" class="btn btn-danger">Confirmer le changement</button>
     <a href="@Url.Action("ListeClients")" class="btn btn-secondary">Annuler</a>
 </form>

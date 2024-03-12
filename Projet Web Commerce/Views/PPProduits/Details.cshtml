@@ -41,50 +41,11 @@
         }
 
         function envoyerCourriel(noProduit, nom) {
-            // You can access event and noProduit here
 
             var sujet = nom + ' - ' + noProduit;
 
             window.location.href = '@Url.Action("EnvoyerMessage", "Messagerie")' + '?emailDest=' + '@emailDest' + '&sujet=' + sujet;
 
-            // Swal.fire({
-            //     title: 'Courriel à envoyer au vendeur',
-            //     html: `<input id="sujet" style="width:550;" class="swal2-input" value="${sujet}" readonly/>
-            //             <textarea id="message" style="resize:none;width:550;height:200;" class="swal2-input" ></textarea>`,
-            //     showCancelButton: true,
-            //     confirmButtonText: 'Envoyer',
-            //     cancelButtonText: 'Annuler',
-            //     showLoaderOnConfirm: true,
-            //     width: '800px',
-            //     allowOutsideClick: () => !Swal.isLoading(),
-            //     preConfirm: () => {
-            //         var url = "/PPProduitsController/ValiderAsync?" + $.param({ noVendeur: @noVendeur, sujet: sujet, message: message })
-            //         return fetch(url)
-            //             .then(response => {
-            //                 if (!response.ok) {
-            //                     throw new Error(response.statusText);
-            //                 }
-            //                 return response.json();
-            //             })
-            //             .then(data => {
-            //                 console.log('Response from ValiderWithNumber:', data);
-            //             })
-            //             .catch(error => {
-            //                 console.error('Error:', error);
-            //                 Swal.showValidationMessage('Validation failed');
-            //             });
-            //     },
-            // }).then((result) => {
-            //     if (result.isConfirmed) {
-            //         Swal.fire({
-            //             title: "Envoyé!",
-            //             text: "Le courriel a été envoyé avec succès",
-            //             icon: "success"
-            //         }).then(() => {
-            //             location.reload();
-            //         });
-            //     }
-            // });
         }
     </script>
 }
@@ -109,7 +70,6 @@
 }
 @if (!SignInManager.IsSignedIn(User) )
 {
-    Console.WriteLine("yes");
     <div class="alert alert-warning" role="alert">
         Vous devez vous connecter avant de pouvoir voir les détails.
     </div>
@@ -135,8 +95,6 @@ else
                 var nomImage = Model.Photo != null ? Model.Photo : "DefaultImage.png";
                 var path = System.IO.Path.Combine(env.WebRootPath, "data/images", nomImage);
                 string imagePath = Model.Photo != null && File.Exists(path) ? $"~/data/images/{Model.Photo}" : "~/data/images/DefaultImage.png";
-                Console.WriteLine("FILE Name : " + Model.Photo);
-                Console.WriteLine("FILE : " + File.Exists(path));
                 PPClients client = null;
             }
 

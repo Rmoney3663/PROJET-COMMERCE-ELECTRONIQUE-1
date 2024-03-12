@@ -254,9 +254,7 @@ namespace Projet_Web_Commerce.Controllers
             pPProduits.DateMAJ = DateTime.Now;
 
 
-            Console.WriteLine("DATE : " + pPProduits.DateVente);
-            Console.WriteLine($"User Id: {user?.Id}, User Name: {user?.UserName}");
-            Console.WriteLine($"Photo: {file.FileName}");
+           
             ModelState.Remove("file");
             ModelState.Remove("Photo");
 
@@ -353,7 +351,6 @@ namespace Projet_Web_Commerce.Controllers
         {
             ModelState.Remove("file");
             ModelState.Remove("Photo");
-            Console.WriteLine("DATE : " + pPProduits.DateVente);
             foreach (var m in ModelState)
             {
                 foreach (var er in m.Value.Errors)
@@ -408,8 +405,6 @@ namespace Projet_Web_Commerce.Controllers
                     _context.Update(pPProduits);
                     await _context.SaveChangesAsync();
 
-                    Console.WriteLine(" pPProduits : " + pPProduits.DateMAJ);
-                    Console.WriteLine(" pPProduits : " + pPProduits.NombreItems);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -468,11 +463,9 @@ namespace Projet_Web_Commerce.Controllers
         {
             try
             {
-                Console.WriteLine("ID : " + id);
                 var pPProduits = await _context.PPProduits.FindAsync(id);
                 if (pPProduits != null)
                 {
-                    Console.WriteLine("Found produit");
 
                     var inPanier = await _context.PPArticlesEnPanier.AnyAsync(a => a.NoProduit == id);
 
@@ -530,11 +523,9 @@ namespace Projet_Web_Commerce.Controllers
         {
             try
             {
-                Console.WriteLine("ID : " + id);
                 var pPProduits = await _context.PPProduits.FindAsync(id);
                 if (pPProduits != null)
                 {
-                    Console.WriteLine("Found produit");
                     var detailsCommandes = await _context.PPDetailsCommandes.FirstOrDefaultAsync(dc => dc.NoProduit == id);
                     
                     var articlesToDelete = _context.PPArticlesEnPanier.Where(a => a.NoProduit == id);
@@ -648,12 +639,10 @@ namespace Projet_Web_Commerce.Controllers
         {
             try
             {
-                Console.WriteLine("NOCLIENT : " + noVendeur + "   NOCLIENT : " + noClient);
                 var pPClient = await _context.PPClients.FindAsync(noClient);
                 var pPVendeur = await _context.PPVendeurs.FindAsync(noVendeur);
                 if (pPClient != null && pPVendeur != null)
                 {
-                    Console.WriteLine("Found produit");
 
                     var articlesToDelete = _context.PPArticlesEnPanier.Where(a => a.NoVendeur == noVendeur && a.NoClient == noClient);
                     _context.PPArticlesEnPanier.RemoveRange(articlesToDelete);
@@ -668,56 +657,6 @@ namespace Projet_Web_Commerce.Controllers
             }
         }
 
-        //[Route("/PPProduitsController/ValiderAsync")]
-        ////[Authorize(Roles = "Gestionnaire")]
-        //public async Task<IActionResult> ValiderAsync(int noVendeur, string sujet, string message)
-        //{
-        //    var vendeurAEnvoyerCourriel = _context.PPVendeurs.FirstOrDefault(v => v.NoVendeur == noVendeur);
-
-        //    var result = new
-        //    {
-        //        Success = false,
-        //        Message = $"Erreur%"
-        //    };
-
-        //    if (vendeurAEnvoyerCourriel != null)
-        //    {
-        //        var user = await _userManager.FindByEmailAsync(vendeurAUpdate.AdresseEmail);
-        //        if (user != null)
-        //        {
-        //            if (infosSupp != null)
-        //                message += "\n\n" + infosSupp;
-        //            await Methodes.envoyerCourriel(sujet, message, vendeurAUpdate.AdresseEmail);
-        //            if (vendeurAccepte)
-        //            {
-        //                vendeurAUpdate.Statut = 1;
-        //                vendeurAUpdate.Pourcentage = pourcentageRedevence;
-        //                _context.Update(vendeurAUpdate);
-        //                await _context.SaveChangesAsync();
-        //            }
-        //            else
-        //            {
-        //                _context.PPVendeurs.Remove(vendeurAUpdate);
-        //                await _userManager.DeleteAsync(user);
-        //            }
-        //            _context.SaveChanges();
-
-        //            var vendeursStatutZero = _context.PPVendeurs
-        //                    .Where(v => v.Statut == 0)
-        //                    .OrderBy(v => v.DateCreation)
-        //                    .ToList();
-
-        //            View(vendeursStatutZero);
-
-        //            result = new
-        //            {
-        //                Success = true,
-        //                Message = $"Courriel envoyé%."
-        //            };
-        //        }
-        //    }
-
-        //    return Json(result);
-        //}
+       
     }
 }
