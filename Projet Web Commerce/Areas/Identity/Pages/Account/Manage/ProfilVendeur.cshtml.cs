@@ -155,6 +155,13 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account.Manage
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
 
+            var compagnieExistante = _context.PPVendeurs.FirstOrDefault(c => c.NomAffaires == Input.NomAffaires);
+
+            if (compagnieExistante != null)
+            {
+                ModelState.AddModelError(string.Empty, "Ce nom d'affaires existe déjà");
+            }
+
             if (!ModelState.IsValid)
             {
                 await LoadAsync(user);

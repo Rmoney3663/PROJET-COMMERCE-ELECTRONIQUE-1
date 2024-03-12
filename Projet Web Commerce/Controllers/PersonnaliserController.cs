@@ -39,15 +39,27 @@ namespace Projet_Web_Commerce.Controllers
                 var files = Directory.GetFiles("wwwroot/data/images", nomFileImage + ".*");
                 if (image != null && image.Length > 0)
                 {
-                    if (files.Length > 0)
-                        System.IO.File.Delete("wwwroot/data/images/" + files[0].Split("\\")[1]);
-
                     string extension = Path.GetExtension(image.FileName);
-                    nomFileImage += extension;
-                    string tempFilePath = Path.Combine("wwwroot/data/images", nomFileImage);
-                    using (Stream fileStream = new FileStream(tempFilePath, FileMode.Create))
+
+                    if (extension == ".jfif" || extension == ".pjpeg" || extension == ".jpeg" || extension == ".pjp" || extension == ".jpg")
                     {
-                        image.CopyTo(fileStream);
+                        if (files.Length > 0)
+                            System.IO.File.Delete("wwwroot/data/images/" + files[0].Split("\\")[1]);
+
+                        nomFileImage += extension;
+                        string tempFilePath = Path.Combine("wwwroot/data/images", nomFileImage);
+                        using (Stream fileStream = new FileStream(tempFilePath, FileMode.Create))
+                        {
+                            image.CopyTo(fileStream);
+                        }
+                    }
+                    else
+                    {
+                        ViewData["erreur"] = "erreur";
+                        if (files.Length > 0)
+                            nomFileImage = files[0].Split("\\")[1];
+                        else
+                            nomFileImage = "none";
                     }
                 }
                 else if (files.Length > 0)
@@ -61,6 +73,11 @@ namespace Projet_Web_Commerce.Controllers
                     backgroundButtonEvaluation + ";" + textButtonEvaluation;
             }
             else{
+                string nomFileImage = vendeur.NoVendeur.ToString();
+                var files = Directory.GetFiles("wwwroot/data/images", nomFileImage + ".*");
+                if (files.Length > 0)
+                    System.IO.File.Delete("wwwroot/data/images/" + files[0].Split("\\")[1]);
+
                 configuration += "#000000;#ECEBF3;#000000;#FFFFFF;#7C6992;#FFFFFF;#7C6992;#F9E547;" +
                     "#808080;#FFFFFF;#FFFFFF;#000000;#FFFFFF;#000000;Arial;none;#808080;#FFFFFF";
             }
