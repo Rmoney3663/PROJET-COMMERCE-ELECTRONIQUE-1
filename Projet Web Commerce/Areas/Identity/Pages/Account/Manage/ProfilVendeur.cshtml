@@ -11,7 +11,7 @@
     var nb = 0;
     var nbEval = 0;
 
-    foreach (var produit in _context.PPProduits.Where(p=>p.NoVendeur == vendeur.NoVendeur))
+    foreach (var produit in _context.PPProduits.Where(p => p.NoVendeur == vendeur.NoVendeur))
     {
         var nbEvalActu = _context.PPEvaluations.Where(e => e.NoProduit == produit.NoProduit).ToList().Count;
         nbEval += nbEvalActu;
@@ -26,7 +26,7 @@
     if (nbEval > 0)
     {
         moyenne = moyenne / nb;
-        moyAffiche = "Votre cote moyenne est " + Math.Round(moyenne, 2).ToString("F2").TrimEnd('0', ',') + " étoiles!";
+        moyAffiche = "Votre cote moyenne est de " + Math.Round(moyenne, 2).ToString("F2").TrimEnd('0', ',') + " étoile(s)!";
     }
     else
     {

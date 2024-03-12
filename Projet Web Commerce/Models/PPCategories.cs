@@ -10,7 +10,7 @@ namespace Projet_Web_Commerce.Models
 
         [Required(ErrorMessage = "Le champ Description est requis.")]
         public string Description { get; set; }
-        [Required(ErrorMessage = "Le champ Details est requis.")]
+        [Required(ErrorMessage = "Le champ Détails est requis.")]
         public string Details { get; set; }
 
         [InverseProperty("PPCategories")]

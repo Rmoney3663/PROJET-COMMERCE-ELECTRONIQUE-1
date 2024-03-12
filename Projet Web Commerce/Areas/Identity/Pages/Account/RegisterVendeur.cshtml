@@ -7,11 +7,11 @@
 }
 @if (SignInManager.IsSignedIn(User))
 {
-    <a asp-area="" asp-controller="MainMenu" asp-action="Catalogue">Retour au catalogue</a>
+    <a class="btn btn-primary" asp-area="" asp-controller="MainMenu" asp-action="Catalogue">Retour au catalogue</a>
 }
 else
 {
-<a asp-area="Identity" asp-page="/Account/Register">Retour</a>
+    <a class="btn btn-primary" asp-area="Identity" asp-page="/Account/Register">Retour</a>
 }
 
 <h1>@ViewData["Title"]</h1>
@@ -23,38 +23,38 @@ else
             <hr />
              <div class="form-floating mb-3">
                 <input asp-for="Input.Prenom" class="form-control" autocomplete="Prénom" aria-required="true" placeholder="Prénom" />
-                <label asp-for="Input.Prenom">Prénom</label>
+                <label asp-for="Input.Prenom">Prénom<span style="color:red;">*</span></label>
                 <span asp-validation-for="Input.Prenom" class="text-danger"></span>
             </div>
             <div class="form-floating mb-3">
                 <input asp-for="Input.Nom" class="form-control" autocomplete="Nom" aria-required="true" placeholder="Nom" />
-                <label asp-for="Input.Nom">Nom</label>
+                <label asp-for="Input.Nom">Nom<span style="color:red;">*</span></label>
                 <span asp-validation-for="Input.Nom" class="text-danger"></span>
             </div>
             <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
             <div class="form-floating mb-3">
                 <input asp-for="Input.NomAffaires" class="form-control" autocomplete="Nom d'affaires" aria-required="true" placeholder="Nom d'affaires" />
-                <label asp-for="Input.NomAffaires">Nom d'affaires</label>
+                <label asp-for="Input.NomAffaires">Nom d'affaires<span style="color:red;">*</span></label>
                 <span asp-validation-for="Input.NomAffaires" class="text-danger"></span>
             </div>
             <div class="form-floating mb-3">
                 <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="courriel@exemple.com" />
-                <label asp-for="Input.Email">Courriel</label>
+                <label asp-for="Input.Email">Courriel<span style="color:red;">*</span></label>
                 <span asp-validation-for="Input.Email" class="text-danger"></span>
             </div>
             <div class="form-floating mb-3">
                 <input asp-for="Input.ConfirmEmail" class="form-control" autocomplete="username" aria-required="true" placeholder="courriel@exemple.com" />
-                <label asp-for="Input.ConfirmEmail">Confirmer le courriel</label>
+                <label asp-for="Input.ConfirmEmail">Confirmer le courriel<span style="color:red;">*</span></label>
                 <span asp-validation-for="Input.ConfirmEmail" class="text-danger"></span>
             </div>
             <div class="form-floating mb-3">
                 <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="Mot de passe" />
-                <label asp-for="Input.Password">Mot de passe</label>
+                <label asp-for="Input.Password">Mot de passe<span style="color:red;">*</span></label>
                 <span asp-validation-for="Input.Password" class="text-danger"></span>
             </div>
             <div class="form-floating mb-3">
                 <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="Mot de passe" />
-                <label asp-for="Input.ConfirmPassword">Confirmer le mot de passe</label>
+                <label asp-for="Input.ConfirmPassword">Confirmer le mot de passe<span style="color:red;">*</span></label>
                 <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
             </div>    
 
@@ -71,12 +71,12 @@ else
             </div>
 
             <div class="form-floating mb-3">
-                <select asp-for="Input.Tax" class="form-control" aria-required="true">
+                <select asp-for="Input.Taxe" class="form-control" aria-required="true">
                     <option value="True">Oui</option>
                     <option value="False">Non</option>
                 </select>
-                <label asp-for="Input.Tax">Client doit payer taxe?</label>
-                <span asp-validation-for="Input.Tax" class="text-danger"></span>
+                <label asp-for="Input.Taxe">Client doit payer taxe?</label>
+                <span asp-validation-for="Input.Taxe" class="text-danger"></span>
             </div>
 
             <div class="form-floating mb-3">
@@ -95,31 +95,31 @@ else
                     <option value="SK">Saskatchewan</option>
                     <option value="YT">Yukon</option>
                 </select>
-                <label asp-for="Input.SelectedProvince">Sélectionner la province</label>
+                <label asp-for="Input.SelectedProvince">Sélectionner la province<span style="color:red;">*</span></label>
                 <span asp-validation-for="Input.SelectedProvince" class="text-danger"></span>
             </div>
 
             <div class="form-floating mb-3">
                 <input asp-for="Input.Ville" class="form-control" autocomplete="Nom d'affaires" aria-required="true" placeholder="Nom de la ville" />
-                <label asp-for="Input.Ville">Nom de la ville</label>
+                <label asp-for="Input.Ville">Nom de la ville<span style="color:red;">*</span></label>
                 <span asp-validation-for="Input.Ville" class="text-danger"></span>
             </div>
 
             <div class="form-floating mb-3">
                 <input asp-for="Input.Rue" class="form-control" autocomplete="Nom de la rue" aria-required="true" placeholder="Nom de la rue" />
-                <label asp-for="Input.Rue">Nom de la rue</label>
+                <label asp-for="Input.Rue">Nom de la rue<span style="color:red;">*</span></label>
                 <span asp-validation-for="Input.Rue" class="text-danger"></span>
             </div>
 
             <div class="form-floating mb-3">
                 <input asp-for="Input.CodePostal" class="form-control" autocomplete="A1A 1A1" aria-required="true" placeholder="A1A 1A1" />
-                <label asp-for="Input.CodePostal">Code postal</label>
+                <label asp-for="Input.CodePostal">Code postal<span style="color:red;">*</span></label>
                 <span asp-validation-for="Input.CodePostal" class="text-danger"></span>
             </div>
 
             <div class="form-floating mb-3">
                 <input asp-for="Input.PhoneNumber1" class="form-control" autocomplete="999-999-9999" aria-required="true" placeholder="999-999-9999" />
-                <label asp-for="Input.PhoneNumber1">Numéro de téléphone 1</label>
+                <label asp-for="Input.PhoneNumber1">Numéro de téléphone 1<span style="color:red;">*</span></label>
                 <span asp-validation-for="Input.PhoneNumber1" class="text-danger"></span>
             </div>
 
@@ -130,6 +130,11 @@ else
             </div>
 
             <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary" style="color: rgb(249, 229, 71); background-color: rgb(124, 105, 146)">S'enregistrer</button>
+
+            <br /><br />
+            <div style="font-size:small;">
+                <span style="color:red;">*</span>Tous les champs contenant une étoile rouge sont obligatoires.
+            </div>
         </form>
     </div>    
 </div>

@@ -5,13 +5,12 @@
 @using System.IO
 @inject IWebHostEnvironment env
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Modifier";
     var user = await _userManager.GetUserAsync(User);    
 }
 
 @if (!SignInManager.IsSignedIn(User) || User.IsInRole("Client"))
 {
-    Console.WriteLine("yes");
     <text>
         <script>
             debugger;
@@ -21,7 +20,7 @@
 }
 else
 {
-    <h1>Modification du Produit</h1>
+    <h1>Modification d'un produit</h1>
 
     <h4>Produit</h4>
     <hr />
@@ -54,8 +53,6 @@ else
                     var nomImage = Model.Photo != null ? Model.Photo : "DefaultImage.png";
                     var path = System.IO.Path.Combine(env.WebRootPath, "data/images", nomImage);
                     string imagePath = Model.Photo != null && File.Exists(path) ? $"~/data/images/{Model.Photo}" : "~/data/images/DefaultImage.png";
-                    Console.WriteLine("FILE Name : " + Model.Photo);
-                    Console.WriteLine("FILE : " + File.Exists(path));
                 }
 
                 <div class="form-group">
@@ -145,13 +142,11 @@ else
 
                 <div class="form-group">
                     <input type="submit" value="Modifier" class="btn btn-primary" />
+                    |
+                    <a class="btn btn-success" asp-action="Index">Retour à la liste</a>
                 </div>
             </form>
         </div>
-    </div>
-
-    <div>
-        <a asp-action="Index">Retour à la liste</a>
     </div>
 
     @section Scripts {
@@ -174,7 +169,6 @@ else
                 var disponibilite = document.getElementById("Disponibilite").value;
 
                 if (disponibilite === "false") {
-                    console.log("FALSE : ", '@Model.NoProduit');
 
                     var result = await fetch('/PPProduits/IsProductInCart?noProduit=@Model.NoProduit');
                     var data = await result.json();

@@ -5,6 +5,10 @@
 @using System.IO
 @inject AuthDbContext _context
 
+@{
+    ViewData["Title"] = "Personnalisation de votre page";
+}
+
 @if (!SignInManager.IsSignedIn(User) || !User.IsInRole("Vendeur"))
 {
     Console.WriteLine("yes");

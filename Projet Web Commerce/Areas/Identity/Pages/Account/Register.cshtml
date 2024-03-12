@@ -14,31 +14,35 @@
             <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
             <div class="form-floating mb-3">
                 <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
-                <label asp-for="Input.Email">Email</label>
+                <label asp-for="Input.Email">Courriel<span style="color:red;">*</span></label>
                 <span asp-validation-for="Input.Email" class="text-danger"></span>
             </div>
             <div class="form-floating mb-3">
                 <input asp-for="Input.ConfirmEmail" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
-                <label asp-for="Input.ConfirmEmail">Confirmer Email</label>
+                <label asp-for="Input.ConfirmEmail">Confirmer le courriel<span style="color:red;">*</span></label>
                 <span asp-validation-for="Input.ConfirmEmail" class="text-danger"></span>
             </div>
             <div class="form-floating mb-3">
                 <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
-                <label asp-for="Input.Password">Mot de passe</label>
+                <label asp-for="Input.Password">Mot de passe<span style="color:red;">*</span></label>
                 <span asp-validation-for="Input.Password" class="text-danger"></span>
             </div>
             <div class="form-floating mb-3">
                 <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
-                <label asp-for="Input.ConfirmPassword">Confirmer mot de passe</label>
+                <label asp-for="Input.ConfirmPassword">Confirmer le mot de passe<span style="color:red;">*</span></label>
                 <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
             </div>
             <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary" style="color: rgb(249, 229, 71); background-color: rgb(124, 105, 146)">S'enregistrer</button>
+            <br /><br />
+            <div style="font-size:small;">
+                <span style="color:red;">*</span>Tous les champs contenant une étoile rouge sont obligatoires.
+            </div>
         </form>
     </div>
     <div class="col-md-6 col-md-offset-2">
         <section>
             <h3>Devenir un vendeur?</h3>
-            <a asp-area="Identity" asp-page="/Account/RegisterVendeur">S'inscrire comme vendeur</a>
+            <a class="btn btn-primary" asp-area="Identity" asp-page="/Account/RegisterVendeur">S'inscrire comme vendeur</a>
         </section>
     </div>
 </div>

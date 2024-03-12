@@ -627,17 +627,18 @@ namespace Projet_Web_Commerce.Controllers
         [HttpGet]
         public async Task<ActionResult> SupprimerBrouillon(int idMessage)
         {
-            var destMsg = _context.PPDestinatairesMessage
+            var destsMsg = _context.PPDestinatairesMessage
                .Where(m => m.NoMessage == idMessage)
-               .FirstOrDefault();
+               .ToList();
 
             var msg = _context.PPMessages
                 .Where(m => m.NoMessage == idMessage)
                 .FirstOrDefault();
 
-            if (destMsg != null)
+            if (destsMsg != null)
             {
-                _context.Remove(destMsg);
+                foreach (var dest in destsMsg)
+                    _context.Remove(dest);
                 await _context.SaveChangesAsync();
             }
 
@@ -647,7 +648,7 @@ namespace Projet_Web_Commerce.Controllers
                 await _context.SaveChangesAsync();
             }
 
-            return RedirectToAction("BoiteDeReception");
+            return RedirectToAction("Brouillons");
         }
 
         [HttpGet]

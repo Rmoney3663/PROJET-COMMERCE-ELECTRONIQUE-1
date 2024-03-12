@@ -20,6 +20,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Org.BouncyCastle.Pqc.Crypto.Lms;
 using Projet_Web_Commerce.Areas.Identity.Data;
 using Projet_Web_Commerce.Data;
 using Projet_Web_Commerce.Models;
@@ -80,13 +81,13 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
             [Required(ErrorMessage = "Le courriel est requis.")]
-            [EmailAddress]
-            [Display(Name = "Email")]
+            [EmailAddress(ErrorMessage = "Le champ {0} n'est pas une adresse courriel valide")]
+            [Display(Name = "Courriel")]
             public string Email { get; set; }
 
             [Required(ErrorMessage = "Veuillez entrer le courriel à nouveau")]
-            [EmailAddress]
-            [Display(Name = "Confirmer Email")]
+            [EmailAddress(ErrorMessage = "Le champ {0} n'est pas une adresse courriel valide")]
+            [Display(Name = "Confirmer le courriel")]
             [Compare("Email", ErrorMessage = "Les courriels ne correspondent pas.")]
             public string ConfirmEmail { get; set; }
 
@@ -95,9 +96,9 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
             [Required(ErrorMessage = "Le mot de passe est requis.")]
-            [StringLength(100, ErrorMessage = "Le {0} doit comporter au moins {2} et au maximum {1} caractères.", MinimumLength = 6)]
+            [StringLength(100, ErrorMessage = "Le mot de passe doit comporter au moins {2} et au maximum {1} caractères.", MinimumLength = 6)]
             [DataType(System.ComponentModel.DataAnnotations.DataType.Password)]
-            [Display(Name = "Password")]
+            [Display(Name = "Mot de passe")]
             public string Password { get; set; }
 
             /// <summary>
@@ -196,7 +197,16 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
                 }
                 foreach (var error in result.Errors)
                 {
-                    ModelState.AddModelError(string.Empty, error.Description);
+                    if (error.Code == "PasswordRequiresNonAlphanumeric")
+                        ModelState.AddModelError(string.Empty, "Les mots de passe doivent comporter au moins un caractère non alphanumérique.");
+                    else if (error.Code == "PasswordRequiresDigit")
+                        ModelState.AddModelError(string.Empty, "Les mots de passe doivent comporter au moins un chiffre ('0'-'9').");
+                    else if (error.Code == "PasswordRequiresLower")
+                        ModelState.AddModelError(string.Empty, "Les mots de passe doivent comporter au moins une minuscule ('a'-'z').");
+                    else if (error.Code == "PasswordRequiresUpper")
+                        ModelState.AddModelError(string.Empty, "Les mots de passe doivent comporter au moins une majuscule ('A'-'Z').");
+                    else
+                        ModelState.AddModelError(string.Empty, error.Description);
                 }
             }
 

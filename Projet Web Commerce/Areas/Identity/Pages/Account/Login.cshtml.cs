@@ -71,8 +71,8 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
-            [Required(ErrorMessage = "Le email est requis.")]
-            [EmailAddress]
+            [Required(ErrorMessage = "Le champ {0} est requis.")]
+            [EmailAddress(ErrorMessage = "Le champ {0} n'est pas une adresse courriel valide")]
             public string Email { get; set; }
 
             /// <summary>
@@ -87,7 +87,7 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
-            [Display(Name = "Se rappelez de moi ?")]
+            [Display(Name = "Se rappeler de moi?")]
             public bool RememberMe { get; set; }
         }
 

@@ -13,7 +13,7 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
 
 @{
-    ViewData["Title"] = "Messagerie";
+    ViewData["Title"] = "Envoyer un message";
 
     var user = await UserManager.GetUserAsync(User);
 
@@ -147,7 +147,7 @@
             <div>
                 @Html.Partial("MenuMessagerie", "EnvoyerMessage")
             </div>
-            <div class="card">
+            <div class="card border-1" style="border-color:rgb(124, 105, 146);">
                 <form id="frmCourriel" method="post" asp-route-envoyeur="@user.Email" enctype="multipart/form-data"><!-- onsubmit="return soumettreForm()" -->
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center">

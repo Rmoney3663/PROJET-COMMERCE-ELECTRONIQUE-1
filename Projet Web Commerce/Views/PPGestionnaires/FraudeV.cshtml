@@ -1,11 +1,14 @@
 ﻿@model Projet_Web_Commerce.Models.PPVendeurs
+@{
+    ViewData["Title"] = "Fraude vendeur";
+}
 
-<h2>Confirmez vous voulez que l'utilisateur confirme à nouveau son compte </h2>
+<h2>Confirmez que vous voulez que l'utilisateur confirme à nouveau son compte </h2>
 
 <p>Compte de @Model.AdresseEmail</p>
 
 <form asp-action="FraudeV" method="post">
     <input type="hidden" name="id" value="@Model.NoVendeur" />
-    <button type="submit" class="btn btn-danger">Confirmer le chagment</button>
+    <button type="submit" class="btn btn-danger">Confirmer le changement</button>
     <a href="@Url.Action("ListeVendeurs")" class="btn btn-secondary">Annuler</a>
 </form>

@@ -8,73 +8,7 @@
 }
 
 <style>
-    .truncate {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-width: 350px;
-    }
 
-    .truncateDest {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-width: 200px;
-    }
-
-    .msg {
-        color: gray;
-    }
-
-    .flotter:hover {
-        background-color: rgb(236, 235, 243);
-        cursor: pointer;
-    }
-
-    .menu-container {
-        display: block;
-        justify-content: space-between;
-        align-items: center;
-        padding-left: 30%;
-    }
-
-    .menu-btn {
-        border: none;
-        cursor: pointer;
-        text-decoration: none;
-        color: black;
-    }
-
-        .menu-btn:after {
-            content: '\2807';
-            font-size: 110%;
-        }
-
-    .menu-list {
-        list-style-type: none;
-        padding: 0;
-        margin: 0;
-        display: none;
-        position: absolute;
-        background-color: #444;
-        border-radius: 5px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-    }
-
-        .menu-list li {
-            padding: 10px;
-        }
-
-            .menu-list li a {
-                text-decoration: none;
-                color: white;
-                display: block;
-            }
-
-                .menu-list li a:hover {
-                    text-decoration: underline;
-                    font-weight: bold;
-                }
 </style>
 
 <div class="row">
@@ -83,7 +17,7 @@
             <div>
                 @Html.Partial("MenuMessagerie", "Envoyes")
             </div>
-            <div class="card">
+            <div class="card" style="border-top:0; border-color: #dee2e6 #dee2e6 #fff; border-radius:0;">
                 <div class="card-body">
                     <h2 class="card-title">@ViewData["Title"]</h2>
                     <hr />
