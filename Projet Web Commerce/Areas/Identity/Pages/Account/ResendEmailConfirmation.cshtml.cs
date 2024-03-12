@@ -46,9 +46,9 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
-            [Required]
-            [EmailAddress]
-            public string Email { get; set; }
+            [Required(ErrorMessage = "Le champ {0} est requis")]
+            [EmailAddress(ErrorMessage = "Le champ {0} n'est pas une adresse courriel valide")]
+            public string Courriel { get; set; }
         }
 
         public void OnGet()
@@ -62,27 +62,35 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
                 return Page();
             }
 
-            var user = await _userManager.FindByEmailAsync(Input.Email);
+            var user = await _userManager.FindByEmailAsync(Input.Courriel);
             if (user == null)
             {
-                ModelState.AddModelError(string.Empty, "Courriel de vérification envoyé. Veuillez vérifier votre courriel.");
+                ModelState.AddModelError(string.Empty, "Cet utilisateur n'existe pas.");
                 return Page();
             }
 
-            var userId = await _userManager.GetUserIdAsync(user);
-            var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-            code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-            var callbackUrl = Url.Page(
-                "/Account/ConfirmEmail",
-                pageHandler: null,
-                values: new { userId = userId, code = code },
-                protocol: Request.Scheme);
-            await _emailSender.SendEmailAsync(
-                Input.Email,
-                "Confirmez votre courriel",
-                $"Veuillez confirmer votre compte en <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>cliquer ici</a>.");
+            if (!user.EmailConfirmed)
+            {
+                var userId = await _userManager.GetUserIdAsync(user);
+                var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+                var callbackUrl = Url.Page(
+                    "/Account/ConfirmEmail",
+                    pageHandler: null,
+                    values: new { userId = userId, code = code },
+                    protocol: Request.Scheme);
+                await Methodes.envoyerCourriel(
+                            "Confirmer votre courriel",
+                            $"Veuillez confirmer votre compte en <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>cliquant ici</a>.",
+                            Input.Courriel);
 
-            ModelState.AddModelError(string.Empty, "Courriel de vérification envoyé. Veuillez vérifier votre courriel.");
+                ModelState.AddModelError(string.Empty, "Courriel de vérification envoyé. Veuillez vérifier votre courriel.");
+            }
+            else
+            {
+                ModelState.AddModelError(string.Empty, "Ce compte a déjà été confirmé.");
+            }
+            
             return Page();
         }
     }

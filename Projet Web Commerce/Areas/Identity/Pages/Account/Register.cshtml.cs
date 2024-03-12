@@ -81,12 +81,12 @@ namespace Projet_Web_Commerce.Areas.Identity.Pages.Account
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
             [Required(ErrorMessage = "Le courriel est requis.")]
-            [EmailAddress]
+            [EmailAddress(ErrorMessage = "Le champ {0} n'est pas une adresse courriel valide")]
             [Display(Name = "Courriel")]
             public string Email { get; set; }
 
             [Required(ErrorMessage = "Veuillez entrer le courriel à nouveau")]
-            [EmailAddress]
+            [EmailAddress(ErrorMessage = "Le champ {0} n'est pas une adresse courriel valide")]
             [Display(Name = "Confirmer le courriel")]
             [Compare("Email", ErrorMessage = "Les courriels ne correspondent pas.")]
             public string ConfirmEmail { get; set; }
