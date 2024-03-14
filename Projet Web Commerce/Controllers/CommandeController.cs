@@ -632,7 +632,12 @@ namespace Projet_Web_Commerce.Controllers
                     errors.Add("Le code postal doit être dans le format A1A1A1.");
                     ModelState.AddModelError("dateExpiration", "La date d'expiration doit être dans le format MM-AAAA.");
                 }
-                else if (Convert.ToInt32(model.dateExpiration.Substring(model.dateExpiration.Length - 4)) > 2027)
+                else if (Convert.ToInt32(model.dateExpiration.Substring(model.dateExpiration.Length - 4)) < currentDateTime.Year)
+                {
+                    errors.Add("Le code postal doit être dans le format A1A1A1.");
+                    ModelState.AddModelError("dateExpiration", "L'année de la date d'expiration est invalide.");
+                }
+                else if (Convert.ToInt32(model.dateExpiration.Substring(model.dateExpiration.Length - 4)) > 2026)
                 {
                     errors.Add("Le code postal doit être dans le format A1A1A1.");
                     ModelState.AddModelError("dateExpiration", "L'année de la date d'expiration est invalide.");
