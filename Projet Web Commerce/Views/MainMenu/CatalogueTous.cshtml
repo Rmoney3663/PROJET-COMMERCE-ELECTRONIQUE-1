@@ -86,7 +86,7 @@
 
                             <div class="flex-grow-1">
                                 <div class="input-group" style="width:400px;">
-                                    <!-- Adjust width and remove margin -->
+                                   
                             @Html.TextBoxFor(model => model.searchString, new { placeholder = "Rechercher par Nom, description ou no de produit", @class = "form-control", @style="background-color:" + backgroundBarre + ";color:" + textBarre })
 
                                     <div class="input-group-append">
@@ -322,12 +322,12 @@
 
 <style>
     .dropdown-menu {
-        max-height: 200px; /* Set maximum height for the dropdown */
-        overflow-y: auto; /* Enable vertical scrolling if needed */
+        max-height: 200px; 
+        overflow-y: auto; 
     }
 
     a:hover {
-        color: #ccc; /* Light gray color on hover */
+        color: #ccc; 
     }
 
     input[type="date"]:before {
@@ -377,7 +377,7 @@
 
 
             $(document).ready(function () {
-                var isContainerVisible = false; // Variable to track visibility state
+                var isContainerVisible = false; 
 
                 $(".show-options-link").click(function () {
                     console.log("Clicked");
@@ -386,10 +386,10 @@
                         height: 'toggle'
                     });
 
-                    // Toggle the boolean variable
+                    
                     isContainerVisible = !isContainerVisible;
 
-                    // Change the text based on current state
+                   
                     var linkText = isContainerVisible ? 'Diminuer' : 'Afficher plus d\'options +';
                     console.log("Link Text: ", linkText);
                     $(this).text(linkText);

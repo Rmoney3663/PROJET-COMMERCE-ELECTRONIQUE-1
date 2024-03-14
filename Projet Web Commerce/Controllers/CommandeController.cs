@@ -98,14 +98,12 @@ namespace Projet_Web_Commerce.Controllers
         {
             if (TempData.ContainsKey("NoVendeur"))
             {
-                // Retrieve the value from TempData and convert it to a string
                 string novendeur = TempData.Peek("NoVendeur").ToString();
                 model.NoVendeur = Convert.ToInt32(novendeur);
             }
 
             if (TempData.ContainsKey("NoClient"))
             {
-                // Retrieve the value from TempData and convert it to a string
                 string noclient = TempData.Peek("NoClient").ToString();
                 model.NoClient = Convert.ToInt32(noclient);
             }
@@ -136,7 +134,7 @@ namespace Projet_Web_Commerce.Controllers
 
             // CALCUL POIDS
             var poidsTotal = articlesEnPanier
-    .Join(_context.PPProduits.Where(produit => produit.Disponibilite), // Filter only available products
+    .Join(_context.PPProduits.Where(produit => produit.Disponibilite),
           article => article.NoProduit,
           produit => produit.NoProduit,
           (article, produit) => article.NbItems * produit.Poids)
@@ -198,13 +196,13 @@ namespace Projet_Web_Commerce.Controllers
 
             var tvq = _context.PPTaxeProvinciale
                             .Where(t => DateTime.Now > t.DateEffectiveTVQ)
-                            .OrderByDescending(t => t.DateEffectiveTVQ) // specify the key to order by
+                            .OrderByDescending(t => t.DateEffectiveTVQ) 
                             .Select(t => t.TauxTVQ)
                             .FirstOrDefault();
 
             var tps = _context.PPTaxeFederale
                             .Where(t => DateTime.Now > t.DateEffectiveTPS)
-                            .OrderByDescending(t => t.DateEffectiveTPS) // specify the key to order by
+                            .OrderByDescending(t => t.DateEffectiveTPS)
                             .Select(t => t.TauxTPS)
                             .FirstOrDefault();
 
@@ -310,7 +308,6 @@ namespace Projet_Web_Commerce.Controllers
 
                                     if (produit == null || produit.Disponibilite == false)
                                     {
-                                        // Handle case where product is not found
                                         continue;
                                     }
 
@@ -335,7 +332,7 @@ namespace Projet_Web_Commerce.Controllers
 
                                     if (produit == null || produit.Disponibilite == false)
                                     {
-                                        // Handle case where product is not found
+                                       
                                         continue;
                                     }
 
@@ -344,7 +341,7 @@ namespace Projet_Web_Commerce.Controllers
                                     if (newQuantity < 0)
                                     {
                                         messageErreur += $"Le produit {produit.Nom} excède le nombre d'items en stock.\n";
-                                        dispo = false; // Set dispo flag to false if any item is out of stock
+                                        dispo = false; 
                                     }
 
                                     produit.NombreItems = newQuantity;
@@ -508,7 +505,7 @@ namespace Projet_Web_Commerce.Controllers
 
 
                                     _context.SaveChanges();
-                                    transaction.Commit(); // Commit the transaction if all operations succeed
+                                    transaction.Commit(); 
                                     TempData.Clear();
                                     return RedirectToAction("CommandeCompleter", new { NoAutorisation = NoAutorisation, DateAutorisation = DateAutorisation, FraisMarchand = FraisMarchand, InfoSuppl = InfoSuppl, NoCommande = ppCommande.NoCommande });
                                 }
@@ -520,7 +517,7 @@ namespace Projet_Web_Commerce.Controllers
                             }
                             catch (Exception ex)
                             {
-                                transaction.Rollback(); // Rollback the transaction if an exception occurs
+                                transaction.Rollback();
                                 TempData.Clear();
 
                                 messageErreur = messageErreur == "" ? "Une erreur s'est produite !" : messageErreur;
@@ -558,37 +555,32 @@ namespace Projet_Web_Commerce.Controllers
             model.client.CodePostal = model.client.CodePostal;
 
 
-            // If there are no errors, proceed with your logic
-            // Your logic here
-
             List<string> errors = new List<string>();
 
-            // Validate client details
             if (payer != null )
             {
 
-                // Validate Nom
+
                 if (string.IsNullOrEmpty(model.NomClient))
                 {
                     errors.Add("Le nom est requis.");
                     ModelState.AddModelError("NomClient", "Le nom est requis.");
                 }
 
-                // Validate Prenom
+
                 if (string.IsNullOrEmpty(model.PrenomClient))
                 {
                     errors.Add("Le prénom est requis.");
                     ModelState.AddModelError("PrenomClient", "Le prénom est requis.");
                 }
 
-                // Validate Email
+
                 if (string.IsNullOrEmpty(model.AdresseClient))
                 {
                     errors.Add("L'adresse email est requise.");
                     ModelState.AddModelError("AdresseClient", "L'adresse courriel est requise.");
                 }
 
-                // Validate Rue
                 if (string.IsNullOrEmpty(model.RueClient))
                 {
                     errors.Add("La rue est requise.");
@@ -607,22 +599,17 @@ namespace Projet_Web_Commerce.Controllers
                 }
 
 
-
-                // Validate NoProvince
                 if (string.IsNullOrEmpty(model.ProvinceCLient))
                 {
                     errors.Add("La province est requise.");
                     ModelState.AddModelError("ProvinceClient", "La province est requise.");
                 }
 
-                // Validate Ville
                 if (string.IsNullOrEmpty(model.VilleClient))
                 {
                     errors.Add("La ville est requise.");
                     ModelState.AddModelError("VilleClient", "La ville est requise.");
                 }
-
-                // Validate CodePostal format
                 if (string.IsNullOrEmpty(model.PostalClient))
                 {
                     errors.Add("Le code postal doit être dans le format A1A1A1 ou A1A 1A1.");
@@ -645,20 +632,18 @@ namespace Projet_Web_Commerce.Controllers
                     errors.Add("Le code postal doit être dans le format A1A1A1.");
                     ModelState.AddModelError("dateExpiration", "La date d'expiration doit être dans le format MM-AAAA.");
                 }
+                else if (Convert.ToInt32(currentDateTime.Year) > Convert.ToInt32(model.dateExpiration.Substring(model.dateExpiration.Length - 4)))
+                {
+                    errors.Add("Le code postal doit être dans le format A1A1A1.");
+                    ModelState.AddModelError("dateExpiration", "L'année de la date d'expiration est invalide.");
+                }
+                else if ((int.Parse(model.dateExpiration.Substring(0, 2)) <= currentDateTime.Month))
+                {
+                    errors.Add("Le code postal doit être dans le format A1A1A1.");
+                    ModelState.AddModelError("dateExpiration", "La date d'expiration doit être après la date d'aujourd'hui");
+                }
 
-
-                //else if (currentDateTime.Year.ToString() != model.dateExpiration.Substring(model.dateExpiration.Length - 4))
-                //{
-                //    errors.Add("Le code postal doit être dans le format A1A1A1.");
-                //    ModelState.AddModelError("dateExpiration", "La date d'expiration doit être avant l'an 2025");
-                //}
-                //else if ((int.Parse(model.dateExpiration.Substring(0, 2)) <= currentDateTime.Month))
-                //{
-                //    errors.Add("Le code postal doit être dans le format A1A1A1.");
-                //    ModelState.AddModelError("dateExpiration", "La date d'expiration doit être après la date d'aujourd'hui");
-                //}
-
-                    if (string.IsNullOrEmpty(model.NoCarte) || !Regex.IsMatch(model.NoCarte, @"^\d{16}$"))
+                if (string.IsNullOrEmpty(model.NoCarte) || !Regex.IsMatch(model.NoCarte, @"^\d{16}$"))
                 {
                     errors.Add("Le code postal doit être dans le format A1A1A1.");
                     ModelState.AddModelError("NoCarte", "Le numéro de carte doit être 16 chiffres.");
@@ -670,7 +655,6 @@ namespace Projet_Web_Commerce.Controllers
 
             if (errors.Any())
             {
-                // If there are errors, return the view with the model and the list of errors
                 ViewBag.Errors = errors;
                 return View(model);
             }
@@ -688,8 +672,6 @@ namespace Projet_Web_Commerce.Controllers
 
                 string formPageUrl = "http://424w.informatique.cgodin.qc.ca/lesi-20XX/lesi-effectue-paiement.php";
 
-                // Create an instance of HttpClient
-
                 var handler = new HttpClientHandler()
                 {
                     ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => true
@@ -698,7 +680,6 @@ namespace Projet_Web_Commerce.Controllers
                 using var httpClient = new HttpClient(handler);
 
                 string prixtotString = model.total.ToString("0.00", System.Globalization.CultureInfo.GetCultureInfo("en-US"));
-                // Prepare form data
                 Dictionary<string, string> formDataDictionary = new Dictionary<string, string>
                 {
                     { "NoVendeur", $"{model.NoVendeur}" },
@@ -709,7 +690,6 @@ namespace Projet_Web_Commerce.Controllers
                     { "NoSecuriteCarteCredit", $"{model.CVV}" },
                     { "NomPageRetour", $"http://424q.cgodin.qc.ca/Commande/ConfirmerCommande"},
                     { "InfoSuppl", "Coucou" }
-                    // Add other form fields as needed
                 };
 
                 var formData = new MultipartFormDataContent();
@@ -724,11 +704,8 @@ namespace Projet_Web_Commerce.Controllers
                 {
                     HttpResponseMessage response = await httpClient.PostAsync(formPageUrl, formData);
 
-
-                // Check if the request was successful
                     if (response.IsSuccessStatusCode)
                     {
-                        // Read the HTML content of the response
                         string htmlContent = await response.Content.ReadAsStringAsync();
 
                         string scriptToInsert = @"<style>body { display: none; }</style>
@@ -740,8 +717,6 @@ namespace Projet_Web_Commerce.Controllers
                         </script>";
 
 
-
-                        // Insert the script directly into the HTML content
                         htmlContent += scriptToInsert;
 
                         TempData["NoVendeur"] = model.NoVendeur;

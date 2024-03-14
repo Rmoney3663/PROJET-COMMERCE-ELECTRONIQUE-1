@@ -107,7 +107,6 @@ namespace Projet_Web_Commerce.Controllers
         [HttpPost]
         public ActionResult Index(int id, int delete, int vendeur, int nb)
         {
-            Console.WriteLine("HELP");
             if (delete == 3)
             {
                 foreach(var article in _context.PPArticlesEnPanier.Where(a=>a.NoVendeur == vendeur && a.NoClient == id).ToList())

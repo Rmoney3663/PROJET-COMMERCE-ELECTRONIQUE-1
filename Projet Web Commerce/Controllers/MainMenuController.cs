@@ -73,7 +73,6 @@ namespace Projet_Web_Commerce.Controllers
         public async Task<IActionResult> CatalogueVendeurAsync(ModelCatalogueVendeur model, int nbPourCon)
         {
 
-            // Action logic
             try {
                 var vendeur = _context.PPVendeurs.Where(v => v.NomAffaires == model.nomAffaire).FirstOrDefault();
 
@@ -149,13 +148,11 @@ namespace Projet_Web_Commerce.Controllers
                                       select p;
                 }
 
-                // First, get the distinct category IDs of the vendeur's products
                 var categoryIds = _context.PPProduits
                     .Where(p => p.NoVendeur == vendeur.NoVendeur)
                     .Select(p => p.NoCategorie)
                     .Distinct();
 
-                // Then, fetch the corresponding category descriptions
                 model.categorieOptions = _context.PPCategories
                     .Where(c => categoryIds.Contains(c.NoCategorie))
                     .Select(c => new SelectListItem
@@ -320,7 +317,6 @@ namespace Projet_Web_Commerce.Controllers
                                       select p;
                 }
 
-                // Then, fetch the corresponding category descriptions
                 model.categorieOptions = _context.PPCategories
                     .Select(c => new SelectListItem
                     {
@@ -429,7 +425,7 @@ namespace Projet_Web_Commerce.Controllers
             .Where(a => a.NoProduit == NoProduit && a.NoClient == NoClient)
             .ToList();
 
-            // Calculate the total quantity of items in the cart for the given product
+
             int quantiteDansPanier = articlesEnPanier.Sum(a => a.NbItems);
 
             Console.WriteLine(model.searchString);
@@ -442,11 +438,11 @@ namespace Projet_Web_Commerce.Controllers
                         var ajoutPanier = new PPArticlesEnPanier
                         {
                             NoPanier = Convert.ToInt64(NoClient.ToString() + NoVendeur.ToString() + NoProduit.ToString()),
-                            NoClient = NoClient, // Provide the NoClient value
-                            NoVendeur = NoVendeur, // Provide the NoVendeur value
-                            NoProduit = NoProduit, // Provide the NoProduit value
-                            DateCreation = DateTime.Now, // Set the creation date
-                            NbItems = quantite // Set the number of items
+                            NoClient = NoClient,
+                            NoVendeur = NoVendeur,
+                            NoProduit = NoProduit, 
+                            DateCreation = DateTime.Now, 
+                            NbItems = quantite 
                         };
 
 

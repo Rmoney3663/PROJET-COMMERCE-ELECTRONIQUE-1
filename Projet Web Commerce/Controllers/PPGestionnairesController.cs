@@ -164,7 +164,6 @@ namespace Projet_Web_Commerce.Controllers
             var lstMoisAnneesDistincts = _context.PPVendeurs
                 .Where(v => v.Statut == 1)
                 .Select(v => new ModelMoisAnnees { Mois = v.DateCreation.Month, Annee = v.DateCreation.Year })
-                //.Select(v => new { Mois = v.DateCreation.Month, Annee = v.DateCreation.Year })
                 .Distinct()
                 .OrderByDescending(item => item.Annee)
                 .ThenByDescending(item => item.Mois)
@@ -1014,7 +1013,6 @@ namespace Projet_Web_Commerce.Controllers
             var lstMoisAnneesDistincts = _context.PPVendeurs
                 .Where(v => v.Statut == 0)
                 .Select(v => new ModelMoisAnnees { Mois = v.DateCreation.Month, Annee = v.DateCreation.Year })
-                //.Select(v => new { Mois = v.DateCreation.Month, Annee = v.DateCreation.Year })
                 .Distinct()
                 .OrderByDescending(item => item.Annee)
                 .ThenByDescending(item => item.Mois)

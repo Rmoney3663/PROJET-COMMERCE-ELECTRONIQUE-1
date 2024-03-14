@@ -10,7 +10,7 @@ namespace Projet_Web_Commerce
     public class Notifications : Hub
     {
         private readonly UserManager<Utilisateur> _userManager;
-        private readonly Dictionary<string, string> _userConnections = new Dictionary<string, string>(); // Mapping of user ID to connection ID
+        private readonly Dictionary<string, string> _userConnections = new Dictionary<string, string>();
 
         public Notifications(UserManager<Utilisateur> userManager)
         {
@@ -40,7 +40,6 @@ namespace Projet_Web_Commerce
 
         public override Task OnDisconnectedAsync(Exception exception)
         {
-            // Remove user from mapping
             var userId = Context.User?.Identity?.Name;
             if (userId != null && _userConnections.ContainsKey(userId))
             {
